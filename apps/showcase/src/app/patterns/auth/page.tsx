@@ -27,7 +27,6 @@ import {
   Sparkles,
   Eye,
   EyeOff,
-  Github,
 } from 'lucide-react';
 import { PageHeader } from '../../../components/page-header';
 

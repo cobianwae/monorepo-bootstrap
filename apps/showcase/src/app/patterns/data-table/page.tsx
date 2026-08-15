@@ -38,7 +38,6 @@ import {
   PaginationLink,
   PaginationPrevious,
   PaginationNext,
-  PaginationEllipsis,
   ToastAction,
   toast,
   Alert,
@@ -47,7 +46,6 @@ import {
 } from '@ds/ui';
 import {
   Search,
-  ArrowUpDown,
   ArrowUp,
   ArrowDown,
   Trash2,

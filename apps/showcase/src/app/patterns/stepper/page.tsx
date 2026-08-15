@@ -20,14 +20,10 @@ import {
   SelectItem,
   Checkbox,
   EmptyState,
-  Alert,
-  AlertTitle,
-  AlertDescription,
   toast,
 } from '@ds/ui';
 import {
   CheckCircle2,
-  AlertCircle,
   Plus,
   Trash2,
   ArrowRight,
