@@ -1,11 +1,26 @@
+export type UserRole = 'admin' | 'editor' | 'viewer';
+export type UserStatus = 'active' | 'inactive' | 'pending';
+
+export const ROLE_LABELS: Record<UserRole, string> = {
+  admin: 'Administrator',
+  editor: 'Content Editor',
+  viewer: 'Read-only Viewer',
+};
+
+export const STATUS_LABELS: Record<UserStatus, string> = {
+  active: 'Active',
+  inactive: 'Inactive',
+  pending: 'Pending Approval',
+};
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'editor' | 'viewer';
+  role: UserRole;
   avatarUrl?: string;
   createdAt: string;
-  status: 'active' | 'inactive' | 'pending';
+  status: UserStatus;
 }
 
 export interface PaginationMeta {
@@ -22,11 +37,20 @@ export interface PaginatedResult<T> {
   meta: PaginationMeta;
 }
 
+export interface ApiErrorDetail {
+  field?: string;
+  message: string;
+}
+
 export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
+  statusCode?: number;
+  error?: string;
+  details?: string[] | ApiErrorDetail[];
   errors?: Record<string, string[]>;
+  timestamp?: string;
 }
 
 export interface MasterDataItem {
@@ -38,4 +62,20 @@ export interface MasterDataItem {
   description?: string;
   updatedAt: string;
   updatedBy: string;
+}
+
+// Type Guards
+export function isUser(obj: unknown): obj is User {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'id' in obj &&
+    'name' in obj &&
+    'email' in obj &&
+    'role' in obj
+  );
+}
+
+export function isApiResponse<T = unknown>(obj: unknown): obj is ApiResponse<T> {
+  return typeof obj === 'object' && obj !== null && 'success' in obj;
 }
