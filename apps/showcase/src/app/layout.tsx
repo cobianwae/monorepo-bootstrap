@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+import { Toaster } from '@ds/ui';
 import { ThemeProvider } from '../components/theme-provider';
 import { ShowcaseSidebar } from '../components/showcase-sidebar';
 import { ShowcaseHeader } from '../components/showcase-header';
@@ -41,6 +42,7 @@ export default function RootLayout({
               </main>
             </div>
           </div>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

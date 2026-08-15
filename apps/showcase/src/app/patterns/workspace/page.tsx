@@ -10,6 +10,7 @@ import {
   BreadcrumbLink,
   BreadcrumbSeparator,
   BreadcrumbPage,
+  toast,
 } from '@ds/ui';
 import {
   FileCode,
@@ -53,6 +54,8 @@ export default function WorkspacePatternPage() {
               size="icon"
               variant="ghost"
               className="h-8 w-8"
+              aria-label={sidebarOpen ? 'Collapse explorer panel' : 'Expand explorer panel'}
+              aria-expanded={sidebarOpen}
               onClick={() => setSidebarOpen(!sidebarOpen)}
             >
               <PanelLeft className="h-4 w-4" />
@@ -76,20 +79,52 @@ export default function WorkspacePatternPage() {
           </div>
 
           {/* Quick Search Trigger */}
-          <div className="hidden sm:flex items-center gap-2 rounded-md border border-input bg-background px-3 py-1 text-xs text-muted-foreground shadow-xs w-64">
+          <button
+            type="button"
+            aria-label="Search files or commands (Shortcut: Cmd+K)"
+            onClick={() =>
+              toast({
+                title: 'Command Palette',
+                description: 'Press Cmd+K or Ctrl+K to trigger global search.',
+                variant: 'info',
+              })
+            }
+            className="hidden sm:flex items-center gap-2 rounded-md border border-input bg-background px-3 py-1 text-xs text-muted-foreground shadow-xs w-64 hover:border-border cursor-pointer transition-colors"
+          >
             <Search className="h-3.5 w-3.5" />
             <span>Search files or commands...</span>
             <kbd className="ml-auto rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono border">
               ⌘K
             </kbd>
-          </div>
+          </button>
 
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" className="gap-1.5 h-8">
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5 h-8"
+              onClick={() =>
+                toast({
+                  variant: 'success',
+                  title: 'Workspace Link Copied',
+                  description: 'Shareable session link copied to clipboard.',
+                })
+              }
+            >
               <Share2 className="h-3.5 w-3.5" />
               Share
             </Button>
-            <Button size="sm" className="gap-1.5 h-8">
+            <Button
+              size="sm"
+              className="gap-1.5 h-8"
+              onClick={() =>
+                toast({
+                  variant: 'success',
+                  title: 'Build Triggered',
+                  description: 'Turborepo task pipeline running for @ds/api...',
+                })
+              }
+            >
               <Play className="h-3.5 w-3.5" />
               Run Build
             </Button>
@@ -116,8 +151,10 @@ export default function WorkspacePatternPage() {
                     return (
                       <li key={file.name}>
                         <button
+                          type="button"
+                          aria-current={isSelected ? 'true' : undefined}
                           onClick={() => setSelectedFile(file.name)}
-                          className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-xs transition-colors ${
+                          className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-xs transition-colors cursor-pointer ${
                             isSelected
                               ? 'bg-primary text-primary-foreground font-medium shadow-xs'
                               : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'

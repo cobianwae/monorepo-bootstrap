@@ -36,6 +36,7 @@ import {
   AlertDescription,
   Skeleton,
   EmptyState,
+  toast,
 } from '@ds/ui';
 import {
   Search,
@@ -167,6 +168,12 @@ export default function MasterDataPatternPage() {
     setFormDesc('');
     setFormError(null);
     setIsDrawerOpen(false);
+
+    toast({
+      variant: 'success',
+      title: 'Master Record Created',
+      description: `Record "${newItem.code}" (${newItem.name}) was registered successfully.`,
+    });
   };
 
   const openAuditLog = (item: MasterDataItem) => {
@@ -204,6 +211,7 @@ export default function MasterDataPatternPage() {
                 size="icon"
                 onClick={simulateLoading}
                 title="Reload data"
+                aria-label="Reload master data records"
                 className="h-9 w-9"
               >
                 <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
@@ -403,6 +411,7 @@ export default function MasterDataPatternPage() {
                           variant="ghost"
                           className="h-8 w-8 text-muted-foreground hover:text-foreground"
                           title="View audit history"
+                          aria-label={`View audit history for ${item.code}`}
                           onClick={() => openAuditLog(item)}
                         >
                           <History className="h-3.5 w-3.5" />
@@ -412,6 +421,14 @@ export default function MasterDataPatternPage() {
                           variant="ghost"
                           className="h-8 w-8 text-muted-foreground hover:text-foreground"
                           title="Edit record"
+                          aria-label={`Edit record ${item.code}`}
+                          onClick={() =>
+                            toast({
+                              title: `Edit Record`,
+                              description: `Opening editing mode for ${item.code}`,
+                              variant: 'info',
+                            })
+                          }
                         >
                           <Edit2 className="h-3.5 w-3.5" />
                         </Button>

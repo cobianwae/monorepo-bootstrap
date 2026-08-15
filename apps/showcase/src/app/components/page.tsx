@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogClose,
   Sheet,
   SheetTrigger,
   SheetContent,
@@ -39,6 +40,10 @@ import {
   Separator,
   EmptyState,
   StatCard,
+  Spinner,
+  RadioGroup,
+  RadioGroupItem,
+  toast,
 } from '@ds/ui';
 import {
   AlertCircle,
@@ -252,8 +257,23 @@ export default function ComponentsPage() {
                     </DialogDescription>
                   </DialogHeader>
                   <DialogFooter>
-                    <Button variant="outline">Cancel</Button>
-                    <Button variant="destructive">Delete Workspace</Button>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DialogClose>
+                    <DialogClose asChild>
+                      <Button
+                        variant="destructive"
+                        onClick={() =>
+                          toast({
+                            variant: 'destructive',
+                            title: 'Workspace Deleted',
+                            description: 'All assets and credentials were permanently revoked.',
+                          })
+                        }
+                      >
+                        Delete Workspace
+                      </Button>
+                    </DialogClose>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
@@ -272,12 +292,12 @@ export default function ComponentsPage() {
                   </SheetHeader>
                   <div className="py-6 space-y-4">
                     <div className="space-y-2">
-                      <Label>Display Name</Label>
-                      <Input defaultValue="Alex Rivers" />
+                      <Label htmlFor="pref-name">Display Name</Label>
+                      <Input id="pref-name" defaultValue="Alex Rivers" />
                     </div>
                     <div className="space-y-2">
-                      <Label>Email</Label>
-                      <Input defaultValue="alex@company.com" disabled />
+                      <Label htmlFor="pref-email">Email</Label>
+                      <Input id="pref-email" defaultValue="alex@company.com" disabled />
                     </div>
                   </div>
                 </SheetContent>
@@ -334,6 +354,44 @@ export default function ComponentsPage() {
           </div>
         </section>
 
+        {/* Radio Group & Spinners Demo */}
+        <section id="inputs-advanced" className="space-y-4 scroll-mt-32">
+          <h2 className="text-lg font-bold text-foreground">Radio Groups & Activity Spinners</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="border-border">
+              <CardContent className="p-6 space-y-4">
+                <p className="text-sm font-medium text-muted-foreground">Radio Group Component</p>
+                <RadioGroup defaultValue="comfortable">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="compact" id="r1" />
+                    <Label htmlFor="r1">Compact Density</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="comfortable" id="r2" />
+                    <Label htmlFor="r2">Comfortable (Default)</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="spacious" id="r3" />
+                    <Label htmlFor="r3">Spacious Density</Label>
+                  </div>
+                </RadioGroup>
+              </CardContent>
+            </Card>
+
+            <Card className="border-border">
+              <CardContent className="p-6 space-y-4">
+                <p className="text-sm font-medium text-muted-foreground">Activity Spinners with ARIA busy</p>
+                <div className="flex items-center gap-6 pt-2">
+                  <Spinner size="sm" variant="primary" label="Small spinner" />
+                  <Spinner size="default" variant="success" label="Default spinner" />
+                  <Spinner size="md" variant="destructive" label="Medium spinner" />
+                  <Spinner size="lg" variant="default" label="Large spinner" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
         {/* Custom Craft Components: Empty State & Stat Card */}
         <section id="composite" className="space-y-4 scroll-mt-32">
           <h2 className="text-lg font-bold text-foreground">High-Craft Composite Components</h2>
@@ -352,6 +410,13 @@ export default function ComponentsPage() {
               title="No Pending Requests"
               description="You have cleared all pending review requests. Great job!"
               actionLabel="Create New Request"
+              onAction={() =>
+                toast({
+                  variant: 'success',
+                  title: 'Request Created',
+                  description: 'New review ticket has been dispatched.',
+                })
+              }
             />
           </div>
         </section>

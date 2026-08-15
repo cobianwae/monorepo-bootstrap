@@ -19,35 +19,43 @@ import {
   SelectContent,
   SelectItem,
   Checkbox,
+  EmptyState,
+  Alert,
+  AlertTitle,
+  AlertDescription,
+  toast,
 } from '@ds/ui';
 import {
   CheckCircle2,
-  Building,
-  CreditCard,
-  Users,
-  Rocket,
-  ArrowRight,
-  ArrowLeft,
+  AlertCircle,
   Plus,
   Trash2,
+  ArrowRight,
+  ArrowLeft,
+  Rocket,
+  RotateCcw,
   Sparkles,
+  Users,
 } from 'lucide-react';
 import { PageHeader } from '../../../components/page-header';
 
 export default function StepperPatternPage() {
   const [currentStep, setCurrentStep] = React.useState(0);
   const [isCompleted, setIsCompleted] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   // Form State
   const [orgName, setOrgName] = React.useState('Acme Innovations');
-  const [subdomain, setSubdomain] = React.useState('acme');
-  const [industry, setIndustry] = React.useState('software');
+  const [orgNameError, setOrgNameError] = React.useState<string | null>(null);
+  const [domain, setDomain] = React.useState('acme-innovations.io');
   const [selectedPlan, setSelectedPlan] = React.useState<'starter' | 'pro' | 'enterprise'>('pro');
-  const [teamMembers, setTeamMembers] = React.useState([
-    { email: 'alex@acme.io', role: 'admin' },
-    { email: 'sarah@acme.io', role: 'editor' },
+  const [teamMembers, setTeamMembers] = React.useState<Array<{ email: string; role: string }>>([
+    { email: 'sarah.connor@acme.io', role: 'admin' },
+    { email: 'john.doe@acme.io', role: 'editor' },
   ]);
   const [newEmail, setNewEmail] = React.useState('');
+  const [newEmailRole, setNewEmailRole] = React.useState('editor');
+  const [emailError, setEmailError] = React.useState<string | null>(null);
   const [agreed, setAgreed] = React.useState(true);
 
   const steps = [
@@ -58,21 +66,62 @@ export default function StepperPatternPage() {
   ];
 
   const handleAddMember = () => {
-    if (newEmail && newEmail.includes('@')) {
-      setTeamMembers([...teamMembers, { email: newEmail, role: 'editor' }]);
-      setNewEmail('');
+    setEmailError(null);
+    if (!newEmail) {
+      setEmailError('Please enter an email address.');
+      return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+      setEmailError('Please provide a valid email format (e.g. name@company.com).');
+      return;
+    }
+    if (teamMembers.some((m) => m.email.toLowerCase() === newEmail.toLowerCase())) {
+      setEmailError('This member has already been added to the invite list.');
+      return;
+    }
+
+    setTeamMembers([...teamMembers, { email: newEmail, role: newEmailRole }]);
+    setNewEmail('');
+    toast({
+      variant: 'info',
+      title: 'Invite Queued',
+      description: `${newEmail} (${newEmailRole}) added to invitation list.`,
+    });
   };
 
   const handleRemoveMember = (idx: number) => {
+    const removed = teamMembers[idx];
     setTeamMembers(teamMembers.filter((_, i) => i !== idx));
+    toast({
+      variant: 'default',
+      title: 'Invite Removed',
+      description: `${removed.email} removed from invitation list.`,
+    });
   };
 
   const handleNext = () => {
+    // Step 1 Validation
+    if (currentStep === 0) {
+      if (!orgName.trim()) {
+        setOrgNameError('Organization name cannot be empty.');
+        return;
+      }
+      setOrgNameError(null);
+    }
+
     if (currentStep < steps.length - 1) {
       setCurrentStep((prev) => prev + 1);
     } else {
-      setIsCompleted(true);
+      setIsSubmitting(true);
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setIsCompleted(true);
+        toast({
+          variant: 'success',
+          title: 'Organization Launched!',
+          description: `Workspace "${orgName}" is live and invitations have been dispatched.`,
+        });
+      }, 1000);
     }
   };
 
@@ -85,6 +134,9 @@ export default function StepperPatternPage() {
   const handleReset = () => {
     setCurrentStep(0);
     setIsCompleted(false);
+    setOrgName('Acme Innovations');
+    setDomain('acme-innovations.io');
+    setSelectedPlan('pro');
   };
 
   return (
@@ -93,272 +145,302 @@ export default function StepperPatternPage() {
         eyebrow="UX Recipe Scenario"
         eyebrowIcon={Sparkles}
         title="Stepper / Multi-Step Wizard"
-        description="Step-by-step onboarding wizard with persistent state, interactive step skipping, field validation, and summary review before final commit."
+        description="Step-by-step onboarding wizard with persistent state, keyboard-accessible step skipping, field validation, and summary review before final commit."
       />
 
       {/* Stepper Header Navigation */}
-      <Card className="border-border p-6 shadow-xs">
+      <div className="mx-auto max-w-4xl px-2">
         <Stepper
           steps={steps}
           currentStep={currentStep}
-          onStepClick={(step) => !isCompleted && setCurrentStep(step)}
+          onStepClick={(stepIdx) => setCurrentStep(stepIdx)}
         />
-      </Card>
+      </div>
 
-      {/* Wizard Step Content Box */}
-      {isCompleted ? (
-        <Card className="border-success/40 bg-success/5 text-center p-8 space-y-4">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success text-success-foreground shadow-md">
-            <Rocket className="h-8 w-8" />
-          </div>
-          <h2 className="text-2xl font-bold text-foreground">Workspace Successfully Deployed!</h2>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            Your organization <strong>{orgName}</strong> is ready at <strong>https://{subdomain}.app.com</strong> with {teamMembers.length} team members invited.
-          </p>
-          <div className="pt-4 flex justify-center gap-3">
-            <Button onClick={handleReset} variant="outline">
-              Restart Wizard Demo
-            </Button>
-            <Button>Go to Workspace</Button>
-          </div>
-        </Card>
-      ) : (
-        <Card className="border-border shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              {currentStep === 0 && <Building className="h-5 w-5 text-primary" />}
-              {currentStep === 1 && <CreditCard className="h-5 w-5 text-primary" />}
-              {currentStep === 2 && <Users className="h-5 w-5 text-primary" />}
-              {currentStep === 3 && <Rocket className="h-5 w-5 text-primary" />}
-              Step {currentStep + 1}: {steps[currentStep].title}
-            </CardTitle>
-            <CardDescription>{steps[currentStep].description}</CardDescription>
-          </CardHeader>
+      {/* Main Wizard Form Card */}
+      <div className="mx-auto max-w-2xl">
+        {isCompleted ? (
+          <Card className="border-border text-center p-8 animate-in zoom-in-95 duration-300">
+            <CardContent className="space-y-6 pt-6">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/15 text-success">
+                <CheckCircle2 className="h-8 w-8" />
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold tracking-tight text-foreground">
+                  Workspace Ready!
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  <strong>{orgName}</strong> has been configured with the <strong>{selectedPlan.toUpperCase()}</strong> tier. {teamMembers.length} invitation emails sent.
+                </p>
+              </div>
 
-          <CardContent className="space-y-6">
-            {/* Step 1: Organization Details */}
-            {currentStep === 0 && (
-              <div className="space-y-4 animate-in fade-in-50">
-                <div className="space-y-2">
-                  <Label htmlFor="orgName">Organization / Company Name</Label>
-                  <Input
-                    id="orgName"
-                    value={orgName}
-                    onChange={(e) => {
-                      setOrgName(e.target.value);
-                      setSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9]/g, ''));
-                    }}
-                    placeholder="Acme Corp"
-                  />
-                </div>
+              <div className="rounded-xl bg-muted/40 p-4 text-left text-xs space-y-1 font-mono">
+                <div>Domain: https://{domain}</div>
+                <div>Admin: sarah.connor@acme.io</div>
+                <div>Status: Provisioned (Active)</div>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="subdomain">Custom Workspace Subdomain</Label>
-                  <div className="flex items-center rounded-md border border-input bg-background px-3 shadow-xs focus-within:ring-2 focus-within:ring-ring">
-                    <span className="text-xs text-muted-foreground">https://</span>
-                    <input
-                      id="subdomain"
-                      value={subdomain}
-                      onChange={(e) => setSubdomain(e.target.value)}
-                      className="w-full bg-transparent px-1 py-2 text-sm focus:outline-none"
+              <div className="flex justify-center gap-3">
+                <Button onClick={handleReset} variant="outline" className="gap-2">
+                  <RotateCcw className="h-4 w-4" />
+                  Restart Demo
+                </Button>
+                <Button className="gap-2">
+                  <Rocket className="h-4 w-4" />
+                  Enter Workspace
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-border shadow-md">
+            <CardHeader>
+              <CardTitle className="text-xl">
+                Step {currentStep + 1}: {steps[currentStep].title}
+              </CardTitle>
+              <CardDescription>{steps[currentStep].description}</CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-6">
+              {/* Step 1: Organization Info */}
+              {currentStep === 0 && (
+                <div className="space-y-4 animate-in fade-in-50">
+                  <div className="space-y-2">
+                    <Label htmlFor="org-name">Organization / Workspace Name</Label>
+                    <Input
+                      id="org-name"
+                      value={orgName}
+                      error={!!orgNameError}
+                      onChange={(e) => {
+                        setOrgName(e.target.value);
+                        if (e.target.value.trim()) setOrgNameError(null);
+                      }}
+                      placeholder="e.g. Acme Corp"
                     />
-                    <span className="text-xs text-muted-foreground">.workspace.io</span>
+                    {orgNameError && (
+                      <p className="text-xs font-medium text-destructive">{orgNameError}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="domain">Custom Workspace Subdomain</Label>
+                    <div className="flex rounded-md shadow-xs">
+                      <Input
+                        id="domain"
+                        value={domain}
+                        onChange={(e) => setDomain(e.target.value)}
+                        className="rounded-r-none"
+                      />
+                      <span className="inline-flex items-center rounded-r-md border border-l-0 border-input bg-muted px-3 text-xs text-muted-foreground">
+                        .workspace.io
+                      </span>
+                    </div>
                   </div>
                 </div>
+              )}
 
-                <div className="space-y-2">
-                  <Label htmlFor="industry">Industry Vertical</Label>
-                  <Select value={industry} onValueChange={setIndustry}>
-                    <SelectTrigger id="industry">
-                      <SelectValue placeholder="Select industry" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="software">Software & SaaS</SelectItem>
-                      <SelectItem value="fintech">Fintech & Banking</SelectItem>
-                      <SelectItem value="healthcare">Healthcare & MedTech</SelectItem>
-                      <SelectItem value="ecommerce">E-Commerce & Retail</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
-
-            {/* Step 2: Plan Selection */}
-            {currentStep === 1 && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in fade-in-50">
-                {(
-                  [
-                    {
-                      id: 'starter',
-                      name: 'Starter',
-                      price: '$29/mo',
-                      features: ['Up to 5 users', '10GB Storage', 'Standard Support'],
-                    },
-                    {
-                      id: 'pro',
-                      name: 'Pro',
-                      price: '$79/mo',
-                      badge: 'Popular',
-                      features: ['Up to 25 users', '100GB Storage', 'Priority 24/7 Support', 'Custom Domains'],
-                    },
-                    {
-                      id: 'enterprise',
-                      name: 'Enterprise',
-                      price: '$249/mo',
-                      features: ['Unlimited users', 'Dedicated cluster', 'SAML SSO & Audit Logs', 'SLA 99.99%'],
-                    },
-                  ] satisfies Array<{
-                    id: 'starter' | 'pro' | 'enterprise';
-                    name: string;
-                    price: string;
-                    badge?: string;
-                    features: string[];
-                  }>
-                ).map((plan) => (
-                  <button
-                    key={plan.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={selectedPlan === plan.id}
-                    onClick={() => setSelectedPlan(plan.id)}
-                    className={`cursor-pointer text-left rounded-xl border-2 p-5 transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                      selectedPlan === plan.id
-                        ? 'border-primary bg-primary/5 shadow-md'
-                        : 'border-border bg-card hover:border-border/80'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-foreground">{plan.name}</h3>
-                      {plan.badge && <Badge variant="default">{plan.badge}</Badge>}
-                    </div>
-                    <div className="mt-2 text-2xl font-bold text-foreground">{plan.price}</div>
-                    <ul className="mt-4 space-y-2 text-xs text-muted-foreground">
-                      {plan.features.map((feat) => (
-                        <li key={feat} className="flex items-center gap-1.5">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-success" />
-                          <span>{feat}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Step 3: Invite Team */}
-            {currentStep === 2 && (
-              <div className="space-y-4 animate-in fade-in-50">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="colleague@company.com"
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleAddMember()}
-                  />
-                  <Button onClick={handleAddMember} className="gap-1.5">
-                    <Plus className="h-4 w-4" />
-                    Add Invite
-                  </Button>
-                </div>
-
-                <div className="rounded-lg border border-border divide-y divide-border">
-                  {teamMembers.map((member, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-3">
-                      <div className="flex items-center gap-2">
-                        <div className="h-7 w-7 rounded-full bg-secondary flex items-center justify-center text-xs font-semibold">
-                          {member.email[0].toUpperCase()}
-                        </div>
-                        <span className="text-sm text-foreground">{member.email}</span>
+              {/* Step 2: Select Plan with Accessible Radio Group */}
+              {currentStep === 1 && (
+                <div
+                  role="radiogroup"
+                  aria-label="Select pricing plan"
+                  className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-in fade-in-50"
+                >
+                  {(
+                    [
+                      {
+                        id: 'starter',
+                        name: 'Starter',
+                        price: '$29/mo',
+                        features: ['Up to 5 members', '10GB Storage', 'Standard Support'],
+                      },
+                      {
+                        id: 'pro',
+                        name: 'Professional',
+                        price: '$79/mo',
+                        badge: 'Recommended',
+                        features: ['Up to 25 members', '100GB Storage', 'Priority Support', 'SSO/SAML'],
+                      },
+                      {
+                        id: 'enterprise',
+                        name: 'Enterprise',
+                        price: '$199/mo',
+                        features: ['Unlimited seats', 'Unlimited Storage', '24/7 Dedicated Support', 'Custom Audit Logs'],
+                      },
+                    ] satisfies Array<{
+                      id: 'starter' | 'pro' | 'enterprise';
+                      name: string;
+                      price: string;
+                      badge?: string;
+                      features: string[];
+                    }>
+                  ).map((plan) => (
+                    <button
+                      key={plan.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={selectedPlan === plan.id}
+                      onClick={() => setSelectedPlan(plan.id)}
+                      className={`cursor-pointer text-left rounded-xl border-2 p-5 transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                        selectedPlan === plan.id
+                          ? 'border-primary bg-primary/5 shadow-md'
+                          : 'border-border bg-card hover:border-border/80'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-foreground">{plan.name}</h3>
+                        {plan.badge && <Badge variant="default">{plan.badge}</Badge>}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="capitalize">
-                          {member.role}
-                        </Badge>
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-7 w-7 text-destructive"
-                          onClick={() => handleRemoveMember(idx)}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </div>
-                    </div>
+                      <div className="mt-2 text-2xl font-bold text-foreground">{plan.price}</div>
+                      <ul className="mt-4 space-y-2 text-xs text-muted-foreground">
+                        {plan.features.map((feat) => (
+                          <li key={feat} className="flex items-center gap-1.5">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+                            <span>{feat}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </button>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Step 4: Review & Launch */}
-            {currentStep === 3 && (
-              <div className="space-y-4 animate-in fade-in-50">
-                <div className="rounded-xl border border-border bg-muted/40 p-5 space-y-3">
-                  <h3 className="font-semibold text-sm text-foreground">Summary of Setup</h3>
-                  <div className="grid grid-cols-2 gap-3 text-xs">
-                    <div>
-                      <span className="text-muted-foreground block">Workspace:</span>
-                      <strong className="text-foreground">{orgName} ({subdomain}.workspace.io)</strong>
+              {/* Step 3: Invite Team */}
+              {currentStep === 2 && (
+                <div className="space-y-4 animate-in fade-in-50">
+                  <div className="space-y-2">
+                    <Label htmlFor="invite-email">Invite Colleagues</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="invite-email"
+                        placeholder="colleague@company.com"
+                        value={newEmail}
+                        error={!!emailError}
+                        onChange={(e) => {
+                          setNewEmail(e.target.value);
+                          if (emailError) setEmailError(null);
+                        }}
+                        onKeyDown={(e) => e.key === 'Enter' && handleAddMember()}
+                      />
+                      <Select value={newEmailRole} onValueChange={setNewEmailRole}>
+                        <SelectTrigger className="w-28" aria-label="Invite role">
+                          <SelectValue placeholder="Role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="editor">Editor</SelectItem>
+                          <SelectItem value="viewer">Viewer</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button onClick={handleAddMember} className="gap-1.5">
+                        <Plus className="h-4 w-4" />
+                        Add
+                      </Button>
                     </div>
-                    <div>
-                      <span className="text-muted-foreground block">Plan:</span>
-                      <strong className="text-foreground uppercase">{selectedPlan}</strong>
+                    {emailError && (
+                      <p className="text-xs font-medium text-destructive">{emailError}</p>
+                    )}
+                  </div>
+
+                  {teamMembers.length === 0 ? (
+                    <EmptyState
+                      icon={Users}
+                      title="No team invites added yet"
+                      description="You can invite colleagues now or add them later from workspace settings."
+                    />
+                  ) : (
+                    <div className="rounded-lg border border-border divide-y divide-border">
+                      {teamMembers.map((member, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-3">
+                          <div className="flex items-center gap-2">
+                            <div className="h-7 w-7 rounded-full bg-secondary flex items-center justify-center text-xs font-semibold">
+                              {member.email[0].toUpperCase()}
+                            </div>
+                            <span className="text-sm text-foreground">{member.email}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="capitalize">
+                              {member.role}
+                            </Badge>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              aria-label={`Remove invitation for ${member.email}`}
+                              className="h-7 w-7 text-destructive hover:text-destructive"
+                              onClick={() => handleRemoveMember(idx)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div>
-                      <span className="text-muted-foreground block">Industry:</span>
-                      <strong className="text-foreground capitalize">{industry}</strong>
+                  )}
+                </div>
+              )}
+
+              {/* Step 4: Review & Confirm */}
+              {currentStep === 3 && (
+                <div className="space-y-4 animate-in fade-in-50">
+                  <div className="rounded-xl border border-border bg-muted/20 p-4 space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Workspace Name:</span>
+                      <span className="font-semibold text-foreground">{orgName}</span>
                     </div>
-                    <div>
-                      <span className="text-muted-foreground block">Invited Members:</span>
-                      <strong className="text-foreground">{teamMembers.length} users</strong>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Subdomain:</span>
+                      <span className="font-mono text-xs">{domain}.workspace.io</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Subscription Tier:</span>
+                      <Badge variant="default" className="capitalize">
+                        {selectedPlan}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Initial Team Size:</span>
+                      <span className="font-semibold text-foreground">{teamMembers.length} seats</span>
                     </div>
                   </div>
+
+                  <div className="flex items-start space-x-2 pt-2">
+                    <Checkbox
+                      id="terms"
+                      checked={agreed}
+                      onCheckedChange={(checked) => setAgreed(checked as boolean)}
+                    />
+                    <Label htmlFor="terms" className="text-xs leading-relaxed cursor-pointer">
+                      I agree to the Master Services Agreement, Data Privacy Addendum, and acceptable use terms.
+                    </Label>
+                  </div>
                 </div>
-
-                <div className="flex items-center space-x-2 pt-2">
-                  <Checkbox
-                    id="agree"
-                    checked={agreed}
-                    onCheckedChange={(val) => setAgreed(Boolean(val))}
-                  />
-                  <Label htmlFor="agree" className="text-xs cursor-pointer">
-                    I agree to the terms of service, SLA guidelines, and automated billing terms.
-                  </Label>
-                </div>
-              </div>
-            )}
-          </CardContent>
-
-          <CardFooter className="flex justify-between border-t border-border pt-4">
-            <Button
-              variant="outline"
-              onClick={handlePrev}
-              disabled={currentStep === 0}
-              className="gap-1.5"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Previous
-            </Button>
-
-            <Button
-              onClick={handleNext}
-              disabled={currentStep === 3 && !agreed}
-              className="gap-1.5"
-            >
-              {currentStep === steps.length - 1 ? (
-                <>
-                  Launch Workspace
-                  <Rocket className="h-4 w-4" />
-                </>
-              ) : (
-                <>
-                  Continue
-                  <ArrowRight className="h-4 w-4" />
-                </>
               )}
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
+            </CardContent>
+
+            <CardFooter className="flex items-center justify-between border-t border-border p-5">
+              <Button
+                variant="outline"
+                onClick={handlePrev}
+                disabled={currentStep === 0 || isSubmitting}
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Previous
+              </Button>
+
+              <Button
+                onClick={handleNext}
+                disabled={currentStep === 3 && !agreed}
+                loading={isSubmitting}
+                className="gap-2"
+              >
+                {currentStep === steps.length - 1 ? 'Launch Workspace' : 'Continue'}
+                {currentStep < steps.length - 1 && <ArrowRight className="h-4 w-4" />}
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
