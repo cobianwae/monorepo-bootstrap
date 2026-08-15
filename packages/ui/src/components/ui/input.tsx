@@ -4,10 +4,41 @@ import { cn } from '../../lib/utils';
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
+  startAdornment?: React.ReactNode;
+  endAdornment?: React.ReactNode;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, error, ...props }, ref) => {
+  ({ className, type, error, startAdornment, endAdornment, ...props }, ref) => {
+    if (startAdornment || endAdornment) {
+      return (
+        <div
+          className={cn(
+            'flex h-9 w-full items-center rounded-md border border-input bg-background px-3 shadow-xs transition-colors focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1',
+            error && 'border-destructive focus-within:ring-destructive',
+            className
+          )}
+        >
+          {startAdornment && (
+            <span className="mr-2 flex items-center text-muted-foreground [&_svg]:size-4">
+              {startAdornment}
+            </span>
+          )}
+          <input
+            type={type}
+            className="flex-1 bg-transparent text-sm placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            ref={ref}
+            {...props}
+          />
+          {endAdornment && (
+            <span className="ml-2 flex items-center text-muted-foreground [&_svg]:size-4">
+              {endAdornment}
+            </span>
+          )}
+        </div>
+      );
+    }
+
     return (
       <input
         type={type}

@@ -24,6 +24,7 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
 
   --radius-xs: 0.125rem;
   --radius-sm: 0.25rem;
@@ -87,6 +88,7 @@
   --border: oklch(0.88 0.01 260);
   --input: oklch(0.88 0.01 260);
   --ring: oklch(0.45 0.18 265);
+  --overlay: oklch(0 0 0 / 0.6);
 
   /* Radii */
   --radius: 0.5rem;
@@ -134,7 +136,7 @@
 
   /* Semantic Feedback */
   --destructive: oklch(0.62 0.22 25);
-  --destructive-foreground: oklch(0.98 0 0);
+  --destructive-foreground: oklch(0.12 0.02 25);
 
   --success: oklch(0.68 0.17 145);
   --success-foreground: oklch(0.12 0.02 145);
@@ -149,6 +151,7 @@
   --border: oklch(0.28 0.015 260);
   --input: oklch(0.28 0.015 260);
   --ring: oklch(0.68 0.17 265);
+  --overlay: oklch(0 0 0 / 0.7);
 
   /* Dark Elevation */
   --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.5);

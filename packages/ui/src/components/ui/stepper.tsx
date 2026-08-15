@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { Check } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -7,65 +8,52 @@ export interface StepItem {
   description?: string;
 }
 
-export interface StepperProps {
+export interface StepperProps extends React.HTMLAttributes<HTMLElement> {
   steps: StepItem[];
   currentStep: number;
   onStepClick?: (stepIndex: number) => void;
   orientation?: 'horizontal' | 'vertical';
-  className?: string;
 }
 
-export function Stepper({
-  steps,
-  currentStep,
-  onStepClick,
-  orientation = 'horizontal',
-  className,
-}: StepperProps) {
-  return (
-    <nav
-      aria-label="Progress"
-      className={cn(
-        orientation === 'horizontal'
-          ? 'w-full flex items-center justify-between'
-          : 'flex flex-col space-y-4',
-        className
-      )}
-    >
-      <ol
+export const Stepper = React.forwardRef<HTMLElement, StepperProps>(
+  (
+    {
+      steps,
+      currentStep,
+      onStepClick,
+      orientation = 'horizontal',
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <nav
+        ref={ref}
+        aria-label="Progress"
         className={cn(
           orientation === 'horizontal'
-            ? 'flex items-center w-full'
-            : 'flex flex-col space-y-4 w-full'
+            ? 'w-full flex items-center justify-between'
+            : 'flex flex-col space-y-4',
+          className
         )}
+        {...props}
       >
-        {steps.map((step, index) => {
-          const isCompleted = index < currentStep;
-          const isCurrent = index === currentStep;
-          const isUpcoming = index > currentStep;
-          const isClickable = Boolean(onStepClick && index <= currentStep);
+        <ol
+          className={cn(
+            orientation === 'horizontal'
+              ? 'flex items-center w-full'
+              : 'flex flex-col space-y-4 w-full'
+          )}
+        >
+          {steps.map((step, index) => {
+            const isCompleted = index < currentStep;
+            const isCurrent = index === currentStep;
+            const isUpcoming = index > currentStep;
+            const isClickable = Boolean(onStepClick && index <= currentStep);
 
-          return (
-            <li
-              key={step.id}
-              className={cn(
-                'relative flex items-center',
-                orientation === 'horizontal'
-                  ? index !== steps.length - 1
-                    ? 'flex-1'
-                    : ''
-                  : ''
-              )}
-            >
-              <div
-                className={cn(
-                  'group flex items-center gap-3',
-                  isClickable && 'cursor-pointer'
-                )}
-                onClick={() => isClickable && onStepClick?.(index)}
-                role={isClickable ? 'button' : undefined}
-                tabIndex={isClickable ? 0 : undefined}
-              >
+            const StepContent = (
+              <>
                 {/* Circle Icon Indicator */}
                 <span
                   className={cn(
@@ -77,6 +65,7 @@ export function Stepper({
                     isUpcoming &&
                       'border-border bg-muted/40 text-muted-foreground'
                   )}
+                  aria-hidden="true"
                 >
                   {isCompleted ? (
                     <Check className="h-4 w-4 stroke-[3]" />
@@ -87,6 +76,10 @@ export function Stepper({
 
                 {/* Title and Description */}
                 <div className="flex flex-col text-left">
+                  <span className="sr-only">
+                    {isCompleted ? 'Completed: ' : isCurrent ? 'Current: ' : 'Upcoming: '}
+                    Step {index + 1} of {steps.length}:{' '}
+                  </span>
                   <span
                     className={cn(
                       'text-sm font-medium leading-none transition-colors',
@@ -103,22 +96,52 @@ export function Stepper({
                     </span>
                   )}
                 </div>
-              </div>
+              </>
+            );
 
-              {/* Connecting Line */}
-              {orientation === 'horizontal' && index !== steps.length - 1 && (
-                <div
-                  className={cn(
-                    'mx-4 h-0.5 flex-1 transition-colors duration-200',
-                    isCompleted ? 'bg-primary' : 'bg-border'
-                  )}
-                  aria-hidden="true"
-                />
-              )}
-            </li>
-          );
-        })}
-      </ol>
-    </nav>
-  );
-}
+            return (
+              <li
+                key={step.id}
+                aria-current={isCurrent ? 'step' : undefined}
+                className={cn(
+                  'relative flex items-center',
+                  orientation === 'horizontal'
+                    ? index !== steps.length - 1
+                      ? 'flex-1'
+                      : ''
+                    : ''
+                )}
+              >
+                {isClickable ? (
+                  <button
+                    type="button"
+                    onClick={() => onStepClick?.(index)}
+                    className="group flex items-center gap-3 p-1 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer transition-all"
+                  >
+                    {StepContent}
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-3 p-1">
+                    {StepContent}
+                  </div>
+                )}
+
+                {/* Connecting Line */}
+                {orientation === 'horizontal' && index !== steps.length - 1 && (
+                  <div
+                    className={cn(
+                      'mx-4 h-0.5 flex-1 transition-colors duration-200',
+                      isCompleted ? 'bg-primary' : 'bg-border'
+                    )}
+                    aria-hidden="true"
+                  />
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+    );
+  }
+);
+Stepper.displayName = 'Stepper';

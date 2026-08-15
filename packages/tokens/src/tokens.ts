@@ -110,6 +110,16 @@ export const COLOR_TOKENS: ColorToken[] = [
     category: 'border',
     description: 'Subtle boundaries for cards, dividers, and inputs',
   },
+  {
+    name: 'Overlay Backdrop',
+    variable: '--overlay',
+    lightOklch: 'oklch(0 0 0 / 0.6)',
+    darkOklch: 'oklch(0 0 0 / 0.7)',
+    lightHex: '#000000',
+    darkHex: '#000000',
+    category: 'surface',
+    description: 'Modal and drawer backdrop dimming layer',
+  },
 ];
 
 export const SPACING_SCALE = [
