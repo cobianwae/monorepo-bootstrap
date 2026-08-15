@@ -1,0 +1,12 @@
+{
+  "extends": "../config/tsconfig.react.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "paths": {
+      "@ds/ui/*": ["./src/*"],
+      "@ds/tokens": ["../tokens/src/index.ts"],
+      "@ds/tokens/*": ["../tokens/src/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}

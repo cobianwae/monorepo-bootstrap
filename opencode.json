@@ -1,0 +1,149 @@
+{
+  "$schema": "https://opencode.ai/schema/opencode.json",
+
+  "provider": {
+     "vertex-garden": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Vertex MaaS (Proxy)",
+      "options": {
+        "baseURL": "http://localhost:4099",
+        "apiKey": "unused"
+      },
+      "models": {
+        "zai-org/glm-5-maas": {
+          "name": "GLM MaaS",
+          "reasoning": true
+        },
+        "deepseek-ai/deepseek-v3.2-maas": {
+          "name": "Deepseek MaaS",
+          "reasoning": true
+        },
+        "qwen/qwen3-coder-480b-a35b-instruct-maas": {
+          "name": "Qwen MaaS",
+          "reasoning": true
+        },
+        "moonshotai/kimi-k2-thinking-maas": {
+          "name": "Kimi MaaS",
+          "reasoning": true
+        }
+      }
+    },
+      "vertexai-global": {
+       "npm": "@ai-sdk/google-vertex",
+       "name": "Google Vertex (SDK)",
+       "options": {
+         "project": "glm-free-trial",
+         "location": "global",
+          "googleAuthOptions": {
+           "keyFile": "/home/fdikdik/Documents/vortex.json"
+         }
+       },
+       "models": {
+         "gemini-3.1-pro-preview": {
+           "name": "Gemini 3.1 ProP",
+           "reasoning": true
+         },
+         "gemini-3-flash-preview": {
+           "name": "Gemini 3 FlashP",
+           "reasoning": true
+         },
+         "gemini-3.1-flash-lite-preview": {
+           "name": "Gemini 3.1 FlashLiteP",
+           "reasoning": true
+         },
+         "gemini-3.7-flash":{
+           "name": "Gemini3.7flash",
+           "reasoning": true
+         }
+       }
+     }
+  },
+
+  "agent": {
+    "build": {
+      "model": "vertexai-global/gemini-3.7-flash",
+      "provider": "vertexai-global",
+      "instructions": "AGENTS.md",
+      "skills": [".opencode/skills/*/SKILL.md"],
+      "permission": {
+        "read": { "*": "allow" },
+        "write": {
+          "apps/**": "allow",
+          "packages/**": "allow",
+          "libs/**": "allow",
+          ".opencode/skills/**": "allow",
+          "*.ts": "allow",
+          "*.tsx": "allow",
+          "*.json": "allow",
+          "*.prisma": "allow",
+          "*.css": "allow",
+          "*.mjs": "allow",
+          "*.md": "allow",
+          "*.env*": "ask",
+          "*": "deny"
+        },
+        "execute": {
+          "pnpm test:*": "allow",
+          "pnpm build:*": "allow",
+          "pnpm lint:*": "allow",
+          "pnpm prisma*": "ask",
+          "pnpm db*": "deny",
+          "npx vitest*": "allow",
+          "npx tsc*": "allow",
+          "git add*": "allow",
+          "git diff*": "allow",
+          "git status*": "allow",
+          "git log*": "allow",
+          "git commit*": "ask",
+          "git push*": "deny",
+          "rm -rf*": "deny"
+        }
+      }
+    },
+    "plan": {
+      "model": "zai-coding-plan/glm-5.3",
+      "provider": "zai-coding-plan",
+      "instructions": "AGENTS.md",
+      "permission": {
+        "read": { "*": "allow" },
+        "write": { "*": "deny" },
+        "execute": { "*": "deny" }
+      }
+    }
+  },
+
+  "permission": {
+    "skill": {
+      "design-tokens": "allow",
+      "ui-component": "allow",
+      "ux-patterns": "allow",
+      "accessibility": "allow",
+      "visual-design": "allow",
+      "nestjs-api": "allow",
+      "nextjs-feature": "allow",
+      "prisma-schema": "allow",
+      "typescript-types": "allow",
+      "testing": "allow",
+      "error-handling": "allow",
+      "git-workflow": "allow"
+    }
+  },
+
+  "hooks": {
+    "after_write": [
+      {
+        "matcher": "apps/api/src/**/*.ts",
+        "command": "cd apps/api && npx tsc --noEmit --pretty 2>&1 | head -30"
+      },
+      {
+        "matcher": "apps/web/src/**/*.{ts,tsx}",
+        "command": "cd apps/web && npx tsc --noEmit --pretty 2>&1 | head -30"
+      }
+    ],
+    "before_commit": [
+      {
+        "command": "pnpm lint && pnpm build:types"
+      }
+    ]
+  }
+}

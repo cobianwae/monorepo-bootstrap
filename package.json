@@ -1,0 +1,18 @@
+{
+  "name": "design-system-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter @ds/showcase dev",
+    "dev:all": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "build:types": "pnpm -r build:types",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "test:tokens": "pnpm --filter @ds/tokens test"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}
