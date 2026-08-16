@@ -11,7 +11,6 @@ import {
   ClipboardList,
   ShoppingBag,
   BarChart3,
-  Sparkles,
   RotateCcw,
   User,
   Calendar,
@@ -25,7 +24,6 @@ export function ClinicCommandPalette() {
     patients,
     appointments,
     setSelectedPatientId,
-    openAiCoach,
     resetAllData,
   } = useClinic();
 
@@ -129,14 +127,6 @@ export function ClinicCommandPalette() {
         heading: 'Quick Actions',
         items: [
           {
-            id: 'action-ai-coach',
-            label: 'Launch AI Clinical Coach Assistant',
-            description: 'Analyze patient trajectory and metabolic safety suggestions',
-            icon: Sparkles,
-            keywords: ['ai', 'coach', 'assistant', 'gpt', 'insights'],
-            onSelect: openAiCoach,
-          },
-          {
             id: 'action-reset-data',
             label: 'Reset Clinic Scenario Demo Data',
             description: 'Restore all initial patients, appointments, treatments & transactions',
@@ -147,7 +137,7 @@ export function ClinicCommandPalette() {
         ],
       },
     ];
-  }, [patients, appointments, router, setSelectedPatientId, openAiCoach, resetAllData]);
+  }, [patients, appointments, router, setSelectedPatientId, resetAllData]);
 
   return <CommandPalette groups={groups} />;
 }

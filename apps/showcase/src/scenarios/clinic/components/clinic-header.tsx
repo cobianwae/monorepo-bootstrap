@@ -130,12 +130,13 @@ export function ClinicHeader({ onOpenCommandPalette }: ClinicHeaderProps) {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={openAiCoach}
-                className="gap-1.5 border-highlight/30 text-highlight hover:bg-highlight/10 hidden md:flex"
-              >
+               <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={openAiCoach}
+                        className="h-8 gap-1.5 border-highlight/40 bg-highlight/10 text-foreground hover:bg-highlight/20 transition-colors shadow-xs"
+                      >
+             
                 <Sparkles className="h-3.5 w-3.5 text-highlight animate-pulse" />
                 <span className="font-mono text-xs">AI Coach</span>
               </Button>

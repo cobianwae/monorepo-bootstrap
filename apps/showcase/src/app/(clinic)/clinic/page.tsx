@@ -8,7 +8,6 @@ import {
   CalendarClock,
   TrendingDown,
   DollarSign,
-  Sparkles,
   UserPlus,
   ArrowRight,
   CheckCircle2,
@@ -50,7 +49,6 @@ export default function ClinicDashboardPage() {
     metrics,
     selectedPatientId,
     updateAppointmentStatus,
-    openAiCoach,
   } = useClinic();
 
   const [isLoading, setIsLoading] = React.useState(false);
@@ -112,15 +110,6 @@ export default function ClinicDashboardPage() {
             >
               <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
               <span className="font-mono text-xs">Sync Feed</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={openAiCoach}
-              className="gap-1.5 border-highlight/30 text-highlight hover:bg-highlight/10"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-highlight animate-pulse" />
-              <span className="font-mono text-xs">AI Coach</span>
             </Button>
             <Link href="/clinic/registration">
               <Button size="sm" className="gap-1.5 font-medium">
@@ -187,7 +176,7 @@ export default function ClinicDashboardPage() {
       {/* Analytics & Distribution Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Weekly Revenue & Target Area Chart */}
-        <Card className="lg:col-span-2 border-border bg-card p-6 shadow-xs">
+        <Card className="lg:col-span-2 border-border bg-card p-6 shadow-xs flex flex-col">
           <CardHeader className="p-0 pb-4">
             <div className="flex items-center justify-between">
               <div>
@@ -197,38 +186,23 @@ export default function ClinicDashboardPage() {
                 </CardDescription>
               </div>
               <Badge variant="outline" className="font-mono text-[11px]">
-                Target: Rp 120M / wk
+                Target: Rp 130M / wk
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="p-0">
-            <div className="w-full">
+          <CardContent className="p-0 flex-1 flex flex-col">
+            <div
+              className="flex-1 min-h-64 flex flex-col"
+              role="img"
+              aria-label="Weekly revenue versus weekly target across seven days"
+            >
               <AreaChartComponent
                 data={REVENUE_CHART_DATA}
                 dataKey={['revenue', 'target']}
                 xKey="name"
+                className="border-none p-0 bg-transparent aspect-auto flex-1 min-h-64 h-full"
               />
             </div>
-            {/* Screen reader table mirror for accessibility */}
-            <table className="sr-only">
-              <caption>Daily revenue and target comparison</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Day</th>
-                  <th scope="col">Revenue</th>
-                  <th scope="col">Target</th>
-                </tr>
-              </thead>
-              <tbody>
-                {REVENUE_CHART_DATA.map((row) => (
-                  <tr key={row.name}>
-                    <td>{row.name}</td>
-                    <td>Rp {row.revenue.toLocaleString()}</td>
-                    <td>Rp {row.target.toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </CardContent>
         </Card>
 
@@ -241,30 +215,16 @@ export default function ClinicDashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="w-full">
+            <div
+              className="w-full"
+              role="img"
+              aria-label={`Patient distribution by cohort stage: ${WEIGHT_FUNNEL_DATA.map((c) => `${c.name}: ${c.count}`).join(', ')}`}
+            >
               <PieChartComponent
                 data={WEIGHT_FUNNEL_DATA.map((d) => ({ name: d.name, value: d.count }))}
-                innerRadius={50}
+                className="mx-auto aspect-square w-full max-w-[320px] border-none p-0 bg-transparent"
               />
             </div>
-            {/* Accessible table mirror */}
-            <table className="sr-only">
-              <caption>Patient distribution by program cohort</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Stage</th>
-                  <th scope="col">Patient Count</th>
-                </tr>
-              </thead>
-              <tbody>
-                {WEIGHT_FUNNEL_DATA.map((c) => (
-                  <tr key={c.name}>
-                    <td>{c.name}</td>
-                    <td>{c.count} patients</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </CardContent>
         </Card>
       </div>

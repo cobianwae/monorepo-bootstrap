@@ -923,10 +923,10 @@ export const REVENUE_CHART_DATA = [
 ];
 
 export const WEIGHT_FUNNEL_DATA = [
-  { name: 'Intake (0-4 wk)', count: 48, fill: 'var(--color-chart-1)' },
-  { name: 'Active Loss (5-12 wk)', count: 64, fill: 'var(--color-chart-2)' },
+  { name: 'Intake (0-4 wk)', count: 52, fill: 'var(--color-chart-1)' },
+  { name: 'Active Loss (5-12 wk)', count: 46, fill: 'var(--color-chart-2)' },
   { name: 'Consolidation (13-24 wk)', count: 28, fill: 'var(--color-chart-3)' },
-  { name: 'Graduation / Maintenance', count: 32, fill: 'var(--color-chart-4)' },
+  { name: 'Graduation / Maintenance', count: 16, fill: 'var(--color-chart-4)' },
 ];
 
 export const TREATMENT_CATEGORY_DATA = [

@@ -31,6 +31,13 @@ export const CHART_COLORS = [
 
 export type ChartColor = (typeof CHART_COLORS)[number];
 
+const COMPACT_NUMBER_FORMATTER = new Intl.NumberFormat('en', {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+});
+
+const formatCompactTick = (value: number) => COMPACT_NUMBER_FORMATTER.format(value);
+
 export interface ChartContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactElement;
   title?: string;
@@ -180,7 +187,7 @@ export function AreaChartComponent({
           axisLine={false}
           width={40}
           tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
-          tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(v))}
+          tickFormatter={formatCompactTick}
         />
         <Tooltip content={<ChartTooltipContent />} />
         {showLegend && (
@@ -236,7 +243,7 @@ export function BarChartComponent({
           axisLine={false}
           width={40}
           tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
-          tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(v))}
+          tickFormatter={formatCompactTick}
         />
         <Tooltip content={<ChartTooltipContent />} />
         {showLegend && (
@@ -289,6 +296,7 @@ export function LineChartComponent({
           axisLine={false}
           width={40}
           tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+          tickFormatter={formatCompactTick}
         />
         <Tooltip content={<ChartTooltipContent />} />
         {showLegend && (
@@ -319,8 +327,8 @@ export interface PieChartProps {
   colors?: string[];
   title?: string;
   description?: string;
-  innerRadius?: number;
-  outerRadius?: number;
+  innerRadius?: number | string;
+  outerRadius?: number | string;
   showLegend?: boolean;
   className?: string;
 }
@@ -330,8 +338,8 @@ export function PieChartComponent({
   colors = [...CHART_COLORS],
   title,
   description,
-  innerRadius = 55,
-  outerRadius = 80,
+  innerRadius = '55%',
+  outerRadius = '80%',
   showLegend = true,
   className,
 }: PieChartProps) {

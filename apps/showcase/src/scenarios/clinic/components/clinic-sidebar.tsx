@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { type ComponentProps } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -13,8 +14,8 @@ import {
   ShoppingBag,
   BarChart3,
   ArrowLeft,
-  Sparkles,
   HeartPulse,
+  type LucideIcon,
 } from 'lucide-react';
 import {
   cn,
@@ -37,6 +38,20 @@ interface ClinicSidebarProps {
   onNavigateMobile?: () => void;
 }
 
+interface NavItem {
+  title: string;
+  href: string;
+  icon: LucideIcon;
+  exact?: boolean;
+  badge?: string;
+  badgeVariant?: ComponentProps<typeof Badge>['variant'];
+}
+
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
+
 export function ClinicSidebar({ onNavigateMobile }: ClinicSidebarProps) {
   const pathname = usePathname();
   const { state, isMobile, setOpenMobile } = useSidebar();
@@ -53,7 +68,6 @@ export function ClinicSidebar({ onNavigateMobile }: ClinicSidebarProps) {
     patients,
     appointments,
     cart,
-    openAiCoach,
   } = useClinic();
 
   const activePatientsCount = React.useMemo(
@@ -71,250 +85,157 @@ export function ClinicSidebar({ onNavigateMobile }: ClinicSidebarProps) {
     [cart]
   );
 
-  const mainNavItems = [
+  const navGroups: NavGroup[] = [
     {
-      title: 'Dashboard',
-      href: '/clinic',
-      icon: LayoutDashboard,
-      badge: undefined,
+      label: 'Front Desk & Schedule',
+      items: [
+        {
+          title: 'Dashboard',
+          href: '/clinic',
+          icon: LayoutDashboard,
+          exact: true,
+        },
+        {
+          title: 'Registration',
+          href: '/clinic/registration',
+          icon: UserPlus,
+          badge: 'Stepper',
+        },
+        {
+          title: 'Appointments',
+          href: '/clinic/appointments',
+          icon: CalendarClock,
+          badge: todayApptsCount > 0 ? String(todayApptsCount) : undefined,
+          badgeVariant: 'warning',
+        },
+        {
+          title: 'Patients & EMR',
+          href: '/clinic/patients',
+          icon: Users,
+          badge: activePatientsCount > 0 ? String(activePatientsCount) : undefined,
+          badgeVariant: 'secondary',
+        },
+      ],
     },
     {
-      title: 'Registration',
-      href: '/clinic/registration',
-      icon: UserPlus,
-      badge: 'Stepper',
+      label: 'Clinical & Therapy',
+      items: [
+        {
+          title: 'Treatments Catalog',
+          href: '/clinic/treatments',
+          icon: Stethoscope,
+          badge: 'Master',
+        },
+        {
+          title: 'Consultations',
+          href: '/clinic/consultations',
+          icon: ClipboardList,
+          badge: '3 Roles',
+          badgeVariant: 'highlight',
+        },
+      ],
     },
     {
-      title: 'Appointments',
-      href: '/clinic/appointments',
-      icon: CalendarClock,
-      badge: todayApptsCount > 0 ? String(todayApptsCount) : undefined,
-      badgeVariant: 'warning' as const,
-    },
-    {
-      title: 'Patients & EMR',
-      href: '/clinic/patients',
-      icon: Users,
-      badge: activePatientsCount > 0 ? String(activePatientsCount) : undefined,
-      badgeVariant: 'secondary' as const,
-    },
-  ];
-
-  const clinicalNavItems = [
-    {
-      title: 'Treatments Catalog',
-      href: '/clinic/treatments',
-      icon: Stethoscope,
-      badge: 'Master',
-    },
-    {
-      title: 'Consultations',
-      href: '/clinic/consultations',
-      icon: ClipboardList,
-      badge: '3 Roles',
-      badgeVariant: 'highlight' as const,
-    },
-  ];
-
-  const commerceNavItems = [
-    {
-      title: 'Point of Sale (POS)',
-      href: '/clinic/pos',
-      icon: ShoppingBag,
-      badge: cartItemsCount > 0 ? `${cartItemsCount}` : undefined,
-      badgeVariant: 'success' as const,
-    },
-    {
-      title: 'Reports & Analytics',
-      href: '/clinic/reports',
-      icon: BarChart3,
-      badge: undefined,
+      label: 'Commerce & Insights',
+      items: [
+        {
+          title: 'Point of Sale (POS)',
+          href: '/clinic/pos',
+          icon: ShoppingBag,
+          badge: cartItemsCount > 0 ? `${cartItemsCount}` : undefined,
+          badgeVariant: 'success',
+        },
+        {
+          title: 'Reports & Analytics',
+          href: '/clinic/reports',
+          icon: BarChart3,
+        },
+      ],
     },
   ];
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-border bg-card">
+    <Sidebar collapsible="icon">
       {/* Clinic Brand Header */}
-      <SidebarHeader className="border-b border-border/40 p-4">
-        <div className="flex items-center justify-between">
+      <SidebarHeader className={cn(isCollapsed && 'justify-center px-2')}>
+        {!isCollapsed && (
           <Link
             href="/clinic"
             onClick={handleNav}
-            className="flex items-center gap-3 group transition-all duration-200"
+            className="flex items-center gap-2.5 group transition-opacity hover:opacity-90"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-primary to-highlight text-primary-foreground shadow-xs group-hover:scale-105 transition-transform">
-              <HeartPulse className="h-5 w-5 animate-pulse" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-highlight text-primary-foreground shadow-xs group-hover:scale-105 transition-transform font-display shrink-0">
+              <HeartPulse className="h-4.5 w-4.5 animate-pulse" />
             </div>
-            {!isCollapsed && (
-              <div className="flex flex-col">
-                <span className="font-display font-bold text-sm tracking-tight text-foreground flex items-center gap-1.5">
-                  Aura Metabolic
-                  <Badge variant="highlight" size="sm" className="text-[10px] px-1.5 py-0 h-4">
-                    CIS
-                  </Badge>
-                </span>
-                <span className="text-[11px] font-mono text-muted-foreground">
-                  Weight Loss Clinic
-                </span>
-              </div>
-            )}
+            <div className="flex flex-col min-w-0">
+              <span className="font-semibold text-sm tracking-tight text-foreground font-display flex items-center gap-1.5 truncate">
+                Aura Metabolic
+                <Badge variant="highlight" className="text-[10px] px-1.5 py-0 h-4 font-mono">
+                  CIS
+                </Badge>
+              </span>
+              <span className="text-[10px] text-muted-foreground uppercase font-mono tracking-wider truncate">
+                Weight Loss Clinic
+              </span>
+            </div>
           </Link>
-          {!isCollapsed && <SidebarTrigger className="hidden lg:flex" />}
-        </div>
+        )}
+
+        <SidebarTrigger className={cn('hidden lg:flex', isCollapsed ? 'mx-auto' : 'ml-auto')} />
       </SidebarHeader>
 
       {/* Navigation Sections */}
-      <SidebarContent className="p-2 space-y-4">
-        {/* Main Section */}
-        <SidebarGroup>
-          {!isCollapsed && (
-            <SidebarGroupLabel className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground px-2">
-              Front Desk & Schedule
-            </SidebarGroupLabel>
-          )}
-          <SidebarMenu>
-            {mainNavItems.map((item) => {
-              const isActive = pathname === item.href;
-              const Icon = item.icon;
-              return (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive}
-                    tooltip={item.title}
-                    className={cn(
-                      'transition-colors',
-                      isActive && 'bg-primary/10 text-primary font-medium'
-                    )}
-                  >
-                    <Link href={item.href} onClick={handleNav} className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-2.5">
+      <SidebarContent>
+        {navGroups.map((group) => (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
+            <SidebarMenu>
+              {group.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = item.exact
+                  ? pathname === item.href
+                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
+                      <Link href={item.href} onClick={handleNav}>
                         <Icon className="h-4 w-4 shrink-0" />
-                        {!isCollapsed && <span>{item.title}</span>}
-                      </div>
-                      {!isCollapsed && item.badge && (
-                        <Badge
-                          variant={item.badgeVariant || 'outline'}
-                          size="sm"
-                          className="text-[10px] h-4 px-1.5"
-                        >
-                          {item.badge}
-                        </Badge>
-                      )}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
+                        <span className="truncate group-data-[collapsible=icon]:hidden">{item.title}</span>
+                        {item.badge && (
+                          <Badge
+                            variant={item.badgeVariant || (isActive ? 'highlight' : 'outline')}
+                            className="ml-auto text-[10px] px-1.5 py-0.5 font-mono shrink-0 whitespace-nowrap leading-none group-data-[collapsible=icon]:hidden"
+                          >
+                            {item.badge}
+                          </Badge>
+                        )}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarGroup>
+        ))}
+
+        {/* Back to Docs Link */}
+        <SidebarGroup className="mt-auto pt-3 pb-0 border-t border-border/40 group-data-[collapsible=icon]:pt-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Back to Design System Docs">
+                <Link href="/" onClick={handleNav}>
+                  <ArrowLeft className="h-4 w-4 shrink-0" />
+                  <span className="group-data-[collapsible=icon]:hidden">Design System Docs</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
-
-        {/* Clinical Care Section */}
-        <SidebarGroup>
-          {!isCollapsed && (
-            <SidebarGroupLabel className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground px-2">
-              Clinical & Therapy
-            </SidebarGroupLabel>
-          )}
-          <SidebarMenu>
-            {clinicalNavItems.map((item) => {
-              const isActive = pathname === item.href;
-              const Icon = item.icon;
-              return (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive}
-                    tooltip={item.title}
-                    className={cn(
-                      'transition-colors',
-                      isActive && 'bg-primary/10 text-primary font-medium'
-                    )}
-                  >
-                    <Link href={item.href} onClick={handleNav} className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-2.5">
-                        <Icon className="h-4 w-4 shrink-0" />
-                        {!isCollapsed && <span>{item.title}</span>}
-                      </div>
-                      {!isCollapsed && item.badge && (
-                        <Badge
-                          variant={item.badgeVariant || 'outline'}
-                          size="sm"
-                          className="text-[10px] h-4 px-1.5"
-                        >
-                          {item.badge}
-                        </Badge>
-                      )}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
-        </SidebarGroup>
-
-        {/* Commerce & Intelligence Section */}
-        <SidebarGroup>
-          {!isCollapsed && (
-            <SidebarGroupLabel className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground px-2">
-              Commerce & Insights
-            </SidebarGroupLabel>
-          )}
-          <SidebarMenu>
-            {commerceNavItems.map((item) => {
-              const isActive = pathname === item.href;
-              const Icon = item.icon;
-              return (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive}
-                    tooltip={item.title}
-                    className={cn(
-                      'transition-colors',
-                      isActive && 'bg-primary/10 text-primary font-medium'
-                    )}
-                  >
-                    <Link href={item.href} onClick={handleNav} className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-2.5">
-                        <Icon className="h-4 w-4 shrink-0" />
-                        {!isCollapsed && <span>{item.title}</span>}
-                      </div>
-                      {!isCollapsed && item.badge && (
-                        <Badge
-                          variant={item.badgeVariant || 'outline'}
-                          size="sm"
-                          className="text-[10px] h-4 px-1.5"
-                        >
-                          {item.badge}
-                        </Badge>
-                      )}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
-          </SidebarMenu>
-        </SidebarGroup>
-
-        {/* AI Clinical Coach Action Button */}
-        <div className="px-2 pt-2">
-          <button
-            onClick={openAiCoach}
-            className={cn(
-              'w-full flex items-center gap-2.5 rounded-lg p-2 text-xs font-medium text-highlight bg-highlight/10 border border-highlight/20 hover:bg-highlight/20 transition-all cursor-pointer',
-              isCollapsed && 'justify-center p-2'
-            )}
-            title="AI Clinical Coach Assistant"
-          >
-            <Sparkles className="h-4 w-4 shrink-0 animate-pulse text-highlight" />
-            {!isCollapsed && <span>AI Clinical Coach</span>}
-          </button>
-        </div>
       </SidebarContent>
 
-      {/* Footer: Active Duty Staff & Return Link */}
-      <SidebarFooter className="border-t border-border/40 p-3 space-y-2">
+      {/* Footer: Active Duty Staff */}
+      <SidebarFooter>
         {!isCollapsed && (
           <div className="flex items-center justify-between p-2 rounded-lg bg-muted/40 text-xs">
             <div className="flex items-center gap-2">
@@ -326,15 +247,6 @@ export function ClinicSidebar({ onNavigateMobile }: ClinicSidebarProps) {
             </div>
           </div>
         )}
-
-        <Link
-          href="/"
-          className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-          title="Back to Design System Docs"
-        >
-          <ArrowLeft className="h-3.5 w-3.5 shrink-0" />
-          {!isCollapsed && <span className="font-mono text-[11px]">Design System Docs</span>}
-        </Link>
       </SidebarFooter>
     </Sidebar>
   );

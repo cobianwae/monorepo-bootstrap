@@ -7,7 +7,6 @@ import {
   Users,
   Award,
   Download,
-  Sparkles,
 } from 'lucide-react';
 import {
   Button,
@@ -42,7 +41,7 @@ const STAFF_VOLUME_DATA = [
 ];
 
 export default function ClinicReportsPage() {
-  const { metrics, openAiCoach } = useClinic();
+  const { metrics } = useClinic();
 
   return (
     <div className="space-y-8 animate-in fade-in-50 duration-200">
@@ -54,15 +53,6 @@ export default function ClinicReportsPage() {
         description="Comprehensive clinical performance reports: treatment efficacy, weight loss velocity across cohorts, revenue breakdown, and care team productivity."
         actions={
           <div className="flex items-center gap-2.5">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={openAiCoach}
-              className="gap-1.5 border-highlight/30 text-highlight hover:bg-highlight/10"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-highlight animate-pulse" />
-              <span className="font-mono text-xs">AI Cohort Analysis</span>
-            </Button>
             <Button size="sm" variant="outline" className="gap-1.5 font-mono text-xs">
               <Download className="h-3.5 w-3.5" />
               Export PDF Report
@@ -122,33 +112,17 @@ export default function ClinicReportsPage() {
             </div>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="w-full">
+            <div
+              className="w-full"
+              role="img"
+              aria-label="Monthly revenue by clinical service category compared to budget targets"
+            >
               <BarChartComponent
                 data={CATEGORY_REVENUE_DATA}
                 dataKey={['revenue', 'target']}
                 xKey="name"
               />
             </div>
-            {/* Screen reader table mirror */}
-            <table className="sr-only">
-              <caption>Category revenue breakdown vs targets</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Category</th>
-                  <th scope="col">Actual Revenue</th>
-                  <th scope="col">Target Budget</th>
-                </tr>
-              </thead>
-              <tbody>
-                {CATEGORY_REVENUE_DATA.map((r) => (
-                  <tr key={r.name}>
-                    <td>{r.name}</td>
-                    <td>Rp {r.revenue.toLocaleString()}</td>
-                    <td>Rp {r.target.toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </CardContent>
         </Card>
 
@@ -161,30 +135,16 @@ export default function ClinicReportsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="w-full">
+            <div
+              className="w-full"
+              role="img"
+              aria-label={`Clinical service volume share: ${TREATMENT_CATEGORY_DATA.map((t) => `${t.name}: ${t.value}%`).join(', ')}`}
+            >
               <PieChartComponent
                 data={TREATMENT_CATEGORY_DATA}
-                innerRadius={50}
+                className="mx-auto aspect-square w-full max-w-[300px] border-none p-0 bg-transparent"
               />
             </div>
-            {/* Accessible table mirror */}
-            <table className="sr-only">
-              <caption>Clinical service percentage share</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Service</th>
-                  <th scope="col">Percentage Share</th>
-                </tr>
-              </thead>
-              <tbody>
-                {TREATMENT_CATEGORY_DATA.map((t) => (
-                  <tr key={t.name}>
-                    <td>{t.name}</td>
-                    <td>{t.value}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </CardContent>
         </Card>
       </div>
@@ -199,31 +159,17 @@ export default function ClinicReportsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="w-full">
+            <div
+              className="w-full"
+              role="img"
+              aria-label="Clinician monthly consultation volumes per practitioner"
+            >
               <BarChartComponent
                 data={STAFF_VOLUME_DATA}
                 dataKey="sessions"
                 xKey="name"
               />
             </div>
-            {/* Accessible table mirror */}
-            <table className="sr-only">
-              <caption>Practitioner session volumes</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Practitioner</th>
-                  <th scope="col">Sessions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {STAFF_VOLUME_DATA.map((s) => (
-                  <tr key={s.name}>
-                    <td>{s.name}</td>
-                    <td>{s.sessions} sessions</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </CardContent>
         </Card>
 

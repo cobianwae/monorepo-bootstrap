@@ -4,7 +4,6 @@ import * as React from 'react';
 import {
   ClipboardList,
   Stethoscope,
-  Sparkles,
   Brain,
   Save,
   Apple,
@@ -43,7 +42,6 @@ export default function ConsultationsPage() {
     addDoctorNote,
     addPsychologistNote,
     addDieticianPlan,
-    openAiCoach,
   } = useClinic();
 
   const activePatient = React.useMemo(
@@ -184,17 +182,6 @@ export default function ConsultationsPage() {
         eyebrowIcon={ClipboardList}
         title="Clinical Consultations & Therapy Notes"
         description="Unified electronic chart workspace for Medical Doctors (SOAP notes), Psychologists (CBT-E behavioral screening), and Dieticians (macro meal plans)."
-        actions={
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={openAiCoach}
-            className="gap-1.5 border-highlight/30 text-highlight hover:bg-highlight/10"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-highlight animate-pulse" />
-            <span className="font-mono text-xs">AI Trajectory Insight</span>
-          </Button>
-        }
       />
 
       {/* Patient Selector Strip & Summary Card */}
