@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -20,6 +21,11 @@ import {
   Compass,
   UploadCloud,
   ListTree,
+  Wand2,
+  Columns3,
+  Activity,
+  Search,
+  ShieldAlert,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@ds/ui';
@@ -48,7 +54,16 @@ export const NAV_SECTIONS: NavSection[] = [
   },
   {
     title: 'Components',
-    items: [{ title: 'Core UI Components', href: '/components', icon: Box, badge: '25+' }],
+    items: [
+      { title: 'Core UI Components', href: '/components', icon: Box, badge: '25+' },
+      {
+        title: 'Advanced Form Kit',
+        href: '/components/forms-advanced',
+        icon: Wand2,
+        badge: 'New',
+      },
+      { title: 'Charts & Data Viz', href: '/components/charts', icon: Activity, badge: 'New' },
+    ],
   },
   {
     title: 'UX Scenario Patterns',
@@ -56,8 +71,14 @@ export const NAV_SECTIONS: NavSection[] = [
       { title: 'Stepper / Wizard Flow', href: '/patterns/stepper', icon: GitFork, badge: 'UX' },
       { title: 'Workspace Layout', href: '/patterns/workspace', icon: Layers },
       { title: 'Data Table & Filtering', href: '/patterns/data-table', icon: TableProperties },
+      { title: 'Advanced Filtering & Views', href: '/patterns/advanced-filtering', icon: ListTree, badge: 'New' },
       { title: 'Master Data CRUD', href: '/patterns/master-data', icon: Database },
       { title: 'Master-Detail Flow', href: '/patterns/master-detail', icon: ListTree },
+      { title: 'Dynamic Form', href: '/patterns/dynamic-form', icon: GitFork, badge: 'New' },
+      { title: 'Kanban & Drag & Drop', href: '/patterns/kanban', icon: Columns3, badge: 'New' },
+      { title: 'Global Search', href: '/patterns/global-search', icon: Search, badge: 'New' },
+      { title: 'Notification Center', href: '/patterns/notifications', icon: BellRing, badge: 'New' },
+      { title: 'Result & Error States', href: '/patterns/results', icon: ShieldAlert, badge: 'New' },
       { title: 'Auth & Onboarding', href: '/patterns/auth', icon: KeyRound },
       { title: 'Dashboard & Metrics', href: '/patterns/dashboard', icon: LayoutDashboard },
       { title: 'Overlays & Feedback', href: '/patterns/overlays', icon: BellRing },
@@ -82,6 +103,13 @@ interface ShowcaseNavContentProps {
 export function ShowcaseNavContent({ collapsed = false, onNavigate }: ShowcaseNavContentProps) {
   const pathname = usePathname();
 
+  const activeHref = useMemo(() => {
+    const matches = NAV_SECTIONS.flatMap((section) => section.items).filter(
+      (item) => pathname === item.href || pathname.startsWith(`${item.href}/`)
+    );
+    return matches.sort((a, b) => b.href.length - a.href.length)[0]?.href;
+  }, [pathname]);
+
   return (
     <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
       {NAV_SECTIONS.map((section) => (
@@ -94,7 +122,7 @@ export function ShowcaseNavContent({ collapsed = false, onNavigate }: ShowcaseNa
           <ul className="space-y-0.5">
             {section.items.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const isActive = activeHref === item.href;
 
               return (
                 <li key={item.href}>

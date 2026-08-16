@@ -164,3 +164,64 @@ export const FormMessage = React.forwardRef<
   );
 });
 FormMessage.displayName = 'FormMessage';
+
+export interface FormSectionProps extends React.HTMLAttributes<HTMLDivElement> {
+  title?: string;
+  description?: string;
+}
+
+export const FormSection = React.forwardRef<HTMLDivElement, FormSectionProps>(
+  ({ className, title, description, children, ...props }, ref) => (
+    <section
+      ref={ref}
+      className={cn('space-y-4 rounded-lg border border-border p-4', className)}
+      {...props}
+    >
+      {(title || description) && (
+        <div className="space-y-1">
+          {title && (
+            <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+          )}
+          {description && (
+            <p className="text-xs text-muted-foreground">{description}</p>
+          )}
+        </div>
+      )}
+      <div className="space-y-4">{children}</div>
+    </section>
+  )
+);
+FormSection.displayName = 'FormSection';
+
+export interface FormErrorSummaryProps {
+  errors?: string[];
+  title?: string;
+}
+
+export const FormErrorSummary = React.forwardRef<
+  HTMLDivElement,
+  FormErrorSummaryProps & React.HTMLAttributes<HTMLDivElement>
+>(({ errors = [], title = 'There are errors in the form', className, ...props }, ref) => {
+  if (errors.length === 0) return null;
+
+  return (
+    <div
+      ref={ref}
+      role="alert"
+      aria-live="polite"
+      className={cn(
+        'rounded-md border border-destructive/50 bg-destructive/10 p-3 text-sm',
+        className
+      )}
+      {...props}
+    >
+      <p className="font-medium text-destructive">{title}</p>
+      <ul className="mt-1.5 list-disc space-y-1 pl-5 text-destructive/90">
+        {errors.map((error) => (
+          <li key={error}>{error}</li>
+        ))}
+      </ul>
+    </div>
+  );
+});
+FormErrorSummary.displayName = 'FormErrorSummary';

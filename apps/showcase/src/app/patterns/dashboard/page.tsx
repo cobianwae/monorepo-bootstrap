@@ -12,6 +12,7 @@ import {
   Badge,
   Skeleton,
   toast,
+  BarChartComponent,
 } from '@ds/ui';
 import {
   DollarSign,
@@ -87,13 +88,23 @@ export default function DashboardPatternPage() {
   }, [timeRange]);
 
   const chartBars = React.useMemo(() => [
-    { label: 'Mon', value: 34, height: '45%' },
-    { label: 'Tue', value: 48, height: '65%' },
-    { label: 'Wed', value: 72, height: '90%' },
-    { label: 'Thu', value: 65, height: '80%' },
-    { label: 'Fri', value: 89, height: '100%' },
-    { label: 'Sat', value: 42, height: '55%' },
-    { label: 'Sun', value: 28, height: '38%' },
+    { label: 'Mon', value: 34 },
+    { label: 'Tue', value: 48 },
+    { label: 'Wed', value: 72 },
+    { label: 'Thu', value: 65 },
+    { label: 'Fri', value: 89 },
+    { label: 'Sat', value: 42 },
+    { label: 'Sun', value: 28 },
+  ], []);
+
+  const chartData = React.useMemo(() => [
+    { day: 'Mon', requests: 34 },
+    { day: 'Tue', requests: 48 },
+    { day: 'Wed', requests: 72 },
+    { day: 'Thu', requests: 65 },
+    { day: 'Fri', requests: 89 },
+    { day: 'Sat', requests: 42 },
+    { day: 'Sun', requests: 28 },
   ], []);
 
   const activities = [
@@ -272,28 +283,14 @@ export default function DashboardPatternPage() {
               </tbody>
             </table>
 
-            {/* Visual Bar Chart */}
-            <div
-              className="h-64 flex items-end justify-between gap-3 pt-6 pb-2 px-4 border-b border-border/50"
-              aria-hidden="true"
-            >
-              {chartBars.map((bar) => (
-                <div key={bar.label} className="flex-1 flex flex-col items-center gap-2 group">
-                  <span className="text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity font-mono">
-                    {bar.value}k
-                  </span>
-                  <div className="w-full max-w-[40px] bg-muted/60 rounded-t-lg overflow-hidden h-48 flex items-end">
-                    <div
-                      className="w-full bg-primary group-hover:bg-primary/80 transition-all duration-300 rounded-t-sm"
-                      style={{ height: bar.height }}
-                    />
-                  </div>
-                  <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
-                    {bar.label}
-                  </span>
-                </div>
-              ))}
-            </div>
+            {/* Recharts bar chart themed with OKLCH tokens */}
+            <BarChartComponent
+              data={chartData}
+              dataKey="requests"
+              xKey="day"
+              grid={false}
+              showLegend={false}
+            />
 
             <div className="flex items-center justify-between pt-4 text-xs text-muted-foreground">
               <span>Peak: Friday (89,000 requests)</span>
