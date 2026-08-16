@@ -8,6 +8,9 @@ import {
   Textarea,
   Label,
   Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
   CardContent,
   Dialog,
   DialogTrigger,
@@ -40,10 +43,28 @@ import {
   Separator,
   EmptyState,
   StatCard,
-  Spinner,
-  RadioGroup,
-  RadioGroupItem,
   toast,
+  // Enhanced & New Components
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+  AvatarGroup,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+  Toggle,
+  Kbd,
+  Rating,
+  CodeBlock,
+  FileInput,
+  NotificationItem,
+  NotificationHeader,
+  NotificationList,
 } from '@ds/ui';
 import {
   AlertCircle,
@@ -55,11 +76,25 @@ import {
   Inbox,
   Users,
   Box,
+  Bold,
+  Italic,
+  Underline as UnderlineIcon,
+  Sparkles,
+  Zap,
+  Layers,
 } from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
 
 const COMPONENT_SECTIONS = [
   { id: 'buttons', label: 'Buttons & Actions' },
+  { id: 'cards', label: 'Card Variants' },
+  { id: 'avatars', label: 'Avatars & Groups' },
+  { id: 'tabs', label: 'Tabs & Navigation' },
+  { id: 'accordions', label: 'Accordions & Disclosure' },
+  { id: 'ratings', label: 'Rating & Feedback' },
+  { id: 'file-uploads', label: 'File Uploads' },
+  { id: 'code-blocks', label: 'Code Blocks' },
+  { id: 'notifications', label: 'Notifications' },
   { id: 'badges', label: 'Badges & Status' },
   { id: 'forms', label: 'Form Controls' },
   { id: 'overlays', label: 'Modals & Overlays' },
@@ -71,10 +106,13 @@ export default function ComponentsPage() {
   const [switchActive, setSwitchActive] = React.useState(true);
   const [checked, setChecked] = React.useState(true);
   const [activeSection, setActiveSection] = React.useState('buttons');
+  const [selectedCard, setSelectedCard] = React.useState('card-1');
+  const [ratingVal, setRatingVal] = React.useState(4);
+  const [uploadedFiles, setUploadedFiles] = React.useState<File[]>([]);
 
   return (
     <TooltipProvider>
-      <div className="space-y-10 animate-in fade-in-50 duration-200">
+      <div className="space-y-12 animate-in fade-in-50 duration-200">
         <PageHeader
           eyebrow="UI Library"
           eyebrowIcon={Box}
@@ -107,7 +145,7 @@ export default function ComponentsPage() {
           </div>
         </div>
 
-        {/* Buttons Section */}
+        {/* 1. Buttons Section */}
         <section id="buttons" className="space-y-4 scroll-mt-32">
           <h2 className="text-lg font-bold text-foreground">Buttons & Actions</h2>
           <Card className="border-border">
@@ -124,6 +162,7 @@ export default function ComponentsPage() {
                   <Button variant="link">Link</Button>
                   <Button variant="destructive">Destructive</Button>
                   <Button variant="success">Success</Button>
+                  <Button variant="highlight">Highlight</Button>
                 </div>
               </div>
 
@@ -147,11 +186,519 @@ export default function ComponentsPage() {
                   <Button disabled>Disabled</Button>
                 </div>
               </div>
+
+              <Separator />
+
+              <div className="space-y-2">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Standalone Toggles & Keyboard Shortcuts (Kbd)
+                </span>
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex items-center gap-1 rounded-lg border border-border p-1 bg-card">
+                    <Toggle aria-label="Toggle bold" size="sm">
+                      <Bold className="h-4 w-4" />
+                    </Toggle>
+                    <Toggle aria-label="Toggle italic" size="sm">
+                      <Italic className="h-4 w-4" />
+                    </Toggle>
+                    <Toggle aria-label="Toggle underline" size="sm">
+                      <UnderlineIcon className="h-4 w-4" />
+                    </Toggle>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">Shortcuts:</span>
+                    <Kbd size="sm">⌘K</Kbd>
+                    <Kbd size="sm">Ctrl+S</Kbd>
+                    <Kbd size="default">Esc</Kbd>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </section>
 
-        {/* Badges Section */}
+        {/* 2. Cards & Variants Section */}
+        <section id="cards" className="space-y-4 scroll-mt-32">
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold text-foreground">Card Variants & Interactive States</h2>
+            <p className="text-sm text-muted-foreground">
+              Varian card untuk konteks hierarki konten berbeda: Default, Interactive (hover), Selectable, Glassmorphism, Gradient, and Flat.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Default Card */}
+            <Card variant="default">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-primary" />
+                  Default Card
+                </CardTitle>
+                <CardDescription>Standar container berbingkai border token.</CardDescription>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">
+                Cocok untuk form section, setting panels, dan modular dashboard widgets.
+              </CardContent>
+            </Card>
+
+            {/* Interactive Card */}
+            <Card variant="interactive" onClick={() => toast({ title: 'Interactive Card Clicked' })}>
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-highlight" />
+                  Interactive Card
+                </CardTitle>
+                <CardDescription>Hover elevation & slight translation.</CardDescription>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">
+                Klik kartu ini untuk melihat feedback active state yang tactile.
+              </CardContent>
+            </Card>
+
+            {/* Glass Card */}
+            <Card variant="glass">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  Glassmorphism Card
+                </CardTitle>
+                <CardDescription>Backdrop blur dengan translucent background.</CardDescription>
+              </CardHeader>
+              <CardContent className="text-xs text-muted-foreground">
+                Sangat estetik untuk floating widgets, hero showcases, dan stats.
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            {/* Selectable Cards (Radio Card Pattern) */}
+            <Card
+              variant="selectable"
+              selected={selectedCard === 'card-1'}
+              onClick={() => setSelectedCard('card-1')}
+            >
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">Standard Plan</CardTitle>
+                  <Badge variant={selectedCard === 'card-1' ? 'default' : 'outline'}>
+                    {selectedCard === 'card-1' ? 'Selected' : 'Select'}
+                  </Badge>
+                </div>
+                <CardDescription>$29 / bulan · Akses 5 pengguna</CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card
+              variant="selectable"
+              selected={selectedCard === 'card-2'}
+              onClick={() => setSelectedCard('card-2')}
+            >
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    Enterprise Pro
+                    <Badge variant="highlight">Popular</Badge>
+                  </CardTitle>
+                  <Badge variant={selectedCard === 'card-2' ? 'default' : 'outline'}>
+                    {selectedCard === 'card-2' ? 'Selected' : 'Select'}
+                  </Badge>
+                </div>
+                <CardDescription>$99 / bulan · Unlimited seat & dedicated support</CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </section>
+
+        {/* 3. Avatars & Avatar Groups */}
+        <section id="avatars" className="space-y-4 scroll-mt-32">
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold text-foreground">Avatars & Avatar Groups</h2>
+            <p className="text-sm text-muted-foreground">
+              Support 5 ukuran (xs, sm, default, lg, xl), live status indicators (online, away, busy, offline), dan overlapping AvatarGroup.
+            </p>
+          </div>
+
+          <Card className="border-border">
+            <CardContent className="p-6 space-y-6">
+              {/* Sizes & Status Dots */}
+              <div className="space-y-2">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Sizes & Presence Indicators
+                </span>
+                <div className="flex flex-wrap items-center gap-6">
+                  <Avatar size="xs" status="online">
+                    <AvatarFallback>XS</AvatarFallback>
+                  </Avatar>
+                  <Avatar size="sm" status="online">
+                    <AvatarFallback>SM</AvatarFallback>
+                  </Avatar>
+                  <Avatar size="default" status="away">
+                    <AvatarFallback>DF</AvatarFallback>
+                  </Avatar>
+                  <Avatar size="lg" status="busy">
+                    <AvatarFallback>LG</AvatarFallback>
+                  </Avatar>
+                  <Avatar size="xl" status="online">
+                    <AvatarImage src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="Sarah" />
+                    <AvatarFallback>XL</AvatarFallback>
+                  </Avatar>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Overlap Group Stack */}
+              <div className="space-y-2">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Avatar Group (with Overflow Counter)
+                </span>
+                <div className="flex items-center gap-6">
+                  <AvatarGroup max={4} size="default">
+                    <Avatar><AvatarFallback className="bg-primary/20 text-primary">AR</AvatarFallback></Avatar>
+                    <Avatar><AvatarFallback className="bg-success/20 text-success">BK</AvatarFallback></Avatar>
+                    <Avatar><AvatarFallback className="bg-warning/20 text-warning">CL</AvatarFallback></Avatar>
+                    <Avatar><AvatarFallback className="bg-destructive/20 text-destructive">DT</AvatarFallback></Avatar>
+                    <Avatar><AvatarFallback>EM</AvatarFallback></Avatar>
+                    <Avatar><AvatarFallback>FN</AvatarFallback></Avatar>
+                  </AvatarGroup>
+
+                  <span className="text-xs text-muted-foreground">
+                    6 team members · 4 shown + 2 excess
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* 4. Tabs & Navigation Variants */}
+        <section id="tabs" className="space-y-4 scroll-mt-32">
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold text-foreground">Tabs Navigation Variants</h2>
+            <p className="text-sm text-muted-foreground">
+              3 Varian visual: Default (pills dalam muted container), Underline (clean minimalist line), dan Enclosed (segmented border).
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Default Pills Variant */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Default (Pills)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="overview" variant="default">
+                  <TabsList className="w-full">
+                    <TabsTrigger value="overview" className="flex-1">Overview</TabsTrigger>
+                    <TabsTrigger value="analytics" className="flex-1">Analytics</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="overview" className="text-xs text-muted-foreground p-2">
+                    Ringkasan performa sistem secara umum.
+                  </TabsContent>
+                  <TabsContent value="analytics" className="text-xs text-muted-foreground p-2">
+                    Metrik detail dan conversion funnel.
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            {/* Underline Variant */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Underline</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="account" variant="underline">
+                  <TabsList>
+                    <TabsTrigger value="account">Account</TabsTrigger>
+                    <TabsTrigger value="security">Security</TabsTrigger>
+                    <TabsTrigger value="billing">Billing</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="account" className="text-xs text-muted-foreground pt-2">
+                    Kelola profil publik dan avatar.
+                  </TabsContent>
+                  <TabsContent value="security" className="text-xs text-muted-foreground pt-2">
+                    Pengaturan MFA dan session devices.
+                  </TabsContent>
+                  <TabsContent value="billing" className="text-xs text-muted-foreground pt-2">
+                    Invoice riwayat dan kartu kredit.
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            {/* Enclosed Variant */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Enclosed (Boxed)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="day" variant="enclosed">
+                  <TabsList className="w-full">
+                    <TabsTrigger value="day" className="flex-1">1 Day</TabsTrigger>
+                    <TabsTrigger value="week" className="flex-1">1 Week</TabsTrigger>
+                    <TabsTrigger value="month" className="flex-1">1 Month</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="day" className="text-xs text-muted-foreground p-2">
+                    24-hour breakdown timeline.
+                  </TabsContent>
+                  <TabsContent value="week" className="text-xs text-muted-foreground p-2">
+                    7-day aggregated trends.
+                  </TabsContent>
+                  <TabsContent value="month" className="text-xs text-muted-foreground p-2">
+                    30-day billing volume.
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* 5. Accordions & Disclosure */}
+        <section id="accordions" className="space-y-4 scroll-mt-32">
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold text-foreground">Accordions & Collapsible Sections</h2>
+            <p className="text-sm text-muted-foreground">
+              Pola FAQ dan collapsible filters dengan smooth height animation dan full keyboard a11y.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Separated Card Style Accordion */}
+            <div className="space-y-2">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Separated Variant (Card Style)
+              </span>
+              <Accordion type="single" collapsible defaultValue="faq-1" variant="separated">
+                <AccordionItem value="faq-1">
+                  <AccordionTrigger className="px-4">
+                    Bagaimana cara mengaktifkan Dark Mode?
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4">
+                    Design system mendukung OKLCH color tokens dengan parity light & dark mode otomatis via kelas CSS `.dark` atau data attribute `theme`.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="faq-2">
+                  <AccordionTrigger className="px-4">
+                    Apakah mendukung keyboard navigation?
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4">
+                    Ya, semua komponen interaktif dibangun di atas Radix UI primitives yang memenuhi standar WCAG 2.1 AA (Tab, Space, Enter, Arrow keys).
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+
+            {/* Bordered Flush Accordion */}
+            <div className="space-y-2">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Bordered Variant (Flush)
+              </span>
+              <Accordion type="single" collapsible variant="bordered">
+                <AccordionItem value="item-1">
+                  <AccordionTrigger>
+                    Integrasi dengan Tailwind CSS v4
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    Menggunakan direct `@theme` directives di tokens.css tanpa overhead runtime konversi warna.
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-2">
+                  <AccordionTrigger>
+                    Testing Strategy & Vitest
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    Unit tests berjalan dengan Vitest + React Testing Library dengan coverage penuh untuk state & event handling.
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          </div>
+        </section>
+
+        {/* 6. Ratings & Feedback */}
+        <section id="ratings" className="space-y-4 scroll-mt-32">
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold text-foreground">Rating & Star Feedback</h2>
+            <p className="text-sm text-muted-foreground">
+              Komponen review interaktif dengan hover preview, precision half-star, keyboard navigation, dan read-only display mode.
+            </p>
+          </div>
+
+          <Card className="border-border">
+            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+              <div className="space-y-2">
+                <Label>Interactive Rating (Click or Hover)</Label>
+                <div className="flex items-center gap-3 pt-1">
+                  <Rating
+                    value={ratingVal}
+                    onChange={setRatingVal}
+                    size="lg"
+                    showValueText
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Nilai terpilih: {ratingVal} dari 5 bintang</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Half-star Precision (0.5)</Label>
+                <div className="pt-1">
+                  <Rating
+                    defaultValue={4.5}
+                    allowHalf
+                    size="default"
+                    showValueText
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Support nilai desimal akurat</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Read-Only Score Badge</Label>
+                <div className="pt-1 flex items-center gap-2">
+                  <Rating defaultValue={5} readOnly size="sm" />
+                  <span className="text-xs font-semibold text-foreground">5.0 (1,240 ulasan)</span>
+                </div>
+                <p className="text-xs text-muted-foreground">Cocok untuk card produk & profil</p>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* 7. File Uploads */}
+        <section id="file-uploads" className="space-y-4 scroll-mt-32">
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold text-foreground">File Upload Inputs</h2>
+            <p className="text-sm text-muted-foreground">
+              Dropzone terpadu dengan drag & drop, file size validation, multiple file list dengan removal feedback.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Dropzone Variant</CardTitle>
+                <CardDescription>Cocok untuk area upload utama dokumen.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FileInput
+                  value={uploadedFiles}
+                  onChange={setUploadedFiles}
+                  accept=".png,.jpg,.pdf"
+                  maxSize={5 * 1024 * 1024}
+                  helperText="PNG, JPG, PDF hingga 5MB"
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Compact Variant</CardTitle>
+                <CardDescription>Ringkas untuk modal atau form sempit.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <FileInput
+                  variant="compact"
+                  accept=".csv,.xlsx"
+                  helperText="Upload data tabular CSV/Excel"
+                />
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* 8. Code Blocks */}
+        <section id="code-blocks" className="space-y-4 scroll-mt-32">
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold text-foreground">Code Blocks & Snippets</h2>
+            <p className="text-sm text-muted-foreground">
+              Container syntax dengan copy-to-clipboard, file badge label, dan collapsible option.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <CodeBlock
+              filename="button.tsx"
+              language="tsx"
+              showLineNumbers
+              code={`import { Button } from '@ds/ui';
+
+export function ActionExample() {
+  return (
+    <Button variant="highlight" size="lg" onClick={() => console.log('Action triggered')}>
+      Launch Project
+    </Button>
+  );
+}`}
+            />
+          </div>
+        </section>
+
+        {/* 9. Notifications */}
+        <section id="notifications" className="space-y-4 scroll-mt-32">
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold text-foreground">Notifications & Activity Feed</h2>
+            <p className="text-sm text-muted-foreground">
+              Pola feed notifikasi dengan unread indicator dot, timestamp, tindakan langsung, dan dismissal.
+            </p>
+          </div>
+
+          <Card className="border-border">
+            <CardContent className="p-6 space-y-4">
+              <NotificationHeader
+                unreadCount={2}
+                onMarkAllAsRead={() => toast({ title: 'Semua notifikasi ditandai dibaca' })}
+              />
+
+              <NotificationList>
+                <NotificationItem
+                  title="Deployment Berhasil"
+                  description="Aplikasi versi v1.8.0 telah aktif di cluster produksi tanpa kendala."
+                  timestamp="2 menit lalu"
+                  type="success"
+                  read={false}
+                  onRead={() => toast({ title: 'Notifikasi dibaca' })}
+                  onDismiss={() => toast({ title: 'Notifikasi dihapus' })}
+                />
+
+                <NotificationItem
+                  title="Permintaan Kolaborasi Baru"
+                  description="Sarah Jenkins mengundang Anda ke workspace 'Design System v2'."
+                  timestamp="1 jam lalu"
+                  avatar={
+                    <Avatar size="sm">
+                      <AvatarImage src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" />
+                      <AvatarFallback>SJ</AvatarFallback>
+                    </Avatar>
+                  }
+                  read={false}
+                  actions={
+                    <>
+                      <Button size="sm" variant="default" className="h-7 text-xs">
+                        Terima
+                      </Button>
+                      <Button size="sm" variant="outline" className="h-7 text-xs">
+                        Tolak
+                      </Button>
+                    </>
+                  }
+                  onDismiss={() => toast({ title: 'Notifikasi dihapus' })}
+                />
+
+                <NotificationItem
+                  title="Tagihan Bulanan Tersedia"
+                  description="Invoice #INV-2026-08 untuk paket Enterprise telah dibuat."
+                  timestamp="Kemarin"
+                  type="info"
+                  read={true}
+                  onDismiss={() => toast({ title: 'Notifikasi dihapus' })}
+                />
+              </NotificationList>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* 10. Badges Section */}
         <section id="badges" className="space-y-4 scroll-mt-32">
           <h2 className="text-lg font-bold text-foreground">Badges & Status Indicators</h2>
           <Card className="border-border">
@@ -160,6 +707,8 @@ export default function ComponentsPage() {
                 <Badge variant="default">Default</Badge>
                 <Badge variant="secondary">Secondary</Badge>
                 <Badge variant="outline">Outline</Badge>
+                <Badge variant="highlight">Highlight</Badge>
+                <Badge variant="highlight-outline">Highlight Outline</Badge>
                 <Badge variant="success">Active / Success</Badge>
                 <Badge variant="warning">Pending / Warning</Badge>
                 <Badge variant="destructive">Failed / Error</Badge>
@@ -169,7 +718,7 @@ export default function ComponentsPage() {
           </Card>
         </section>
 
-        {/* Form Controls Section */}
+        {/* 11. Form Controls Section */}
         <section id="forms" className="space-y-4 scroll-mt-32">
           <h2 className="text-lg font-bold text-foreground">Form Controls & Inputs</h2>
           <Card className="border-border">
@@ -241,7 +790,7 @@ export default function ComponentsPage() {
           </Card>
         </section>
 
-        {/* Overlays & Dialogs */}
+        {/* 12. Overlays & Dialogs */}
         <section id="overlays" className="space-y-4 scroll-mt-32">
           <h2 className="text-lg font-bold text-foreground">Modals, Sheets & Tooltips</h2>
           <Card className="border-border">
@@ -318,7 +867,7 @@ export default function ComponentsPage() {
           </Card>
         </section>
 
-        {/* Feedback Alerts */}
+        {/* 13. Feedback Alerts */}
         <section id="alerts" className="space-y-4 scroll-mt-32">
           <h2 className="text-lg font-bold text-foreground">Alerts & Banners</h2>
           <div className="space-y-3">
@@ -356,45 +905,7 @@ export default function ComponentsPage() {
           </div>
         </section>
 
-        {/* Radio Group & Spinners Demo */}
-        <section id="inputs-advanced" className="space-y-4 scroll-mt-32">
-          <h2 className="text-lg font-bold text-foreground">Radio Groups & Activity Spinners</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="border-border">
-              <CardContent className="p-6 space-y-4">
-                <p className="text-sm font-medium text-muted-foreground">Radio Group Component</p>
-                <RadioGroup defaultValue="comfortable">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="compact" id="r1" />
-                    <Label htmlFor="r1">Compact Density</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="comfortable" id="r2" />
-                    <Label htmlFor="r2">Comfortable (Default)</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="spacious" id="r3" />
-                    <Label htmlFor="r3">Spacious Density</Label>
-                  </div>
-                </RadioGroup>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border">
-              <CardContent className="p-6 space-y-4">
-                <p className="text-sm font-medium text-muted-foreground">Activity Spinners with ARIA busy</p>
-                <div className="flex items-center gap-6 pt-2">
-                  <Spinner size="sm" variant="primary" label="Small spinner" />
-                  <Spinner size="default" variant="success" label="Default spinner" />
-                  <Spinner size="md" variant="destructive" label="Medium spinner" />
-                  <Spinner size="lg" variant="default" label="Large spinner" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        {/* Custom Craft Components: Empty State & Stat Card */}
+        {/* 14. Custom Craft Components: Empty State & Stat Card */}
         <section id="composite" className="space-y-4 scroll-mt-32">
           <h2 className="text-lg font-bold text-foreground">High-Craft Composite Components</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

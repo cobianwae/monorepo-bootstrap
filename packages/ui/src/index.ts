@@ -62,3 +62,16 @@ export * from './components/ui/section-number';
 
 export * from './components/ui/art-background';
 export * from './components/ui/gradient-text';
+
+// Newly added components (P0 & P2)
+export * from './components/ui/accordion';
+export * from './components/ui/collapsible';
+export * from './components/ui/toggle';
+export * from './components/ui/scroll-area';
+export * from './components/ui/kbd';
+export * from './components/ui/file-input';
+export * from './components/ui/carousel';
+export * from './components/ui/rating';
+export * from './components/ui/code-block';
+export * from './components/ui/sidebar';
+export * from './components/ui/notification';

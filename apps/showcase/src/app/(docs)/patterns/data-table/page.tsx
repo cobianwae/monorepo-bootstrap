@@ -318,7 +318,7 @@ export default function DataTablePatternPage() {
   );
 }
 
-function buildColumns(): ColumnDef<User, unknown>[] {
+function buildColumns(): ColumnDef<User, any>[] {
   const columnHelper = createColumnHelper<User>();
 
   return [
