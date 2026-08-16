@@ -37,9 +37,9 @@ describe('WCAG 2.1 Contrast Calculation Engine', () => {
     }
   });
 
-  it('all 4 themes satisfy WCAG AA (>= 4.5:1) across light and dark modes', () => {
+  it('all themes satisfy WCAG AA (>= 4.5:1) across light and dark modes', () => {
     const allAudited = auditThemeTokenPairs();
-    expect(allAudited.length).toBe(THEMES.length * 10 * 2); // 4 themes * 10 pairs * 2 modes = 80 pairs
+    expect(allAudited.length).toBe(THEMES.length * 10 * 2); // all themes * 10 pairs * 2 modes
     for (const tokenPair of allAudited) {
       expect(
         tokenPair.compliance.ratio,

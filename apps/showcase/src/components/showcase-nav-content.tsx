@@ -47,7 +47,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     title: 'Foundations',
     items: [
-      { title: 'Themes & Art Direction', href: '/foundations/themes', icon: Palette, badge: '4 Themes' },
+      { title: 'Art Directions', href: '/foundations/themes', icon: Palette, badge: '3 Styles' },
       { title: 'Color & Contrast Matrix', href: '/foundations/colors', icon: Sparkles },
       { title: 'Typography Scale', href: '/foundations/typography', icon: BookOpen },
       { title: 'Spacing, Radius & Motion', href: '/foundations/spacing', icon: Layers },

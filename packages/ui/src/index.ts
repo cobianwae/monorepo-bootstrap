@@ -60,3 +60,5 @@ export * from './components/ui/glow-orb';
 export * from './components/ui/statement-card';
 export * from './components/ui/section-number';
 
+export * from './components/ui/art-background';
+export * from './components/ui/gradient-text';

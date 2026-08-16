@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { TYPOGRAPHY_SCALE } from '@ds/tokens';
+import { TYPOGRAPHY_SCALE, getArtDirection, getTonesForArtDirection } from '@ds/tokens';
 import {
   Card,
   CardHeader,
@@ -14,36 +14,7 @@ import {
 } from '@ds/ui';
 import { BookOpen, Sliders } from 'lucide-react';
 import { PageHeader } from '../../../components/page-header';
-
-const FONT_FAMILIES = [
-  {
-    name: 'Inter',
-    role: 'Primary UI Sans-Serif',
-    fontClass: 'font-sans',
-    variable: '--font-sans',
-    weights: [
-      { label: 'Regular', weight: '400', sample: 'Every detail reflects thoughtful intentionality.' },
-      { label: 'Medium', weight: '500', sample: 'Structured contrast enhances cognitive clarity.' },
-      { label: 'Semibold', weight: '600', sample: 'Clear hierarchy guides natural focus navigation.' },
-      { label: 'Bold', weight: '700', sample: 'Confident display anchors key actions instantly.' },
-    ],
-    alphabet: 'Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz',
-    numerals: '0 1 2 3 4 5 6 7 8 9 ( ! @ # $ % & * )',
-  },
-  {
-    name: 'JetBrains Mono',
-    role: 'Code, Telemetry & Data Grid Mono',
-    fontClass: 'font-mono',
-    variable: '--font-mono',
-    weights: [
-      { label: 'Regular', weight: '400', sample: 'const ratio = calculateContrast(fg, bg);' },
-      { label: 'Medium', weight: '500', sample: 'export type TokenCompliance = "AAA" | "AA";' },
-      { label: 'Bold', weight: '700', sample: '0x7FFD98A1  [ACTIVE]  lat: +37.7749' },
-    ],
-    alphabet: 'Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz',
-    numerals: '0 1 2 3 4 5 6 7 8 9 { [ ( => === != ) ] }',
-  },
-];
+import { useTheme } from '../../../components/theme-provider';
 
 const PAIRING_EXAMPLES = [
   {
@@ -63,8 +34,92 @@ const PAIRING_EXAMPLES = [
 ];
 
 export default function TypographyPage() {
+  const { artDirection, palette } = useTheme();
+  
+  const activeDirectionDef = getArtDirection(artDirection);
+  const activeTones = getTonesForArtDirection(artDirection);
+  const activeThemeDef = activeTones.find((t) => t.id === palette) || activeTones[0];
+  
   const [sampleText, setSampleText] = React.useState('Crafting delightful user experiences with mathematical precision');
   const [selectedWeight, setSelectedWeight] = React.useState<string>('400');
+  const [selectedRole, setSelectedRole] = React.useState<'display' | 'body' | 'mono'>('body');
+
+  // Dynamically build font families list based on active art direction
+  const typoDef = activeDirectionDef.typography;
+  
+  // Dedupe logic: if Display and Mono use the same font (e.g., Blueprint), show one shared card
+  const isDisplaySameAsMono = typoDef.displayName === typoDef.monoName;
+  
+  const FONT_FAMILIES = [];
+  
+  if (isDisplaySameAsMono) {
+    FONT_FAMILIES.push({
+      id: 'shared-display-mono',
+      name: typoDef.displayName,
+      role: 'Display Headers, Code & Telemetry',
+      fontClass: 'font-display', // Will fall back to mono naturally
+      variable: typoDef.display,
+      weights: [
+        { label: 'Regular', weight: '400', sample: '0x7FFD98A1  [ACTIVE]  lat: +37.7749' },
+        { label: 'Medium', weight: '500', sample: 'export type TokenCompliance = "AAA" | "AA";' },
+        { label: 'Semibold', weight: '600', sample: 'Architecture & System Infrastructure' },
+      ],
+      alphabet: 'Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz',
+      numerals: '0 1 2 3 4 5 6 7 8 9 { [ ( => === != ) ] }',
+      isMono: true,
+    });
+  } else {
+    FONT_FAMILIES.push({
+      id: 'display',
+      name: typoDef.displayName,
+      role: 'Display & Hero Headlines',
+      fontClass: 'font-display',
+      variable: typoDef.display,
+      weights: [
+        { label: 'Regular', weight: '400', sample: 'Crafting Interfaces with Precision' },
+        { label: 'Medium', weight: '500', sample: 'Unified Visual Language Foundation' },
+        { label: 'Semibold', weight: '600', sample: 'Architecting Scalable Solutions' },
+        { label: 'Bold', weight: '700', sample: 'Modern Web Engineering' },
+      ],
+      alphabet: 'Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz',
+      numerals: '0 1 2 3 4 5 6 7 8 9 ( ! @ # $ % & * )',
+      isMono: false,
+    });
+    
+    FONT_FAMILIES.push({
+      id: 'mono',
+      name: typoDef.monoName,
+      role: 'Code, Telemetry & Data Grid Mono',
+      fontClass: 'font-mono',
+      variable: typoDef.mono,
+      weights: [
+        { label: 'Regular', weight: '400', sample: 'const ratio = calculateContrast(fg, bg);' },
+        { label: 'Medium', weight: '500', sample: 'export type TokenCompliance = "AAA" | "AA";' },
+        { label: 'Bold', weight: '700', sample: '0x7FFD98A1  [ACTIVE]  lat: +37.7749' },
+      ],
+      alphabet: 'Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz',
+      numerals: '0 1 2 3 4 5 6 7 8 9 { [ ( => === != ) ] }',
+      isMono: true,
+    });
+  }
+  
+  // Body font is always added
+  FONT_FAMILIES.splice(1, 0, {
+    id: 'body',
+    name: typoDef.bodyName,
+    role: 'Primary UI Sans-Serif & Body Copy',
+    fontClass: 'font-sans',
+    variable: typoDef.body,
+    weights: [
+      { label: 'Regular', weight: '400', sample: 'Every detail reflects thoughtful intentionality.' },
+      { label: 'Medium', weight: '500', sample: 'Structured contrast enhances cognitive clarity.' },
+      { label: 'Semibold', weight: '600', sample: 'Clear hierarchy guides natural focus navigation.' },
+      { label: 'Bold', weight: '700', sample: 'Confident display anchors key actions instantly.' },
+    ],
+    alphabet: 'Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz',
+    numerals: '0 1 2 3 4 5 6 7 8 9 ( ! @ # $ % & * )',
+    isMono: false,
+  });
 
   return (
     <div className="space-y-10 animate-in fade-in-50 duration-200">
@@ -73,20 +128,25 @@ export default function TypographyPage() {
         eyebrowIcon={BookOpen}
         title="Typography Scale & Specimen Sheet"
         description="The typographic hierarchy establishes clear reading rhythm, high legibility, and proportional scaling across all viewport sizes. Engineered with optical kerning and variable font weights."
+        actions={
+          <Badge variant="highlight-outline" className="font-mono">
+            Active: {activeDirectionDef.name} / {activeThemeDef.name}
+          </Badge>
+        }
       />
 
-      {/* Font Family Dual Specimen Card */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Font Family Dual/Triple Specimen Card */}
+      <div className={`grid grid-cols-1 ${FONT_FAMILIES.length === 2 ? 'lg:grid-cols-2' : 'lg:grid-cols-3'} gap-6`}>
         {FONT_FAMILIES.map((family) => (
-          <Card key={family.name} className="border-border overflow-hidden shadow-xs">
+          <Card key={family.id} className="border-border overflow-hidden shadow-xs">
             <CardHeader className="border-b border-border/60 bg-muted/30 pb-4">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <CardTitle className="text-xl font-bold tracking-tight text-foreground">
+                    <CardTitle className="text-xl font-bold tracking-tight text-foreground truncate max-w-[160px] sm:max-w-xs">
                       {family.name}
                     </CardTitle>
-                    <Badge variant="secondary" className="font-mono text-[10px]">
+                    <Badge variant="secondary" className="font-mono text-[10px] shrink-0">
                       Variable Font
                     </Badge>
                   </div>
@@ -94,11 +154,11 @@ export default function TypographyPage() {
                     {family.role}
                   </CardDescription>
                 </div>
-                <div className="text-right font-mono text-xs text-muted-foreground">
-                  <code className="bg-muted px-2 py-1 rounded text-[11px] text-foreground">
-                    {family.variable}
-                  </code>
-                </div>
+              </div>
+              <div className="mt-3 text-left font-mono text-xs text-muted-foreground">
+                <code className="bg-muted/80 px-2 py-1 rounded text-[10px] sm:text-[11px] text-foreground">
+                  {family.variable}
+                </code>
               </div>
             </CardHeader>
 
@@ -133,8 +193,9 @@ export default function TypographyPage() {
                         {w.label} ({w.weight})
                       </span>
                       <p
-                        className={`text-sm text-foreground ${family.fontClass}`}
+                        className={`text-sm text-foreground ${family.fontClass} truncate`}
                         style={{ fontWeight: Number(w.weight) }}
+                        title={w.sample}
                       >
                         {w.sample}
                       </p>
@@ -155,11 +216,11 @@ export default function TypographyPage() {
             <CardTitle className="text-base">Interactive Specimen Tester</CardTitle>
           </div>
           <CardDescription className="text-xs">
-            Type custom preview copy and test responsive scaling across weights.
+            Type custom preview copy and test responsive scaling across weights and font roles.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div className="md:col-span-2 space-y-2">
               <Label htmlFor="sampleText">Custom Preview Text</Label>
               <Input
@@ -169,6 +230,30 @@ export default function TypographyPage() {
                 placeholder="Type custom text..."
                 className="bg-card"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Preview Role</Label>
+              <div className="flex rounded-lg border border-border bg-card p-1">
+                {[
+                  { label: 'Display', value: 'display' },
+                  { label: 'Body', value: 'body' },
+                  { label: 'Mono', value: 'mono' },
+                ].map((item) => (
+                  <button
+                    key={item.value}
+                    type="button"
+                    onClick={() => setSelectedRole(item.value as 'display' | 'body' | 'mono')}
+                    className={`flex-1 rounded-md py-1 text-xs font-mono font-medium transition-colors ${
+                      selectedRole === item.value
+                        ? 'bg-primary text-primary-foreground shadow-xs'
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -237,7 +322,9 @@ export default function TypographyPage() {
                     fontWeight: Number(selectedWeight),
                     letterSpacing: item.tracking,
                   }}
-                  className="font-sans text-foreground transition-all duration-150 break-words"
+                  className={`text-foreground transition-all duration-150 break-words ${
+                    selectedRole === 'display' ? 'font-display' : selectedRole === 'mono' ? 'font-mono' : 'font-sans'
+                  }`}
                 >
                   {sampleText}
                 </div>
@@ -266,10 +353,10 @@ export default function TypographyPage() {
                 <div className="font-mono text-[11px] font-semibold text-primary tracking-wider">
                   {pair.meta}
                 </div>
-                <h3 className="text-2xl font-bold tracking-tight text-foreground">
+                <h3 className="text-2xl font-bold tracking-tight text-foreground font-display">
                   {pair.display}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed font-sans">
                   {pair.body}
                 </p>
               </CardContent>

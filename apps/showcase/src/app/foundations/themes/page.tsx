@@ -2,8 +2,10 @@
 
 import * as React from 'react';
 import {
-  THEMES,
+  ART_DIRECTIONS,
+  type ArtDirectionId,
   type ThemeId,
+  getTonesForArtDirection,
   auditThemeTokenPairs,
 } from '@ds/tokens';
 import {
@@ -15,6 +17,7 @@ import {
   Badge,
   Button,
   Input,
+  GradientText,
 } from '@ds/ui';
 import {
   Sparkles,
@@ -22,17 +25,20 @@ import {
   ShieldCheck,
   ArrowRight,
   Code2,
-  Palette,
   Eye,
+  Wand2,
 } from 'lucide-react';
 import { PageHeader } from '../../../components/page-header';
 import { useTheme } from '../../../components/theme-provider';
 
 export default function ThemesPage() {
-  const { palette, setPalette, resolvedTheme } = useTheme();
+  const { palette, setPalette, resolvedTheme, artDirection, setArtDirection } = useTheme();
   const isDark = resolvedTheme === 'dark';
 
-  const activeThemeDef = THEMES.find((t) => t.id === palette) || THEMES[0];
+  const activeDirectionDef = ART_DIRECTIONS.find((d) => d.id === artDirection) || ART_DIRECTIONS[0];
+  const activeTones = getTonesForArtDirection(artDirection);
+  const activeThemeDef = activeTones.find((t) => t.id === palette) || activeTones[0];
+  
   const activeAuditedPairs = React.useMemo(
     () => auditThemeTokenPairs(palette),
     [palette]
@@ -42,44 +48,52 @@ export default function ThemesPage() {
     <div className="space-y-10 animate-in fade-in-50 duration-200">
       <PageHeader
         eyebrow="Art Direction System"
-        eyebrowIcon={Palette}
-        title="Themes & Art Direction"
+        eyebrowIcon={Wand2}
+        title="Art Directions & Tones"
         description={
           <>
-            Explore <strong>4 curated art directions</strong> engineered for high visual character while maintaining strict WCAG 2.1 AA/AAA contrast compliance across light and dark modes. Switch themes instantly to see all UI components adapt.
+            Explore <strong>3 curated art directions</strong> offering unique visual character via typography, decorative motifs, and hand-picked color tones. All mathematically verified against WCAG 2.1 AA/AAA contrast rules.
           </>
         }
         actions={
           <div className="flex items-center gap-2">
             <Badge variant="highlight-outline" className="font-mono">
-              Active: {activeThemeDef.name}
+              Active: {activeDirectionDef.name} / {activeThemeDef.name}
             </Badge>
           </div>
         }
       />
 
-      {/* Active Theme Spotlight Banner */}
+      {/* Active Direction Spotlight Banner */}
       <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 max-w-xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-highlight/30 bg-highlight/10 px-3 py-1 text-xs font-semibold text-highlight font-mono">
               <Sparkles className="h-3 w-3" />
-              <span>ACTIVE ART DIRECTION: {activeThemeDef.name.toUpperCase()}</span>
+              <span>ACTIVE ART DIRECTION: {activeDirectionDef.name.toUpperCase()}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground font-display">
-              {activeThemeDef.name} — {activeThemeDef.tagline}
-            </h2>
+            
+            {activeDirectionDef.id === 'aurora' ? (
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight font-display">
+                <GradientText>{activeDirectionDef.name}</GradientText> — {activeDirectionDef.tagline}
+              </h2>
+            ) : (
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground font-display">
+                {activeDirectionDef.name} — {activeDirectionDef.tagline}
+              </h2>
+            )}
+            
             <p className="text-sm text-muted-foreground leading-relaxed">
-              {activeThemeDef.description}
+              {activeDirectionDef.description}
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-muted-foreground font-mono">
               <div>
-                Accent Hue: <span className="text-foreground font-semibold">{activeThemeDef.accentHue}°</span>
+                Display Font: <span className="text-foreground font-semibold">{activeDirectionDef.typography.googleFont.split(',')[0]}</span>
               </div>
               <div className="h-3 w-px bg-border" />
               <div>
-                Mode: <span className="text-foreground font-semibold capitalize">{resolvedTheme}</span>
+                Tone: <span className="text-foreground font-semibold">{activeThemeDef.name}</span>
               </div>
               <div className="h-3 w-px bg-border" />
               <div className="flex items-center gap-1 text-success font-semibold">
@@ -90,7 +104,7 @@ export default function ThemesPage() {
           </div>
 
           {/* Live Micro-Preview using Active Tokens */}
-          <div className="rounded-xl border border-border bg-background/80 p-5 space-y-4 max-w-sm w-full shrink-0 shadow-sm">
+          <div className={`rounded-xl border border-border bg-background/80 p-5 space-y-4 max-w-sm w-full shrink-0 shadow-sm backdrop-blur-md ${activeDirectionDef.id === 'aurora' ? 'gradient-border' : ''}`}>
             <div className="flex items-center justify-between text-xs font-semibold text-foreground font-display">
               <span>Interactive Component Test</span>
               <Eye className="h-3.5 w-3.5 text-muted-foreground" />
@@ -125,19 +139,94 @@ export default function ThemesPage() {
         </div>
       </div>
 
-      {/* 4 Curated Themes Grid */}
+      {/* 3 Art Directions */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold tracking-tight text-foreground font-display">
-            Curated Art Direction Library
+            Art Direction Library
           </h3>
           <span className="text-xs text-muted-foreground font-mono">
-            Click to switch theme
+            Click to switch direction
           </span>
         </div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {ART_DIRECTIONS.map((dir) => {
+            const isSelected = dir.id === artDirection;
+            
+            return (
+              <Card
+                key={dir.id}
+                className={`transition-all duration-200 flex flex-col ${
+                  isSelected
+                    ? 'ring-2 ring-highlight border-highlight/50 shadow-md'
+                    : 'hover:border-border/80 hover:shadow-xs'
+                }`}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary text-foreground shadow-xs">
+                      <Wand2 className="h-4 w-4" />
+                    </div>
+                    <Button
+                      size="sm"
+                      variant={isSelected ? 'secondary' : 'outline'}
+                      onClick={() => setArtDirection(dir.id as ArtDirectionId)}
+                      className="gap-1.5 text-xs h-8"
+                    >
+                      {isSelected ? (
+                        <>
+                          <Check className="h-3.5 w-3.5 text-highlight" />
+                          <span>Active</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Activate</span>
+                          <ArrowRight className="h-3 w-3" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                  <CardTitle className="text-base font-display">
+                    {dir.id === 'aurora' ? <GradientText>{dir.name}</GradientText> : dir.name}
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    {dir.tagline}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 pt-0 flex-1 flex flex-col">
+                  <p className="text-xs text-muted-foreground leading-relaxed flex-1">
+                    {dir.description}
+                  </p>
+                  <div className="space-y-2 border-t border-border pt-3">
+                    <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Typography</span>
+                    <p className="text-xs font-mono">{dir.typography.googleFont}</p>
+                  </div>
+                  <div className="space-y-2 border-t border-border pt-3">
+                    <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Motifs</span>
+                    <ul className="text-xs text-muted-foreground list-disc pl-4 space-y-1">
+                      {dir.art.signature.map((s, i) => (
+                        <li key={i}>{s}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+      
+      {/* Color Tones for Active Art Direction */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-bold tracking-tight text-foreground font-display">
+            Color Tones for {activeDirectionDef.name}
+          </h3>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {THEMES.map((theme) => {
+          {activeTones.map((theme) => {
             const isSelected = theme.id === palette;
             const primaryHex = isDark
               ? theme.swatches.primary.darkHex
@@ -258,7 +347,7 @@ export default function ThemesPage() {
         </div>
       </div>
 
-      {/* Contrast Matrix for Active Theme */}
+      {/* Contrast Matrix for Active Tone */}
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -267,7 +356,7 @@ export default function ThemesPage() {
                 Audited Contrast Pairs: {activeThemeDef.name}
               </CardTitle>
               <CardDescription>
-                Mathematical WCAG 2.1 ratio audit for all semantic pairs in the {activeThemeDef.name} theme.
+                Mathematical WCAG 2.1 ratio audit for all semantic pairs in the {activeThemeDef.name} tone.
               </CardDescription>
             </div>
             <div className="flex items-center gap-1.5 rounded-md bg-success/10 border border-success/30 px-2.5 py-1 text-xs text-success font-semibold">
@@ -345,21 +434,21 @@ export default function ThemesPage() {
           <div className="flex items-center gap-2">
             <Code2 className="h-4 w-4 text-highlight" />
             <CardTitle className="text-base font-display">
-              How to Apply Themes in Code
+              How to Apply Art Directions in Code
             </CardTitle>
           </div>
           <CardDescription>
-            Use either declarative HTML attributes or the React hook in your app.
+            Use declarative HTML attributes to switch between art directions and color tones.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <h4 className="text-xs font-semibold text-foreground font-mono uppercase tracking-wider">
-              1. Declarative CSS Attribute
+              1. Declarative CSS Attributes
             </h4>
             <pre className="rounded-lg bg-muted/60 p-3.5 text-xs font-mono text-foreground overflow-x-auto border border-border">
-{`<!-- Set on html tag to switch entire app theme -->
-<html lang="en" data-theme="sunset" class="dark">`}
+{`<!-- Set on html tag to switch entire app style -->
+<html lang="en" data-art-direction="aurora" data-theme="nebula" class="dark">`}
             </pre>
           </div>
 
@@ -371,10 +460,10 @@ export default function ThemesPage() {
 {`import { useTheme } from '@/components/theme-provider';
 
 export function ThemeControl() {
-  const { palette, setPalette } = useTheme();
+  const { artDirection, setArtDirection, palette, setPalette } = useTheme();
   return (
-    <button onClick={() => setPalette('midnight')}>
-      Active Theme: {palette}
+    <button onClick={() => setArtDirection('blueprint')}>
+      Active Direction: {artDirection}
     </button>
   );
 }`}

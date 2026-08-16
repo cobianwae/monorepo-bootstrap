@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { Sun, Moon, Laptop, Palette } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { THEMES, type ThemeId } from '@ds/tokens';
+import { ART_DIRECTIONS, type ThemeId, type ArtDirectionId, getTonesForArtDirection } from '@ds/tokens';
 import { CommandPalette, type CommandPaletteGroup } from '@ds/ui';
 import { NAV_SECTIONS } from './showcase-nav-content';
 import { useTheme } from './theme-provider';
@@ -19,7 +19,7 @@ function itemIcon(kind: 'light' | 'dark' | 'system'): LucideIcon {
 
 export function GlobalCommandPalette() {
   const router = useRouter();
-  const { setTheme, setPalette } = useTheme();
+  const { setTheme, setPalette, artDirection, setArtDirection } = useTheme();
 
   const groups: CommandPaletteGroup[] = [
     {
@@ -35,14 +35,24 @@ export function GlobalCommandPalette() {
         }))
       ),
     },
+    
     {
-      heading: 'Art Direction & Themes',
-      items: THEMES.map((t) => ({
-        id: `palette-${t.id}`,
-        label: `Set Art Direction: ${t.name}`,
-        description: t.tagline,
+      heading: 'Art Directions',
+      items: ART_DIRECTIONS.map((dir) => ({
+        id: `ad-${dir.id}`,
         icon: Palette,
-        keywords: ['theme', 'palette', 'color', 'art direction', t.name.toLowerCase()],
+        label: `Set Art Direction: ${dir.name}`,
+        description: dir.tagline,
+        onSelect: () => setArtDirection(dir.id as ArtDirectionId),
+      })),
+    },
+    {
+      heading: 'Color Tones',
+      items: getTonesForArtDirection(artDirection).map((t) => ({
+        id: `theme-${t.id}`,
+        icon: Palette,
+        label: `Set Tone: ${t.name}`,
+        description: t.tagline,
         onSelect: () => setPalette(t.id as ThemeId),
       })),
     },

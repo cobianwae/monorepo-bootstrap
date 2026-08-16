@@ -34,11 +34,11 @@ import {
 export default function OverviewPage() {
   const sections = [
     {
-      title: 'Themes & Art Direction',
-      description: '4 curated visual identities with live switching and audited WCAG AA/AAA parity.',
+      title: 'Art Directions & Tones',
+      description: '3 art directions and 8 color tones with live switching and audited WCAG AA/AAA parity.',
       href: '/foundations/themes',
       icon: Palette,
-      badge: '4 Themes',
+      badge: '3 Styles',
       tag: 'FOUNDATION',
     },
     {
@@ -195,7 +195,7 @@ export default function OverviewPage() {
           <div className="flex flex-wrap items-center gap-3 pt-3">
             <Link href="/foundations/themes">
               <Button variant="highlight" className="gap-2 h-10 px-5 font-semibold text-sm shadow-md">
-                Explore 4 Art Directions
+                Explore 3 Art Directions
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -227,7 +227,7 @@ export default function OverviewPage() {
               Guaranteed WCAG Contrast
             </CardTitle>
             <CardDescription className="text-xs leading-relaxed">
-              All 80 token pairs across 4 themes are mathematically verified against WCAG 2.1 AA (≥ 4.5:1) & AAA (≥ 7.0:1) with automated CI tests.
+              All 160 token pairs across 8 tones are mathematically verified against WCAG 2.1 AA (≥ 4.5:1) & AAA (≥ 7.0:1) with automated CI tests.
             </CardDescription>
           </CardHeader>
         </Card>

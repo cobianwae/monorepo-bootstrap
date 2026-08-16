@@ -1,6 +1,9 @@
-export type ThemeId = 'pulse' | 'sunset' | 'botanic' | 'midnight';
+export type ThemeId = 'pulse' | 'sunset' | 'botanic' | 'midnight' | 'nebula' | 'lagoon' | 'ink' | 'graphite';
+
+import type { ArtDirectionId } from './art-directions';
 
 export interface ThemeDefinition {
+  direction: ArtDirectionId;
   id: ThemeId;
   name: string;
   tagline: string;
@@ -24,6 +27,7 @@ export interface ThemeDefinition {
 
 export const THEMES: ThemeDefinition[] = [
   {
+    direction: 'atelier',
     id: 'pulse',
     name: 'Pulse',
     tagline: 'Electric Studio',
@@ -143,6 +147,7 @@ export const THEMES: ThemeDefinition[] = [
     ],
   },
   {
+    direction: 'atelier',
     id: 'sunset',
     name: 'Sunset',
     tagline: 'Warm Terracotta',
@@ -262,6 +267,7 @@ export const THEMES: ThemeDefinition[] = [
     ],
   },
   {
+    direction: 'atelier',
     id: 'botanic',
     name: 'Botanic',
     tagline: 'Sage & Emerald',
@@ -381,6 +387,7 @@ export const THEMES: ThemeDefinition[] = [
     ],
   },
   {
+    direction: 'atelier',
     id: 'midnight',
     name: 'Midnight',
     tagline: 'Obsidian & Neon',
@@ -499,6 +506,107 @@ export const THEMES: ThemeDefinition[] = [
       },
     ],
   },
+
+  {
+    direction: 'aurora',
+    id: 'nebula',
+    name: 'Nebula',
+    tagline: 'Violet & Magenta',
+    description: 'Vibrant and dreamy gradient tones with violet and magenta.',
+    accentHue: 300,
+    swatches: {
+      primary: { light: 'oklch(0.50 0.22 300)', dark: 'oklch(0.70 0.20 300)', lightHex: '#B829E3', darkHex: '#D972FF' },
+      highlight: { light: 'oklch(0.60 0.22 330)', dark: 'oklch(0.80 0.18 330)', lightHex: '#E838A6', darkHex: '#F98BCA' },
+      surface: { light: 'oklch(0.99 0.005 300)', dark: 'oklch(0.12 0.02 300)', lightHex: '#FCFAFF', darkHex: '#140E17' },
+    },
+    pairs: [
+      { name: 'Default Body Text', fgName: 'Foreground', bgName: 'Background', lightFg: '#21102A', lightBg: '#FCFAFF', darkFg: '#F7EDFF', darkBg: '#140E17' },
+      { name: 'Card Content', fgName: 'Card Foreground', bgName: 'Card', lightFg: '#21102A', lightBg: '#FFFFFF', darkFg: '#F7EDFF', darkBg: '#1D1422' },
+      { name: 'Primary Action Button', fgName: 'Primary Foreground', bgName: 'Primary', lightFg: '#FFFFFF', lightBg: '#B829E3', darkFg: '#140E17', darkBg: '#D972FF' },
+      { name: 'Highlight Accent Element', fgName: 'Highlight Foreground', bgName: 'Highlight', lightFg: '#FFFFFF', lightBg: '#C01980', darkFg: '#140E17', darkBg: '#F98BCA' },
+      { name: 'Secondary Action Button', fgName: 'Secondary Foreground', bgName: 'Secondary', lightFg: '#21102A', lightBg: '#F0E5F5', darkFg: '#F7EDFF', darkBg: '#2E2235' },
+      { name: 'Muted Caption Text', fgName: 'Muted Foreground', bgName: 'Background', lightFg: '#645370', lightBg: '#FCFAFF', darkFg: '#B29FC0', darkBg: '#140E17' },
+      { name: 'Destructive Button', fgName: 'Destructive Foreground', bgName: 'Destructive', lightFg: '#FFFFFF', lightBg: '#DC2626', darkFg: '#140E17', darkBg: '#F87171' },
+      { name: 'Success Badge / Banner', fgName: 'Success Foreground', bgName: 'Success', lightFg: '#FFFFFF', lightBg: '#047857', darkFg: '#140E17', darkBg: '#34D399' },
+      { name: 'Warning Banner', fgName: 'Warning Foreground', bgName: 'Warning', lightFg: '#18181B', lightBg: '#D97706', darkFg: '#18181B', darkBg: '#FBBF24' },
+      { name: 'Info Notice', fgName: 'Info Foreground', bgName: 'Info', lightFg: '#FFFFFF', lightBg: '#2563EB', darkFg: '#140E17', darkBg: '#60A5FA' },
+    ]
+  },
+  {
+    direction: 'aurora',
+    id: 'lagoon',
+    name: 'Lagoon',
+    tagline: 'Teal & Deep Blue',
+    description: 'Liquid gradients combining deep oceanic blue and vibrant teal.',
+    accentHue: 200,
+    swatches: {
+      primary: { light: 'oklch(0.50 0.15 240)', dark: 'oklch(0.70 0.14 240)', lightHex: '#2563EB', darkHex: '#60A5FA' },
+      highlight: { light: 'oklch(0.55 0.14 200)', dark: 'oklch(0.80 0.12 200)', lightHex: '#0891B2', darkHex: '#2DD4BF' },
+      surface: { light: 'oklch(0.99 0.005 240)', dark: 'oklch(0.12 0.02 240)', lightHex: '#F8FAFC', darkHex: '#0F172A' },
+    },
+    pairs: [
+      { name: 'Default Body Text', fgName: 'Foreground', bgName: 'Background', lightFg: '#0F172A', lightBg: '#F8FAFC', darkFg: '#F1F5F9', darkBg: '#0F172A' },
+      { name: 'Card Content', fgName: 'Card Foreground', bgName: 'Card', lightFg: '#0F172A', lightBg: '#FFFFFF', darkFg: '#F1F5F9', darkBg: '#1E293B' },
+      { name: 'Primary Action Button', fgName: 'Primary Foreground', bgName: 'Primary', lightFg: '#FFFFFF', lightBg: '#2563EB', darkFg: '#0F172A', darkBg: '#60A5FA' },
+      { name: 'Highlight Accent Element', fgName: 'Highlight Foreground', bgName: 'Highlight', lightFg: '#FFFFFF', lightBg: '#067A96', darkFg: '#0F172A', darkBg: '#2DD4BF' },
+      { name: 'Secondary Action Button', fgName: 'Secondary Foreground', bgName: 'Secondary', lightFg: '#0F172A', lightBg: '#E2E8F0', darkFg: '#F1F5F9', darkBg: '#334155' },
+      { name: 'Muted Caption Text', fgName: 'Muted Foreground', bgName: 'Background', lightFg: '#475569', lightBg: '#F8FAFC', darkFg: '#94A3B8', darkBg: '#0F172A' },
+      { name: 'Destructive Button', fgName: 'Destructive Foreground', bgName: 'Destructive', lightFg: '#FFFFFF', lightBg: '#DC2626', darkFg: '#0F172A', darkBg: '#F87171' },
+      { name: 'Success Badge / Banner', fgName: 'Success Foreground', bgName: 'Success', lightFg: '#FFFFFF', lightBg: '#047857', darkFg: '#0F172A', darkBg: '#34D399' },
+      { name: 'Warning Banner', fgName: 'Warning Foreground', bgName: 'Warning', lightFg: '#18181B', lightBg: '#D97706', darkFg: '#18181B', darkBg: '#FBBF24' },
+      { name: 'Info Notice', fgName: 'Info Foreground', bgName: 'Info', lightFg: '#FFFFFF', lightBg: '#2563EB', darkFg: '#0F172A', darkBg: '#60A5FA' },
+    ]
+  },
+  {
+    direction: 'blueprint',
+    id: 'ink',
+    name: 'Ink',
+    tagline: 'Technical Blue',
+    description: 'Precision engineering aesthetic built on classic blueprint ink and stark contrast.',
+    accentHue: 250,
+    swatches: {
+      primary: { light: 'oklch(0.40 0.14 260)', dark: 'oklch(0.70 0.12 260)', lightHex: '#312E81', darkHex: '#818CF8' },
+      highlight: { light: 'oklch(0.50 0.16 230)', dark: 'oklch(0.80 0.14 230)', lightHex: '#0284C7', darkHex: '#38BDF8' },
+      surface: { light: 'oklch(0.99 0.005 260)', dark: 'oklch(0.12 0.015 260)', lightHex: '#F8FAFC', darkHex: '#0F172A' },
+    },
+    pairs: [
+      { name: 'Default Body Text', fgName: 'Foreground', bgName: 'Background', lightFg: '#020617', lightBg: '#F8FAFC', darkFg: '#F8FAFC', darkBg: '#0F172A' },
+      { name: 'Card Content', fgName: 'Card Foreground', bgName: 'Card', lightFg: '#020617', lightBg: '#FFFFFF', darkFg: '#F8FAFC', darkBg: '#1E293B' },
+      { name: 'Primary Action Button', fgName: 'Primary Foreground', bgName: 'Primary', lightFg: '#FFFFFF', lightBg: '#312E81', darkFg: '#0F172A', darkBg: '#818CF8' },
+      { name: 'Highlight Accent Element', fgName: 'Highlight Foreground', bgName: 'Highlight', lightFg: '#FFFFFF', lightBg: '#02679C', darkFg: '#0F172A', darkBg: '#38BDF8' },
+      { name: 'Secondary Action Button', fgName: 'Secondary Foreground', bgName: 'Secondary', lightFg: '#020617', lightBg: '#E2E8F0', darkFg: '#F8FAFC', darkBg: '#334155' },
+      { name: 'Muted Caption Text', fgName: 'Muted Foreground', bgName: 'Background', lightFg: '#475569', lightBg: '#F8FAFC', darkFg: '#94A3B8', darkBg: '#0F172A' },
+      { name: 'Destructive Button', fgName: 'Destructive Foreground', bgName: 'Destructive', lightFg: '#FFFFFF', lightBg: '#DC2626', darkFg: '#0F172A', darkBg: '#F87171' },
+      { name: 'Success Badge / Banner', fgName: 'Success Foreground', bgName: 'Success', lightFg: '#FFFFFF', lightBg: '#047857', darkFg: '#0F172A', darkBg: '#34D399' },
+      { name: 'Warning Banner', fgName: 'Warning Foreground', bgName: 'Warning', lightFg: '#18181B', lightBg: '#D97706', darkFg: '#18181B', darkBg: '#FBBF24' },
+      { name: 'Info Notice', fgName: 'Info Foreground', bgName: 'Info', lightFg: '#FFFFFF', lightBg: '#2563EB', darkFg: '#0F172A', darkBg: '#60A5FA' },
+    ]
+  },
+  {
+    direction: 'blueprint',
+    id: 'graphite',
+    name: 'Graphite',
+    tagline: 'Charcoal & Signal Amber',
+    description: 'Industrial charcoal canvas illuminated by strict amber signal warnings.',
+    accentHue: 70,
+    swatches: {
+      primary: { light: 'oklch(0.35 0.01 260)', dark: 'oklch(0.85 0.01 260)', lightHex: '#3F3F46', darkHex: '#D4D4D8' },
+      highlight: { light: 'oklch(0.60 0.16 70)', dark: 'oklch(0.80 0.15 75)', lightHex: '#D97706', darkHex: '#FBBF24' },
+      surface: { light: 'oklch(0.99 0 0)', dark: 'oklch(0.12 0.005 260)', lightHex: '#FAFAFA', darkHex: '#09090B' },
+    },
+    pairs: [
+      { name: 'Default Body Text', fgName: 'Foreground', bgName: 'Background', lightFg: '#09090B', lightBg: '#FAFAFA', darkFg: '#FAFAFA', darkBg: '#09090B' },
+      { name: 'Card Content', fgName: 'Card Foreground', bgName: 'Card', lightFg: '#09090B', lightBg: '#FFFFFF', darkFg: '#FAFAFA', darkBg: '#18181B' },
+      { name: 'Primary Action Button', fgName: 'Primary Foreground', bgName: 'Primary', lightFg: '#FFFFFF', lightBg: '#3F3F46', darkFg: '#09090B', darkBg: '#D4D4D8' },
+      { name: 'Highlight Accent Element', fgName: 'Highlight Foreground', bgName: 'Highlight', lightFg: '#09090B', lightBg: '#D97706', darkFg: '#09090B', darkBg: '#FBBF24' },
+      { name: 'Secondary Action Button', fgName: 'Secondary Foreground', bgName: 'Secondary', lightFg: '#09090B', lightBg: '#E4E4E7', darkFg: '#FAFAFA', darkBg: '#27272A' },
+      { name: 'Muted Caption Text', fgName: 'Muted Foreground', bgName: 'Background', lightFg: '#52525B', lightBg: '#FAFAFA', darkFg: '#A1A1AA', darkBg: '#09090B' },
+      { name: 'Destructive Button', fgName: 'Destructive Foreground', bgName: 'Destructive', lightFg: '#FFFFFF', lightBg: '#DC2626', darkFg: '#09090B', darkBg: '#F87171' },
+      { name: 'Success Badge / Banner', fgName: 'Success Foreground', bgName: 'Success', lightFg: '#FFFFFF', lightBg: '#047857', darkFg: '#09090B', darkBg: '#34D399' },
+      { name: 'Warning Banner', fgName: 'Warning Foreground', bgName: 'Warning', lightFg: '#09090B', lightBg: '#D97706', darkFg: '#09090B', darkBg: '#FBBF24' },
+      { name: 'Info Notice', fgName: 'Info Foreground', bgName: 'Info', lightFg: '#FFFFFF', lightBg: '#2563EB', darkFg: '#09090B', darkBg: '#60A5FA' },
+    ]
+  }
 ];
 
 export function getTheme(id: ThemeId): ThemeDefinition {

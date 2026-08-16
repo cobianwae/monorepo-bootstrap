@@ -65,7 +65,7 @@ export function ShowcaseSidebar() {
               <div className="h-full bg-gradient-to-r from-success to-highlight w-full rounded-full" />
             </div>
             <p className="text-[10px] text-muted-foreground font-mono">
-              80 token pairs verified WCAG
+              160 token pairs verified WCAG
             </p>
           </div>
         </div>
