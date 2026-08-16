@@ -10,7 +10,6 @@ import {
   Sun,
   Moon,
   RotateCcw,
-  Menu,
   CheckCheck,
   Building2,
 } from 'lucide-react';
@@ -30,14 +29,15 @@ import {
   BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
+  SidebarTrigger,
+  Kbd,
+  useSidebar,
 } from '@ds/ui';
 import { useCrm } from '../store/crm-context';
 import { useTheme } from '@/components/theme-provider';
 import { PaletteSwitcher } from '@/components/palette-switcher';
 
 interface CrmHeaderProps {
-  sidebarCollapsed?: boolean;
-  onOpenMobileMenu?: () => void;
   onOpenCommandPalette: () => void;
 }
 
@@ -49,12 +49,11 @@ const SECTION_TITLES: Record<string, string> = {
   '/crm/ai': 'AI Intelligence & Copilot Studio',
 };
 
-export function CrmHeader({
-  sidebarCollapsed = false,
-  onOpenMobileMenu,
-  onOpenCommandPalette,
-}: CrmHeaderProps) {
+export function CrmHeader({ onOpenCommandPalette }: CrmHeaderProps) {
   const pathname = usePathname();
+  const { state } = useSidebar();
+  const isCollapsed = state === 'collapsed';
+
   const {
     notifications,
     markNotificationsRead,
@@ -72,22 +71,12 @@ export function CrmHeader({
 
   return (
     <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-border bg-background/80 px-4 md:px-6 backdrop-blur-md">
-      {/* Left: Mobile hamburger, Collapsed Logo & Breadcrumbs */}
+      {/* Left: Sidebar trigger, Collapsed Logo & Breadcrumbs */}
       <div className="flex items-center gap-3">
-        {onOpenMobileMenu && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="lg:hidden h-9 w-9"
-            onClick={onOpenMobileMenu}
-            aria-label="Open mobile navigation menu"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        )}
+        <SidebarTrigger className="lg:hidden" />
 
-        {/* Collapsed Navbar Logo Mark (Theme-reactive gradient identical to docs & sidebar) */}
-        {sidebarCollapsed && (
+        {/* Collapsed Navbar Logo Mark */}
+        {isCollapsed && (
           <Link
             href="/crm"
             className="hidden lg:flex items-center group transition-all duration-200 hover:opacity-90 animate-in fade-in-50"
@@ -122,15 +111,15 @@ export function CrmHeader({
         <button
           type="button"
           onClick={onOpenCommandPalette}
-          className="flex h-8 w-36 md:w-52 items-center justify-between rounded-lg border border-border/80 bg-muted/40 px-2.5 text-xs text-muted-foreground hover:border-foreground/30 hover:bg-muted/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex h-8 w-36 md:w-52 items-center justify-between rounded-lg border border-border/80 bg-muted/40 px-2.5 text-xs text-muted-foreground hover:border-foreground/30 hover:bg-muted/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
         >
           <span className="inline-flex items-center gap-1.5 truncate">
             <Search className="h-3.5 w-3.5 shrink-0" />
             <span className="truncate">Search leads, campaigns...</span>
           </span>
-          <kbd className="hidden sm:inline-flex items-center rounded border border-border bg-background px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
+          <Kbd size="sm" className="hidden sm:inline-flex">
             ⌘K
-          </kbd>
+          </Kbd>
         </button>
 
         {/* AI Copilot Quick Launch button */}
@@ -176,7 +165,7 @@ export function CrmHeader({
                 <button
                   type="button"
                   onClick={markNotificationsRead}
-                  className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+                  className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                 >
                   <CheckCheck className="h-3 w-3" />
                   Mark all read
@@ -250,7 +239,7 @@ export function CrmHeader({
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p className="text-xs">Reset demo fixtures to initial state</p>
+              <p className="text-xs">Reset Demo Data</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

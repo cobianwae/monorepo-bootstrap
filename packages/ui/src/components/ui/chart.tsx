@@ -321,6 +321,7 @@ export interface PieChartProps {
   description?: string;
   innerRadius?: number;
   outerRadius?: number;
+  showLegend?: boolean;
   className?: string;
 }
 
@@ -331,6 +332,7 @@ export function PieChartComponent({
   description,
   innerRadius = 55,
   outerRadius = 80,
+  showLegend = true,
   className,
 }: PieChartProps) {
   return (
@@ -351,11 +353,13 @@ export function PieChartComponent({
           ))}
         </Pie>
         <Tooltip content={<ChartTooltipContent />} />
-        <Legend
-          iconType="circle"
-          iconSize={8}
-          wrapperStyle={{ fontSize: 12, color: 'var(--muted-foreground)' }}
-        />
+        {showLegend && (
+          <Legend
+            iconType="circle"
+            iconSize={8}
+            wrapperStyle={{ fontSize: 12, color: 'var(--muted-foreground)' }}
+          />
+        )}
       </PieChart>
     </ChartContainer>
   );

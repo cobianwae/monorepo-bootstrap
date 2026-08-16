@@ -33,7 +33,7 @@ import {
   Slider,
   Progress,
   EmptyState,
-  SectionNumber,
+  GradientText,
   toast,
 } from '@ds/ui';
 import { PageHeader } from '@/components/page-header';
@@ -120,7 +120,11 @@ export default function AiStudioPage() {
       <PageHeader
         eyebrow="AI Intelligence Suite"
         eyebrowIcon={Sparkles}
-        title="AI Intelligence & Copilot Studio"
+        title={
+          <span>
+            AI Intelligence &amp; <GradientText>Copilot Studio</GradientText>
+          </span>
+        }
         description="Explore predictive lead scoring models, test generative sales drafts with streaming token synthesis, and monitor autonomous pipeline triage."
         actions={
           <div className="flex items-center gap-2">
@@ -143,14 +147,16 @@ export default function AiStudioPage() {
             label: 'of total pipeline',
           }}
           icon={Target}
+          variant="highlight"
         />
 
         <StatCard
           title="Triage Accuracy"
           value="94.8%"
           delta={{
-            value: '+3.1% precision',
+            value: '+3.1%',
             trend: 'up',
+            label: 'precision score',
           }}
           icon={CheckCircle2}
         />
@@ -159,8 +165,9 @@ export default function AiStudioPage() {
           title="AI Generated Drafts"
           value="142"
           delta={{
-            value: '88% accepted',
+            value: '88%',
             trend: 'up',
+            label: 'acceptance rate',
           }}
           icon={Wand2}
         />
@@ -169,8 +176,9 @@ export default function AiStudioPage() {
           title="Rep Hours Saved"
           value="34.5 hrs"
           delta={{
-            value: 'per rep / month',
+            value: '+12.4 hrs',
             trend: 'up',
+            label: 'per rep / month',
           }}
           icon={Clock}
         />
@@ -203,8 +211,8 @@ export default function AiStudioPage() {
               <CardHeader className="pb-3 border-b border-border/40">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <SectionNumber number="01" />
-                    <CardTitle className="text-base font-bold text-foreground font-display">
+                    <Sliders className="h-4 w-4 text-primary" />
+                    <CardTitle className="text-base font-semibold text-foreground">
                       Predictive Scoring Parameter Sandbox
                     </CardTitle>
                   </div>
@@ -301,8 +309,8 @@ export default function AiStudioPage() {
               <CardHeader className="pb-3 border-b border-border/40">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <SectionNumber number="02" />
-                    <CardTitle className="text-base font-bold text-foreground font-display">
+                    <Flame className="h-4 w-4 text-highlight" />
+                    <CardTitle className="text-base font-semibold text-foreground">
                       Calculated AI Score
                     </CardTitle>
                   </div>

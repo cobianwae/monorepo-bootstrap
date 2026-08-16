@@ -17,6 +17,12 @@ import {
   Tag,
   X,
   Lightbulb,
+  MoreVertical,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  AlertCircle,
+  MoveRight,
 } from 'lucide-react';
 import {
   Button,
@@ -52,6 +58,28 @@ import {
   SelectItem,
   DescriptionList,
   TagInput,
+  NumberInput,
+  Checkbox,
+  BulkActionBar,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  HoverCard,
+  HoverCardTrigger,
+  HoverCardContent,
+  ContextMenu,
+  ContextMenuTrigger,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
   AlertDialog,
   AlertDialogContent,
   AlertDialogHeader,
@@ -60,11 +88,15 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
+  ToastAction,
+  GradientText,
+  toast,
   type KanbanColumnData,
   type KanbanItemData,
 } from '@ds/ui';
 import { PageHeader } from '@/components/page-header';
 import { useCrm } from '@/scenarios/crm/store/crm-context';
+import { useDebounce } from '@/scenarios/crm/lib/use-debounce';
 import type { Lead, LeadStage, LeadPriority } from '@/scenarios/crm/types';
 
 const STAGE_CONFIG: Record<
@@ -89,6 +121,9 @@ const PRIORITY_BADGE_VARIANT: Record<LeadPriority, 'secondary' | 'warning' | 'de
 
 const ALL_STAGES: LeadStage[] = ['new', 'contacted', 'qualified', 'proposal', 'negotiation', 'won', 'lost'];
 
+type SortField = 'name' | 'dealValue' | 'aiScore' | 'stage' | 'lastContactedAt';
+type SortOrder = 'asc' | 'desc';
+
 export default function LeadsPage() {
   const {
     leads,
@@ -104,12 +139,20 @@ export default function LeadsPage() {
 
   const [viewMode, setViewMode] = React.useState<'kanban' | 'table'>('kanban');
   const [searchQuery, setSearchQuery] = React.useState('');
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const [stageFilter, setStageFilter] = React.useState<string>('all');
   const [onlyHighIntent, setOnlyHighIntent] = React.useState(false);
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
-  const [leadToDelete, setLeadToDelete] = React.useState<string | null>(null);
+  const [leadToDelete, setLeadToDelete] = React.useState<Lead | null>(null);
 
-  // New Lead Form state
+  // Sorting & Selection state for Table
+  const [sortField, setSortField] = React.useState<SortField>('aiScore');
+  const [sortOrder, setSortOrder] = React.useState<SortOrder>('desc');
+  const [selectedRowIds, setSelectedRowIds] = React.useState<Set<string>>(new Set());
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const pageSize = 10;
+
+  // New Lead Form state & Validation
   const [newLeadForm, setNewLeadForm] = React.useState({
     name: '',
     company: '',
@@ -122,11 +165,12 @@ export default function LeadsPage() {
     source: 'Website Form' as Lead['source'],
     tags: ['Enterprise', 'Inbound'],
   });
+  const [formErrors, setFormErrors] = React.useState<Record<string, string>>({});
 
   // Filtered Leads
   const filteredLeads = React.useMemo(() => {
     return leads.filter((lead) => {
-      const q = searchQuery.toLowerCase().trim();
+      const q = debouncedSearch.toLowerCase().trim();
       const matchQuery =
         !q ||
         lead.name.toLowerCase().includes(q) ||
@@ -139,7 +183,31 @@ export default function LeadsPage() {
 
       return matchQuery && matchStage && matchHighIntent;
     });
-  }, [leads, searchQuery, stageFilter, onlyHighIntent]);
+  }, [leads, debouncedSearch, stageFilter, onlyHighIntent]);
+
+  // Sorted Leads
+  const sortedLeads = React.useMemo(() => {
+    const list = [...filteredLeads];
+    list.sort((a, b) => {
+      let aVal: any = a[sortField];
+      let bVal: any = b[sortField];
+      if (sortField === 'name') {
+        aVal = a.name.toLowerCase();
+        bVal = b.name.toLowerCase();
+      }
+      if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return list;
+  }, [filteredLeads, sortField, sortOrder]);
+
+  // Paginated Leads
+  const totalPages = Math.max(1, Math.ceil(sortedLeads.length / pageSize));
+  const paginatedLeads = React.useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return sortedLeads.slice(start, start + pageSize);
+  }, [sortedLeads, currentPage, pageSize]);
 
   // Selected Lead for Drawer
   const activeLead = React.useMemo(() => {
@@ -179,9 +247,35 @@ export default function LeadsPage() {
     });
   };
 
+  const handleToggleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
+    }
+  };
+
+  const validateLeadForm = (): boolean => {
+    const errors: Record<string, string> = {};
+    if (!newLeadForm.name.trim()) errors.name = 'Full name is required.';
+    if (!newLeadForm.company.trim()) errors.company = 'Company name is required.';
+    if (!newLeadForm.email.trim()) {
+      errors.email = 'Work email is required.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newLeadForm.email)) {
+      errors.email = 'Please enter a valid work email address.';
+    }
+    if (!newLeadForm.dealValue || newLeadForm.dealValue <= 0) {
+      errors.dealValue = 'Deal value must be greater than 0.';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleCreateLeadSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newLeadForm.name || !newLeadForm.company || !newLeadForm.email) return;
+    if (!validateLeadForm()) return;
 
     addLead({
       name: newLeadForm.name,
@@ -215,38 +309,223 @@ export default function LeadsPage() {
       source: 'Website Form',
       tags: ['Enterprise', 'Inbound'],
     });
+    setFormErrors({});
+
+    toast({
+      variant: 'success',
+      title: 'Lead Opportunity Created',
+      description: `"${newLeadForm.name}" has been added to the pipeline.`,
+    });
   };
 
-  // Table Columns with improved typography
+  const handleDeleteLeadConfirmed = () => {
+    if (!leadToDelete) return;
+    const backupLead = { ...leadToDelete };
+    deleteLead(leadToDelete.id);
+    setLeadToDelete(null);
+    setSelectedLeadId(null);
+
+    toast({
+      variant: 'default',
+      title: 'Lead deleted',
+      description: `"${backupLead.name}" was removed from the pipeline.`,
+      action: (
+        <ToastAction
+          altText="Undo delete lead"
+          onClick={() => {
+            addLead(backupLead);
+            toast({
+              variant: 'success',
+              title: 'Lead restored',
+              description: `"${backupLead.name}" has been restored.`,
+            });
+          }}
+        >
+          Undo
+        </ToastAction>
+      ),
+    });
+  };
+
+  // Bulk operations
+  const handleSelectAllRows = (checked: boolean) => {
+    if (checked) {
+      setSelectedRowIds(new Set(paginatedLeads.map((l) => l.id)));
+    } else {
+      setSelectedRowIds(new Set());
+    }
+  };
+
+  const handleToggleRowSelect = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedRowIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkMoveStage = (targetStage: LeadStage) => {
+    selectedRowIds.forEach((id) => moveLeadStage(id, targetStage));
+    toast({
+      variant: 'success',
+      title: 'Bulk Stage Update',
+      description: `Moved ${selectedRowIds.size} leads to "${STAGE_CONFIG[targetStage].label}".`,
+    });
+    setSelectedRowIds(new Set());
+  };
+
+  const handleBulkConvertWon = () => {
+    selectedRowIds.forEach((id) => convertLead(id));
+    toast({
+      variant: 'success',
+      title: 'Bulk Conversion',
+      description: `Converted ${selectedRowIds.size} opportunities to Closed Won.`,
+    });
+    setSelectedRowIds(new Set());
+  };
+
+  const handleBulkDelete = () => {
+    selectedRowIds.forEach((id) => deleteLead(id));
+    toast({
+      variant: 'default',
+      title: 'Leads Deleted',
+      description: `Removed ${selectedRowIds.size} leads from the system.`,
+    });
+    setSelectedRowIds(new Set());
+  };
+
+  // Table Columns with Sortable Headers, Checkboxes, HoverCards, and DropdownMenu
   const tableColumns: ColumnDef<Lead>[] = React.useMemo(
     () => [
       {
+        id: 'select',
+        header: () => (
+          <div className="px-1" onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={
+                paginatedLeads.length > 0 &&
+                paginatedLeads.every((l) => selectedRowIds.has(l.id))
+              }
+              onCheckedChange={(checked) => handleSelectAllRows(Boolean(checked))}
+              aria-label="Select all rows"
+            />
+          </div>
+        ),
+        cell: ({ row }) => (
+          <div className="px-1" onClick={(e) => handleToggleRowSelect(row.original.id, e)}>
+            <Checkbox
+              checked={selectedRowIds.has(row.original.id)}
+              aria-label={`Select ${row.original.name}`}
+            />
+          </div>
+        ),
+      },
+      {
         accessorKey: 'name',
-        header: 'Lead & Organization',
+        header: () => (
+          <button
+            type="button"
+            onClick={() => handleToggleSort('name')}
+            className="flex items-center gap-1.5 font-semibold text-xs text-foreground hover:text-primary transition-colors cursor-pointer"
+          >
+            <span>Lead & Organization</span>
+            {sortField === 'name' ? (
+              sortOrder === 'asc' ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
+            ) : (
+              <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
+            )}
+          </button>
+        ),
         cell: ({ row }) => {
           const lead = row.original;
           return (
-            <div className="flex items-center gap-3 py-1">
-              <Avatar className="h-8 w-8 border border-border">
-                <AvatarFallback className="text-xs font-bold font-mono">
-                  {lead.name.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <span className="font-semibold text-foreground text-sm block">
-                  {lead.name}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {lead.company} • {lead.title}
-                </span>
-              </div>
-            </div>
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <div
+                  className="flex items-center gap-3 py-1 cursor-pointer group"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedLeadId(lead.id);
+                  }}
+                >
+                  <Avatar className="h-8 w-8 border border-border group-hover:border-primary transition-colors">
+                    <AvatarImage src={lead.avatarUrl} alt={lead.name} />
+                    <AvatarFallback className="text-xs font-bold font-mono">
+                      {lead.name.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <span className="font-semibold text-foreground text-sm block group-hover:text-primary transition-colors">
+                      {lead.name}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {lead.company} • {lead.title}
+                    </span>
+                  </div>
+                </div>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80 p-4 space-y-3" align="start">
+                <div className="flex items-center justify-between border-b border-border pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-9 w-9">
+                      <AvatarImage src={lead.avatarUrl} alt={lead.name} />
+                      <AvatarFallback className="font-mono text-xs">
+                        {lead.name.substring(0, 2).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h4 className="text-sm font-bold text-foreground">{lead.name}</h4>
+                      <p className="text-xs text-muted-foreground">{lead.company}</p>
+                    </div>
+                  </div>
+                  <Badge variant={STAGE_CONFIG[lead.stage]?.badgeVariant || 'outline'} className="text-[10px] uppercase font-mono">
+                    {STAGE_CONFIG[lead.stage]?.label}
+                  </Badge>
+                </div>
+                <div className="text-xs space-y-1.5">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Deal Value:</span>
+                    <span className="font-mono font-bold">${lead.dealValue.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">AI Conversion Score:</span>
+                    <span className="font-mono font-bold text-highlight">{lead.aiScore}/100</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Assigned Rep:</span>
+                    <span>{lead.assignedAgentName}</span>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {lead.tags.map((t) => (
+                    <Badge key={t} variant="secondary" className="text-[10px]">
+                      {t}
+                    </Badge>
+                  ))}
+                </div>
+              </HoverCardContent>
+            </HoverCard>
           );
         },
       },
       {
         accessorKey: 'stage',
-        header: 'Pipeline Stage',
+        header: () => (
+          <button
+            type="button"
+            onClick={() => handleToggleSort('stage')}
+            className="flex items-center gap-1.5 font-semibold text-xs text-foreground hover:text-primary transition-colors cursor-pointer"
+          >
+            <span>Pipeline Stage</span>
+            {sortField === 'stage' ? (
+              sortOrder === 'asc' ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
+            ) : (
+              <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
+            )}
+          </button>
+        ),
         cell: ({ row }) => {
           const stage = row.original.stage;
           return (
@@ -261,7 +540,20 @@ export default function LeadsPage() {
       },
       {
         accessorKey: 'aiScore',
-        header: 'AI Score',
+        header: () => (
+          <button
+            type="button"
+            onClick={() => handleToggleSort('aiScore')}
+            className="flex items-center gap-1.5 font-semibold text-xs text-foreground hover:text-primary transition-colors cursor-pointer"
+          >
+            <span>AI Score</span>
+            {sortField === 'aiScore' ? (
+              sortOrder === 'asc' ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
+            ) : (
+              <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
+            )}
+          </button>
+        ),
         cell: ({ row }) => {
           const score = row.original.aiScore;
           return (
@@ -280,7 +572,20 @@ export default function LeadsPage() {
       },
       {
         accessorKey: 'dealValue',
-        header: 'Deal Value',
+        header: () => (
+          <button
+            type="button"
+            onClick={() => handleToggleSort('dealValue')}
+            className="flex items-center gap-1.5 font-semibold text-xs text-foreground hover:text-primary transition-colors cursor-pointer"
+          >
+            <span>Deal Value</span>
+            {sortField === 'dealValue' ? (
+              sortOrder === 'asc' ? <ArrowUp className="h-3.5 w-3.5" /> : <ArrowDown className="h-3.5 w-3.5" />
+            ) : (
+              <ArrowUpDown className="h-3.5 w-3.5 text-muted-foreground opacity-60" />
+            )}
+          </button>
+        ),
         cell: ({ row }) => (
           <span className="font-mono font-bold text-sm text-foreground">
             ${row.original.dealValue.toLocaleString()}
@@ -323,40 +628,94 @@ export default function LeadsPage() {
         cell: ({ row }) => {
           const lead = row.original;
           return (
-            <div className="flex items-center justify-end gap-1">
-              {lead.stage !== 'won' && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 text-xs text-success hover:bg-success/10"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    convertLead(lead.id);
-                  }}
-                  title="Convert to Deal"
-                >
-                  <CheckCircle2 className="h-4 w-4" />
-                </Button>
-              )}
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedLeadId(lead.id);
-                }}
-                title="View details"
-              >
-                <ExternalLink className="h-4 w-4" />
-              </Button>
+            <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                    aria-label={`Actions for ${lead.name}`}
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => setSelectedLeadId(lead.id)}>
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    <span>View 360 Details</span>
+                  </DropdownMenuItem>
+
+                  {lead.stage !== 'won' && (
+                    <DropdownMenuItem
+                      onClick={() => convertLead(lead.id)}
+                      className="text-success focus:text-success"
+                    >
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      <span>Convert to Won Deal</span>
+                    </DropdownMenuItem>
+                  )}
+
+                  <DropdownMenuItem
+                    onClick={() =>
+                      openAiDrawer({
+                        type: 'lead',
+                        entityId: lead.id,
+                        initialTab: 'lead-scoring',
+                      })
+                    }
+                  >
+                    <Sparkles className="h-4 w-4 mr-2 text-highlight" />
+                    <span>AI Copilot Analysis</span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <MoveRight className="h-4 w-4 mr-2" />
+                      <span>Move Stage</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      {ALL_STAGES.map((st) => (
+                        <DropdownMenuItem
+                          key={st}
+                          disabled={lead.stage === st}
+                          onClick={() => moveLeadStage(lead.id, st)}
+                        >
+                          {STAGE_CONFIG[st].label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem
+                    onClick={() => setLeadToDelete(lead)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    <span>Delete Opportunity</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           );
         },
       },
     ],
-    [convertLead, setSelectedLeadId]
+    [
+      paginatedLeads,
+      selectedRowIds,
+      sortField,
+      sortOrder,
+      convertLead,
+      moveLeadStage,
+      openAiDrawer,
+      setSelectedLeadId,
+    ]
   );
+
+  const hasActiveFilters = searchQuery !== '' || stageFilter !== 'all' || onlyHighIntent;
 
   return (
     <div className="space-y-8 animate-in fade-in-50 duration-200">
@@ -364,7 +723,11 @@ export default function LeadsPage() {
       <PageHeader
         eyebrow="Opportunity Engine"
         eyebrowIcon={Sparkles}
-        title="Leads & Opportunities Pipeline"
+        title={
+          <span>
+            Leads &amp; Opportunities <GradientText>Pipeline</GradientText>
+          </span>
+        }
         description="Manage sales prospects across deal stages, evaluate AI intent scores, and convert high-probability opportunities into closed revenue."
         actions={
           <div className="flex items-center gap-2.5">
@@ -392,69 +755,119 @@ export default function LeadsPage() {
         }
       />
 
-      {/* Filter and Search Bar with DS Select */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card/60 p-3.5 shadow-xs">
-        <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
-          <div className="relative flex-1 max-w-xs">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search leads, companies, tags..."
-              className="h-9 pl-9 text-xs bg-background"
-            />
-          </div>
+      {/* Filter and Search Bar with Active Filter Chips */}
+      <div className="space-y-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card/60 p-3.5 shadow-xs">
+          <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
+            <div className="relative flex-1 max-w-xs">
+              <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search leads, companies, tags..."
+                className="h-9 pl-9 text-xs bg-background"
+                aria-label="Search leads"
+              />
+            </div>
 
-          {/* Stage filter with DS Select */}
-          <div className="w-44">
-            <Select value={stageFilter} onValueChange={setStageFilter}>
-              <SelectTrigger className="h-9 text-xs">
-                <SelectValue placeholder="All Stages" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Stages ({leads.length})</SelectItem>
-                <SelectItem value="new">New Inbound</SelectItem>
-                <SelectItem value="contacted">Contacted</SelectItem>
-                <SelectItem value="qualified">Qualified</SelectItem>
-                <SelectItem value="proposal">Proposal</SelectItem>
-                <SelectItem value="negotiation">Negotiation</SelectItem>
-                <SelectItem value="won">Closed Won</SelectItem>
-                <SelectItem value="lost">Closed Lost</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Stage filter with DS Select */}
+            <div className="w-44">
+              <Select value={stageFilter} onValueChange={setStageFilter}>
+                <SelectTrigger className="h-9 text-xs" aria-label="Filter by stage">
+                  <SelectValue placeholder="All Stages" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Stages ({leads.length})</SelectItem>
+                  <SelectItem value="new">New Inbound</SelectItem>
+                  <SelectItem value="contacted">Contacted</SelectItem>
+                  <SelectItem value="qualified">Qualified</SelectItem>
+                  <SelectItem value="proposal">Proposal</SelectItem>
+                  <SelectItem value="negotiation">Negotiation</SelectItem>
+                  <SelectItem value="won">Closed Won</SelectItem>
+                  <SelectItem value="lost">Closed Lost</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* High Intent toggle */}
-          <Button
-            size="sm"
-            variant={onlyHighIntent ? 'highlight' : 'outline'}
-            onClick={() => setOnlyHighIntent((prev) => !prev)}
-            className="h-9 gap-1.5 text-xs"
-          >
-            <Flame className="h-3.5 w-3.5" />
-            High Intent (≥80)
-          </Button>
-
-          {(searchQuery || stageFilter !== 'all' || onlyHighIntent) && (
+            {/* High Intent toggle */}
             <Button
               size="sm"
-              variant="ghost"
-              onClick={() => {
-                setSearchQuery('');
-                setStageFilter('all');
-                setOnlyHighIntent(false);
-              }}
-              className="h-9 text-xs text-muted-foreground hover:text-foreground"
+              variant={onlyHighIntent ? 'highlight' : 'outline'}
+              onClick={() => setOnlyHighIntent((prev) => !prev)}
+              className="h-9 gap-1.5 text-xs"
+              aria-pressed={onlyHighIntent}
             >
-              <X className="h-3.5 w-3.5 mr-1" />
-              Clear
+              <Flame className="h-3.5 w-3.5" />
+              High Intent (≥80)
             </Button>
-          )}
+
+            {hasActiveFilters && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setSearchQuery('');
+                  setStageFilter('all');
+                  setOnlyHighIntent(false);
+                }}
+                className="h-9 text-xs text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-3.5 w-3.5 mr-1" />
+                Reset All
+              </Button>
+            )}
+          </div>
+
+          <div className="text-xs text-muted-foreground font-mono">
+            Showing {filteredLeads.length} of {leads.length} leads
+          </div>
         </div>
 
-        <div className="text-xs text-muted-foreground font-mono">
-          Showing {filteredLeads.length} of {leads.length} leads
-        </div>
+        {/* Active Filter Chips */}
+        {hasActiveFilters && (
+          <div className="flex flex-wrap items-center gap-2 pt-1 px-1">
+            <span className="text-xs text-muted-foreground font-mono">Active Filters:</span>
+            {searchQuery && (
+              <Badge variant="secondary" className="text-xs gap-1 py-0.5">
+                Query: &quot;{searchQuery}&quot;
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="hover:text-foreground ml-0.5"
+                  aria-label="Remove search filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {stageFilter !== 'all' && (
+              <Badge variant="secondary" className="text-xs gap-1 py-0.5">
+                Stage: {STAGE_CONFIG[stageFilter as LeadStage]?.label || stageFilter}
+                <button
+                  type="button"
+                  onClick={() => setStageFilter('all')}
+                  className="hover:text-foreground ml-0.5"
+                  aria-label="Remove stage filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {onlyHighIntent && (
+              <Badge variant="highlight" className="text-xs gap-1 py-0.5">
+                <Flame className="h-3 w-3 mr-0.5" /> High Intent (≥80)
+                <button
+                  type="button"
+                  onClick={() => setOnlyHighIntent(false)}
+                  className="hover:text-foreground ml-0.5"
+                  aria-label="Remove high intent filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Main Content: Kanban or Table */}
@@ -473,56 +886,182 @@ export default function LeadsPage() {
               if (!lead) return null;
 
               return (
-                <div
-                  onClick={() => setSelectedLeadId(lead.id)}
-                  className="rounded-lg border border-border bg-card p-3.5 shadow-xs hover:shadow-md hover:border-foreground/30 transition-all cursor-pointer space-y-2.5 group"
-                >
-                  <div className="flex items-start justify-between gap-1.5">
-                    <span className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                      {lead.name}
-                    </span>
-                    <Badge
-                      variant={PRIORITY_BADGE_VARIANT[lead.priority] || 'secondary'}
-                      className="text-xs px-1.5 py-0 capitalize"
+                <ContextMenu key={lead.id}>
+                  <ContextMenuTrigger asChild>
+                    <div
+                      onClick={() => setSelectedLeadId(lead.id)}
+                      className="rounded-lg border border-border bg-card p-3.5 shadow-xs hover:shadow-md hover:border-foreground/30 transition-all cursor-pointer space-y-2.5 group"
                     >
-                      {lead.priority}
-                    </Badge>
-                  </div>
-
-                  <p className="text-xs text-muted-foreground truncate">
-                    {lead.company}
-                  </p>
-
-                  <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs">
-                    <span className="font-mono font-bold text-sm text-foreground">
-                      ${lead.dealValue.toLocaleString()}
-                    </span>
-
-                    <div className="flex items-center gap-1 font-mono text-xs">
-                      {lead.aiScore >= 80 ? (
-                        <span className="flex items-center text-highlight font-bold">
-                          <Flame className="h-3.5 w-3.5 mr-0.5" />
-                          {lead.aiScore}
+                      <div className="flex items-start justify-between gap-1.5">
+                        <span className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                          {lead.name}
                         </span>
-                      ) : (
-                        <span className="text-muted-foreground">{lead.aiScore}</span>
-                      )}
+                        <Badge
+                          variant={PRIORITY_BADGE_VARIANT[lead.priority] || 'secondary'}
+                          className="text-xs px-1.5 py-0 capitalize"
+                        >
+                          {lead.priority}
+                        </Badge>
+                      </div>
+
+                      <p className="text-xs text-muted-foreground truncate">
+                        {lead.company}
+                      </p>
+
+                      <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs">
+                        <span className="font-mono font-bold text-sm text-foreground">
+                          ${lead.dealValue.toLocaleString()}
+                        </span>
+
+                        <div className="flex items-center gap-1 font-mono text-xs">
+                          {lead.aiScore >= 80 ? (
+                            <span className="flex items-center text-highlight font-bold">
+                              <Flame className="h-3.5 w-3.5 mr-0.5" />
+                              {lead.aiScore}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">{lead.aiScore}</span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent className="w-48">
+                    <ContextMenuItem onClick={() => setSelectedLeadId(lead.id)}>
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View 360 Details
+                    </ContextMenuItem>
+                    {lead.stage !== 'won' && (
+                      <ContextMenuItem
+                        onClick={() => convertLead(lead.id)}
+                        className="text-success focus:text-success"
+                      >
+                        <CheckCircle2 className="h-4 w-4 mr-2" />
+                        Convert to Won Deal
+                      </ContextMenuItem>
+                    )}
+                    <ContextMenuItem
+                      onClick={() =>
+                        openAiDrawer({
+                          type: 'lead',
+                          entityId: lead.id,
+                          initialTab: 'lead-scoring',
+                        })
+                      }
+                    >
+                      <Sparkles className="h-4 w-4 mr-2 text-highlight" />
+                      AI Copilot Analysis
+                    </ContextMenuItem>
+                    <ContextMenuSub>
+                      <ContextMenuSubTrigger>
+                        <MoveRight className="h-4 w-4 mr-2" />
+                        Move Stage
+                      </ContextMenuSubTrigger>
+                      <ContextMenuSubContent>
+                        {ALL_STAGES.map((st) => (
+                          <ContextMenuItem
+                            key={st}
+                            disabled={lead.stage === st}
+                            onClick={() => moveLeadStage(lead.id, st)}
+                          >
+                            {STAGE_CONFIG[st].label}
+                          </ContextMenuItem>
+                        ))}
+                      </ContextMenuSubContent>
+                    </ContextMenuSub>
+                    <ContextMenuSeparator />
+                    <ContextMenuItem
+                      onClick={() => setLeadToDelete(lead)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Lead
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
               );
             }}
           />
         </div>
       ) : (
-        <DataTable
-          columns={tableColumns}
-          data={filteredLeads}
-          onRowClick={(row) => setSelectedLeadId(row.id)}
-          emptyTitle="No leads match filters"
-          emptyDescription="Try clearing your search query or stage filters to view more opportunities."
-        />
+        <div className="space-y-4">
+          <DataTable
+            columns={tableColumns}
+            data={paginatedLeads}
+            onRowClick={(row) => setSelectedLeadId(row.id)}
+            emptyTitle="No leads match filters"
+            emptyDescription="Try clearing your search query or stage filters to view more opportunities."
+          />
+
+          {/* Table Footer: Pagination & Item Count */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 text-xs text-muted-foreground">
+            <span className="font-mono">
+              Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, sortedLeads.length)} of {sortedLeads.length} leads
+            </span>
+
+            {totalPages > 1 && (
+              <div className="flex items-center gap-1.5">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="h-8 text-xs"
+                >
+                  Previous
+                </Button>
+                <span className="font-mono px-2">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  className="h-8 text-xs"
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
       )}
+
+      {/* Bulk Action Bar (when rows are selected) */}
+      <BulkActionBar
+        open={selectedRowIds.size > 0}
+        count={selectedRowIds.size}
+        onClearSelection={() => setSelectedRowIds(new Set())}
+        actions={[
+          {
+            id: 'qualify',
+            label: 'Mark Qualified',
+            onClick: () => handleBulkMoveStage('qualified'),
+            variant: 'outline',
+          },
+          {
+            id: 'proposal',
+            label: 'Send Proposal',
+            onClick: () => handleBulkMoveStage('proposal'),
+            variant: 'outline',
+          },
+          {
+            id: 'convert',
+            label: 'Convert to Won',
+            icon: CheckCircle2,
+            onClick: handleBulkConvertWon,
+            variant: 'default',
+          },
+          {
+            id: 'delete',
+            label: 'Delete',
+            icon: Trash2,
+            onClick: handleBulkDelete,
+            variant: 'destructive',
+          },
+        ]}
+      />
 
       {/* Lead Detail Slide-Over Sheet with DescriptionList */}
       <Sheet
@@ -666,21 +1205,23 @@ export default function LeadsPage() {
                   </div>
                 </div>
 
-                {/* Stage Progression Selector */}
+                {/* Stage Progression Selector with accessible radio semantics */}
                 <div className="space-y-2">
                   <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">
                     Change Pipeline Stage
                   </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5" role="radiogroup" aria-label="Pipeline stage">
                     {ALL_STAGES.map((st) => (
                       <button
                         key={st}
                         type="button"
+                        role="radio"
+                        aria-checked={activeLead.stage === st}
                         onClick={() => moveLeadStage(activeLead.id, st)}
-                        className={`rounded-md border p-2 text-xs font-medium capitalize transition-all ${
+                        className={`rounded-md border p-2 text-xs font-medium capitalize transition-all cursor-pointer ${
                           activeLead.stage === st
-                            ? 'border-primary bg-primary/10 text-foreground font-bold shadow-xs'
-                            : 'border-border bg-background text-muted-foreground hover:bg-accent'
+                            ? 'border-primary bg-primary/10 text-foreground font-bold shadow-xs ring-1 ring-primary'
+                            : 'border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground'
                         }`}
                       >
                         {STAGE_CONFIG[st].label}
@@ -696,7 +1237,7 @@ export default function LeadsPage() {
                   variant="ghost"
                   size="sm"
                   className="gap-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                  onClick={() => setLeadToDelete(activeLead.id)}
+                  onClick={() => setLeadToDelete(activeLead)}
                 >
                   <Trash2 className="h-4 w-4" />
                   Delete Lead
@@ -733,30 +1274,24 @@ export default function LeadsPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete this lead?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Lead Opportunity</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. The opportunity record, stage progression, and associated activity history will be removed.
+              Are you sure you want to delete &quot;{leadToDelete?.name}&quot; ({leadToDelete?.company})? The opportunity record, stage progression, and activity history will be removed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-              onClick={() => {
-                if (leadToDelete) {
-                  deleteLead(leadToDelete);
-                  setLeadToDelete(null);
-                  setSelectedLeadId(null);
-                }
-              }}
+              onClick={handleDeleteLeadConfirmed}
             >
-              Delete
+              Delete Lead
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Create Lead Modal Dialog with DS Select & TagInput */}
+      {/* Create Lead Modal Dialog with Real-time Validation & DS NumberInput */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
@@ -776,12 +1311,20 @@ export default function LeadsPage() {
                 </Label>
                 <Input
                   id="name"
-                  required
                   placeholder="e.g. Clara Oswald"
                   value={newLeadForm.name}
-                  onChange={(e) => setNewLeadForm({ ...newLeadForm, name: e.target.value })}
-                  className="text-sm"
+                  onChange={(e) => {
+                    setNewLeadForm({ ...newLeadForm, name: e.target.value });
+                    if (formErrors.name) setFormErrors((prev) => ({ ...prev, name: '' }));
+                  }}
+                  className={`text-sm ${formErrors.name ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
+                {formErrors.name && (
+                  <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                    <span>{formErrors.name}</span>
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1.5">
@@ -790,14 +1333,20 @@ export default function LeadsPage() {
                 </Label>
                 <Input
                   id="company"
-                  required
                   placeholder="e.g. Cyberdyne Systems"
                   value={newLeadForm.company}
-                  onChange={(e) =>
-                    setNewLeadForm({ ...newLeadForm, company: e.target.value })
-                  }
-                  className="text-sm"
+                  onChange={(e) => {
+                    setNewLeadForm({ ...newLeadForm, company: e.target.value });
+                    if (formErrors.company) setFormErrors((prev) => ({ ...prev, company: '' }));
+                  }}
+                  className={`text-sm ${formErrors.company ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
+                {formErrors.company && (
+                  <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                    <span>{formErrors.company}</span>
+                  </p>
+                )}
               </div>
             </div>
 
@@ -809,30 +1358,44 @@ export default function LeadsPage() {
                 <Input
                   id="email"
                   type="email"
-                  required
                   placeholder="name@company.com"
                   value={newLeadForm.email}
-                  onChange={(e) =>
-                    setNewLeadForm({ ...newLeadForm, email: e.target.value })
-                  }
-                  className="text-sm"
+                  onChange={(e) => {
+                    setNewLeadForm({ ...newLeadForm, email: e.target.value });
+                    if (formErrors.email) setFormErrors((prev) => ({ ...prev, email: '' }));
+                  }}
+                  className={`text-sm ${formErrors.email ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
+                {formErrors.email && (
+                  <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                    <span>{formErrors.email}</span>
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="dealValue" className="text-sm font-medium">
-                  Estimated Deal Value ($)
+                  Estimated Deal Value ($) *
                 </Label>
-                <Input
+                <NumberInput
                   id="dealValue"
-                  type="number"
-                  placeholder="50000"
                   value={newLeadForm.dealValue}
-                  onChange={(e) =>
-                    setNewLeadForm({ ...newLeadForm, dealValue: Number(e.target.value) })
-                  }
-                  className="text-sm"
+                  onValueChange={(val) => {
+                    setNewLeadForm({ ...newLeadForm, dealValue: val || 0 });
+                    if (formErrors.dealValue) setFormErrors((prev) => ({ ...prev, dealValue: '' }));
+                  }}
+                  min={1000}
+                  step={5000}
+                  prefix="$"
+                  error={Boolean(formErrors.dealValue)}
                 />
+                {formErrors.dealValue && (
+                  <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                    <span>{formErrors.dealValue}</span>
+                  </p>
+                )}
               </div>
             </div>
 

@@ -19,6 +19,7 @@ import {
   ArrowLeft,
   Search,
   X,
+  AlertCircle,
 } from 'lucide-react';
 import {
   Button,
@@ -46,11 +47,24 @@ import {
   SelectItem,
   EmptyState,
   DescriptionList,
+  NumberInput,
+  DatePicker,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+  ToastAction,
+  GradientText,
   toast,
 } from '@ds/ui';
 import { PageHeader } from '@/components/page-header';
 import { useCrm } from '@/scenarios/crm/store/crm-context';
-import type { CampaignStatus, CampaignChannel } from '@/scenarios/crm/types';
+import { useDebounce } from '@/scenarios/crm/lib/use-debounce';
+import type { CampaignStatus, CampaignChannel, Campaign } from '@/scenarios/crm/types';
 
 const CHANNEL_CONFIG: Record<
   CampaignChannel,
@@ -90,13 +104,18 @@ export default function CampaignsPage() {
   } = useCrm();
 
   const [searchQuery, setSearchQuery] = React.useState('');
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const [channelFilter, setChannelFilter] = React.useState<string>('all');
   const [statusFilter, setStatusFilter] = React.useState<string>('all');
+
+  // Deletion state with Undo
+  const [campaignToDelete, setCampaignToDelete] = React.useState<Campaign | null>(null);
 
   // Wizard state
   const [isWizardOpen, setIsWizardOpen] = React.useState(false);
   const [wizardStep, setWizardStep] = React.useState(0);
   const [isGeneratingAi, setIsGeneratingAi] = React.useState(false);
+  const [stepErrors, setStepErrors] = React.useState<Record<string, string>>({});
 
   const [wizardForm, setWizardForm] = React.useState({
     name: '',
@@ -107,18 +126,19 @@ export default function CampaignsPage() {
     subject: '',
     previewText: '',
     body: '',
-    scheduledFor: 'Immediate',
+    launchMode: 'Immediate' as 'Immediate' | 'Scheduled',
+    scheduledDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) as Date | null,
   });
 
   const filteredCampaigns = React.useMemo(() => {
     return campaigns.filter((c) => {
-      const q = searchQuery.toLowerCase().trim();
+      const q = debouncedSearch.toLowerCase().trim();
       const matchQuery = !q || c.name.toLowerCase().includes(q) || c.targetAudience.toLowerCase().includes(q);
       const matchChannel = channelFilter === 'all' || c.channel === channelFilter;
       const matchStatus = statusFilter === 'all' || c.status === statusFilter;
       return matchQuery && matchChannel && matchStatus;
     });
-  }, [campaigns, searchQuery, channelFilter, statusFilter]);
+  }, [campaigns, debouncedSearch, channelFilter, statusFilter]);
 
   const totalCampaignRevenue = React.useMemo(() => {
     return campaigns.reduce((acc, c) => acc + c.revenueGenerated, 0);
@@ -127,6 +147,57 @@ export default function CampaignsPage() {
   const activeCampaigns = React.useMemo(() => {
     return campaigns.filter((c) => c.status === 'active');
   }, [campaigns]);
+
+  // Step validation rules
+  const validateCurrentStep = (step: number): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (step === 0) {
+      if (!wizardForm.name.trim()) {
+        errors.name = 'Campaign name is required.';
+      }
+      if (!wizardForm.targetAudience.trim()) {
+        errors.targetAudience = 'Target audience criteria is required.';
+      }
+      if (!wizardForm.audienceCount || wizardForm.audienceCount <= 0) {
+        errors.audienceCount = 'Audience reach must be greater than 0.';
+      }
+    } else if (step === 1) {
+      if (wizardForm.channel === 'email' && !wizardForm.subject.trim()) {
+        errors.subject = 'Email subject line is required.';
+      }
+      if (!wizardForm.body.trim()) {
+        errors.body = 'Message body cannot be empty. Click "1-Click AI Copy Generation" to fill automatically.';
+      }
+    } else if (step === 2) {
+      if (!wizardForm.budget || wizardForm.budget < 100) {
+        errors.budget = 'Minimum campaign budget is $100.';
+      }
+      if (wizardForm.launchMode === 'Scheduled' && !wizardForm.scheduledDate) {
+        errors.scheduledDate = 'Please select a scheduled launch date.';
+      }
+    }
+
+    setStepErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleNextStep = () => {
+    if (validateCurrentStep(wizardStep)) {
+      setWizardStep((s) => Math.min(3, s + 1));
+      setStepErrors({});
+    }
+  };
+
+  const handleStepClick = (targetStep: number) => {
+    if (targetStep < wizardStep) {
+      setWizardStep(targetStep);
+      setStepErrors({});
+    } else if (validateCurrentStep(wizardStep)) {
+      setWizardStep(targetStep);
+      setStepErrors({});
+    }
+  };
 
   const handleAiCopywriter = () => {
     setIsGeneratingAi(true);
@@ -145,6 +216,12 @@ export default function CampaignsPage() {
           body: `Hi {{firstName}},\n\nIs your frontend team currently building bespoke components from scratch?\n\nOur fullstack monorepo design system provides 50+ accessible primitives, validated OKLCH color palettes, and real-time CRM workflow recipes.\n\nWould you like a personalized 15-minute walkthrough of our enterprise tier this week?\n\nBest regards,\nThe Acme Team`,
         }));
       }
+      setStepErrors((prev) => {
+        const next = { ...prev };
+        delete next.subject;
+        delete next.body;
+        return next;
+      });
       setIsGeneratingAi(false);
       toast({
         variant: 'success',
@@ -155,17 +232,25 @@ export default function CampaignsPage() {
   };
 
   const handleLaunchWizardCampaign = () => {
+    if (!validateCurrentStep(2)) {
+      setWizardStep(2);
+      return;
+    }
+
     addCampaign({
-      name: wizardForm.name || 'New Enterprise Outreach Wave',
+      name: wizardForm.name,
       channel: wizardForm.channel,
-      status: wizardForm.scheduledFor === 'Immediate' ? 'active' : 'scheduled',
+      status: wizardForm.launchMode === 'Immediate' ? 'active' : 'scheduled',
       targetAudience: wizardForm.targetAudience,
       audienceCount: Number(wizardForm.audienceCount) || 1000,
       budget: Number(wizardForm.budget) || 2000,
       subject: wizardForm.subject,
       previewText: wizardForm.previewText,
-      launchedAt: wizardForm.scheduledFor === 'Immediate' ? new Date().toISOString() : undefined,
-      scheduledFor: wizardForm.scheduledFor !== 'Immediate' ? '2025-02-28T10:00:00Z' : undefined,
+      launchedAt: wizardForm.launchMode === 'Immediate' ? new Date().toISOString() : undefined,
+      scheduledFor:
+        wizardForm.launchMode === 'Scheduled' && wizardForm.scheduledDate
+          ? wizardForm.scheduledDate.toISOString()
+          : undefined,
     });
 
     setIsWizardOpen(false);
@@ -179,9 +264,49 @@ export default function CampaignsPage() {
       subject: '',
       previewText: '',
       body: '',
-      scheduledFor: 'Immediate',
+      launchMode: 'Immediate',
+      scheduledDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+    setStepErrors({});
+
+    toast({
+      variant: 'success',
+      title: 'Campaign Launched',
+      description: `"${wizardForm.name}" has been ${
+        wizardForm.launchMode === 'Immediate' ? 'activated' : 'scheduled'
+      } successfully.`,
     });
   };
+
+  const handleDeleteCampaignConfirmed = () => {
+    if (!campaignToDelete) return;
+    const backupCampaign = { ...campaignToDelete };
+    deleteCampaign(campaignToDelete.id);
+    setCampaignToDelete(null);
+
+    toast({
+      variant: 'default',
+      title: 'Campaign deleted',
+      description: `"${backupCampaign.name}" was removed.`,
+      action: (
+        <ToastAction
+          altText="Undo delete campaign"
+          onClick={() => {
+            addCampaign(backupCampaign);
+            toast({
+              variant: 'success',
+              title: 'Campaign restored',
+              description: `"${backupCampaign.name}" has been restored.`,
+            });
+          }}
+        >
+          Undo
+        </ToastAction>
+      ),
+    });
+  };
+
+  const hasActiveFilters = searchQuery !== '' || channelFilter !== 'all' || statusFilter !== 'all';
 
   return (
     <div className="space-y-8 animate-in fade-in-50 duration-200">
@@ -189,7 +314,11 @@ export default function CampaignsPage() {
       <PageHeader
         eyebrow="Campaign Workspace"
         eyebrowIcon={Megaphone}
-        title="Marketing Campaigns & Performance"
+        title={
+          <span>
+            Marketing Campaigns &amp; <GradientText>Performance</GradientText>
+          </span>
+        }
         description="Launch targeted multi-channel outreach campaigns, monitor conversion rates in real time, and track pipeline ROI across all touchpoints."
         actions={
           <div className="flex items-center gap-2.5">
@@ -222,14 +351,16 @@ export default function CampaignsPage() {
             label: 'attributed pipeline',
           }}
           icon={DollarSign}
+          variant="highlight"
         />
 
         <StatCard
           title="Active Live Broadcasts"
           value={activeCampaigns.length}
           delta={{
-            value: `${campaigns.length} total campaigns`,
+            value: 'Active',
             trend: 'neutral',
+            label: `${campaigns.length} total campaigns`,
           }}
           icon={Megaphone}
         />
@@ -238,8 +369,9 @@ export default function CampaignsPage() {
           title="Average Open Rate"
           value="66.2%"
           delta={{
-            value: '+14.5% vs benchmark',
+            value: '+14.5%',
             trend: 'up',
+            label: 'vs industry benchmark',
           }}
           icon={TrendingUp}
         />
@@ -248,77 +380,127 @@ export default function CampaignsPage() {
           title="Top Performing Channel"
           value="WhatsApp (19.3x)"
           delta={{
-            value: '89.2% open rate',
+            value: '89.2%',
             trend: 'up',
+            label: 'highest open rate',
           }}
           icon={MessageSquare}
         />
       </div>
 
-      {/* Filters Bar with DS Select */}
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card/60 p-3.5 shadow-xs">
-        <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
-          <div className="relative flex-1 max-w-xs">
-            <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search campaigns by name or audience..."
-              className="h-9 pl-9 text-xs bg-background"
-            />
+      {/* Filters Bar with Active Filter Chips */}
+      <div className="space-y-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card/60 p-3.5 shadow-xs">
+          <div className="flex flex-wrap items-center gap-2.5 flex-1 min-w-[280px]">
+            <div className="relative flex-1 max-w-xs">
+              <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search campaigns by name or audience..."
+                className="h-9 pl-9 text-xs bg-background"
+                aria-label="Search campaigns"
+              />
+            </div>
+
+            <div className="w-40">
+              <Select value={channelFilter} onValueChange={setChannelFilter}>
+                <SelectTrigger className="h-9 text-xs" aria-label="Filter by channel">
+                  <SelectValue placeholder="All Channels" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Channels</SelectItem>
+                  <SelectItem value="email">Email Broadcast</SelectItem>
+                  <SelectItem value="whatsapp">WhatsApp Direct</SelectItem>
+                  <SelectItem value="sms">SMS Alert</SelectItem>
+                  <SelectItem value="multichannel">Omnichannel Sync</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="w-40">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="h-9 text-xs" aria-label="Filter by status">
+                  <SelectValue placeholder="All Statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  <SelectItem value="active">Active Live</SelectItem>
+                  <SelectItem value="scheduled">Scheduled</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="paused">Paused</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {hasActiveFilters && (
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setSearchQuery('');
+                  setChannelFilter('all');
+                  setStatusFilter('all');
+                }}
+                className="h-9 text-xs text-muted-foreground hover:text-foreground"
+              >
+                <X className="h-3.5 w-3.5 mr-1" />
+                Reset All
+              </Button>
+            )}
           </div>
 
-          <div className="w-40">
-            <Select value={channelFilter} onValueChange={setChannelFilter}>
-              <SelectTrigger className="h-9 text-xs">
-                <SelectValue placeholder="All Channels" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Channels</SelectItem>
-                <SelectItem value="email">Email</SelectItem>
-                <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                <SelectItem value="sms">SMS</SelectItem>
-                <SelectItem value="multichannel">Omnichannel</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="text-xs text-muted-foreground font-mono">
+            Showing {filteredCampaigns.length} of {campaigns.length} campaigns
           </div>
-
-          <div className="w-40">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="h-9 text-xs">
-                <SelectValue placeholder="All Statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="active">Active Live</SelectItem>
-                <SelectItem value="scheduled">Scheduled</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="paused">Paused</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {(searchQuery || channelFilter !== 'all' || statusFilter !== 'all') && (
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => {
-                setSearchQuery('');
-                setChannelFilter('all');
-                setStatusFilter('all');
-              }}
-              className="h-9 text-xs text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-3.5 w-3.5 mr-1" />
-              Clear
-            </Button>
-          )}
         </div>
 
-        <div className="text-xs text-muted-foreground font-mono">
-          Showing {filteredCampaigns.length} of {campaigns.length} campaigns
-        </div>
+        {/* Active Filter Chips */}
+        {hasActiveFilters && (
+          <div className="flex flex-wrap items-center gap-2 pt-1 px-1">
+            <span className="text-xs text-muted-foreground font-mono">Active Filters:</span>
+            {searchQuery && (
+              <Badge variant="secondary" className="text-xs gap-1 py-0.5">
+                Query: &quot;{searchQuery}&quot;
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="hover:text-foreground ml-0.5"
+                  aria-label="Remove search filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {channelFilter !== 'all' && (
+              <Badge variant="secondary" className="text-xs gap-1 py-0.5">
+                Channel: {channelFilter}
+                <button
+                  type="button"
+                  onClick={() => setChannelFilter('all')}
+                  className="hover:text-foreground ml-0.5"
+                  aria-label="Remove channel filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+            {statusFilter !== 'all' && (
+              <Badge variant="secondary" className="text-xs gap-1 py-0.5">
+                Status: {statusFilter}
+                <button
+                  type="button"
+                  onClick={() => setStatusFilter('all')}
+                  className="hover:text-foreground ml-0.5"
+                  aria-label="Remove status filter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Campaigns Grid or EmptyState */}
@@ -434,8 +616,9 @@ export default function CampaignsPage() {
                       size="sm"
                       variant="ghost"
                       className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => deleteCampaign(cmp.id)}
+                      onClick={() => setCampaignToDelete(cmp)}
                       title="Delete campaign"
+                      aria-label={`Delete campaign ${cmp.name}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -446,6 +629,30 @@ export default function CampaignsPage() {
           })}
         </div>
       )}
+
+      {/* Delete Campaign Confirmation Dialog */}
+      <AlertDialog
+        open={Boolean(campaignToDelete)}
+        onOpenChange={(open) => !open && setCampaignToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Campaign</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete &quot;{campaignToDelete?.name}&quot;? All associated performance tracking and attribution metrics will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+              onClick={handleDeleteCampaignConfirmed}
+            >
+              Delete Campaign
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Multi-Step Campaign Wizard Dialog */}
       <Dialog open={isWizardOpen} onOpenChange={setIsWizardOpen}>
@@ -465,7 +672,7 @@ export default function CampaignsPage() {
             <Stepper
               steps={WIZARD_STEPS}
               currentStep={wizardStep}
-              onStepClick={(s) => setWizardStep(s)}
+              onStepClick={handleStepClick}
             />
           </div>
 
@@ -480,9 +687,20 @@ export default function CampaignsPage() {
                   id="camp-name"
                   placeholder="e.g. Q1 Enterprise Design System Upsell"
                   value={wizardForm.name}
-                  onChange={(e) => setWizardForm({ ...wizardForm, name: e.target.value })}
-                  className="text-sm"
+                  onChange={(e) => {
+                    setWizardForm({ ...wizardForm, name: e.target.value });
+                    if (stepErrors.name) {
+                      setStepErrors((prev) => ({ ...prev, name: '' }));
+                    }
+                  }}
+                  className={`text-sm ${stepErrors.name ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
+                {stepErrors.name && (
+                  <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                    <span>{stepErrors.name}</span>
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -510,32 +728,48 @@ export default function CampaignsPage() {
 
                 <div className="space-y-1.5">
                   <Label htmlFor="camp-count" className="text-sm font-medium">
-                    Target Audience Reach (Seats)
+                    Target Audience Reach (Contacts) *
                   </Label>
-                  <Input
+                  <NumberInput
                     id="camp-count"
-                    type="number"
                     value={wizardForm.audienceCount}
-                    onChange={(e) =>
-                      setWizardForm({ ...wizardForm, audienceCount: Number(e.target.value) })
+                    onValueChange={(val) =>
+                      setWizardForm({ ...wizardForm, audienceCount: val || 0 })
                     }
-                    className="text-sm"
+                    min={10}
+                    step={50}
+                    error={Boolean(stepErrors.audienceCount)}
                   />
+                  {stepErrors.audienceCount && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                      <span>{stepErrors.audienceCount}</span>
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="camp-audience" className="text-sm font-medium">
-                  Audience Segment Criteria
+                  Audience Segment Criteria *
                 </Label>
                 <Input
                   id="camp-audience"
                   value={wizardForm.targetAudience}
-                  onChange={(e) =>
-                    setWizardForm({ ...wizardForm, targetAudience: e.target.value })
-                  }
-                  className="text-sm"
+                  onChange={(e) => {
+                    setWizardForm({ ...wizardForm, targetAudience: e.target.value });
+                    if (stepErrors.targetAudience) {
+                      setStepErrors((prev) => ({ ...prev, targetAudience: '' }));
+                    }
+                  }}
+                  className={`text-sm ${stepErrors.targetAudience ? 'border-destructive' : ''}`}
                 />
+                {stepErrors.targetAudience && (
+                  <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                    <span>{stepErrors.targetAudience}</span>
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -563,30 +797,52 @@ export default function CampaignsPage() {
               {wizardForm.channel === 'email' && (
                 <div className="space-y-1.5">
                   <Label htmlFor="camp-subj" className="text-sm font-medium">
-                    Email Subject Line
+                    Email Subject Line *
                   </Label>
                   <Input
                     id="camp-subj"
                     placeholder="e.g. Accelerate your Design Tokens Pipeline"
                     value={wizardForm.subject}
-                    onChange={(e) => setWizardForm({ ...wizardForm, subject: e.target.value })}
-                    className="text-sm"
+                    onChange={(e) => {
+                      setWizardForm({ ...wizardForm, subject: e.target.value });
+                      if (stepErrors.subject) {
+                        setStepErrors((prev) => ({ ...prev, subject: '' }));
+                      }
+                    }}
+                    className={`text-sm ${stepErrors.subject ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                   />
+                  {stepErrors.subject && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                      <span>{stepErrors.subject}</span>
+                    </p>
+                  )}
                 </div>
               )}
 
               <div className="space-y-1.5">
                 <Label htmlFor="camp-body" className="text-sm font-medium">
-                  Message Body & Call To Action
+                  Message Body & Call To Action *
                 </Label>
                 <Textarea
                   id="camp-body"
                   rows={5}
                   placeholder="Write your campaign messaging or click 1-Click AI Copy Generation above..."
                   value={wizardForm.body}
-                  onChange={(e) => setWizardForm({ ...wizardForm, body: e.target.value })}
-                  className="text-sm"
+                  onChange={(e) => {
+                    setWizardForm({ ...wizardForm, body: e.target.value });
+                    if (stepErrors.body) {
+                      setStepErrors((prev) => ({ ...prev, body: '' }));
+                    }
+                  }}
+                  className={`text-sm ${stepErrors.body ? 'border-destructive focus-visible:ring-destructive' : ''}`}
                 />
+                {stepErrors.body && (
+                  <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                    <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                    <span>{stepErrors.body}</span>
+                  </p>
+                )}
               </div>
             </div>
           )}
@@ -597,20 +853,29 @@ export default function CampaignsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label htmlFor="camp-budget" className="text-sm font-medium">
-                    Campaign Budget Allocation ($)
+                    Campaign Budget Allocation ($) *
                   </Label>
-                  <Input
+                  <NumberInput
                     id="camp-budget"
-                    type="number"
                     value={wizardForm.budget}
-                    onChange={(e) =>
-                      setWizardForm({ ...wizardForm, budget: Number(e.target.value) })
+                    onValueChange={(val) =>
+                      setWizardForm({ ...wizardForm, budget: val || 0 })
                     }
-                    className="text-sm font-mono"
+                    min={100}
+                    step={250}
+                    prefix="$"
+                    error={Boolean(stepErrors.budget)}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Estimated ROI multiplier: <strong className="text-foreground">14x–20x</strong>
-                  </p>
+                  {stepErrors.budget ? (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                      <span>{stepErrors.budget}</span>
+                    </p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Estimated ROI multiplier: <strong className="text-foreground">14x–20x</strong>
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
@@ -618,9 +883,9 @@ export default function CampaignsPage() {
                     Launch Timing
                   </Label>
                   <Select
-                    value={wizardForm.scheduledFor}
-                    onValueChange={(val) =>
-                      setWizardForm({ ...wizardForm, scheduledFor: val })
+                    value={wizardForm.launchMode}
+                    onValueChange={(val: 'Immediate' | 'Scheduled') =>
+                      setWizardForm({ ...wizardForm, launchMode: val })
                     }
                   >
                     <SelectTrigger id="camp-timing" className="text-sm">
@@ -628,11 +893,33 @@ export default function CampaignsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Immediate">Dispatch Immediately</SelectItem>
-                      <SelectItem value="Scheduled">Schedule for Next Tuesday 10:00 AM</SelectItem>
+                      <SelectItem value="Scheduled">Schedule for Specific Date</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
+
+              {wizardForm.launchMode === 'Scheduled' && (
+                <div className="space-y-1.5 pt-2">
+                  <Label className="text-sm font-medium">
+                    Target Broadcast Date *
+                  </Label>
+                  <DatePicker
+                    value={wizardForm.scheduledDate}
+                    onValueChange={(date) =>
+                      setWizardForm({ ...wizardForm, scheduledDate: date })
+                    }
+                    placeholder="Select dispatch date"
+                    error={Boolean(stepErrors.scheduledDate)}
+                  />
+                  {stepErrors.scheduledDate && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                      <span>{stepErrors.scheduledDate}</span>
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -667,7 +954,12 @@ export default function CampaignsPage() {
                     },
                     {
                       label: 'Scheduled Dispatch',
-                      value: wizardForm.scheduledFor,
+                      value:
+                        wizardForm.launchMode === 'Immediate'
+                          ? 'Dispatch Immediately'
+                          : wizardForm.scheduledDate
+                          ? wizardForm.scheduledDate.toLocaleDateString()
+                          : 'Scheduled',
                     },
                   ]}
                 />
@@ -703,7 +995,7 @@ export default function CampaignsPage() {
                 <Button
                   type="button"
                   size="sm"
-                  onClick={() => setWizardStep((s) => Math.min(3, s + 1))}
+                  onClick={handleNextStep}
                   className="gap-1.5"
                 >
                   Next Step

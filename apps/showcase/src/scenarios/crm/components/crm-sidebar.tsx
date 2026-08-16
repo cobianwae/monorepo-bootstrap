@@ -10,8 +10,6 @@ import {
   Headphones,
   Sparkles,
   ArrowLeft,
-  PanelLeftClose,
-  PanelLeftOpen,
   Building2,
   Check,
 } from 'lucide-react';
@@ -24,13 +22,22 @@ import {
   Popover,
   PopoverTrigger,
   PopoverContent,
+  Sidebar,
+  SidebarHeader,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarFooter,
+  SidebarTrigger,
+  useSidebar,
 } from '@ds/ui';
 import { useCrm } from '../store/crm-context';
 import type { AgentStatus } from '../types';
 
 interface CrmSidebarProps {
-  collapsed?: boolean;
-  onToggleCollapse?: () => void;
   onNavigateMobile?: () => void;
 }
 
@@ -60,12 +67,11 @@ const AGENT_STATUS_CONFIG: Record<
   },
 };
 
-export function CrmSidebar({
-  collapsed = false,
-  onToggleCollapse,
-  onNavigateMobile,
-}: CrmSidebarProps) {
+export function CrmSidebar({ onNavigateMobile }: CrmSidebarProps) {
   const pathname = usePathname();
+  const { state } = useSidebar();
+  const isCollapsed = state === 'collapsed';
+
   const {
     leads,
     campaigns,
@@ -96,6 +102,7 @@ export function CrmSidebar({
       href: '/crm/leads',
       icon: Users,
       badge: leads.length.toString(),
+      badgeVariant: 'outline' as const,
     },
     {
       title: 'Campaigns',
@@ -121,138 +128,98 @@ export function CrmSidebar({
   ];
 
   return (
-    <aside
-      className={cn(
-        'relative flex flex-col border-r border-border bg-card/70 backdrop-blur-md transition-all duration-300 z-30',
-        onNavigateMobile
-          ? 'h-full w-full'
-          : 'hidden lg:flex h-screen sticky top-0',
-        !onNavigateMobile && (collapsed ? 'w-16' : 'w-72')
-      )}
-    >
+    <Sidebar collapsible="icon">
       {/* App Header / Logo */}
-      <div className="flex h-16 items-center justify-between px-4 border-b border-border">
-        {!collapsed && (
+      <SidebarHeader className={cn(isCollapsed && 'justify-center px-2')}>
+        {!isCollapsed && (
           <Link
             href="/crm"
             className="flex items-center gap-2.5 group transition-opacity hover:opacity-90"
             onClick={onNavigateMobile}
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-highlight text-primary-foreground shadow-xs group-hover:scale-105 transition-transform font-display">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-highlight text-primary-foreground shadow-xs group-hover:scale-105 transition-transform font-display shrink-0">
               <Building2 className="h-4.5 w-4.5" />
             </div>
-            <div className="flex flex-col">
-              <span className="font-semibold text-sm tracking-tight text-foreground font-display group-hover:text-highlight transition-colors flex items-center gap-1.5">
+            <div className="flex flex-col min-w-0">
+              <span className="font-semibold text-sm tracking-tight text-foreground font-display group-hover:text-highlight transition-colors flex items-center gap-1.5 truncate">
                 Acme CRM
                 <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 font-mono">
                   v2.4
                 </Badge>
               </span>
-              <span className="text-[10px] text-muted-foreground uppercase font-mono tracking-wider">
+              <span className="text-[10px] text-muted-foreground uppercase font-mono tracking-wider truncate">
                 Design System Suite
               </span>
             </div>
           </Link>
         )}
 
-        {onToggleCollapse && (
-          <button
-            type="button"
-            onClick={onToggleCollapse}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors mx-auto"
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-          </button>
-        )}
-      </div>
+        <SidebarTrigger className={cn('hidden lg:flex', isCollapsed ? 'mx-auto' : 'ml-auto')} />
+      </SidebarHeader>
 
       {/* Navigation list */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-        {!collapsed && (
-          <h4 className="px-3 text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-            CRM Modules
-          </h4>
-        )}
-        <ul className="space-y-0.5">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = item.exact
-              ? pathname === item.href
-              : pathname === item.href || pathname.startsWith(`${item.href}/`);
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>CRM Modules</SidebarGroupLabel>
+          <SidebarMenu>
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = item.exact
+                ? pathname === item.href
+                : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={onNavigateMobile}
-                  className={cn(
-                    'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150',
-                    isActive
-                      ? 'bg-primary/10 text-foreground font-semibold shadow-xs'
-                      : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
-                    collapsed && 'justify-center px-2'
-                  )}
-                  title={collapsed ? item.title : undefined}
-                >
-                  {isActive && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-highlight shadow-xs"
-                    />
-                  )}
-                  <Icon
-                    className={cn(
-                      'h-4 w-4 shrink-0 transition-colors',
-                      isActive ? 'text-highlight' : 'text-muted-foreground group-hover:text-foreground'
-                    )}
-                  />
-                  {!collapsed && (
-                    <div className="flex flex-1 items-center justify-between min-w-0 gap-2">
-                      <span className="truncate">{item.title}</span>
+              return (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive}
+                    tooltip={item.title}
+                  >
+                    <Link href={item.href} onClick={onNavigateMobile}>
+                      <Icon className="h-4 w-4 shrink-0" />
+                      <span className="truncate group-data-[collapsible=icon]:hidden">{item.title}</span>
                       {item.badge && (
                         <Badge
                           variant={item.badgeVariant || (isActive ? 'highlight' : 'outline')}
-                          className="text-[10px] px-1.5 py-0.5 font-mono shrink-0 whitespace-nowrap leading-none"
+                          className="ml-auto text-[10px] px-1.5 py-0.5 font-mono shrink-0 whitespace-nowrap leading-none group-data-[collapsible=icon]:hidden"
                         >
                           {item.badge}
                         </Badge>
                       )}
-                    </div>
-                  )}
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </SidebarGroup>
+
+        {/* Back to Design System Documentation Link */}
+        <SidebarGroup className="mt-auto pt-3 pb-0 border-t border-border/40 group-data-[collapsible=icon]:pt-2">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Back to Design System Docs">
+                <Link href="/" onClick={onNavigateMobile}>
+                  <ArrowLeft className="h-4 w-4 shrink-0" />
+                  <span className="group-data-[collapsible=icon]:hidden">Design System Docs</span>
                 </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
 
-      {/* Back to Design System Documentation */}
-      <div className="p-3 border-t border-border">
-        <Link
-          href="/"
-          className={cn(
-            'flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-colors font-mono',
-            collapsed && 'justify-center px-2'
-          )}
-          title="Back to Design System Living Docs"
-        >
-          <ArrowLeft className="h-4 w-4 shrink-0" />
-          {!collapsed && <span>Design System Docs</span>}
-        </Link>
-      </div>
-
-      {/* Current Agent Profile & Status Popover */}
-      <div className="border-t border-border p-3 bg-muted/20">
+      {/* Current Agent Profile & Status Popover in Footer */}
+      <SidebarFooter>
         <Popover>
           <PopoverTrigger asChild>
             <button
               type="button"
               className={cn(
-                'w-full flex items-center gap-2.5 rounded-lg p-1.5 hover:bg-accent/70 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                collapsed && 'justify-center'
+                'w-full flex items-center gap-2.5 rounded-lg p-1.5 hover:bg-accent/70 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer',
+                isCollapsed && 'justify-center p-1 gap-0'
               )}
+              aria-label="Agent profile and status options"
             >
               <div className="relative shrink-0">
                 <Avatar className="h-8 w-8 border border-border">
@@ -269,12 +236,12 @@ export function CrmSidebar({
                 />
               </div>
 
-              {!collapsed && (
+              {!isCollapsed && (
                 <div className="flex flex-1 flex-col min-w-0">
                   <span className="text-xs font-semibold text-foreground truncate">
                     {currentAgent.name}
                   </span>
-                  <span className="text-xs text-muted-foreground truncate font-mono">
+                  <span className="text-[11px] text-muted-foreground truncate font-mono">
                     {AGENT_STATUS_CONFIG[currentAgent.status].label}
                   </span>
                 </div>
@@ -295,7 +262,7 @@ export function CrmSidebar({
                   key={st}
                   type="button"
                   onClick={() => setAgentStatus(st)}
-                  className="w-full flex items-center justify-between rounded-md px-2 py-1.5 text-xs text-foreground hover:bg-accent transition-colors"
+                  className="w-full flex items-center justify-between rounded-md px-2 py-1.5 text-xs text-foreground hover:bg-accent transition-colors cursor-pointer"
                 >
                   <span className="flex items-center gap-2">
                     <span className={cn('h-2 w-2 rounded-full', AGENT_STATUS_CONFIG[st].dotColor)} />
@@ -307,7 +274,7 @@ export function CrmSidebar({
             </div>
           </PopoverContent>
         </Popover>
-      </div>
-    </aside>
+      </SidebarFooter>
+    </Sidebar>
   );
 }

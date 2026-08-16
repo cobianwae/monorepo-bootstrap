@@ -39,8 +39,14 @@ import {
   ChatSuggestionList,
   ChatComposer,
   SearchInput,
+  SegmentedControl,
+  SegmentedControlItem,
+  ScrollArea,
+  Rating,
+  GradientText,
 } from '@ds/ui';
 import { useCrm } from '@/scenarios/crm/store/crm-context';
+import { useDebounce } from '@/scenarios/crm/lib/use-debounce';
 import type { ChannelType, ConversationStatus, Conversation, Lead } from '@/scenarios/crm/types';
 
 const CHANNEL_ICONS: Record<ChannelType, React.ComponentType<{ className?: string }>> = {
@@ -112,6 +118,22 @@ function Customer360Content({ conversation, linkedLead, onOpenCopilot }: Custome
                 <span>{conversation.customerPhone}</span>
               </p>
             )}
+          </div>
+        </div>
+
+        {/* CSAT & SLA Indicator using DS Rating */}
+        <div className="p-3.5 rounded-xl border border-border bg-card space-y-2.5 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider">
+              Customer CSAT
+            </span>
+            <Badge variant="success" className="text-[10px] font-mono">
+              99.4% SLA
+            </Badge>
+          </div>
+          <div className="flex items-center justify-between">
+            <Rating value={4.8} readOnly size="sm" showValueText allowHalf />
+            <span className="text-xs font-mono font-bold text-foreground">4.8 / 5.0</span>
           </div>
         </div>
 
@@ -191,6 +213,7 @@ export default function ContactCenterPage() {
 
   const [channelFilter, setChannelFilter] = React.useState<string>('all');
   const [searchQuery, setSearchQuery] = React.useState('');
+  const debouncedSearch = useDebounce(searchQuery, 300);
   const [replyText, setReplyText] = React.useState('');
   const [isSimulatingTyping, setIsSimulatingTyping] = React.useState(false);
   const [mobileCustomer360Open, setMobileCustomer360Open] = React.useState(false);
@@ -200,7 +223,7 @@ export default function ContactCenterPage() {
 
   const filteredConversations = React.useMemo(() => {
     return conversations.filter((c) => {
-      const q = searchQuery.toLowerCase().trim();
+      const q = debouncedSearch.toLowerCase().trim();
       const matchQuery =
         !q ||
         c.customerName.toLowerCase().includes(q) ||
@@ -210,7 +233,7 @@ export default function ContactCenterPage() {
       const matchChannel = channelFilter === 'all' || c.channel === channelFilter;
       return matchQuery && matchChannel;
     });
-  }, [conversations, searchQuery, channelFilter]);
+  }, [conversations, debouncedSearch, channelFilter]);
 
   const activeConv = React.useMemo(() => {
     return (
@@ -265,38 +288,47 @@ export default function ContactCenterPage() {
     }, 1200);
   };
 
-  // Conversation list UI element
+  // Conversation list UI element with SegmentedControl & full keyboard accessibility
   const conversationListContent = (
     <div className="flex flex-col h-full bg-muted/10">
-      {/* Channel selector filter tabs */}
+      {/* Channel selector filter tabs via SegmentedControl */}
       <div className="p-3 border-b border-border space-y-2.5">
-        <div className="flex items-center gap-1 overflow-x-auto pb-1">
-          {(['all', 'email', 'whatsapp', 'webchat', 'voice'] as const).map((ch) => (
-            <button
-              key={ch}
-              type="button"
-              onClick={() => setChannelFilter(ch)}
-              className={`rounded-md px-2.5 py-1 text-xs font-semibold capitalize whitespace-nowrap transition-colors cursor-pointer ${
-                channelFilter === ch
-                  ? 'bg-primary text-primary-foreground shadow-xs'
-                  : 'text-muted-foreground hover:bg-accent hover:text-foreground'
-              }`}
-            >
-              {ch}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          type="single"
+          value={channelFilter}
+          onValueChange={(val) => val && setChannelFilter(val)}
+          className="w-full"
+          aria-label="Filter channels"
+        >
+          <SegmentedControlItem value="all" className="text-xs px-2 py-1">
+            All
+          </SegmentedControlItem>
+          <SegmentedControlItem value="email" className="text-xs px-2 py-1">
+            Email
+          </SegmentedControlItem>
+          <SegmentedControlItem value="whatsapp" className="text-xs px-2 py-1">
+            WhatsApp
+          </SegmentedControlItem>
+          <SegmentedControlItem value="webchat" className="text-xs px-2 py-1">
+            Webchat
+          </SegmentedControlItem>
+        </SegmentedControl>
 
         <SearchInput
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search conversations..."
           sizeVariant="sm"
+          aria-label="Search conversation history"
         />
       </div>
 
-      {/* Conversation List items */}
-      <div className="flex-1 overflow-y-auto divide-y divide-border/60">
+      {/* Conversation List items with full keyboard nav */}
+      <div
+        className="flex-1 overflow-y-auto divide-y divide-border/60"
+        role="listbox"
+        aria-label="Conversations"
+      >
         {filteredConversations.length === 0 ? (
           <div className="p-8 text-center text-xs text-muted-foreground">
             No conversations match current filters.
@@ -309,11 +341,21 @@ export default function ContactCenterPage() {
             return (
               <div
                 key={conv.id}
+                role="option"
+                aria-selected={isSelected}
+                tabIndex={0}
                 onClick={() => {
                   setSelectedConversationId(conv.id);
                   setMobileView('detail');
                 }}
-                className={`p-3.5 space-y-1.5 cursor-pointer transition-colors ${
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedConversationId(conv.id);
+                    setMobileView('detail');
+                  }
+                }}
+                className={`p-3.5 space-y-1.5 cursor-pointer transition-colors outline-none focus-visible:bg-accent focus-visible:ring-2 focus-visible:ring-ring ${
                   isSelected
                     ? 'bg-primary/10 border-l-2 border-l-primary'
                     : 'hover:bg-accent/50'
@@ -367,7 +409,7 @@ export default function ContactCenterPage() {
     </div>
   );
 
-  // Chat thread UI element
+  // Chat thread UI element with ScrollArea
   const chatThreadContent = activeConv ? (
     <div className="flex flex-col h-full bg-card">
       {/* Active Conversation Header */}
@@ -378,6 +420,7 @@ export default function ContactCenterPage() {
             size="icon"
             className="lg:hidden h-8 w-8 shrink-0"
             onClick={() => setMobileView('list')}
+            aria-label="Back to conversations list"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -419,7 +462,7 @@ export default function ContactCenterPage() {
                 setConversationStatus(activeConv.id, val as ConversationStatus)
               }
             >
-              <SelectTrigger className="h-8 text-xs">
+              <SelectTrigger className="h-8 text-xs" aria-label="Conversation status">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -443,23 +486,25 @@ export default function ContactCenterPage() {
         </div>
       )}
 
-      {/* Message History Thread */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
-        {activeConv.messages.map((msg) => (
-          <ChatMessage
-            key={msg.id}
-            sender={msg.sender === 'agent' ? 'agent' : msg.sender === 'system' ? 'system' : 'user'}
-            senderName={msg.senderName}
-            avatar={msg.senderAvatar}
-            timestamp={msg.timestamp}
-            content={msg.content}
-            status="read"
-            copyable={msg.sender === 'customer'}
-          />
-        ))}
-        {isSimulatingTyping && <ChatTypingIndicator />}
-        <div ref={messagesEndRef} />
-      </div>
+      {/* Message History Thread with ScrollArea */}
+      <ScrollArea className="flex-1 p-4">
+        <div className="space-y-3.5">
+          {activeConv.messages.map((msg) => (
+            <ChatMessage
+              key={msg.id}
+              sender={msg.sender === 'agent' ? 'agent' : msg.sender === 'system' ? 'system' : 'user'}
+              senderName={msg.senderName}
+              avatar={msg.senderAvatar}
+              timestamp={msg.timestamp}
+              content={msg.content}
+              status="read"
+              copyable={msg.sender === 'customer'}
+            />
+          ))}
+          {isSimulatingTyping && <ChatTypingIndicator />}
+          <div ref={messagesEndRef} />
+        </div>
+      </ScrollArea>
 
       {/* AI Suggested Quick Replies */}
       {activeConv.suggestedReplies && activeConv.suggestedReplies.length > 0 && (
@@ -491,7 +536,11 @@ export default function ContactCenterPage() {
       <PageHeader
         eyebrow="Omnichannel Desk"
         eyebrowIcon={Headphones}
-        title="Omnichannel Contact Center"
+        title={
+          <span>
+            Omnichannel <GradientText>Contact Center</GradientText>
+          </span>
+        }
         description="Unified customer communications across Email, WhatsApp, Webchat, and Voice with automated AI triage, contextual CRM insights, and resizable layout workspace."
         actions={
           <div className="flex items-center gap-2.5">

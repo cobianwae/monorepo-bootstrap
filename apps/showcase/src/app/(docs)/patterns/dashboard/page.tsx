@@ -269,23 +269,25 @@ export default function DashboardPatternPage() {
           </CardHeader>
           <CardContent>
             {/* Screen-reader accessible data summary */}
-            <table className="sr-only">
-              <caption>Daily Request Volume Summary for {timeRange}</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Day</th>
-                  <th scope="col">Requests (Thousands)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {chartBars.map((bar) => (
-                  <tr key={bar.label}>
-                    <td>{bar.label}</td>
-                    <td>{bar.value}k</td>
+            <div className="sr-only">
+              <table>
+                <caption>Daily Request Volume Summary for {timeRange}</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Day</th>
+                    <th scope="col">Requests (Thousands)</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {chartBars.map((bar) => (
+                    <tr key={bar.label}>
+                      <td>{bar.label}</td>
+                      <td>{bar.value}k</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
             {/* Recharts bar chart themed with OKLCH tokens */}
             <BarChartComponent

@@ -75,6 +75,8 @@ import {
   Plus,
   Inbox,
   Users,
+  DollarSign,
+  TrendingDown,
   Box,
   Bold,
   Italic,
@@ -906,18 +908,54 @@ export function ActionExample() {
         </section>
 
         {/* 14. Custom Craft Components: Empty State & Stat Card */}
-        <section id="composite" className="space-y-4 scroll-mt-32">
-          <h2 className="text-lg font-bold text-foreground">High-Craft Composite Components</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Stat Card */}
-            <StatCard
-              title="Total Active Members"
-              value="12,840"
-              delta={{ value: '+14.2%', trend: 'up', label: 'vs previous quarter' }}
-              icon={Users}
-            />
+        <section id="composite" className="space-y-6 scroll-mt-32">
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold text-foreground">High-Craft Composite Components</h2>
+            <p className="text-sm text-muted-foreground">
+              Pre-built composite patterns for rapid dashboard assembly with built-in responsive sizing and dark mode contrast parity.
+            </p>
+          </div>
 
-            {/* Empty State */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-foreground">StatCard Variants & Trends</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Highlight Hero Variant */}
+              <StatCard
+                title="Total Revenue (Hero)"
+                value="$128,450"
+                delta={{ value: '+18.2%', trend: 'up', label: 'vs last month' }}
+                icon={DollarSign}
+                variant="highlight"
+              />
+
+              {/* Up Trend */}
+              <StatCard
+                title="Active Subscribers"
+                value="12,840"
+                delta={{ value: '+14.2%', trend: 'up', label: 'vs previous quarter' }}
+                icon={Users}
+              />
+
+              {/* Down Trend (Destructive Indicator) */}
+              <StatCard
+                title="Churn Rate"
+                value="2.4%"
+                delta={{ value: '-0.8%', trend: 'down', label: 'vs last quarter' }}
+                icon={TrendingDown}
+              />
+
+              {/* Neutral Trend */}
+              <StatCard
+                title="P99 Response Time"
+                value="42ms"
+                delta={{ value: 'Stable', trend: 'neutral', label: 'within SLA targets' }}
+                icon={Zap}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-foreground">EmptyState Pattern</h3>
             <EmptyState
               icon={Inbox}
               title="No Pending Requests"
