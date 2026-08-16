@@ -91,7 +91,7 @@ export const SidebarProvider = React.forwardRef<HTMLDivElement, SidebarProviderP
         : setOpen((prev) => !prev);
     }, [isMobile, setOpen]);
 
-    const state = open ? 'expanded' : 'collapsed';
+    const state = isMobile ? 'expanded' : (open ? 'expanded' : 'collapsed');
 
     return (
       <SidebarContext.Provider
@@ -170,7 +170,7 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
         <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
           <SheetContent
             side={side}
-            className="w-(--sidebar-width-mobile) bg-card/95 backdrop-blur-md p-0 text-card-foreground [&>button]:hidden"
+            className="w-(--sidebar-width-mobile) bg-card/95 backdrop-blur-md p-0 text-card-foreground [&>button]:hidden flex flex-col"
             style={
               {
                 '--sidebar-width-mobile': SIDEBAR_WIDTH_MOBILE,
@@ -178,7 +178,13 @@ export const Sidebar = React.forwardRef<HTMLDivElement, SidebarProps>(
             }
           >
             <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-            <div className="flex h-full w-full flex-col">{children}</div>
+            <div
+              data-state="expanded"
+              data-mobile="true"
+              className="group flex h-full w-full flex-col"
+            >
+              {children}
+            </div>
           </SheetContent>
         </Sheet>
       );
@@ -399,7 +405,7 @@ export const SidebarMenuButton = React.forwardRef<
     ref
   ) => {
     const { state, isMobile } = useSidebar();
-    const isCollapsed = state === 'collapsed';
+    const isCollapsed = !isMobile && state === 'collapsed';
     const activeVariant = isActive ? 'active' : variant;
 
     const Comp = asChild ? Slot : 'button';

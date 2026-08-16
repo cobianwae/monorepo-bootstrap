@@ -51,8 +51,8 @@ const SECTION_TITLES: Record<string, string> = {
 
 export function CrmHeader({ onOpenCommandPalette }: CrmHeaderProps) {
   const pathname = usePathname();
-  const { state } = useSidebar();
-  const isCollapsed = state === 'collapsed';
+  const { state, isMobile } = useSidebar();
+  const isCollapsed = !isMobile && state === 'collapsed';
 
   const {
     notifications,

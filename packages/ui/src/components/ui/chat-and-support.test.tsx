@@ -40,6 +40,45 @@ describe('Chat and Supporting Primitives', () => {
       expect(screen.getByText('Thinking...')).toBeDefined();
     });
 
+    it('renders customer, agent, bot, and system message variants', () => {
+      render(
+        <ChatContainer>
+          <ChatThread>
+            <ChatMessage
+              sender="system"
+              content="Conversation transferred to Omnichannel Queue"
+              timestamp="09:59 AM"
+            />
+            <ChatMessage
+              sender="customer"
+              senderName="Sarah Connor"
+              content="I need help with billing."
+              timestamp="10:00 AM"
+            />
+            <ChatMessage
+              sender="bot"
+              senderName="AI Triage"
+              content="Checking your account details..."
+              timestamp="10:00 AM"
+            />
+            <ChatMessage
+              sender="agent"
+              content="Hello Sarah, I can help you with that."
+              timestamp="10:01 AM"
+              status="read"
+            />
+          </ChatThread>
+        </ChatContainer>
+      );
+
+      expect(screen.getByText(/Conversation transferred to Omnichannel Queue/)).toBeDefined();
+      expect(screen.getByText('Sarah Connor')).toBeDefined();
+      expect(screen.getByText('I need help with billing.')).toBeDefined();
+      expect(screen.getByText('AI Triage')).toBeDefined();
+      expect(screen.getByText('Checking your account details...')).toBeDefined();
+      expect(screen.getByText('Hello Sarah, I can help you with that.')).toBeDefined();
+    });
+
     it('renders suggestion list', () => {
       render(
         <ChatSuggestionList

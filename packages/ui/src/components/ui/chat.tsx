@@ -36,12 +36,14 @@ export const ChatThread = React.forwardRef<
 ));
 ChatThread.displayName = 'ChatThread';
 
-export const chatMessageVariants = cva('flex gap-2.5 transition-all', {
+export const chatMessageVariants = cva('flex gap-2.5 transition-all w-full min-w-0', {
   variants: {
     sender: {
       user: 'justify-end',
-      assistant: 'justify-start',
       agent: 'justify-end',
+      assistant: 'justify-start',
+      customer: 'justify-start',
+      bot: 'justify-start',
       system: 'justify-center',
     },
   },
@@ -51,15 +53,19 @@ export const chatMessageVariants = cva('flex gap-2.5 transition-all', {
 });
 
 export const chatBubbleVariants = cva(
-  'relative rounded-xl px-4 py-2.5 text-sm leading-relaxed max-w-[85%] sm:max-w-[75%]',
+  'relative rounded-2xl px-4 py-2.5 text-sm leading-relaxed max-w-full break-words shadow-2xs',
   {
     variants: {
       sender: {
-        user: 'bg-primary text-primary-foreground font-medium',
-        agent: 'bg-primary text-primary-foreground font-medium',
-        assistant: 'bg-muted/70 text-foreground border border-border',
+        agent: 'bg-primary text-primary-foreground font-medium rounded-br-xs shadow-xs',
+        user: 'bg-primary text-primary-foreground font-medium rounded-br-xs shadow-xs',
+        customer:
+          'bg-muted/70 text-card-foreground border border-border/80 rounded-bl-xs',
+        assistant:
+          'bg-muted/70 text-card-foreground border border-border/80 rounded-bl-xs',
+        bot: 'bg-highlight/10 text-card-foreground border border-highlight/30 rounded-bl-xs',
         system:
-          'bg-muted/40 border border-border text-center text-xs text-muted-foreground font-mono max-w-full',
+          'bg-muted/50 border border-border/80 text-center text-xs text-muted-foreground font-mono rounded-full px-3.5 py-1 max-w-full shadow-none',
       },
     },
     defaultVariants: {
@@ -96,7 +102,7 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
     ref
   ) => {
     const [copied, setCopied] = React.useState(false);
-    const isUserOrAgent = sender === 'user' || sender === 'agent';
+    const isOutgoing = sender === 'user' || sender === 'agent';
     const isSystem = sender === 'system';
 
     const handleCopy = () => {
@@ -127,35 +133,44 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
         className={cn(chatMessageVariants({ sender, className }))}
         {...props}
       >
-        {!isUserOrAgent && (
+        {!isOutgoing && (
           <Avatar className="h-7 w-7 border border-border shrink-0 mt-0.5">
             {avatar && <AvatarImage src={avatar} alt={senderName || 'Avatar'} />}
             <AvatarFallback className="text-[10px] font-mono">
-              {senderName ? senderName.substring(0, 2).toUpperCase() : 'AI'}
+              {senderName
+                ? senderName.substring(0, 2).toUpperCase()
+                : sender === 'bot' || sender === 'assistant'
+                  ? 'AI'
+                  : 'CU'}
             </AvatarFallback>
           </Avatar>
         )}
 
-        <div className="group/bubble relative flex flex-col space-y-1">
-          {senderName && !isUserOrAgent && (
-            <span className="text-[11px] font-semibold text-muted-foreground px-1">
+        <div
+          className={cn(
+            'group/bubble relative flex flex-col space-y-1 max-w-[85%] sm:max-w-[75%] min-w-0',
+            isOutgoing ? 'items-end' : 'items-start'
+          )}
+        >
+          {senderName && !isOutgoing && (
+            <span className="text-[11px] font-semibold text-muted-foreground px-1 truncate max-w-full">
               {senderName}
             </span>
           )}
 
-          <div className={cn(chatBubbleVariants({ sender }))}>
-            <div className="whitespace-pre-wrap">{content}</div>
+          <div className={cn(chatBubbleVariants({ sender }), 'w-fit')}>
+            <div className="whitespace-pre-wrap break-words">{content}</div>
             {children}
 
-            {(timestamp || (isUserOrAgent && status)) && (
+            {(timestamp || (isOutgoing && status)) && (
               <div
                 className={cn(
                   'mt-1 flex items-center justify-end gap-1 text-[11px] font-mono',
-                  isUserOrAgent ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                  isOutgoing ? 'text-primary-foreground/75' : 'text-muted-foreground'
                 )}
               >
                 {timestamp && <span>{timestamp}</span>}
-                {isUserOrAgent && <CheckCheck className="h-3.5 w-3.5" />}
+                {isOutgoing && <CheckCheck className="h-3.5 w-3.5" />}
               </div>
             )}
           </div>
@@ -164,7 +179,10 @@ export const ChatMessage = React.forwardRef<HTMLDivElement, ChatMessageProps>(
             <button
               type="button"
               onClick={handleCopy}
-              className="opacity-0 group-hover/bubble:opacity-100 transition-opacity self-end mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground"
+              className={cn(
+                'opacity-0 group-hover/bubble:opacity-100 transition-opacity mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground cursor-pointer',
+                isOutgoing ? 'self-end' : 'self-start'
+              )}
             >
               {copied ? <Check className="h-3 w-3 text-success" /> : <Copy className="h-3 w-3" />}
               <span>{copied ? 'Copied' : 'Copy'}</span>

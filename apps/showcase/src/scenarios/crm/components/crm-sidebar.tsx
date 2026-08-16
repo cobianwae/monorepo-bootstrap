@@ -69,8 +69,15 @@ const AGENT_STATUS_CONFIG: Record<
 
 export function CrmSidebar({ onNavigateMobile }: CrmSidebarProps) {
   const pathname = usePathname();
-  const { state } = useSidebar();
-  const isCollapsed = state === 'collapsed';
+  const { state, isMobile, setOpenMobile } = useSidebar();
+  const isCollapsed = !isMobile && state === 'collapsed';
+
+  const handleNav = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+    onNavigateMobile?.();
+  };
 
   const {
     leads,
@@ -135,7 +142,7 @@ export function CrmSidebar({ onNavigateMobile }: CrmSidebarProps) {
           <Link
             href="/crm"
             className="flex items-center gap-2.5 group transition-opacity hover:opacity-90"
-            onClick={onNavigateMobile}
+            onClick={handleNav}
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-highlight text-primary-foreground shadow-xs group-hover:scale-105 transition-transform font-display shrink-0">
               <Building2 className="h-4.5 w-4.5" />
@@ -175,7 +182,7 @@ export function CrmSidebar({ onNavigateMobile }: CrmSidebarProps) {
                     isActive={isActive}
                     tooltip={item.title}
                   >
-                    <Link href={item.href} onClick={onNavigateMobile}>
+                    <Link href={item.href} onClick={handleNav}>
                       <Icon className="h-4 w-4 shrink-0" />
                       <span className="truncate group-data-[collapsible=icon]:hidden">{item.title}</span>
                       {item.badge && (
@@ -199,7 +206,7 @@ export function CrmSidebar({ onNavigateMobile }: CrmSidebarProps) {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip="Back to Design System Docs">
-                <Link href="/" onClick={onNavigateMobile}>
+                <Link href="/" onClick={handleNav}>
                   <ArrowLeft className="h-4 w-4 shrink-0" />
                   <span className="group-data-[collapsible=icon]:hidden">Design System Docs</span>
                 </Link>

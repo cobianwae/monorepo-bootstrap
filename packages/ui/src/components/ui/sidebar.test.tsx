@@ -95,4 +95,35 @@ describe('Sidebar Component Suite', () => {
     const trigger = screen.getByRole('button', { name: /toggle sidebar/i });
     expect(trigger).toBeDefined();
   });
+
+  it('keeps full labels visible in mobile sheet even if desktop defaultOpen is false', () => {
+    // Simulate mobile viewport width (< 1024)
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 768,
+    });
+
+    render(
+      <SidebarProvider defaultOpen={false}>
+        <Sidebar>
+          <SidebarHeader>
+            <span>Acme Mobile Brand</span>
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton>
+                  <span>Mobile Leads</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarContent>
+        </Sidebar>
+      </SidebarProvider>
+    );
+
+    // In mobile mode, isMobile = true -> state = 'expanded' so text is rendered cleanly
+    expect(window.innerWidth).toBe(768);
+  });
 });

@@ -492,7 +492,7 @@ export default function ContactCenterPage() {
           {activeConv.messages.map((msg) => (
             <ChatMessage
               key={msg.id}
-              sender={msg.sender === 'agent' ? 'agent' : msg.sender === 'system' ? 'system' : 'user'}
+              sender={msg.sender}
               senderName={msg.senderName}
               avatar={msg.senderAvatar}
               timestamp={msg.timestamp}
@@ -562,21 +562,21 @@ export default function ContactCenterPage() {
       <div className="hidden lg:block h-[calc(100dvh-18rem)] min-h-[600px] max-h-[900px] rounded-xl border border-border bg-card shadow-xs overflow-hidden">
         <ResizablePanelGroup direction="horizontal">
           {/* Left Panel: Conversation List */}
-          <ResizablePanel defaultSize={30} minSize={20} maxSize={40}>
+          <ResizablePanel defaultSize="30%" minSize="20%" maxSize="40%">
             {conversationListContent}
           </ResizablePanel>
 
           <ResizableHandle withHandle />
 
           {/* Middle Panel: Active Chat Thread */}
-          <ResizablePanel defaultSize={45} minSize={30}>
+          <ResizablePanel defaultSize="45%" minSize="30%">
             {chatThreadContent}
           </ResizablePanel>
 
           <ResizableHandle withHandle />
 
           {/* Right Panel: Customer 360 */}
-          <ResizablePanel defaultSize={25} minSize={20} maxSize={35}>
+          <ResizablePanel defaultSize="25%" minSize="20%" maxSize="35%">
             <div className="flex flex-col h-full bg-muted/10 p-4 space-y-4 overflow-y-auto">
               {activeConv && (
                 <>

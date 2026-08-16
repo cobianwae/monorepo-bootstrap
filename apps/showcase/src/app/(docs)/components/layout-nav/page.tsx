@@ -341,7 +341,7 @@ export default function LayoutNavPage() {
               <CardContent className="p-6">
                 <div className="h-64 rounded-xl border border-border overflow-hidden bg-card shadow-xs">
                   <ResizablePanelGroup direction="horizontal">
-                    <ResizablePanel defaultSize={30} minSize={20}>
+                    <ResizablePanel defaultSize="30%" minSize="20%">
                       <div className="flex h-full items-center justify-center p-6 bg-muted/10">
                         <span className="font-semibold text-xs text-muted-foreground font-mono">
                           Panel 1 (30%)
@@ -349,7 +349,7 @@ export default function LayoutNavPage() {
                       </div>
                     </ResizablePanel>
                     <ResizableHandle withHandle />
-                    <ResizablePanel defaultSize={45}>
+                    <ResizablePanel defaultSize="45%">
                       <div className="flex h-full items-center justify-center p-6 bg-background">
                         <span className="font-semibold text-xs text-foreground font-mono">
                           Panel 2 (Drag handles to resize)
@@ -357,7 +357,7 @@ export default function LayoutNavPage() {
                       </div>
                     </ResizablePanel>
                     <ResizableHandle withHandle />
-                    <ResizablePanel defaultSize={25} minSize={15}>
+                    <ResizablePanel defaultSize="25%" minSize="15%">
                       <div className="flex h-full items-center justify-center p-6 bg-muted/10">
                         <span className="font-semibold text-xs text-muted-foreground font-mono">
                           Panel 3 (25%)
