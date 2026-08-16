@@ -41,6 +41,16 @@ export const COLOR_TOKENS: ColorToken[] = [
     description: 'Primary interactive actions, brand accents, and active states',
   },
   {
+    name: 'Highlight / Highlight Foreground',
+    variable: '--highlight',
+    lightOklch: 'oklch(0.48 0.18 195)',
+    darkOklch: 'oklch(0.82 0.16 175)',
+    lightHex: '#087EA4',
+    darkHex: '#2DD4BF',
+    category: 'brand',
+    description: 'Signature graphic accent, active indicators, badges, and glows',
+  },
+  {
     name: 'Secondary / Secondary Foreground',
     variable: '--secondary',
     lightOklch: 'oklch(0.94 0.015 260)',

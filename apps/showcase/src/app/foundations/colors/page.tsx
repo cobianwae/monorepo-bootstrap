@@ -17,7 +17,9 @@ import {
   Input,
   Label,
 } from '@ds/ui';
-import { ShieldCheck, Check, Copy, Sparkles } from 'lucide-react';
+import { ShieldCheck, Check, Copy, Sparkles, Palette, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@ds/ui';
 import { PageHeader } from '../../../components/page-header';
 
 export default function ColorsPage() {
@@ -54,6 +56,15 @@ export default function ColorsPage() {
           <>
             The color system uses modern <strong>OKLCH color space</strong> for perceptual uniformity and predictability across both light and dark modes. Every single semantic foreground/background pair is audited and guaranteed to meet or exceed WCAG 2.1 AA (4.5:1 for body text, 3:1 for UI elements).
           </>
+        }
+        actions={
+          <Link href="/foundations/themes">
+            <Button variant="outline" size="sm" className="gap-2 border-highlight/30 text-highlight hover:bg-highlight hover:text-highlight-foreground">
+              <Palette className="h-3.5 w-3.5" />
+              <span>Explore 4 Art Directions</span>
+              <ArrowRight className="h-3 w-3" />
+            </Button>
+          </Link>
         }
       />
 

@@ -2,9 +2,11 @@ import { describe, it, expect } from 'vitest';
 import {
   getContrastRatio,
   auditSemanticTokenPairs,
+  auditThemeTokenPairs,
   hexToRgb,
   getRelativeLuminance,
 } from './contrast';
+import { THEMES } from './themes';
 
 describe('WCAG 2.1 Contrast Calculation Engine', () => {
   it('converts hex strings to RGB accurately', () => {
@@ -24,7 +26,7 @@ describe('WCAG 2.1 Contrast Calculation Engine', () => {
     expect(ratio).toBeCloseTo(21.0, 1);
   });
 
-  it('all semantic token pairs satisfy at least WCAG AA (>= 4.5:1)', () => {
+  it('all semantic token pairs in default Pulse theme satisfy at least WCAG AA (>= 4.5:1)', () => {
     const audited = auditSemanticTokenPairs();
     for (const tokenPair of audited) {
       expect(
@@ -35,12 +37,32 @@ describe('WCAG 2.1 Contrast Calculation Engine', () => {
     }
   });
 
-  it('critical text pairs (Body text, Card content) satisfy WCAG AAA (>= 7.0:1)', () => {
-    const audited = auditSemanticTokenPairs();
-    const bodyTextLight = audited.find((p) => p.name === 'Default Body Text (Light)');
-    const bodyTextDark = audited.find((p) => p.name === 'Default Body Text (Dark)');
+  it('all 4 themes satisfy WCAG AA (>= 4.5:1) across light and dark modes', () => {
+    const allAudited = auditThemeTokenPairs();
+    expect(allAudited.length).toBe(THEMES.length * 10 * 2); // 4 themes * 10 pairs * 2 modes = 80 pairs
+    for (const tokenPair of allAudited) {
+      expect(
+        tokenPair.compliance.ratio,
+        `Theme token pair "${tokenPair.name}" has contrast ${tokenPair.compliance.ratioFormatted}, expected >= 4.5:1 (WCAG AA)`
+      ).toBeGreaterThanOrEqual(4.5);
+      expect(tokenPair.compliance.passAA).toBe(true);
+    }
+  });
 
-    expect(bodyTextLight?.compliance.ratio).toBeGreaterThanOrEqual(7.0);
-    expect(bodyTextDark?.compliance.ratio).toBeGreaterThanOrEqual(7.0);
+  it('critical text pairs satisfy WCAG AAA (>= 7.0:1) across all themes', () => {
+    for (const theme of THEMES) {
+      const themeAudited = auditThemeTokenPairs(theme.id);
+      const bodyTextLight = themeAudited.find((p) => p.name.includes('Default Body Text (Light)'));
+      const bodyTextDark = themeAudited.find((p) => p.name.includes('Default Body Text (Dark)'));
+
+      expect(
+        bodyTextLight?.compliance.ratio,
+        `[${theme.name}] Light Body Text contrast ${bodyTextLight?.compliance.ratioFormatted} < 7.0:1`
+      ).toBeGreaterThanOrEqual(7.0);
+      expect(
+        bodyTextDark?.compliance.ratio,
+        `[${theme.name}] Dark Body Text contrast ${bodyTextDark?.compliance.ratioFormatted} < 7.0:1`
+      ).toBeGreaterThanOrEqual(7.0);
+    }
   });
 });

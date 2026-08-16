@@ -1,3 +1,5 @@
+import { THEMES, ThemeId } from './themes';
+
 export interface RGB {
   r: number;
   g: number;
@@ -16,6 +18,7 @@ export interface WcagCompliance {
 
 export interface TokenContrastPair {
   name: string;
+  themeId?: ThemeId;
   fgName: string;
   bgName: string;
   fgHex: string;
@@ -95,144 +98,49 @@ export function checkWcagCompliance(ratio: number): WcagCompliance {
 }
 
 /**
- * Audit standard semantic token pairs for light and dark themes
+ * Audit token pairs for a specific theme or all themes
  */
-export function auditSemanticTokenPairs(): TokenContrastPair[] {
-  const pairs: Array<{
-    name: string;
-    fgName: string;
-    bgName: string;
-    lightFg: string;
-    lightBg: string;
-    darkFg: string;
-    darkBg: string;
-  }> = [
-    {
-      name: 'Default Body Text',
-      fgName: 'Foreground',
-      bgName: 'Background',
-      lightFg: '#18181B',
-      lightBg: '#FAFBFD',
-      darkFg: '#F4F4F5',
-      darkBg: '#0D0E15',
-    },
-    {
-      name: 'Card Content',
-      fgName: 'Card Foreground',
-      bgName: 'Card',
-      lightFg: '#18181B',
-      lightBg: '#FFFFFF',
-      darkFg: '#F4F4F5',
-      darkBg: '#141620',
-    },
-    {
-      name: 'Primary Action Button',
-      fgName: 'Primary Foreground',
-      bgName: 'Primary',
-      lightFg: '#FFFFFF',
-      lightBg: '#3D34B3',
-      darkFg: '#0D0E15',
-      darkBg: '#8479FF',
-    },
-    {
-      name: 'Secondary Action Button',
-      fgName: 'Secondary Foreground',
-      bgName: 'Secondary',
-      lightFg: '#18181B',
-      lightBg: '#EAEBF2',
-      darkFg: '#F4F4F5',
-      darkBg: '#222533',
-    },
-    {
-      name: 'Muted Caption Text',
-      fgName: 'Muted Foreground',
-      bgName: 'Background',
-      lightFg: '#52525B',
-      lightBg: '#FAFBFD',
-      darkFg: '#A1A1AA',
-      darkBg: '#0D0E15',
-    },
-    {
-      name: 'Destructive Button',
-      fgName: 'Destructive Foreground',
-      bgName: 'Destructive',
-      lightFg: '#FFFFFF',
-      lightBg: '#DC2626',
-      darkFg: '#0D0E15',
-      darkBg: '#F87171',
-    },
-    {
-      name: 'Success Badge / Banner',
-      fgName: 'Success Foreground',
-      bgName: 'Success',
-      lightFg: '#FFFFFF',
-      lightBg: '#047857',
-      darkFg: '#0D0E15',
-      darkBg: '#34D399',
-    },
-    {
-      name: 'Warning Banner',
-      fgName: 'Warning Foreground',
-      bgName: 'Warning',
-      lightFg: '#18181B',
-      lightBg: '#D97706',
-      darkFg: '#18181B',
-      darkBg: '#FBBF24',
-    },
-    {
-      name: 'Info Notice',
-      fgName: 'Info Foreground',
-      bgName: 'Info',
-      lightFg: '#FFFFFF',
-      lightBg: '#2563EB',
-      darkFg: '#0D0E15',
-      darkBg: '#60A5FA',
-    },
-    {
-      name: 'Popover Surface',
-      fgName: 'Popover Foreground',
-      bgName: 'Popover',
-      lightFg: '#18181B',
-      lightBg: '#FFFFFF',
-      darkFg: '#F4F4F5',
-      darkBg: '#141620',
-    },
-    {
-      name: 'Accent Element',
-      fgName: 'Accent Foreground',
-      bgName: 'Accent',
-      lightFg: '#18181B',
-      lightBg: '#EAEBF2',
-      darkFg: '#F4F4F5',
-      darkBg: '#222533',
-    },
-  ];
+export function auditThemeTokenPairs(themeId?: ThemeId): TokenContrastPair[] {
+  const themesToAudit = themeId
+    ? THEMES.filter((t) => t.id === themeId)
+    : THEMES;
 
   const results: TokenContrastPair[] = [];
 
-  for (const pair of pairs) {
-    const lightRatio = getContrastRatio(pair.lightFg, pair.lightBg);
-    results.push({
-      name: `${pair.name} (Light)`,
-      fgName: pair.fgName,
-      bgName: pair.bgName,
-      fgHex: pair.lightFg,
-      bgHex: pair.lightBg,
-      mode: 'light',
-      compliance: checkWcagCompliance(lightRatio),
-    });
+  for (const theme of themesToAudit) {
+    for (const pair of theme.pairs) {
+      const lightRatio = getContrastRatio(pair.lightFg, pair.lightBg);
+      results.push({
+        name: `[${theme.name}] ${pair.name} (Light)`,
+        themeId: theme.id,
+        fgName: pair.fgName,
+        bgName: pair.bgName,
+        fgHex: pair.lightFg,
+        bgHex: pair.lightBg,
+        mode: 'light',
+        compliance: checkWcagCompliance(lightRatio),
+      });
 
-    const darkRatio = getContrastRatio(pair.darkFg, pair.darkBg);
-    results.push({
-      name: `${pair.name} (Dark)`,
-      fgName: pair.fgName,
-      bgName: pair.bgName,
-      fgHex: pair.darkFg,
-      bgHex: pair.darkBg,
-      mode: 'dark',
-      compliance: checkWcagCompliance(darkRatio),
-    });
+      const darkRatio = getContrastRatio(pair.darkFg, pair.darkBg);
+      results.push({
+        name: `[${theme.name}] ${pair.name} (Dark)`,
+        themeId: theme.id,
+        fgName: pair.fgName,
+        bgName: pair.bgName,
+        fgHex: pair.darkFg,
+        bgHex: pair.darkBg,
+        mode: 'dark',
+        compliance: checkWcagCompliance(darkRatio),
+      });
+    }
   }
 
   return results;
+}
+
+/**
+ * Audit standard semantic token pairs for default theme (Pulse)
+ */
+export function auditSemanticTokenPairs(): TokenContrastPair[] {
+  return auditThemeTokenPairs('pulse');
 }

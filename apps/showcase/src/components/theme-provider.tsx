@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import type { ThemeId } from '@ds/tokens';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -8,6 +9,8 @@ interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
   resolvedTheme: 'light' | 'dark';
+  palette: ThemeId;
+  setPalette: (palette: ThemeId) => void;
 }
 
 const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined);
@@ -15,13 +18,19 @@ const ThemeContext = React.createContext<ThemeContextType | undefined>(undefined
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = React.useState<Theme>('light');
   const [resolvedTheme, setResolvedTheme] = React.useState<'light' | 'dark'>('light');
+  const [palette, setPaletteState] = React.useState<ThemeId>('pulse');
 
   React.useEffect(() => {
-    const stored = localStorage.getItem('ds-theme') as Theme | null;
-    if (stored) {
-      setThemeState(stored);
+    const storedTheme = localStorage.getItem('ds-theme') as Theme | null;
+    if (storedTheme) {
+      setThemeState(storedTheme);
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       setThemeState('dark');
+    }
+
+    const storedPalette = localStorage.getItem('ds-palette') as ThemeId | null;
+    if (storedPalette && ['pulse', 'sunset', 'botanic', 'midnight'].includes(storedPalette)) {
+      setPaletteState(storedPalette);
     }
   }, []);
 
@@ -47,12 +56,22 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('ds-theme', theme);
   }, [theme]);
 
+  React.useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-theme', palette);
+    localStorage.setItem('ds-palette', palette);
+  }, [palette]);
+
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
   };
 
+  const setPalette = (newPalette: ThemeId) => {
+    setPaletteState(newPalette);
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme, palette, setPalette }}>
       {children}
     </ThemeContext.Provider>
   );

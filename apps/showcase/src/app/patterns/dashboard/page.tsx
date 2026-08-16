@@ -13,6 +13,7 @@ import {
   Skeleton,
   toast,
   BarChartComponent,
+  SectionNumber,
 } from '@ds/ui';
 import {
   DollarSign,
@@ -253,13 +254,16 @@ export default function DashboardPatternPage() {
         {/* Left 2 Cols: Traffic & Revenue Distribution */}
         <Card className="lg:col-span-2 border-border shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between pb-4">
-            <div>
-              <CardTitle className="text-base">Weekly Request Volume ({timeRange})</CardTitle>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <SectionNumber number="01" />
+                <CardTitle className="text-base font-display">Weekly Request Volume ({timeRange})</CardTitle>
+              </div>
               <CardDescription className="text-xs">
                 Total API calls processed across distributed gateway regions
               </CardDescription>
             </div>
-            <Badge variant="secondary" className="font-mono text-xs">
+            <Badge variant="highlight-outline" className="font-mono text-xs">
               {metrics.volume}
             </Badge>
           </CardHeader>
@@ -302,8 +306,11 @@ export default function DashboardPatternPage() {
         {/* Right 1 Col: Live Activity Feed */}
         <Card className="border-border shadow-xs">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Live Activity Feed</CardTitle>
-            <CardDescription className="text-xs">Real-time system events</CardDescription>
+            <div className="flex items-center gap-2">
+              <SectionNumber number="02" />
+              <CardTitle className="text-base font-display">Live Activity Feed</CardTitle>
+            </div>
+            <CardDescription className="text-xs">Real-time system audit events</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-4">

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@ds/ui';
 import { ThemeProvider } from '../components/theme-provider';
@@ -10,6 +10,12 @@ import { GlobalCommandPalette } from '../components/global-command-palette';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
+  display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-space-grotesk',
   display: 'swap',
 });
 
@@ -31,8 +37,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
-      <body className="min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20 selection:text-primary">
+    <html
+      lang="en"
+      className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
+    >
+      <body className="min-h-screen bg-background font-sans text-foreground antialiased selection:bg-highlight/30 selection:text-highlight-foreground">
         <ThemeProvider>
           <div className="flex min-h-screen">
             <ShowcaseSidebar />

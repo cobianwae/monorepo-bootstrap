@@ -6,6 +6,7 @@ import { Menu, Sun, Moon, Laptop, ShieldCheck } from 'lucide-react';
 import { Button, Sheet, SheetContent, SheetTitle } from '@ds/ui';
 import { useTheme } from './theme-provider';
 import { ShowcaseNavContent } from './showcase-nav-content';
+import { PaletteSwitcher } from './palette-switcher';
 
 export function ShowcaseHeader() {
   const pathname = usePathname();
@@ -36,18 +37,23 @@ export function ShowcaseHeader() {
         </Button>
 
         <div className="flex min-w-0 items-center gap-3">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Section:
+          <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider hidden sm:inline">
+            Location:
           </span>
-          <span className="truncate text-sm font-semibold text-foreground">{getBreadcrumb()}</span>
+          <span className="truncate text-sm font-semibold text-foreground font-display">
+            {getBreadcrumb()}
+          </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2.5">
+        {/* Palette Switcher */}
+        <PaletteSwitcher />
+
         {/* Compliance Badge */}
-        <div className="hidden sm:flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-3 py-1 text-xs font-medium text-success">
-          <ShieldCheck className="h-3.5 w-3.5" />
-          <span>WCAG 2.1 AA Contrast</span>
+        <div className="hidden md:flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
+          <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
+          <span className="font-mono text-[11px]">WCAG AA/AAA</span>
         </div>
 
         {/* Theme Toggle Button */}
@@ -88,15 +94,15 @@ export function ShowcaseHeader() {
           <SheetTitle className="sr-only">Navigation</SheetTitle>
           <div className="flex h-16 items-center border-b border-border px-4">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm shadow-xs">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-highlight text-primary-foreground font-bold text-sm shadow-xs font-display">
                 DS
               </div>
               <div className="flex flex-col">
-                <span className="font-semibold text-sm tracking-tight text-foreground">
+                <span className="font-semibold text-sm tracking-tight text-foreground font-display">
                   Design System
                 </span>
                 <span className="text-[10px] text-muted-foreground uppercase font-mono tracking-wider">
-                  Tailwind v4 + shadcn
+                  Tailwind v4 + Radix
                 </span>
               </div>
             </div>

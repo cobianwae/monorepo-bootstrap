@@ -13,17 +13,41 @@ import {
   ShieldCheck,
   CheckCircle2,
   Sparkles,
+  Wand2,
+  ListTree,
+  Columns3,
+  Search,
+  Activity,
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardDescription, Button, Badge } from '@ds/ui';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  Button,
+  Badge,
+  GridPattern,
+  GlowOrb,
+  SectionNumber,
+} from '@ds/ui';
 
 export default function OverviewPage() {
   const sections = [
     {
-      title: 'Foundations & Contrast Matrix',
+      title: 'Themes & Art Direction',
+      description: '4 curated visual identities with live switching and audited WCAG AA/AAA parity.',
+      href: '/foundations/themes',
+      icon: Palette,
+      badge: '4 Themes',
+      tag: 'FOUNDATION',
+    },
+    {
+      title: 'Color & Contrast Matrix',
       description: 'OKLCH color system with mathematically audited WCAG AA/AAA contrast ratios.',
       href: '/foundations/colors',
-      icon: Palette,
+      icon: Sparkles,
       badge: 'Audited',
+      tag: 'FOUNDATION',
     },
     {
       title: 'UI Components',
@@ -31,6 +55,7 @@ export default function OverviewPage() {
       href: '/components',
       icon: Box,
       badge: '25+ Primitives',
+      tag: 'PRIMITIVES',
     },
     {
       title: 'Stepper / Wizard Flow',
@@ -38,6 +63,7 @@ export default function OverviewPage() {
       href: '/patterns/stepper',
       icon: GitFork,
       badge: 'Interactive UX',
+      tag: 'SCENARIO',
     },
     {
       title: 'Workspace Layout',
@@ -45,6 +71,7 @@ export default function OverviewPage() {
       href: '/patterns/workspace',
       icon: Layers,
       badge: 'Layout',
+      tag: 'SCENARIO',
     },
     {
       title: 'Data Table & Filtering',
@@ -52,6 +79,15 @@ export default function OverviewPage() {
       href: '/patterns/data-table',
       icon: TableProperties,
       badge: 'Complex UX',
+      tag: 'SCENARIO',
+    },
+    {
+      title: 'Advanced Filtering & Views',
+      description: 'Multi-condition rule builder, saved views, column presets, and facet filtering.',
+      href: '/patterns/advanced-filtering',
+      icon: ListTree,
+      badge: 'New',
+      tag: 'SCENARIO',
     },
     {
       title: 'Master Data CRUD',
@@ -59,13 +95,23 @@ export default function OverviewPage() {
       href: '/patterns/master-data',
       icon: Database,
       badge: 'Enterprise',
+      tag: 'SCENARIO',
     },
     {
-      title: 'Auth & Onboarding',
-      description: 'Login, registration, password recovery, and 2FA OTP verification screens.',
-      href: '/patterns/auth',
-      icon: KeyRound,
-      badge: 'Security UX',
+      title: 'Kanban & Drag & Drop',
+      description: 'Multi-column workflow board with card ordering, column limits, and quick task creation.',
+      href: '/patterns/kanban',
+      icon: Columns3,
+      badge: 'New',
+      tag: 'SCENARIO',
+    },
+    {
+      title: 'Global Search',
+      description: 'Unified omni-search modal with categorized instant results and keyboard shortcuts.',
+      href: '/patterns/global-search',
+      icon: Search,
+      badge: 'New',
+      tag: 'SCENARIO',
     },
     {
       title: 'Dashboard & Metrics',
@@ -73,6 +119,31 @@ export default function OverviewPage() {
       href: '/patterns/dashboard',
       icon: LayoutDashboard,
       badge: 'Analytics',
+      tag: 'SCENARIO',
+    },
+    {
+      title: 'Charts & Data Viz',
+      description: 'Perceptually uniform OKLCH charts with responsive containers and tooltips.',
+      href: '/components/charts',
+      icon: Activity,
+      badge: 'New',
+      tag: 'DATA VIZ',
+    },
+    {
+      title: 'Advanced Form Kit',
+      description: 'Tag input, date pickers, OTP verification, numeric steppers, and range sliders.',
+      href: '/components/forms-advanced',
+      icon: Wand2,
+      badge: 'New',
+      tag: 'FORMS',
+    },
+    {
+      title: 'Auth & Onboarding',
+      description: 'Login, registration, password recovery, and 2FA OTP verification screens.',
+      href: '/patterns/auth',
+      icon: KeyRound,
+      badge: 'Security UX',
+      tag: 'AUTH',
     },
     {
       title: 'Overlays & Feedback',
@@ -80,110 +151,172 @@ export default function OverviewPage() {
       href: '/patterns/overlays',
       icon: BellRing,
       badge: 'Feedback',
+      tag: 'OVERLAY',
     },
   ];
 
   return (
-    <div className="space-y-10 animate-in fade-in-50 duration-300">
-      {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card via-card to-primary/5 p-8 sm:p-10 shadow-xs">
-        <div className="max-w-2xl space-y-4">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>Coherent Design System Architecture</span>
+    <div className="space-y-12 animate-in fade-in-50 duration-300">
+      {/* Hero Header with Ambient Aura & Pattern Grid */}
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-card/95 to-card p-8 sm:p-12 shadow-sm">
+        {/* Background Accents */}
+        <GridPattern
+          width={44}
+          height={44}
+          squares={[
+            [4, 1],
+            [6, 3],
+            [12, 2],
+            [15, 4],
+          ]}
+          fade="radial"
+          className="opacity-40 dark:opacity-30"
+        />
+        <GlowOrb color="highlight" size="xl" position="top-right" />
+        <GlowOrb color="primary" size="lg" position="bottom-left" />
+
+        <div className="relative z-10 max-w-3xl space-y-5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-highlight/30 bg-highlight/10 px-3.5 py-1 text-xs font-semibold text-highlight font-mono">
+            <Sparkles className="h-3.5 w-3.5 shrink-0" />
+            <span>TAILWIND V4 + RADIX + OKLCH TOKENS</span>
           </div>
 
-          <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            Design System & UX Scenarios
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground font-display leading-[1.1]">
+            Engineering Artistry in{' '}
+            <span className="bg-gradient-to-r from-primary via-highlight to-primary bg-clip-text text-transparent">
+              Design Systems
+            </span>
           </h1>
 
-          <p className="text-base text-muted-foreground leading-relaxed">
-            A comprehensive design system based on <strong>Tailwind CSS v4</strong> and <strong>shadcn/ui</strong> principles.
-            Engineered with strict WCAG AA/AAA contrast compliance, fluid responsiveness, and production-ready UX scenario patterns.
+          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl">
+            A comprehensive, character-rich design system featuring <strong>4 curated art directions</strong>, strict WCAG 2.1 AA/AAA contrast guarantees, and production-ready UX scenario patterns.
           </p>
 
-          <div className="flex flex-wrap items-center gap-3 pt-2">
-            <Link href="/foundations/colors">
-              <Button className="gap-2">
-                Explore Colors & Contrast
+          <div className="flex flex-wrap items-center gap-3 pt-3">
+            <Link href="/foundations/themes">
+              <Button variant="highlight" className="gap-2 h-10 px-5 font-semibold text-sm shadow-md">
+                Explore 4 Art Directions
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
+            <Link href="/foundations/colors">
+              <Button variant="outline" className="gap-2 h-10 px-5 text-sm bg-background/50 backdrop-blur-sm hover:border-highlight/50">
+                Contrast Matrix Audit
+              </Button>
+            </Link>
             <Link href="/patterns/stepper">
-              <Button variant="outline" className="gap-2">
-                View UX Stepper Scenario
+              <Button variant="ghost" className="gap-2 h-10 px-4 text-sm text-muted-foreground hover:text-foreground">
+                Live UX Scenarios
               </Button>
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Feature Highlights Grid */}
+      {/* Feature Highlights Grid with Monospace Indexing */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-border/80">
-          <CardHeader className="pb-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary mb-2">
+        <Card className="border-border/80 relative overflow-hidden group hover:border-highlight/50 transition-all duration-200">
+          <div className="absolute top-0 right-0 p-4">
+            <SectionNumber number="01" />
+          </div>
+          <CardHeader className="pb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-highlight/10 text-highlight mb-3 group-hover:scale-105 transition-transform">
               <ShieldCheck className="h-5 w-5" />
             </div>
-            <CardTitle className="text-base">Guaranteed WCAG Contrast</CardTitle>
-            <CardDescription>
-              All color token pairs are mathematically validated against WCAG 2.1 AA (4.5:1) & AAA (7.0:1) with automated CI tests.
+            <CardTitle className="text-base font-display">
+              Guaranteed WCAG Contrast
+            </CardTitle>
+            <CardDescription className="text-xs leading-relaxed">
+              All 80 token pairs across 4 themes are mathematically verified against WCAG 2.1 AA (≥ 4.5:1) & AAA (≥ 7.0:1) with automated CI tests.
             </CardDescription>
           </CardHeader>
         </Card>
 
-        <Card className="border-border/80">
-          <CardHeader className="pb-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary mb-2">
+        <Card className="border-border/80 relative overflow-hidden group hover:border-highlight/50 transition-all duration-200">
+          <div className="absolute top-0 right-0 p-4">
+            <SectionNumber number="02" />
+          </div>
+          <CardHeader className="pb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-3 group-hover:scale-105 transition-transform">
               <GitFork className="h-5 w-5" />
             </div>
-            <CardTitle className="text-base">Deep UX Scenario Recipes</CardTitle>
-            <CardDescription>
-              Beyond basic buttons — includes full multi-step wizards, workspace split layouts, master data CRUD, and rich data tables.
+            <CardTitle className="text-base font-display">
+              18+ UX Scenario Recipes
+            </CardTitle>
+            <CardDescription className="text-xs leading-relaxed">
+              Beyond basic buttons — includes multi-step wizards, workspace split layouts, master data CRUD, Kanban boards, and complex filters.
             </CardDescription>
           </CardHeader>
         </Card>
 
-        <Card className="border-border/80">
-          <CardHeader className="pb-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary mb-2">
+        <Card className="border-border/80 relative overflow-hidden group hover:border-highlight/50 transition-all duration-200">
+          <div className="absolute top-0 right-0 p-4">
+            <SectionNumber number="03" />
+          </div>
+          <CardHeader className="pb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-success/10 text-success mb-3 group-hover:scale-105 transition-transform">
               <CheckCircle2 className="h-5 w-5" />
             </div>
-            <CardTitle className="text-base">Tailwind v4 CSS-First</CardTitle>
-            <CardDescription>
-              Built with modern CSS `@theme` directives, OKLCH color space for perceptual uniformity, and seamless dark mode support.
+            <CardTitle className="text-base font-display">
+              Tailwind v4 + OKLCH Tokens
+            </CardTitle>
+            <CardDescription className="text-xs leading-relaxed">
+              Engineered with modern CSS-first `@theme` directives, perceptually uniform OKLCH space, and seamless light & dark mode parity.
             </CardDescription>
           </CardHeader>
         </Card>
       </div>
 
       {/* Showcase Sections Navigation Grid */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-bold tracking-tight text-foreground">
-          Showcase Sections & Scenarios
-        </h2>
+      <div className="space-y-5">
+        <div className="flex items-center justify-between border-b border-border pb-3">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-foreground font-display">
+              Showcase Catalog & Scenarios
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Comprehensive reference library for components, foundations, and interaction patterns
+            </p>
+          </div>
+          <span className="text-xs font-mono text-muted-foreground hidden sm:inline">
+            {sections.length} MODULES
+          </span>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {sections.map((section) => {
+          {sections.map((section, idx) => {
             const Icon = section.icon;
             return (
               <Link key={section.href} href={section.href} className="group">
-                <Card className="h-full border-border hover:border-primary/50 hover:shadow-md transition-all duration-200">
+                <Card className="h-full border-border hover:border-highlight/50 hover:shadow-md transition-all duration-200 relative overflow-hidden">
                   <CardHeader className="p-5">
                     <div className="flex items-center justify-between mb-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-foreground group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-200">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-foreground group-hover:bg-highlight group-hover:text-highlight-foreground transition-all duration-200 shadow-xs">
                         <Icon className="h-4 w-4" />
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        {section.badge}
-                      </Badge>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-mono text-muted-foreground">
+                          #{String(idx + 1).padStart(2, '0')}
+                        </span>
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] px-2 py-0 border-border group-hover:border-highlight/30 group-hover:text-highlight transition-colors"
+                        >
+                          {section.badge}
+                        </Badge>
+                      </div>
                     </div>
 
-                    <CardTitle className="text-base group-hover:text-primary transition-colors">
-                      {section.title}
-                    </CardTitle>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground/80">
+                        {section.tag}
+                      </span>
+                      <CardTitle className="text-base font-display group-hover:text-highlight transition-colors">
+                        {section.title}
+                      </CardTitle>
+                    </div>
 
-                    <CardDescription className="text-xs line-clamp-2 mt-1.5">
+                    <CardDescription className="text-xs line-clamp-2 mt-1.5 leading-relaxed">
                       {section.description}
                     </CardDescription>
                   </CardHeader>

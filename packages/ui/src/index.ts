@@ -54,3 +54,9 @@ export * from './components/ui/navigation-menu';
 export * from './components/ui/sortable-list';
 export * from './components/ui/kanban';
 export * from './components/ui/chart';
+export * from './components/ui/grid-pattern';
+export * from './components/ui/dot-pattern';
+export * from './components/ui/glow-orb';
+export * from './components/ui/statement-card';
+export * from './components/ui/section-number';
+

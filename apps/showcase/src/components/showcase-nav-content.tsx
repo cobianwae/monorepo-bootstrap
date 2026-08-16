@@ -47,9 +47,10 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     title: 'Foundations',
     items: [
-      { title: 'Color & Contrast Matrix', href: '/foundations/colors', icon: Palette },
+      { title: 'Themes & Art Direction', href: '/foundations/themes', icon: Palette, badge: '4 Themes' },
+      { title: 'Color & Contrast Matrix', href: '/foundations/colors', icon: Sparkles },
       { title: 'Typography Scale', href: '/foundations/typography', icon: BookOpen },
-      { title: 'Spacing, Radius & Motion', href: '/foundations/spacing', icon: Sparkles },
+      { title: 'Spacing, Radius & Motion', href: '/foundations/spacing', icon: Layers },
     ],
   },
   {
@@ -130,22 +131,33 @@ export function ShowcaseNavContent({ collapsed = false, onNavigate }: ShowcaseNa
                     href={item.href}
                     onClick={onNavigate}
                     className={cn(
-                      'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150',
+                      'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150',
                       isActive
-                        ? 'bg-primary text-primary-foreground shadow-xs'
-                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                        ? 'bg-primary/10 text-foreground font-semibold shadow-xs'
+                        : 'text-muted-foreground hover:bg-accent/60 hover:text-foreground',
                       collapsed && 'justify-center px-2'
                     )}
                     title={collapsed ? item.title : undefined}
                   >
-                    <Icon className="h-4 w-4 shrink-0" />
+                    {isActive && (
+                      <span
+                        aria-hidden="true"
+                        className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-highlight shadow-xs"
+                      />
+                    )}
+                    <Icon
+                      className={cn(
+                        'h-4 w-4 shrink-0 transition-colors',
+                        isActive ? 'text-highlight' : 'text-muted-foreground group-hover:text-foreground'
+                      )}
+                    />
                     {!collapsed && (
-                      <div className="flex flex-1 items-center justify-between">
+                      <div className="flex flex-1 items-center justify-between min-w-0 gap-2">
                         <span className="truncate">{item.title}</span>
                         {item.badge && (
                           <Badge
-                            variant={isActive ? 'secondary' : 'outline'}
-                            className="text-[10px] px-1.5 py-0 h-4"
+                            variant={isActive ? 'highlight' : 'outline'}
+                            className="text-[10px] px-1.5 py-0.5 font-mono shrink-0 whitespace-nowrap leading-none"
                           >
                             {item.badge}
                           </Badge>
