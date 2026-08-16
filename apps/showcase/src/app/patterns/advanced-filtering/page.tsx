@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { format } from 'date-fns';
 import {
   FilterBuilder,
   SegmentedControl,
@@ -14,13 +15,22 @@ import {
   ContextMenuItem,
   ContextMenuSeparator,
   ContextMenuLabel,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
   DescriptionList,
   Badge,
   Button,
   Card,
   CardContent,
   CardHeader,
+  EmptyState,
+  Skeleton,
   toast,
+  ToastAction,
   type FilterChip,
   type FilterFieldDefinition,
   type SavedFilterView,
@@ -37,6 +47,9 @@ import {
   Trash2,
   MoreHorizontal,
   Eye,
+  FilterX,
+  RefreshCw,
+  Info,
 } from 'lucide-react';
 import { PageHeader } from '../../../components/page-header';
 
@@ -122,7 +135,7 @@ function matchesChips(task: Task, chips: FilterChip[]): boolean {
   });
 }
 
-const SAVED_VIEWS: SavedFilterView[] = [
+const INITIAL_SAVED_VIEWS: SavedFilterView[] = [
   {
     id: 'v1',
     name: 'Urgent & In review',
@@ -144,63 +157,183 @@ const SAVED_VIEWS: SavedFilterView[] = [
 export default function AdvancedFilteringPage() {
   const [chips, setChips] = React.useState<FilterChip[]>([]);
   const [viewMode, setViewMode] = React.useState<'list' | 'grid'>('list');
+  const [views, setViews] = React.useState<SavedFilterView[]>(INITIAL_SAVED_VIEWS);
+  const [activeViewId, setActiveViewId] = React.useState<string | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const results = React.useMemo(
     () => (chips.length === 0 ? TASKS : TASKS.filter((t) => matchesChips(t, chips))),
     [chips]
   );
 
-  const renderTask = (task: Task) => {
-    const menu = (
-      <ContextMenuContent className="w-48">
-        <ContextMenuLabel>{task.title}</ContextMenuLabel>
-        <ContextMenuSeparator />
-        <ContextMenuItem inset onClick={() => toast({ title: `Opening ${task.title}` })}>
-          <Eye className="h-3.5 w-3.5" /> View details
-        </ContextMenuItem>
-        <ContextMenuItem inset onClick={() => toast({ title: 'Edit task', description: task.title })}>
-          <Pencil className="h-3.5 w-3.5" /> Edit
-        </ContextMenuItem>
-        <ContextMenuItem inset onClick={() => toast({ title: 'Duplicated task' })}>
-          <Copy className="h-3.5 w-3.5" /> Duplicate
-        </ContextMenuItem>
-        <ContextMenuSeparator />
-        <ContextMenuItem variant="destructive" inset onClick={() => toast({ variant: 'destructive', title: `Deleted ${task.title}` })}>
-          <Trash2 className="h-3.5 w-3.5" /> Delete
-        </ContextMenuItem>
-      </ContextMenuContent>
+  const simulateLoading = () => {
+    setIsLoading(true);
+    setTimeout(() => setIsLoading(false), 600);
+  };
+
+  const handleApplyView = (view: SavedFilterView) => {
+    setChips(view.chips);
+    setActiveViewId(view.id);
+    toast({
+      title: 'View applied',
+      description: `${view.name} (${view.chips.length} filter${view.chips.length > 1 ? 's' : ''})`,
+      variant: 'info',
+    });
+  };
+
+  const handleSaveView = (name: string, viewChips: FilterChip[]) => {
+    const newView: SavedFilterView = {
+      id: `v-${Date.now()}`,
+      name,
+      chips: viewChips,
+    };
+    setViews((prev) => [...prev, newView]);
+    setActiveViewId(newView.id);
+    toast({
+      title: 'View saved',
+      description: `${name} (${viewChips.length} filter${viewChips.length > 1 ? 's' : ''})`,
+      variant: 'success',
+    });
+  };
+
+  const handleDeleteView = (id: string) => {
+    const target = views.find((v) => v.id === id);
+    setViews((prev) => prev.filter((v) => v.id !== id));
+    if (activeViewId === id) {
+      setActiveViewId(null);
+    }
+    if (target) {
+      toast({
+        title: 'Saved view removed',
+        description: target.name,
+        variant: 'default',
+        action: (
+          <ToastAction
+            altText="Undo view deletion"
+            onClick={() => {
+              setViews((prev) => [...prev, target]);
+              setActiveViewId(target.id);
+              toast({
+                title: 'View restored',
+                description: target.name,
+                variant: 'success',
+              });
+            }}
+          >
+            Undo
+          </ToastAction>
+        ),
+      });
+    }
+  };
+
+  const handleUpdateView = (id: string, viewChips: FilterChip[]) => {
+    const target = views.find((v) => v.id === id);
+    setViews((prev) =>
+      prev.map((v) => (v.id === id ? { ...v, chips: viewChips } : v))
     );
+    toast({
+      title: 'View updated',
+      description: `Updated filters for "${target?.name ?? 'view'}"`,
+      variant: 'success',
+    });
+  };
+
+  const renderTaskActions = (task: Task) => (
+    <>
+      <DropdownMenuItem onClick={() => toast({ title: `Opening ${task.title}` })}>
+        <Eye className="h-3.5 w-3.5" /> View details
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => toast({ title: 'Edit task', description: task.title })}>
+        <Pencil className="h-3.5 w-3.5" /> Edit
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => toast({ title: 'Duplicated task' })}>
+        <Copy className="h-3.5 w-3.5" /> Duplicate
+      </DropdownMenuItem>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem
+        className="text-destructive focus:text-destructive focus:bg-destructive/10"
+        onClick={() => toast({ variant: 'destructive', title: `Deleted ${task.title}` })}
+      >
+        <Trash2 className="h-3.5 w-3.5" /> Delete
+      </DropdownMenuItem>
+    </>
+  );
+
+  const renderContextMenu = (task: Task) => (
+    <ContextMenuContent className="w-48">
+      <ContextMenuLabel>{task.title}</ContextMenuLabel>
+      <ContextMenuSeparator />
+      <ContextMenuItem inset onClick={() => toast({ title: `Opening ${task.title}` })}>
+        <Eye className="h-3.5 w-3.5" /> View details
+      </ContextMenuItem>
+      <ContextMenuItem inset onClick={() => toast({ title: 'Edit task', description: task.title })}>
+        <Pencil className="h-3.5 w-3.5" /> Edit
+      </ContextMenuItem>
+      <ContextMenuItem inset onClick={() => toast({ title: 'Duplicated task' })}>
+        <Copy className="h-3.5 w-3.5" /> Duplicate
+      </ContextMenuItem>
+      <ContextMenuSeparator />
+      <ContextMenuItem
+        variant="destructive"
+        inset
+        onClick={() => toast({ variant: 'destructive', title: `Deleted ${task.title}` })}
+      >
+        <Trash2 className="h-3.5 w-3.5" /> Delete
+      </ContextMenuItem>
+    </ContextMenuContent>
+  );
+
+  const renderTask = (task: Task) => {
+    const formattedDue = format(new Date(task.dueAt), 'd MMM yyyy');
 
     const title = (
       <ContextMenuTrigger asChild>
-        <h3 className="text-sm font-semibold text-foreground cursor-context-menu">{task.title}</h3>
+        <h3 className="text-sm font-semibold text-foreground cursor-context-menu truncate">{task.title}</h3>
       </ContextMenuTrigger>
     );
 
     if (viewMode === 'grid') {
       return (
         <ContextMenu key={task.id}>
-          {menu}
+          {renderContextMenu(task)}
           <ContextMenuTrigger asChild>
-            <Card className="cursor-context-menu transition-shadow hover:shadow-md">
-              <CardHeader className="p-4 pb-2 space-y-2">
+            <Card
+              tabIndex={0}
+              className="cursor-context-menu transition-all hover:border-primary/40 hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            >
+              <CardHeader className="p-4 pb-3 space-y-2">
                 <div className="flex items-start justify-between gap-2">
                   {title}
-                  <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                        aria-label={`Actions for ${task.title}`}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuLabel>{task.title}</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      {renderTaskActions(task)}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 <div className="flex flex-wrap gap-1">
-                  <Badge variant={PRIORITY_BADGE[task.priority]} className="capitalize text-[10px]">{task.priority}</Badge>
-                  <Badge variant={STATUS_BADGE[task.status]} className="capitalize text-[10px]">{task.status.replace('-', ' ')}</Badge>
+                  <Badge variant={PRIORITY_BADGE[task.priority]} className="capitalize text-xs">{task.priority}</Badge>
+                  <Badge variant={STATUS_BADGE[task.status]} className="capitalize text-xs">{task.status.replace('-', ' ')}</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="p-4 pt-2">
+              <CardContent className="p-4 pt-0">
                 <DescriptionList
                   columns={1}
                   items={[
-                    { label: 'Assignee', value: task.assignee, hint: undefined },
-                    { label: 'Due', value: task.dueAt },
+                    { label: 'Assignee', value: task.assignee },
+                    { label: 'Due', value: <span className="font-mono text-xs">{formattedDue}</span> },
                   ]}
                 />
               </CardContent>
@@ -212,32 +345,84 @@ export default function AdvancedFilteringPage() {
 
     return (
       <ContextMenu key={task.id}>
-        {menu}
+        {renderContextMenu(task)}
         <ContextMenuTrigger asChild>
-          <div className="flex flex-col gap-1 rounded-md border border-border bg-card p-3 hover:bg-accent/40 transition-colors sm:flex-row sm:items-center sm:justify-between cursor-context-menu">
+          <div
+            tabIndex={0}
+            className="flex flex-col gap-2 rounded-md border border-border bg-card p-3 transition-colors hover:border-primary/40 hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:flex-row sm:items-center sm:justify-between cursor-context-menu"
+          >
             <div className="min-w-0 flex-1">
               {title}
               <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1">
-                  <User className="h-3 w-3" /> {task.assignee}
+                  <User className="h-3.5 w-3.5" /> {task.assignee}
                 </span>
-                <span className="inline-flex items-center gap-1">
-                  <CalendarDays className="h-3 w-3" /> {task.dueAt}
+                <span className="inline-flex items-center gap-1 font-mono text-xs">
+                  <CalendarDays className="h-3.5 w-3.5" /> {formattedDue}
                 </span>
                 {task.tags.map((tag) => (
-                  <span key={tag} className="inline-flex items-center gap-0.5 rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium">
-                    <Tag className="h-2.5 w-2.5" /> {tag}
+                  <span key={tag} className="inline-flex items-center gap-0.5 rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
+                    <Tag className="h-3 w-3" /> {tag}
                   </span>
                 ))}
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <Badge variant={PRIORITY_BADGE[task.priority]} className="capitalize text-[10px]">{task.priority}</Badge>
-              <Badge variant={STATUS_BADGE[task.status]} className="capitalize text-[10px]">{task.status.replace('-', ' ')}</Badge>
+              <Badge variant={PRIORITY_BADGE[task.priority]} className="capitalize text-xs">{task.priority}</Badge>
+              <Badge variant={STATUS_BADGE[task.status]} className="capitalize text-xs">{task.status.replace('-', ' ')}</Badge>
             </div>
           </div>
         </ContextMenuTrigger>
       </ContextMenu>
+    );
+  };
+
+  const renderSkeletons = () => {
+    if (viewMode === 'grid') {
+      return (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader className="p-4 pb-3 space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-6 w-6 rounded-md" />
+                </div>
+                <div className="flex gap-1.5">
+                  <Skeleton className="h-4 w-14 rounded-full" />
+                  <Skeleton className="h-4 w-16 rounded-full" />
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 pt-0 space-y-2">
+                <Skeleton className="h-3 w-1/2" />
+                <Skeleton className="h-3 w-1/3" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="rounded-md border border-border bg-card p-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1.5 flex-1">
+                <Skeleton className="h-4 w-2/5" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-3 w-16" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+              </div>
+              <div className="flex gap-2 shrink-0">
+                <Skeleton className="h-4 w-12 rounded-full" />
+                <Skeleton className="h-4 w-16 rounded-full" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     );
   };
 
@@ -247,103 +432,138 @@ export default function AdvancedFilteringPage() {
         eyebrow="UX Recipe Scenario"
         eyebrowIcon={Sparkles}
         title="Advanced Filtering & Saved Views"
-        description="FilterBuilder with multi-criteria chips, saved filter views, grid/list view switching via SegmentedControl, hover-card previews, and right-click context menus for row actions."
+        description="FilterBuilder with multi-criteria chips, persistent saved views, grid/list view switching via SegmentedControl, contextual hover-card help, loading skeleton states, and right-click context menus for row actions."
       />
 
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-        <FilterBuilder
-          fields={FILTER_FIELDS}
-          chips={chips}
-          onChipsChange={setChips}
-          savedViews={SAVED_VIEWS}
-          onApplyView={(view) => setChips(view.chips)}
-          onDeleteView={(id) =>
-            toast({ title: 'Saved view removed', description: id, variant: 'info' })
-          }
-          onSaveView={(name, viewChips) =>
-            toast({
-              title: 'View saved',
-              description: `${name} (${viewChips.length} filter${viewChips.length > 1 ? 's' : ''})`,
-              variant: 'success',
-            })
-          }
-          maxChips={6}
-        />
-
-        <div className="flex items-center gap-3">
-          <SegmentedControl
-            type="single"
-            value={viewMode}
-            onValueChange={(v) => {
-              if (v) setViewMode(v as 'list' | 'grid');
+      <div className="space-y-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <FilterBuilder
+            fields={FILTER_FIELDS}
+            chips={chips}
+            onChipsChange={(newChips) => {
+              setChips(newChips);
+              // Clear active view indicator if chips no longer match
+              if (activeViewId) {
+                const current = views.find((v) => v.id === activeViewId);
+                if (current && JSON.stringify(current.chips) !== JSON.stringify(newChips)) {
+                  setActiveViewId(null);
+                }
+              }
             }}
-            aria-label="Results view mode"
-          >
-            <SegmentedControlItem value="list">
-              <LayoutList className="h-3.5 w-3.5" />
-              List
-            </SegmentedControlItem>
-            <SegmentedControlItem value="grid">
-              <LayoutGrid className="h-3.5 w-3.5" />
-              Grid
-            </SegmentedControlItem>
-          </SegmentedControl>
-        </div>
-      </div>
+            savedViews={views}
+            activeViewId={activeViewId ?? undefined}
+            onApplyView={handleApplyView}
+            onSaveView={handleSaveView}
+            onDeleteView={handleDeleteView}
+            onUpdateView={handleUpdateView}
+            maxChips={6}
+          />
 
-      <div className="text-sm text-muted-foreground">
-        Showing <strong className="text-foreground">{results.length}</strong> of{' '}
-        {TASKS.length} tasks
-        {chips.length > 0 && (
-          <span>
-            {' '}·{' '}
-            <button
-              className="text-primary underline-offset-4 hover:underline"
-              onClick={() => setChips([])}
+          <div className="flex items-center gap-2.5">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={simulateLoading}
+              className="h-8 gap-1.5 text-xs"
+              title="Simulate loading state"
             >
-              Reset filters
-            </button>
-          </span>
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+              Reload
+            </Button>
+
+            <SegmentedControl
+              type="single"
+              value={viewMode}
+              onValueChange={(v) => {
+                if (v) setViewMode(v as 'list' | 'grid');
+              }}
+              aria-label="Results view mode"
+            >
+              <SegmentedControlItem value="list">
+                <LayoutList className="h-3.5 w-3.5" />
+                List
+              </SegmentedControlItem>
+              <SegmentedControlItem value="grid">
+                <LayoutGrid className="h-3.5 w-3.5" />
+                Grid
+              </SegmentedControlItem>
+            </SegmentedControl>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <span>
+              Showing <strong className="text-foreground">{results.length}</strong> of{' '}
+              {TASKS.length} tasks
+            </span>
+            {chips.length > 0 && (
+              <span>
+                {' '}·{' '}
+                <button
+                  className="text-primary underline-offset-4 hover:underline"
+                  onClick={() => {
+                    setChips([]);
+                    setActiveViewId(null);
+                  }}
+                >
+                  Reset filters
+                </button>
+              </span>
+            )}
+
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  aria-label="How saved views work"
+                >
+                  <Info className="h-3.5 w-3.5" />
+                </button>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium text-foreground">How saved views work</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Click the <strong>Views</strong> dropdown to apply a saved filter set instantly, update the current view with modified filters, or name your current chips to save a new preset.
+                  </p>
+                  <DescriptionList
+                    columns={1}
+                    dividers
+                    items={views.map((v) => ({
+                      label: v.name,
+                      value: `${v.chips.length} filter${v.chips.length > 1 ? 's' : ''}`,
+                      hint: v.chips.map((c) => c.fieldId).join(', '),
+                    }))}
+                  />
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          </div>
+        </div>
+
+        {isLoading ? (
+          renderSkeletons()
+        ) : results.length === 0 ? (
+          <EmptyState
+            icon={FilterX}
+            title="No tasks match your filters"
+            description="Try widening your search criteria or resetting your active filter chips."
+            actionLabel="Reset filters"
+            onAction={() => {
+              setChips([]);
+              setActiveViewId(null);
+            }}
+          />
+        ) : viewMode === 'grid' ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {results.map(renderTask)}
+          </div>
+        ) : (
+          <div className="space-y-2">{results.map(renderTask)}</div>
         )}
       </div>
-
-      {results.length === 0 ? (
-        <div className="rounded-md border border-dashed border-border p-12 text-center text-sm text-muted-foreground">
-          No tasks match your filters. Try widening the criteria.
-        </div>
-      ) : viewMode === 'grid' ? (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {results.map(renderTask)}
-        </div>
-      ) : (
-        <div className="space-y-2">{results.map(renderTask)}</div>
-      )}
-
-      <HoverCard>
-        <HoverCardTrigger asChild>
-          <button className="text-sm text-primary underline-offset-4 hover:underline">
-            Hover to preview a saved view
-          </button>
-        </HoverCardTrigger>
-        <HoverCardContent className="w-80">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">How saved views work</p>
-            <p className="text-xs text-muted-foreground">
-              Click the <strong>Views</strong> dropdown to apply a saved filter set instantly, or
-              name your current filters to persist them for later sessions.
-            </p>
-            <DescriptionList
-              columns={1}
-              dividers
-              items={SAVED_VIEWS.map((v) => ({
-                label: v.name,
-                value: `${v.chips.length} filter${v.chips.length > 1 ? 's' : ''}`,
-                hint: v.chips.map((c) => c.fieldId).join(', '),
-              }))}
-            />
-          </div>
-        </HoverCardContent>
-      </HoverCard>
     </div>
   );
 }

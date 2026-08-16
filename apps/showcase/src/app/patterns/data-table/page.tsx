@@ -13,6 +13,7 @@ import {
   DataTablePagination,
   FilterBuilder,
   BulkActionBar,
+  Table,
   Badge,
   Button,
   Checkbox,
@@ -270,15 +271,17 @@ export default function DataTablePatternPage() {
             searchPlaceholder="Search by name or email..."
           />
 
-          <div className="border-t border-border overflow-x-auto">
-            <DataTableHeader table={table} />
-            <DataTableBody
-              table={table}
-              loading={isLoading}
-              emptyTitle="No members match your criteria"
-              emptyDescription="Try clearing your search query or removing some filters."
-              emptyIcon={Inbox}
-            />
+          <div className="border-t border-border">
+            <Table>
+              <DataTableHeader table={table} />
+              <DataTableBody
+                table={table}
+                loading={isLoading}
+                emptyTitle="No members match your criteria"
+                emptyDescription="Try clearing your search query or removing some filters."
+                emptyIcon={Inbox}
+              />
+            </Table>
           </div>
 
           <div className="border-t border-border">

@@ -1,10 +1,17 @@
 'use client';
 
 import * as React from 'react';
-import { X, Filter as FilterIcon, Plus, Save, Eye } from 'lucide-react';
+import { X, Filter as FilterIcon, Plus, Save, Eye, Check, RefreshCw, Trash2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from './button';
 import { Badge } from './badge';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from './select';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -55,6 +62,8 @@ export interface FilterBuilderProps extends React.HTMLAttributes<HTMLDivElement>
   onSaveView?: (name: string, chips: FilterChip[]) => void;
   onApplyView?: (view: SavedFilterView) => void;
   onDeleteView?: (id: string) => void;
+  onUpdateView?: (id: string, chips: FilterChip[]) => void;
+  activeViewId?: string;
   maxChips?: number;
   allowAdvanced?: boolean;
   storageKey?: string;
@@ -76,6 +85,8 @@ export const FilterBuilder = React.forwardRef<HTMLDivElement, FilterBuilderProps
       onSaveView,
       onApplyView,
       onDeleteView,
+      onUpdateView,
+      activeViewId,
       maxChips = 10,
       storageKey,
       label = 'Filters',
@@ -90,8 +101,6 @@ export const FilterBuilder = React.forwardRef<HTMLDivElement, FilterBuilderProps
     const [draftOperator, setDraftOperator] = React.useState<FilterOperator>('contains');
     const [draftValue, setDraftValue] = React.useState('');
     const [viewName, setViewName] = React.useState('');
-
-    const views = storageKey ? savedViews : internalViews;
 
     const persistViews = React.useCallback(
       (next: SavedFilterView[]) => {
@@ -118,7 +127,10 @@ export const FilterBuilder = React.forwardRef<HTMLDivElement, FilterBuilderProps
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [storageKey]);
 
+    const controlled = typeof onSaveView === 'function';
+    const views = controlled ? savedViews : internalViews;
     const activeField = fields.find((f) => f.id === draftField);
+    const activeView = views.find((v) => v.id === activeViewId);
 
     const addChip = () => {
       if (!draftField || !draftValue.trim() || chips.length >= maxChips) return;
@@ -156,6 +168,11 @@ export const FilterBuilder = React.forwardRef<HTMLDivElement, FilterBuilderProps
       setViewName('');
     };
 
+    const handleApplyView = (view: SavedFilterView) => {
+      onChipsChange(view.chips);
+      onApplyView?.(view);
+    };
+
     const handleDeleteView = (id: string) => {
       if (onDeleteView) {
         onDeleteView(id);
@@ -164,10 +181,27 @@ export const FilterBuilder = React.forwardRef<HTMLDivElement, FilterBuilderProps
       }
     };
 
+    const handleUpdateView = (id: string) => {
+      if (!activeView || chips.length === 0) return;
+      if (onUpdateView) {
+        onUpdateView(id, chips);
+      } else {
+        persistViews(views.map((v) => (v.id === id ? { ...v, chips } : v)));
+      }
+    };
+
+    const handleFieldChange = (value: string) => {
+      setDraftField(value);
+      const field = fields.find((f) => f.id === value);
+      if (field?.operators && !field.operators.includes(draftOperator)) {
+        setDraftOperator(field.operators[0] ?? 'contains');
+      }
+    };
+
     const fieldById = (id: string) => fields.find((f) => f.id === id);
 
     return (
-      <div ref={ref} className={cn('w-full', className)} {...props}>
+      <div ref={ref} className={cn('flex-1 min-w-0', className)} {...props}>
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground">
             <FilterIcon className="h-4 w-4 text-muted-foreground" />
@@ -203,47 +237,41 @@ export const FilterBuilder = React.forwardRef<HTMLDivElement, FilterBuilderProps
           {/* Add filter */}
           {adding ? (
             <div className="flex flex-wrap items-center gap-1.5 rounded-md border border-border bg-muted/40 p-1.5 animate-in fade-in zoom-in-95">
-              <select
-                value={draftField}
-                onChange={(e) => {
-                  setDraftField(e.target.value);
-                  const f = fields.find((x) => x.id === e.target.value);
-                  if (f?.operators && !f.operators.includes(draftOperator)) {
-                    setDraftOperator(f.operators[0] ?? 'contains');
-                  }
-                }}
-                className="h-7 rounded-md border border-input bg-background px-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label="Filter field"
-              >
-                <option value="">Field…</option>
-                {fields.map((f) => (
-                  <option key={f.id} value={f.id}>{f.label}</option>
-                ))}
-              </select>
+              <Select value={draftField} onValueChange={handleFieldChange}>
+                <SelectTrigger aria-label="Filter field" className="h-7 w-auto gap-1 rounded-md px-2 text-xs">
+                  <SelectValue placeholder="Field…" />
+                </SelectTrigger>
+                <SelectContent align="start" className="min-w-[8rem]">
+                  {fields.map((f) => (
+                    <SelectItem key={f.id} value={f.id}>{f.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
               {activeField && (
-                <select
-                  value={draftOperator}
-                  onChange={(e) => setDraftOperator(e.target.value as FilterOperator)}
-                  className="h-7 rounded-md border border-input bg-background px-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  aria-label="Filter operator"
-                >
-                  {(activeField.operators ?? ['eq', 'contains']).map((op) => (
-                    <option key={op} value={op}>{FILTER_OPERATOR_LABELS[op]}</option>
-                  ))}
-                </select>
+                <Select value={draftOperator} onValueChange={(op) => setDraftOperator(op as FilterOperator)}>
+                  <SelectTrigger aria-label="Filter operator" className="h-7 w-auto gap-1 rounded-md px-2 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent align="start" className="min-w-[8rem]">
+                    {(activeField.operators ?? ['eq', 'contains']).map((op) => (
+                      <SelectItem key={op} value={op}>{FILTER_OPERATOR_LABELS[op]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
+
               {activeField?.options ? (
-                <select
-                  value={draftValue}
-                  onChange={(e) => setDraftValue(e.target.value)}
-                  className="h-7 rounded-md border border-input bg-background px-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  aria-label="Filter value"
-                >
-                  <option value="">Value…</option>
-                  {activeField.options.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                  ))}
-                </select>
+                <Select value={draftValue} onValueChange={setDraftValue}>
+                  <SelectTrigger aria-label="Filter value" className="h-7 w-auto gap-1 rounded-md px-2 text-xs">
+                    <SelectValue placeholder="Value…" />
+                  </SelectTrigger>
+                  <SelectContent align="start" className="min-w-[8rem]">
+                    {activeField.options.map((o) => (
+                      <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               ) : (
                 <input
                   value={draftValue}
@@ -259,6 +287,7 @@ export const FilterBuilder = React.forwardRef<HTMLDivElement, FilterBuilderProps
                   aria-label="Filter value"
                 />
               )}
+
               <Button type="button" size="sm" className="h-7 px-2 text-xs" onClick={addChip} disabled={!draftField || !draftValue.trim()}>
                 <Plus className="h-3.5 w-3.5" />
                 Add
@@ -268,14 +297,7 @@ export const FilterBuilder = React.forwardRef<HTMLDivElement, FilterBuilderProps
               </Button>
             </div>
           ) : (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="h-7 gap-1 px-2 text-xs"
-              onClick={() => setAdding(true)}
-              disabled={chips.length >= maxChips}
-            >
+            <Button type="button" variant="outline" size="sm" className="h-7 shrink-0 gap-1 px-2 text-xs whitespace-nowrap" onClick={() => setAdding(true)} disabled={chips.length >= maxChips}>
               <Plus className="h-3.5 w-3.5" />
               Add filter
             </Button>
@@ -285,9 +307,13 @@ export const FilterBuilder = React.forwardRef<HTMLDivElement, FilterBuilderProps
           {(views.length > 0 || onSaveView) && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="button" variant="outline" size="sm" className="h-7 gap-1 px-2 text-xs">
+                <Button type="button" variant="outline" size="sm" className="h-7 shrink-0 gap-1 px-2 text-xs whitespace-nowrap">
                   <Eye className="h-3.5 w-3.5" />
-                  Views ({views.length})
+                  {activeView ? (
+                    <span className="max-w-28 truncate">{activeView.name}</span>
+                  ) : (
+                    <span>Views ({views.length})</span>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
@@ -299,21 +325,18 @@ export const FilterBuilder = React.forwardRef<HTMLDivElement, FilterBuilderProps
                   views.map((view) => (
                     <DropdownMenuItem
                       key={view.id}
-                      onSelect={() => onApplyView?.(view)}
-                      className="flex items-center justify-between"
+                      onSelect={() => handleApplyView(view)}
+                      className="flex items-center justify-between gap-2"
                     >
-                      <span className="truncate">{view.name}</span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteView(view.id);
-                        }}
-                        className="rounded-sm p-0.5 text-muted-foreground hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                        aria-label={`Delete view ${view.name}`}
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
+                      <span className="flex min-w-0 items-center gap-2">
+                        {activeViewId === view.id && (
+                          <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
+                        )}
+                        <span className="truncate">{view.name}</span>
+                      </span>
+                      <Badge variant="secondary" className="shrink-0 text-[10px]">
+                        {view.chips.length}
+                      </Badge>
                     </DropdownMenuItem>
                   ))
                 )}
@@ -336,10 +359,31 @@ export const FilterBuilder = React.forwardRef<HTMLDivElement, FilterBuilderProps
                     className="h-7 px-2 text-xs"
                     disabled={!viewName.trim() || chips.length === 0}
                     onClick={handleSaveView}
+                    aria-label="Save view"
                   >
                     <Save className="h-3.5 w-3.5" />
                   </Button>
                 </div>
+                {activeView && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onSelect={() => handleUpdateView(activeView.id)}
+                      disabled={chips.length === 0}
+                      className="gap-2"
+                    >
+                      <RefreshCw className="h-3.5 w-3.5 text-muted-foreground" />
+                      Update "{activeView.name}"
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onSelect={() => handleDeleteView(activeView.id)}
+                      className="gap-2 text-destructive focus:text-destructive focus:bg-destructive/10"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Delete view
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           )}

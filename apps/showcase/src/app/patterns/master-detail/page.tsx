@@ -113,6 +113,23 @@ export default function MasterDetailPatternPage() {
   const [detailOpen, setDetailOpen] = React.useState(false);
   const [isLoadingDetail, setIsLoadingDetail] = React.useState(false);
   const [replyDraft, setReplyDraft] = React.useState('');
+  const [isDesktop, setIsDesktop] = React.useState(false);
+
+  React.useEffect(() => {
+    const mql = window.matchMedia('(min-width: 1024px)');
+    const handleChange = () => {
+      const desktop = mql.matches;
+      setIsDesktop(desktop);
+      if (desktop) {
+        setDetailOpen(false);
+      } else if (selectedId) {
+        setDetailOpen(true);
+      }
+    };
+    handleChange();
+    mql.addEventListener('change', handleChange);
+    return () => mql.removeEventListener('change', handleChange);
+  }, [selectedId]);
 
   const filteredTickets = tickets.filter((t) =>
     `${t.subject} ${t.id} ${t.requester}`
@@ -125,8 +142,8 @@ export default function MasterDetailPatternPage() {
   const openDetail = (id: string) => {
     setSelectedId(id);
     setIsLoadingDetail(true);
-    // Mobile-first: detail renders in a Sheet; desktop shows the split pane.
-    setDetailOpen(true);
+    // Desktop: detail renders in the split pane; mobile: slide-over Sheet.
+    setDetailOpen(!isDesktop);
     setTimeout(() => setIsLoadingDetail(false), 600);
   };
 

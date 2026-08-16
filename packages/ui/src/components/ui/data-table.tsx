@@ -132,6 +132,7 @@ export function useDataTable<TData, TValue>({
     enableRowSelection,
     enableSorting,
     getRowId: (row: TData) => String((row as { id?: string }).id ?? ''),
+    autoResetPageIndex: false,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onRowSelectionChange: setRowSelection,
@@ -148,10 +149,20 @@ export function useDataTable<TData, TValue>({
     pageCount: pagination.show === false ? -1 : undefined,
   });
 
+  const lastDataRef = React.useRef(data);
+
   React.useEffect(() => {
     table.setPageSize(pagination.pageSize ?? 10);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination.pageSize]);
+
+  React.useEffect(() => {
+    if (lastDataRef.current !== data) {
+      lastDataRef.current = data;
+      table.setPageIndex(0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   React.useEffect(() => {
     onStateChange?.({
@@ -186,7 +197,7 @@ export function DataTableToolbar<TData>({
     table.getState().columnFilters.length > 0;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative">
           <Input
@@ -312,7 +323,7 @@ export function DataTablePagination<TData>({
   const { pageIndex } = table.getState().pagination;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 px-2">
+    <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
       <p className="text-sm text-muted-foreground">
         {labels.selected?.(selectedCount) ??
           (selectedCount > 0 ? `${selectedCount} selected` : '')}
