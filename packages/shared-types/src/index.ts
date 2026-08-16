@@ -64,6 +64,65 @@ export interface MasterDataItem {
   updatedBy: string;
 }
 
+// Navigation & Layout Types
+export interface NavItem {
+  title: string;
+  href?: string;
+  icon?: string;
+  badge?: string;
+  badgeVariant?: 'default' | 'highlight' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' | 'info';
+  disabled?: boolean;
+  external?: boolean;
+  description?: string;
+  items?: NavItem[];
+}
+
+export interface MegaMenuFeaturedItem {
+  title: string;
+  description: string;
+  href: string;
+  badge?: string;
+  imageUrl?: string;
+  ctaText?: string;
+}
+
+export interface MegaMenuSection {
+  title?: string;
+  items: NavItem[];
+}
+
+export interface MegaMenuColumn {
+  title: string;
+  sections?: MegaMenuSection[];
+  items?: NavItem[];
+  featured?: MegaMenuFeaturedItem;
+}
+
+export interface FooterLinkItem {
+  title: string;
+  href: string;
+  external?: boolean;
+  badge?: string;
+}
+
+export interface FooterColumn {
+  title: string;
+  links: FooterLinkItem[];
+}
+
+export interface SocialLinkItem {
+  platform: 'github' | 'twitter' | 'discord' | 'linkedin' | 'youtube' | 'instagram';
+  href: string;
+  label?: string;
+}
+
+export interface TocHeading {
+  id: string;
+  text: string;
+  level: number;
+}
+
+
 // Type Guards
 export function isUser(obj: unknown): obj is User {
   return (

@@ -4,13 +4,11 @@ import * as React from 'react';
 import {
   Sparkles,
   Send,
-  Bot,
   Zap,
   TrendingUp,
   AlertTriangle,
   CheckCircle2,
   Copy,
-  Check,
   Flame,
   Lightbulb,
 } from 'lucide-react';
@@ -32,6 +30,8 @@ import {
   CardHeader,
   CardTitle,
   toast,
+  ChatMessage as UiChatMessage,
+  ChatTypingIndicator,
 } from '@ds/ui';
 import { useCrm } from '../store/crm-context';
 import { streamAiDraftReply } from '../lib/mock-api';
@@ -60,7 +60,6 @@ export function CrmCopilotDrawer() {
   const [activeTab, setActiveTab] = React.useState<string>('chat');
   const [inputVal, setInputVal] = React.useState('');
   const [isStreaming, setIsStreaming] = React.useState(false);
-  const [copiedId, setCopiedId] = React.useState<string | null>(null);
 
   const [selectedLeadForScore, setSelectedLeadForScore] = React.useState<string>(
     aiContext?.entityId || leads[0]?.id || ''
@@ -135,15 +134,13 @@ export function CrmCopilotDrawer() {
     );
   };
 
-  const handleCopy = (text: string, id: string) => {
+  const handleCopy = (text: string, _id?: string) => {
     navigator.clipboard.writeText(text);
-    setCopiedId(id);
     toast({
       variant: 'success',
       title: 'Copied to Clipboard',
       description: 'Draft ready to paste into email or chat.',
     });
-    setTimeout(() => setCopiedId(null), 2000);
   };
 
   return (
@@ -202,44 +199,15 @@ export function CrmCopilotDrawer() {
             {/* Message History */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {chatMessages.map((msg) => (
-                <div
+                <UiChatMessage
                   key={msg.id}
-                  className={`flex gap-3 ${
-                    msg.sender === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
-                >
-                  {msg.sender === 'assistant' && (
-                    <div className="h-7 w-7 rounded-md bg-highlight/20 text-highlight flex items-center justify-center shrink-0 mt-0.5">
-                      <Bot className="h-4 w-4" />
-                    </div>
-                  )}
-                  <div
-                    className={`rounded-xl px-3.5 py-2.5 max-w-[85%] text-xs leading-relaxed ${
-                      msg.sender === 'user'
-                        ? 'bg-primary text-primary-foreground font-medium'
-                        : 'bg-muted/70 text-foreground border border-border'
-                    }`}
-                  >
-                    <p className="whitespace-pre-wrap">{msg.text || (isStreaming && 'AI is thinking...')}</p>
-                    {msg.sender === 'assistant' && msg.text && (
-                      <div className="mt-2 pt-2 border-t border-border/50 flex justify-end">
-                        <button
-                          type="button"
-                          onClick={() => handleCopy(msg.text, msg.id)}
-                          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors font-mono"
-                        >
-                          {copiedId === msg.id ? (
-                            <Check className="h-3 w-3 text-success" />
-                          ) : (
-                            <Copy className="h-3 w-3" />
-                          )}
-                          {copiedId === msg.id ? 'Copied' : 'Copy'}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  sender={msg.sender}
+                  senderName={msg.sender === 'assistant' ? 'CRM Copilot' : undefined}
+                  content={msg.text || (isStreaming ? 'AI is thinking...' : '')}
+                  copyable={msg.sender === 'assistant' && Boolean(msg.text)}
+                />
               ))}
+              {isStreaming && <ChatTypingIndicator />}
             </div>
 
             {/* Prompt presets */}

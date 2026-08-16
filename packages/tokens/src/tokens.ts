@@ -175,3 +175,27 @@ export const MOTION_TOKENS = {
     inOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
   },
 };
+
+export const BREAKPOINT_TOKENS = [
+  { name: 'sm', value: '640px', px: 640 },
+  { name: 'md', value: '768px', px: 768 },
+  { name: 'lg', value: '1024px', px: 1024 },
+  { name: 'xl', value: '1280px', px: 1280 },
+  { name: '2xl', value: '1536px', px: 1536 },
+];
+
+export const Z_INDEX_TOKENS = {
+  hide: -1,
+  base: 0,
+  docked: 10,
+  dropdown: 1000,
+  sticky: 1100,
+  banner: 1200,
+  overlay: 1300,
+  modal: 1400,
+  popover: 1500,
+  toast: 1600,
+  tooltip: 1700,
+  max: 9999,
+};
+

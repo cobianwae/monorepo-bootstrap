@@ -75,3 +75,40 @@ export * from './components/ui/rating';
 export * from './components/ui/code-block';
 export * from './components/ui/sidebar';
 export * from './components/ui/notification';
+
+// Layout Primitives
+export * from './components/ui/container';
+export * from './components/ui/section';
+export * from './components/ui/page-header';
+export * from './components/ui/app-shell';
+export * from './components/ui/resizable';
+export * from './components/ui/aspect-ratio';
+export * from './components/ui/skip-link';
+
+// Navigation & Menu Primitives
+export * from './components/ui/mega-menu';
+export * from './components/ui/navbar';
+export * from './components/ui/footer';
+export * from './components/ui/bottom-nav';
+export * from './components/ui/toc';
+export * from './components/ui/menubar';
+
+// Marketing Blocks
+export * from './components/ui/hero';
+export * from './components/ui/feature-grid';
+export * from './components/ui/pricing';
+export * from './components/ui/testimonial';
+export * from './components/ui/logo-cloud';
+export * from './components/ui/cta-band';
+export * from './components/ui/faq';
+export * from './components/ui/stats-band';
+
+// AI / Chat & Supporting Primitives
+export * from './components/ui/chat';
+export * from './components/ui/prose';
+export * from './components/ui/search-input';
+export * from './components/ui/banner';
+
+
+
+

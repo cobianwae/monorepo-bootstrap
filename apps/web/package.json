@@ -11,7 +11,10 @@
     "test": "echo 'web test ok'"
   },
   "dependencies": {
+    "@ds/tokens": "workspace:*",
+    "@ds/ui": "workspace:*",
     "@shared/types": "workspace:*",
+    "lucide-react": "^0.475.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "next": "^15.1.0"

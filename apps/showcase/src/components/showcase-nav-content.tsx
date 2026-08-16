@@ -27,6 +27,11 @@ import {
   Search,
   ShieldAlert,
   Briefcase,
+  PanelLeft,
+  SlidersHorizontal,
+  Bot,
+  FileCheck2,
+  Component,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@ds/ui';
@@ -70,9 +75,51 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { title: 'Core UI Components', href: '/components', icon: Box, badge: '25+' },
       {
+        title: 'Sidebar Layout System',
+        href: '/components/sidebar',
+        icon: PanelLeft,
+        badge: 'New',
+      },
+      {
+        title: 'Layout & Navigation',
+        href: '/components/layout-nav',
+        icon: Layers,
+        badge: 'New',
+      },
+      {
+        title: 'Carousel & Scroll',
+        href: '/components/carousel',
+        icon: SlidersHorizontal,
+        badge: 'New',
+      },
+      {
+        title: 'Data & Collections',
+        href: '/components/data-collections',
+        icon: Bot,
+        badge: 'New',
+      },
+      {
+        title: 'Marketing Blocks',
+        href: '/components/marketing',
+        icon: Sparkles,
+        badge: 'New',
+      },
+      {
+        title: 'Form Core & Radios',
+        href: '/components/forms-core',
+        icon: FileCheck2,
+        badge: 'New',
+      },
+      {
         title: 'Advanced Form Kit',
         href: '/components/forms-advanced',
         icon: Wand2,
+        badge: 'New',
+      },
+      {
+        title: 'Primitives & Utilities',
+        href: '/components/primitives',
+        icon: Component,
         badge: 'New',
       },
       { title: 'Charts & Data Viz', href: '/components/charts', icon: Activity, badge: 'New' },
