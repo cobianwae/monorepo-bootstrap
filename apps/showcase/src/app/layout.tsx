@@ -3,10 +3,6 @@ import { Inter, JetBrains_Mono, Space_Grotesk, Sora, IBM_Plex_Sans, IBM_Plex_Mon
 import './globals.css';
 import { Toaster } from '@ds/ui';
 import { ThemeProvider } from '../components/theme-provider';
-import { ShowcaseSidebar } from '../components/showcase-sidebar';
-import { ShowcaseHeader } from '../components/showcase-header';
-import { GlobalCommandPalette } from '../components/global-command-palette';
-import { ArtCanvas } from '../components/art-canvas';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -65,18 +61,8 @@ export default function RootLayout({
     >
       <body className="min-h-screen bg-background font-sans text-foreground antialiased selection:bg-highlight/30 selection:text-highlight-foreground">
         <ThemeProvider>
-          <ArtCanvas />
-          <div className="flex min-h-screen">
-            <ShowcaseSidebar />
-            <div className="flex min-w-0 flex-1 flex-col">
-              <ShowcaseHeader />
-              <main className="flex-1 p-6 md:p-10 max-w-7xl w-full mx-auto">
-                {children}
-              </main>
-            </div>
-          </div>
+          {children}
           <Toaster />
-          <GlobalCommandPalette />
         </ThemeProvider>
       </body>
     </html>

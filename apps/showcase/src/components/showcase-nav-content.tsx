@@ -26,6 +26,7 @@ import {
   Activity,
   Search,
   ShieldAlert,
+  Briefcase,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@ds/ui';
@@ -44,6 +45,17 @@ interface NavSection {
 }
 
 export const NAV_SECTIONS: NavSection[] = [
+  {
+    title: 'Integrated Scenarios',
+    items: [
+      {
+        title: 'CRM Full Suite',
+        href: '/crm',
+        icon: Briefcase,
+        badge: 'Interactive',
+      },
+    ],
+  },
   {
     title: 'Foundations',
     items: [
