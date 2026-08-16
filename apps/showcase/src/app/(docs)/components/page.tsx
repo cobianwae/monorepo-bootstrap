@@ -712,9 +712,13 @@ export function ActionExample() {
                 <Badge variant="highlight">Highlight</Badge>
                 <Badge variant="highlight-outline">Highlight Outline</Badge>
                 <Badge variant="success">Active / Success</Badge>
+                <Badge variant="success-outline">Success Outline</Badge>
                 <Badge variant="warning">Pending / Warning</Badge>
+                <Badge variant="warning-outline">Warning Outline</Badge>
                 <Badge variant="destructive">Failed / Error</Badge>
+                <Badge variant="destructive-outline">Destructive Outline</Badge>
                 <Badge variant="info">Info Notice</Badge>
+                <Badge variant="info-outline">Info Outline</Badge>
               </div>
             </CardContent>
           </Card>

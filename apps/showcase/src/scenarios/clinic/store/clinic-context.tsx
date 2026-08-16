@@ -15,6 +15,7 @@ import type {
   Activity,
   ClinicMetrics,
   StaffPractitioner,
+  StaffStatus,
   PaymentMethod,
 } from '../types';
 import {
@@ -54,6 +55,7 @@ interface ClinicState {
   activities: Activity[];
   metrics: ClinicMetrics;
   staff: StaffPractitioner[];
+  currentStaffId: string;
   selectedPatientId: string | null;
   selectedAppointmentId: string | null;
   isAiCoachOpen: boolean;
@@ -81,6 +83,8 @@ type ClinicAction =
   | { type: 'PROCESS_CHECKOUT'; payload: { patientId?: string; patientName: string; paymentMethod: PaymentMethod; cashierName: string; discountAmount?: number } }
   | { type: 'SET_SELECTED_PATIENT'; payload: string | null }
   | { type: 'SET_SELECTED_APPOINTMENT'; payload: string | null }
+  | { type: 'SET_CURRENT_STAFF'; payload: string }
+  | { type: 'SET_STAFF_STATUS'; payload: { staffId: string; status: StaffStatus } }
   | { type: 'OPEN_AI_COACH' }
   | { type: 'CLOSE_AI_COACH' }
   | { type: 'MARK_NOTIFICATIONS_READ' }
@@ -127,6 +131,7 @@ const initialState: ClinicState = {
   activities: INITIAL_ACTIVITIES,
   metrics: INITIAL_CLINIC_METRICS,
   staff: INITIAL_STAFF,
+  currentStaffId: 'staff-1',
   selectedPatientId: 'PAT-1001',
   selectedAppointmentId: null,
   isAiCoachOpen: false,
@@ -535,6 +540,17 @@ function clinicReducer(state: ClinicState, action: ClinicAction): ClinicState {
     case 'SET_SELECTED_APPOINTMENT':
       return { ...state, selectedAppointmentId: action.payload };
 
+    case 'SET_CURRENT_STAFF':
+      return { ...state, currentStaffId: action.payload };
+
+    case 'SET_STAFF_STATUS':
+      return {
+        ...state,
+        staff: state.staff.map((s) =>
+          s.id === action.payload.staffId ? { ...s, status: action.payload.status } : s
+        ),
+      };
+
     case 'OPEN_AI_COACH':
       return { ...state, isAiCoachOpen: true };
 
@@ -573,6 +589,7 @@ function clinicReducer(state: ClinicState, action: ClinicAction): ClinicState {
         transactions: [...INITIAL_TRANSACTIONS],
         activities: [...INITIAL_ACTIVITIES],
         metrics: { ...INITIAL_CLINIC_METRICS },
+        currentStaffId: 'staff-1',
       };
 
     default:
@@ -581,6 +598,7 @@ function clinicReducer(state: ClinicState, action: ClinicAction): ClinicState {
 }
 
 interface ClinicContextType extends ClinicState {
+  currentStaff: StaffPractitioner;
   registerPatient: (patient: Omit<Patient, 'id' | 'joinedAt' | 'lastVisit' | 'notesCount' | 'bmi' | 'weightHistory'>) => void;
   updatePatient: (id: string, patch: Partial<Patient>) => void;
   recordWeightEntry: (patientId: string, weight: number, bodyFatPct?: number) => void;
@@ -600,6 +618,8 @@ interface ClinicContextType extends ClinicState {
   processCheckout: (payload: { patientId?: string; patientName: string; paymentMethod: PaymentMethod; cashierName: string; discountAmount?: number }) => void;
   setSelectedPatientId: (id: string | null) => void;
   setSelectedAppointmentId: (id: string | null) => void;
+  setCurrentStaff: (id: string) => void;
+  setStaffStatus: (staffId: string, status: StaffStatus) => void;
   openAiCoach: () => void;
   closeAiCoach: () => void;
   markNotificationsRead: () => void;
@@ -758,6 +778,14 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'SET_SELECTED_APPOINTMENT', payload: id });
   }, []);
 
+  const setCurrentStaff = React.useCallback((id: string) => {
+    dispatch({ type: 'SET_CURRENT_STAFF', payload: id });
+  }, []);
+
+  const setStaffStatus = React.useCallback((staffId: string, status: StaffStatus) => {
+    dispatch({ type: 'SET_STAFF_STATUS', payload: { staffId, status } });
+  }, []);
+
   const openAiCoach = React.useCallback(() => {
     dispatch({ type: 'OPEN_AI_COACH' });
   }, []);
@@ -778,9 +806,13 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const value = React.useMemo<ClinicContextType>(
-    () => ({
+  const value = React.useMemo<ClinicContextType>(() => {
+    const currentStaff =
+      state.staff.find((s) => s.id === state.currentStaffId) ?? state.staff[0];
+
+    return {
       ...state,
+      currentStaff,
       registerPatient,
       updatePatient,
       recordWeightEntry,
@@ -800,38 +832,41 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       processCheckout,
       setSelectedPatientId,
       setSelectedAppointmentId,
+      setCurrentStaff,
+      setStaffStatus,
       openAiCoach,
       closeAiCoach,
       markNotificationsRead,
       resetAllData,
-    }),
-    [
-      state,
-      registerPatient,
-      updatePatient,
-      recordWeightEntry,
-      addAppointment,
-      updateAppointmentStatus,
-      deleteAppointment,
-      addTreatment,
-      updateTreatment,
-      deleteTreatment,
-      addDoctorNote,
-      addPsychologistNote,
-      addDieticianPlan,
-      addToCart,
-      updateCartQuantity,
-      removeFromCart,
-      clearCart,
-      processCheckout,
-      setSelectedPatientId,
-      setSelectedAppointmentId,
-      openAiCoach,
-      closeAiCoach,
-      markNotificationsRead,
-      resetAllData,
-    ]
-  );
+    };
+  }, [
+    state,
+    registerPatient,
+    updatePatient,
+    recordWeightEntry,
+    addAppointment,
+    updateAppointmentStatus,
+    deleteAppointment,
+    addTreatment,
+    updateTreatment,
+    deleteTreatment,
+    addDoctorNote,
+    addPsychologistNote,
+    addDieticianPlan,
+    addToCart,
+    updateCartQuantity,
+    removeFromCart,
+    clearCart,
+    processCheckout,
+    setSelectedPatientId,
+    setSelectedAppointmentId,
+    setCurrentStaff,
+    setStaffStatus,
+    openAiCoach,
+    closeAiCoach,
+    markNotificationsRead,
+    resetAllData,
+  ]);
 
   return <ClinicContext.Provider value={value}>{children}</ClinicContext.Provider>;
 }

@@ -14,8 +14,12 @@ export const badgeVariants = cva(
         destructive: 'border-transparent bg-destructive text-destructive-foreground shadow-xs',
         outline: 'border-border text-foreground',
         success: 'border-transparent bg-success text-success-foreground shadow-xs',
+        'success-outline': 'border-success/30 bg-success/10 text-success',
         warning: 'border-transparent bg-warning text-warning-foreground shadow-xs',
+        'warning-outline': 'border-warning/30 bg-warning/10 text-warning-text',
         info: 'border-info bg-info text-info-foreground shadow-xs',
+        'info-outline': 'border-info/30 bg-info/10 text-info',
+        'destructive-outline': 'border-destructive/30 bg-destructive/10 text-destructive-text',
         muted: 'border-transparent bg-muted text-muted-foreground',
       },
       size: {

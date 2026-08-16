@@ -43,6 +43,8 @@ export interface Patient {
 
 export type PractitionerRole = 'doctor' | 'psychologist' | 'dietician';
 
+export type StaffStatus = 'available' | 'in-consult' | 'break' | 'off-duty';
+
 export type AppointmentStatus =
   | 'scheduled'
   | 'checked-in'
@@ -224,7 +226,7 @@ export interface StaffPractitioner {
   role: PractitionerRole;
   specialty: string;
   avatarUrl?: string;
-  status: 'available' | 'in-consult' | 'break' | 'off-duty';
+  status: StaffStatus;
   room: string;
   todayAppointmentsCount: number;
 }

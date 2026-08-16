@@ -15,11 +15,18 @@ import {
   BarChart3,
   ArrowLeft,
   HeartPulse,
+  Check,
   type LucideIcon,
 } from 'lucide-react';
 import {
   cn,
   Badge,
+  Avatar,
+  AvatarImage,
+  AvatarFallback,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
   Sidebar,
   SidebarHeader,
   SidebarContent,
@@ -33,10 +40,39 @@ import {
   useSidebar,
 } from '@ds/ui';
 import { useClinic } from '../store/clinic-context';
+import type { StaffStatus, PractitionerRole } from '../types';
 
 interface ClinicSidebarProps {
   onNavigateMobile?: () => void;
 }
+
+const ROLE_LABELS: Record<PractitionerRole, string> = {
+  doctor: 'Doctor',
+  psychologist: 'Psychologist',
+  dietician: 'Dietician',
+};
+
+const STAFF_STATUS_CONFIG: Record<
+  StaffStatus,
+  { label: string; dotColor: string }
+> = {
+  available: {
+    label: 'Available',
+    dotColor: 'bg-success ring-success/20',
+  },
+  'in-consult': {
+    label: 'In Consultation',
+    dotColor: 'bg-highlight ring-highlight/20',
+  },
+  break: {
+    label: 'On Break',
+    dotColor: 'bg-warning ring-warning/20',
+  },
+  'off-duty': {
+    label: 'Off Duty',
+    dotColor: 'bg-muted ring-muted/20',
+  },
+};
 
 interface NavItem {
   title: string;
@@ -68,6 +104,8 @@ export function ClinicSidebar({ onNavigateMobile }: ClinicSidebarProps) {
     patients,
     appointments,
     cart,
+    currentStaff,
+    setStaffStatus,
   } = useClinic();
 
   const activePatientsCount = React.useMemo(
@@ -106,7 +144,7 @@ export function ClinicSidebar({ onNavigateMobile }: ClinicSidebarProps) {
           href: '/clinic/appointments',
           icon: CalendarClock,
           badge: todayApptsCount > 0 ? String(todayApptsCount) : undefined,
-          badgeVariant: 'warning',
+          badgeVariant: 'warning-outline',
         },
         {
           title: 'Patients & EMR',
@@ -143,7 +181,7 @@ export function ClinicSidebar({ onNavigateMobile }: ClinicSidebarProps) {
           href: '/clinic/pos',
           icon: ShoppingBag,
           badge: cartItemsCount > 0 ? `${cartItemsCount}` : undefined,
-          badgeVariant: 'success',
+          badgeVariant: 'success-outline',
         },
         {
           title: 'Reports & Analytics',
@@ -234,19 +272,73 @@ export function ClinicSidebar({ onNavigateMobile }: ClinicSidebarProps) {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Footer: Active Duty Staff */}
+      {/* Current Practitioner Profile & Status Popover in Footer */}
       <SidebarFooter>
-        {!isCollapsed && (
-          <div className="flex items-center justify-between p-2 rounded-lg bg-muted/40 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
-              </span>
-              <span className="font-mono text-[11px] text-muted-foreground">Duty: 6 Staff On-Site</span>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className={cn(
+                'w-full flex items-center gap-2.5 rounded-lg p-1.5 hover:bg-accent/70 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer',
+                isCollapsed && 'justify-center p-1 gap-0'
+              )}
+              aria-label="Practitioner profile and status options"
+            >
+              <div className="relative shrink-0">
+                <Avatar className="h-8 w-8 border border-border">
+                  <AvatarImage src={currentStaff.avatarUrl} alt={currentStaff.name} />
+                  <AvatarFallback className="text-xs font-bold font-mono">
+                    {currentStaff.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <span
+                  className={cn(
+                    'absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full ring-2 ring-card',
+                    STAFF_STATUS_CONFIG[currentStaff.status].dotColor
+                  )}
+                />
+              </div>
+
+              {!isCollapsed && (
+                <div className="flex flex-1 flex-col min-w-0">
+                  <span className="text-xs font-semibold text-foreground truncate">
+                    {currentStaff.name}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground truncate font-mono">
+                    {STAFF_STATUS_CONFIG[currentStaff.status].label}
+                  </span>
+                </div>
+              )}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent side="right" align="end" className="w-56 p-2 space-y-1.5 shadow-lg">
+            <div className="px-2 py-1.5 border-b border-border">
+              <p className="text-xs font-semibold text-foreground">{currentStaff.name}</p>
+              <p className="text-xs text-muted-foreground font-mono">
+                {ROLE_LABELS[currentStaff.role]} · {currentStaff.room}
+              </p>
             </div>
-          </div>
-        )}
+            <div className="space-y-0.5 pt-1">
+              <span className="text-xs font-semibold text-muted-foreground px-2 uppercase font-mono tracking-wider">
+                Change Status
+              </span>
+              {(['available', 'in-consult', 'break', 'off-duty'] as StaffStatus[]).map((st) => (
+                <button
+                  key={st}
+                  type="button"
+                  onClick={() => setStaffStatus(currentStaff.id, st)}
+                  className="w-full flex items-center justify-between rounded-md px-2 py-1.5 text-xs text-foreground hover:bg-accent transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    <span className={cn('h-2 w-2 rounded-full', STAFF_STATUS_CONFIG[st].dotColor)} />
+                    {STAFF_STATUS_CONFIG[st].label}
+                  </span>
+                  {currentStaff.status === st && <Check className="h-3.5 w-3.5 text-primary" />}
+                </button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
       </SidebarFooter>
     </Sidebar>
   );

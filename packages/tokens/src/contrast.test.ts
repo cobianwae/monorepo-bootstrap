@@ -49,6 +49,22 @@ describe('WCAG 2.1 Contrast Calculation Engine', () => {
     }
   });
 
+  it('semantic text-on-surface tokens (soft badge text) satisfy WCAG AA (>= 4.5:1) on card surfaces', () => {
+    const cases = [
+      { name: 'Warning Text', fg: '#B45309', bg: '#FFFFFF' },
+      { name: 'Destructive Text', fg: '#B91C1C', bg: '#FFFFFF' },
+      { name: 'Warning Text', fg: '#FBBF24', bg: '#141620' },
+      { name: 'Destructive Text', fg: '#F87171', bg: '#141620' },
+    ];
+    for (const c of cases) {
+      const ratio = getContrastRatio(c.fg, c.bg);
+      expect(
+        ratio,
+        `${c.name} (${c.fg} on ${c.bg}) has contrast ${ratio.toFixed(2)}:1, expected >= 4.5:1 (WCAG AA)`
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
   it('critical text pairs satisfy WCAG AAA (>= 7.0:1) across all themes', () => {
     for (const theme of THEMES) {
       const themeAudited = auditThemeTokenPairs(theme.id);

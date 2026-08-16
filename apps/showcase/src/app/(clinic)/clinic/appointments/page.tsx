@@ -51,13 +51,13 @@ import type {
 const COLUMNS: Array<{
   id: AppointmentStatus;
   title: string;
-  badgeVariant: 'secondary' | 'warning' | 'highlight' | 'success' | 'destructive';
+  badgeVariant: 'secondary' | 'warning-outline' | 'highlight-outline' | 'success-outline' | 'destructive-outline';
 }> = [
   { id: 'scheduled', title: 'Scheduled Bookings', badgeVariant: 'secondary' },
-  { id: 'checked-in', title: 'Checked-In (Waiting)', badgeVariant: 'warning' },
-  { id: 'in-consult', title: 'In-Consultation', badgeVariant: 'highlight' },
-  { id: 'completed', title: 'Completed Sessions', badgeVariant: 'success' },
-  { id: 'no-show', title: 'No-Show / Cancelled', badgeVariant: 'destructive' },
+  { id: 'checked-in', title: 'Checked-In (Waiting)', badgeVariant: 'warning-outline' },
+  { id: 'in-consult', title: 'In-Consultation', badgeVariant: 'highlight-outline' },
+  { id: 'completed', title: 'Completed Sessions', badgeVariant: 'success-outline' },
+  { id: 'no-show', title: 'No-Show / Cancelled', badgeVariant: 'destructive-outline' },
 ];
 
 export default function AppointmentsPage() {
