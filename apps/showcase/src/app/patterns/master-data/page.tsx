@@ -36,6 +36,16 @@ import {
   AlertDescription,
   Skeleton,
   EmptyState,
+  ToastAction,
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
   toast,
 } from '@ds/ui';
 import {
@@ -46,6 +56,8 @@ import {
   Sparkles,
   Inbox,
   RefreshCw,
+  Trash2,
+  RotateCcw,
 } from 'lucide-react';
 import { PageHeader } from '../../../components/page-header';
 import type { MasterDataItem } from '@shared/types';
@@ -108,6 +120,7 @@ export default function MasterDataPatternPage() {
   const [search, setSearch] = React.useState('');
   const [activeCategory, setActiveCategory] = React.useState('all');
   const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
+  const [editingItem, setEditingItem] = React.useState<MasterDataItem | null>(null);
   const [isAuditOpen, setIsAuditOpen] = React.useState(false);
   const [selectedAuditItem, setSelectedAuditItem] = React.useState<MasterDataItem | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -123,6 +136,51 @@ export default function MasterDataPatternPage() {
   const [formCategory, setFormCategory] = React.useState('Currency');
   const [formDesc, setFormDesc] = React.useState('');
   const [formError, setFormError] = React.useState<string | null>(null);
+
+  const openCreateDrawer = () => {
+    setEditingItem(null);
+    setFormCode('');
+    setFormName('');
+    setFormCategory('Currency');
+    setFormDesc('');
+    setFormError(null);
+    setIsDrawerOpen(true);
+  };
+
+  const openEditDrawer = (item: MasterDataItem) => {
+    setEditingItem(item);
+    setFormCode(item.code);
+    setFormName(item.name);
+    setFormCategory(item.category);
+    setFormDesc(item.description ?? '');
+    setFormError(null);
+    setIsDrawerOpen(true);
+  };
+
+  const handleDeleteItem = (item: MasterDataItem) => {
+    setItems((prev) => prev.filter((i) => i.id !== item.id));
+    toast({
+      variant: 'default',
+      title: 'Record deleted',
+      description: `Master record "${item.code}" was archived.`,
+      action: (
+        <ToastAction
+          altText="Undo deletion"
+          onClick={() => {
+            setItems((prev) => [item, ...prev]);
+            toast({
+              variant: 'success',
+              title: 'Deletion undone',
+              description: `Record "${item.code}" restored.`,
+            });
+          }}
+        >
+          <RotateCcw className="h-3 w-3 mr-1" />
+          Undo
+        </ToastAction>
+      ),
+    });
+  };
 
   const categories = ['all', 'Currency', 'Tax Code', 'Warehouse', 'Unit of Measure'];
 
@@ -144,10 +202,36 @@ export default function MasterDataPatternPage() {
       return;
     }
     const exists = items.some(
-      (i) => i.code.toUpperCase() === formCode.toUpperCase()
+      (i) =>
+        i.code.toUpperCase() === formCode.toUpperCase() &&
+        i.id !== editingItem?.id
     );
     if (exists) {
       setFormError(`Item code "${formCode.toUpperCase()}" already exists. Codes must be globally unique.`);
+      return;
+    }
+
+    if (editingItem) {
+      const updatedItem: MasterDataItem = {
+        ...editingItem,
+        code: formCode.toUpperCase(),
+        name: formName,
+        category: formCategory,
+        description: formDesc,
+        updatedAt: 'Just now',
+        updatedBy: 'Current User',
+      };
+      setItems((prev) =>
+        prev.map((i) => (i.id === editingItem.id ? updatedItem : i))
+      );
+      setFormError(null);
+      setIsDrawerOpen(false);
+      setEditingItem(null);
+      toast({
+        variant: 'success',
+        title: 'Record Updated',
+        description: `Record "${updatedItem.code}" was updated successfully.`,
+      });
       return;
     }
 
@@ -220,16 +304,20 @@ export default function MasterDataPatternPage() {
               {/* Create Drawer Trigger */}
               <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
                 <SheetTrigger asChild>
-                  <Button className="gap-2">
+                  <Button className="gap-2" onClick={openCreateDrawer}>
                     <Plus className="h-4 w-4" />
                     Add Master Record
                   </Button>
                 </SheetTrigger>
-              <SheetContent side="right">
+              <SheetContent side="right" className="sm:max-w-md">
                 <SheetHeader>
-                  <SheetTitle>Add Master Data Record</SheetTitle>
+                  <SheetTitle>
+                    {editingItem ? 'Edit Master Data Record' : 'Add Master Data Record'}
+                  </SheetTitle>
                   <SheetDescription>
-                    Define a new enterprise reference record. Code must be unique.
+                    {editingItem
+                      ? `Update reference record ${editingItem.code}. Code must stay unique.`
+                      : 'Define a new enterprise reference record. Code must be unique.'}
                   </SheetDescription>
                 </SheetHeader>
 
@@ -295,7 +383,9 @@ export default function MasterDataPatternPage() {
                   <Button variant="outline" onClick={() => setIsDrawerOpen(false)}>
                     Cancel
                   </Button>
-                  <Button onClick={handleSaveItem}>Save Record</Button>
+                  <Button onClick={handleSaveItem}>
+                    {editingItem ? 'Save Changes' : 'Save Record'}
+                  </Button>
                 </SheetFooter>
               </SheetContent>
             </Sheet>
@@ -304,13 +394,15 @@ export default function MasterDataPatternPage() {
 
         {/* Category Tabs */}
           <Tabs value={activeCategory} onValueChange={setActiveCategory}>
-            <TabsList className="h-9">
-              {categories.map((cat) => (
-                <TabsTrigger key={cat} value={cat} className="capitalize text-xs">
-                  {cat === 'all' ? 'All Records' : cat}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+            <div className="overflow-x-auto no-scrollbar -mx-1 px-1">
+              <TabsList className="h-9 w-max">
+                {categories.map((cat) => (
+                  <TabsTrigger key={cat} value={cat} className="capitalize text-xs">
+                    {cat === 'all' ? 'All Records' : cat}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
           </Tabs>
         </CardHeader>
 
@@ -422,16 +514,42 @@ export default function MasterDataPatternPage() {
                           className="h-8 w-8 text-muted-foreground hover:text-foreground"
                           title="Edit record"
                           aria-label={`Edit record ${item.code}`}
-                          onClick={() =>
-                            toast({
-                              title: `Edit Record`,
-                              description: `Opening editing mode for ${item.code}`,
-                              variant: 'info',
-                            })
-                          }
+                          onClick={() => openEditDrawer(item)}
                         >
                           <Edit2 className="h-3.5 w-3.5" />
                         </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                              title="Delete record"
+                              aria-label={`Delete record ${item.code}`}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete master record?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                You are about to delete <strong>{item.code}</strong> ({item.name}).
+                                This removes the reference record and any dependent references
+                                will fail validation. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                variant="destructive"
+                                onClick={() => handleDeleteItem(item)}
+                              >
+                                Delete Record
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </TableCell>
                   </TableRow>

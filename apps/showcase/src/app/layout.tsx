@@ -5,6 +5,7 @@ import { Toaster } from '@ds/ui';
 import { ThemeProvider } from '../components/theme-provider';
 import { ShowcaseSidebar } from '../components/showcase-sidebar';
 import { ShowcaseHeader } from '../components/showcase-header';
+import { GlobalCommandPalette } from '../components/global-command-palette';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -35,7 +36,7 @@ export default function RootLayout({
         <ThemeProvider>
           <div className="flex min-h-screen">
             <ShowcaseSidebar />
-            <div className="flex flex-1 flex-col overflow-x-hidden">
+            <div className="flex min-w-0 flex-1 flex-col">
               <ShowcaseHeader />
               <main className="flex-1 p-6 md:p-10 max-w-7xl w-full mx-auto">
                 {children}
@@ -43,6 +44,7 @@ export default function RootLayout({
             </div>
           </div>
           <Toaster />
+          <GlobalCommandPalette />
         </ThemeProvider>
       </body>
     </html>

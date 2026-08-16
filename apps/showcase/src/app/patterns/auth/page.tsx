@@ -156,12 +156,14 @@ export default function AuthPatternPage() {
         )}
 
         <Tabs value={activeTab} onValueChange={(val) => { setActiveTab(val); setErrorMsg(null); setSuccessMsg(null); }} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <div className="overflow-x-auto no-scrollbar -mx-1 px-1">
+          <TabsList className="grid w-full min-w-[420px] grid-cols-4 sm:min-w-0">
             <TabsTrigger value="login">Sign In</TabsTrigger>
             <TabsTrigger value="register">Register</TabsTrigger>
             <TabsTrigger value="2fa">2FA OTP</TabsTrigger>
             <TabsTrigger value="forgot">Reset</TabsTrigger>
           </TabsList>
+          </div>
 
           {/* Tab 1: Sign In */}
           <TabsContent value="login">
@@ -349,7 +351,7 @@ export default function AuthPatternPage() {
                       onChange={(e) => handleOtpChange(idx, e.target.value)}
                       onKeyDown={(e) => handleOtpKeyDown(idx, e)}
                       onPaste={handleOtpPaste}
-                      className="h-12 w-11 rounded-lg border border-input bg-background text-center text-lg font-bold font-mono shadow-xs focus:border-primary focus:ring-2 focus:ring-ring focus:outline-none"
+                      className="h-12 w-9 rounded-lg border border-input bg-background text-center text-lg font-bold font-mono shadow-xs focus:border-primary focus:ring-2 focus:ring-ring focus:outline-none sm:w-11"
                     />
                   ))}
                 </div>

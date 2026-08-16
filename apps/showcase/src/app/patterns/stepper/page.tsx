@@ -146,11 +146,21 @@ export default function StepperPatternPage() {
 
       {/* Stepper Header Navigation */}
       <div className="mx-auto max-w-4xl px-2">
-        <Stepper
-          steps={steps}
-          currentStep={currentStep}
-          onStepClick={(stepIdx) => setCurrentStep(stepIdx)}
-        />
+        <div className="sm:hidden">
+          <Stepper
+            steps={steps}
+            currentStep={currentStep}
+            onStepClick={(stepIdx) => setCurrentStep(stepIdx)}
+            orientation="vertical"
+          />
+        </div>
+        <div className="hidden sm:block">
+          <Stepper
+            steps={steps}
+            currentStep={currentStep}
+            onStepClick={(stepIdx) => setCurrentStep(stepIdx)}
+          />
+        </div>
       </div>
 
       {/* Main Wizard Form Card */}
@@ -306,7 +316,7 @@ export default function StepperPatternPage() {
                 <div className="space-y-4 animate-in fade-in-50">
                   <div className="space-y-2">
                     <Label htmlFor="invite-email">Invite Colleagues</Label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                       <Input
                         id="invite-email"
                         placeholder="colleague@company.com"
@@ -317,21 +327,24 @@ export default function StepperPatternPage() {
                           if (emailError) setEmailError(null);
                         }}
                         onKeyDown={(e) => e.key === 'Enter' && handleAddMember()}
+                        className="w-full"
                       />
-                      <Select value={newEmailRole} onValueChange={setNewEmailRole}>
-                        <SelectTrigger className="w-28" aria-label="Invite role">
-                          <SelectValue placeholder="Role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="editor">Editor</SelectItem>
-                          <SelectItem value="viewer">Viewer</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button onClick={handleAddMember} className="gap-1.5">
-                        <Plus className="h-4 w-4" />
-                        Add
-                      </Button>
+                      <div className="flex gap-2">
+                        <Select value={newEmailRole} onValueChange={setNewEmailRole}>
+                          <SelectTrigger className="w-28 flex-1" aria-label="Invite role">
+                            <SelectValue placeholder="Role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="editor">Editor</SelectItem>
+                            <SelectItem value="viewer">Viewer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button onClick={handleAddMember} className="gap-1.5">
+                          <Plus className="h-4 w-4" />
+                          Add
+                        </Button>
+                      </div>
                     </div>
                     {emailError && (
                       <p className="text-xs font-medium text-destructive">{emailError}</p>

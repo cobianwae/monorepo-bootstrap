@@ -61,8 +61,8 @@
 
   "agent": {
     "build": {
-      "model": "vertexai-global/gemini-3.7-flash",
-      "provider": "vertexai-global",
+      "model": "opencode/deepseek-v4-flash-free",
+      "provider": "opencode",
       "instructions": "AGENTS.md",
       "skills": [".opencode/skills/*/SKILL.md"],
       "permission": {
