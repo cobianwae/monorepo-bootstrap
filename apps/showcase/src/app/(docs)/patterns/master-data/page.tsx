@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import {
   Table,
   TableHeader,
@@ -58,6 +59,8 @@ import {
   RefreshCw,
   Trash2,
   RotateCcw,
+  Stethoscope,
+  ArrowRight,
 } from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
 import type { MasterDataItem } from '@shared/types';
@@ -273,6 +276,29 @@ export default function MasterDataPatternPage() {
         title="Master Data & Reference CRUD Management"
         description="Standardized enterprise master data workflow: category tabs, code uniqueness validation, slide-over create form, status badges, and historical audit trail drawer."
       />
+
+      {/* Cross-Link Banner to Clinic Treatments Scenario */}
+      <div className="flex items-center justify-between rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 to-transparent p-4 shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Stethoscope className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              See Master Data CRUD in the Clinic Treatment Catalog
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Live protocol master data with session durations, IDR margins, category filtering, and drawer editing.
+            </p>
+          </div>
+        </div>
+        <Link href="/clinic/treatments">
+          <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
+            Open Treatment Catalog
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Button>
+        </Link>
+      </div>
 
       <Card className="border-border shadow-xs">
         {/* Header Toolbar */}

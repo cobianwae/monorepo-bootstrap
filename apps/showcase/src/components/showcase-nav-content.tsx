@@ -32,6 +32,7 @@ import {
   Bot,
   FileCheck2,
   Component,
+  HeartPulse,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@ds/ui';
@@ -58,6 +59,12 @@ export const NAV_SECTIONS: NavSection[] = [
         href: '/crm',
         icon: Briefcase,
         badge: 'Interactive',
+      },
+      {
+        title: 'Weight Loss Clinic (CIS)',
+        href: '/clinic',
+        icon: HeartPulse,
+        badge: 'New Suite',
       },
     ],
   },

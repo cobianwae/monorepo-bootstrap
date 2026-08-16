@@ -11,6 +11,8 @@ import {
   Code2,
   FileText,
   Palette,
+  Blocks,
+  Info,
 } from 'lucide-react';
 import {
   PageHeader,
@@ -22,7 +24,9 @@ import {
   Badge,
   Button,
   Spinner,
+  Skeleton,
   Prose,
+  Separator,
   DotPattern,
   StatementCard,
   BottomNavItem,
@@ -62,6 +66,7 @@ export default function PrimitivesDocsPage() {
 
   const tocHeadings = [
     { id: 'spinners', text: 'Spinners & Loading Indicators', level: 2 },
+    { id: 'skeletons', text: 'Skeleton Loading Placeholders', level: 2 },
     { id: 'prose', text: 'Prose Rich Text Typography', level: 2 },
     { id: 'patterns-cards', text: 'DotPattern & StatementCard', level: 2 },
     { id: 'mobile-primitives', text: 'BottomNav & Mobile Drawer', level: 2 },
@@ -71,14 +76,14 @@ export default function PrimitivesDocsPage() {
   return (
     <div className="space-y-12">
       <Banner variant="highlight" actionText="Explore Primitives" actionHref="#spinners">
-        <strong>UI Utilities & Foundations:</strong> Spinners, Prose typography, SVG dot patterns, elevated statement cards, and mobile shell containers.
+        <strong>UI Utilities & Foundations:</strong> Spinners, skeleton placeholders, Prose typography, SVG dot patterns, elevated statement cards, and mobile shell containers.
       </Banner>
 
       <PageHeader
         eyebrow="Foundation & Utilities"
         eyebrowIcon={Layers}
         title="Primitives & Utility Components"
-        description="Core helper components and foundational display primitives including accessible loading spinners, typographic prose wrappers, generative SVG patterns, and specialized sub-components."
+        description="Core helper components and foundational display primitives including accessible loading spinners, skeleton loading placeholders, typographic prose wrappers, generative SVG patterns, and specialized sub-components."
         actions={
           <div className="flex items-center gap-2">
             <Badge variant="highlight" className="font-mono text-xs">
@@ -140,7 +145,98 @@ export default function PrimitivesDocsPage() {
             </Card>
           </section>
 
-          {/* SECTION 2: PROSE */}
+          {/* SECTION 2: SKELETONS */}
+          <section id="skeletons" className="space-y-4 scroll-mt-20">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
+                <Blocks className="h-6 w-6 text-highlight" />
+                <span>Skeleton Loading Placeholders</span>
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Non-interactive placeholder blocks mirroring the exact shape of incoming content. Uses `animate-pulse` with the `muted` surface token, and respects `prefers-reduced-motion`.
+              </p>
+            </div>
+
+            <Card>
+              <CardContent className="p-6 space-y-6">
+                <div className="space-y-2">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Basic Shapes
+                  </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col justify-center gap-3">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-1/2" />
+                      <span className="text-[11px] font-mono text-muted-foreground mt-1">text lines</span>
+                    </div>
+                    <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col items-center justify-center gap-2">
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <span className="text-[11px] font-mono text-muted-foreground">circle avatar</span>
+                    </div>
+                    <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col justify-center gap-2">
+                      <Skeleton className="h-24 w-full rounded-lg" />
+                      <span className="text-[11px] font-mono text-muted-foreground mt-1">rectangle card</span>
+                    </div>
+                    <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col justify-center gap-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-2/3" />
+                      <span className="text-[11px] font-mono text-muted-foreground mt-1">paragraph block</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Composite: Card & Table Rows
+                  </span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="rounded-xl border border-border bg-card p-5 space-y-3 shadow-xs">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-10 w-10 rounded-full" />
+                        <div className="space-y-2 flex-1">
+                          <Skeleton className="h-3 w-2/3" />
+                          <Skeleton className="h-3 w-1/3" />
+                        </div>
+                      </div>
+                      <Skeleton className="h-3 w-full" />
+                      <Skeleton className="h-3 w-5/6" />
+                      <div className="flex gap-2 pt-1">
+                        <Skeleton className="h-8 w-24 rounded-md" />
+                        <Skeleton className="h-8 w-24 rounded-md" />
+                      </div>
+                    </div>
+
+                    <div className="rounded-xl border border-border bg-card p-4 space-y-3 shadow-xs">
+                      <div className="flex items-center gap-3 pb-2 border-b border-border">
+                        <Skeleton className="h-3 w-1/4" />
+                        <Skeleton className="h-3 w-1/5" />
+                        <Skeleton className="h-3 w-1/6 ml-auto" />
+                      </div>
+                      {[0, 1, 2].map((row) => (
+                        <div key={row} className="flex items-center gap-3">
+                          <Skeleton className="h-3 w-1/4" />
+                          <Skeleton className="h-3 w-1/5" />
+                          <Skeleton className="h-3 w-1/6 ml-auto" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 rounded-lg bg-card border border-border">
+                  <Info className="h-4 w-4 text-highlight mt-0.5 shrink-0" />
+                  <p className="text-xs text-muted-foreground">
+                    Tandai kontainer konten dengan <code className="font-mono text-foreground">aria-busy=&quot;true&quot;</code> saat data dimuat, lalu hapus setelah render final. Skeleton wajib meniru posisi & dimensi konten asli (loading.tsx / Suspense fallback) dan otomatis berhenti beranimasi saat user mengaktifkan reduced motion.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* SECTION 3: PROSE */}
           <section id="prose" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
               <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">

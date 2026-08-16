@@ -19,6 +19,7 @@ import {
   Search,
   Activity,
   Briefcase,
+  HeartPulse,
 } from 'lucide-react';
 import {
   Card,
@@ -40,6 +41,14 @@ export default function OverviewPage() {
       href: '/crm',
       icon: Briefcase,
       badge: 'Interactive App',
+      tag: 'INTEGRATED SCENARIO',
+    },
+    {
+      title: 'Weight Loss Clinic (CIS)',
+      description: 'Full-suite Clinic Information System: patient intake wizard, multi-disciplinary consultations (Doctor, Psych, Dietician), treatments catalog, appointments board, and retail POS.',
+      href: '/clinic',
+      icon: HeartPulse,
+      badge: 'New Suite',
       tag: 'INTEGRATED SCENARIO',
     },
     {

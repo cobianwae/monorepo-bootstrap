@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import {
   Stepper,
   Button,
@@ -32,6 +33,7 @@ import {
   RotateCcw,
   Sparkles,
   Users,
+  HeartPulse,
 } from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
 
@@ -143,6 +145,29 @@ export default function StepperPatternPage() {
         title="Stepper / Multi-Step Wizard"
         description="Step-by-step onboarding wizard with persistent state, keyboard-accessible step skipping, field validation, and summary review before final commit."
       />
+
+      {/* Cross-Link Banner to Clinic Scenario */}
+      <div className="flex items-center justify-between rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 to-transparent p-4 shadow-xs">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <HeartPulse className="h-5 w-5" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">
+              See this Stepper in action in the Clinic Patient Intake Wizard
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Explore a production 5-step clinical intake wizard with dynamic BMI calculation and care team assignment.
+            </p>
+          </div>
+        </div>
+        <Link href="/clinic/registration">
+          <Button variant="outline" size="sm" className="gap-1.5 shrink-0">
+            Open Patient Intake
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Button>
+        </Link>
+      </div>
 
       {/* Stepper Header Navigation */}
       <div className="mx-auto max-w-4xl px-2">
