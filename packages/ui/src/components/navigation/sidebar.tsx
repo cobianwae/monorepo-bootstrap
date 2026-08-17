@@ -357,14 +357,14 @@ export const SidebarMenuItem = React.forwardRef<
 SidebarMenuItem.displayName = 'SidebarMenuItem';
 
 export const sidebarMenuButtonVariants = cva(
-  'peer/menu-button group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium outline-none transition-all duration-150 focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0 data-[active=true]:before:content-[""] data-[active=true]:before:absolute data-[active=true]:before:left-0 data-[active=true]:before:top-2 data-[active=true]:before:bottom-2 data-[active=true]:before:w-1 data-[active=true]:before:rounded-r-full data-[active=true]:before:bg-highlight data-[active=true]:before:shadow-xs group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:[&>span]:hidden',
+  'peer/menu-button group relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-medium outline-none transition-all duration-150 focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&>svg]:size-4 [&>svg]:shrink-0 data-[active=true]:before:content-[""] data-[active=true]:before:absolute data-[active=true]:before:left-0 data-[active=true]:before:top-1.5 data-[active=true]:before:bottom-1.5 data-[active=true]:before:w-1 data-[active=true]:before:rounded-r-full data-[active=true]:before:bg-highlight data-[active=true]:before:shadow-[0_0_8px_var(--color-highlight)] group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:[&>span]:hidden',
   {
     variants: {
       variant: {
         default:
           'text-muted-foreground hover:bg-accent/60 hover:text-foreground [&>svg]:text-muted-foreground [&>svg]:group-hover:text-foreground',
         active:
-          'bg-primary/10 text-foreground font-semibold shadow-xs hover:bg-primary/15 [&>svg]:text-highlight',
+          'bg-highlight/10 text-foreground font-semibold shadow-xs border border-highlight/20 hover:bg-highlight/15 [&>svg]:text-highlight',
       },
       size: {
         default: 'h-10 text-sm',
@@ -507,7 +507,7 @@ export const SidebarMenuSubButton = React.forwardRef<
       data-sidebar="menu-sub-button"
       className={cn(
         'group/menu-sub-button relative flex w-full min-w-0 items-center gap-2 rounded-md px-3 py-1.5 text-sm text-muted-foreground outline-none transition-colors duration-150 hover:bg-accent/60 hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring [&>svg]:size-3.5 [&>svg]:shrink-0',
-        isActive && 'bg-accent/60 text-foreground font-semibold',
+        isActive && 'bg-highlight/10 text-foreground font-semibold border-l-2 border-highlight pl-2.5',
         className
       )}
       {...props}

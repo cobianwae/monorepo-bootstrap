@@ -44,14 +44,14 @@ export function WeightTrajectoryChart({
       <ChartCard
         title={title}
         description={description}
-        className="border-border bg-card shadow-xs"
+        className="border-border/80 bg-card/90 backdrop-blur-xs shadow-xs hover:border-highlight/30 transition-colors"
       >
         <div className="w-full">
           <AreaChartComponent data={chartData} dataKey={['weight', 'bodyFat']} xKey="name" />
         </div>
 
         {targetWeight && (
-          <div className="mt-4 flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2 text-xs border border-border/40">
+          <div className="mt-4 flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2 text-xs border border-border/60">
             <span className="font-mono text-muted-foreground text-[11px]">Target Weight Goal</span>
             <span className="font-display font-bold text-success text-sm">{targetWeight} kg</span>
           </div>

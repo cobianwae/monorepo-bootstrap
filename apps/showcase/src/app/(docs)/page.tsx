@@ -518,7 +518,7 @@ export default function OverviewPage() {
             const Icon = section.icon;
             return (
               <Link key={section.href} href={section.href} className="group">
-                <Card className="h-full border-border hover:border-highlight/50 hover:shadow-md transition-all duration-200 relative overflow-hidden">
+                <Card className="h-full border-border/80 bg-card/90 backdrop-blur-xs hover:border-highlight/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 relative overflow-hidden">
                   <CardHeader className="p-5">
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-foreground group-hover:bg-highlight group-hover:text-highlight-foreground transition-all duration-200 shadow-xs">

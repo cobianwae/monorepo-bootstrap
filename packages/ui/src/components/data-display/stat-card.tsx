@@ -6,14 +6,14 @@ import { cn } from '../../lib/utils';
 import { Card, CardContent } from '../base/card';
 
 export const statCardVariants = cva(
-  'h-full overflow-hidden transition-all duration-200',
+  'h-full overflow-hidden transition-all duration-200 relative',
   {
     variants: {
       variant: {
         default:
-          'border-border bg-card shadow-xs hover:-translate-y-0.5 hover:shadow-md hover:border-border/80',
+          'border-border bg-card/90 backdrop-blur-xs shadow-xs hover:-translate-y-0.5 hover:shadow-md hover:border-border-strong',
         highlight:
-          'border-highlight/40 bg-highlight/[0.03] shadow-xs hover:-translate-y-0.5 hover:shadow-md hover:border-highlight/60',
+          'border-highlight/30 bg-gradient-to-br from-highlight/[0.08] via-card to-card shadow-xs hover:-translate-y-0.5 hover:shadow-md hover:border-highlight/50',
       },
     },
     defaultVariants: {
@@ -61,14 +61,21 @@ export const StatCard = React.forwardRef<HTMLDivElement, StatCardProps>(
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-medium text-muted-foreground truncate">{title}</p>
               {Icon && (
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <div
+                  className={cn(
+                    'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors',
+                    variant === 'highlight'
+                      ? 'bg-highlight/15 text-highlight border border-highlight/20'
+                      : 'bg-primary/10 text-primary'
+                  )}
+                >
                   <Icon className="h-5 w-5" />
                 </div>
               )}
             </div>
 
             <div className="mt-3 flex flex-wrap items-baseline gap-2">
-              <span className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl tabular-nums">
+              <span className="text-2xl font-bold tracking-tight text-foreground font-display sm:text-3xl tabular-nums">
                 {value}
               </span>
 

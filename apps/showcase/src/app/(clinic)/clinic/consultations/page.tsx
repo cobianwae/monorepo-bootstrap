@@ -186,7 +186,7 @@ export default function ConsultationsPage() {
 
       {/* Patient Selector Strip & Summary Card */}
       <div className="space-y-3">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-muted/30 rounded-xl border border-border/40">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-muted/40 rounded-xl border border-border/80">
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono uppercase font-semibold text-muted-foreground">Active Patient:</span>
             <Select value={activePatient?.id} onValueChange={setSelectedPatientId}>
@@ -231,7 +231,7 @@ export default function ConsultationsPage() {
         <TabsContent value="doctor" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left 2 Cols: Doctor SOAP Form */}
-            <Card className="lg:col-span-2 p-6 bg-card border-border shadow-xs space-y-5">
+            <Card className="lg:col-span-2 p-6 bg-card/90 backdrop-blur-xs border-border/80 shadow-xs space-y-5">
               <form onSubmit={handleSaveSoap} className="space-y-4">
                 <div className="flex items-center justify-between border-b border-border/40 pb-3">
                   <div>
@@ -387,7 +387,7 @@ export default function ConsultationsPage() {
         <TabsContent value="psychologist" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left 2 Cols: Behavioral Assessment Form */}
-            <Card className="lg:col-span-2 p-6 bg-card border-border shadow-xs space-y-5">
+            <Card className="lg:col-span-2 p-6 bg-card/90 backdrop-blur-xs border-border/80 shadow-xs space-y-5">
               <form onSubmit={handleSavePsych} className="space-y-4">
                 <div className="flex items-center justify-between border-b border-border/40 pb-3">
                   <div>
@@ -564,7 +564,7 @@ export default function ConsultationsPage() {
             </Card>
 
             {/* Right: Previous Psych Sessions */}
-            <Card className="p-6 bg-card border-border shadow-xs space-y-4">
+            <Card className="p-6 bg-card/90 backdrop-blur-xs border-border/80 shadow-xs space-y-4">
               <h4 className="font-display font-semibold text-xs uppercase tracking-wider text-foreground">
                 Psychology History ({patientPsychNotes.length})
               </h4>
@@ -589,7 +589,7 @@ export default function ConsultationsPage() {
         <TabsContent value="dietician" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left 2 Cols: Nutrition & Macro Builder */}
-            <Card className="lg:col-span-2 p-6 bg-card border-border shadow-xs space-y-5">
+            <Card className="lg:col-span-2 p-6 bg-card/90 backdrop-blur-xs border-border/80 shadow-xs space-y-5">
               <form onSubmit={handleSaveDiet} className="space-y-5">
                 <div className="flex items-center justify-between border-b border-border/40 pb-3">
                   <div>
@@ -753,7 +753,7 @@ export default function ConsultationsPage() {
             </Card>
 
             {/* Right: Previous Meal Plans */}
-            <Card className="p-6 bg-card border-border shadow-xs space-y-4">
+            <Card className="p-6 bg-card/90 backdrop-blur-xs border-border/80 shadow-xs space-y-4">
               <h4 className="font-display font-semibold text-xs uppercase tracking-wider text-foreground">
                 Meal Plan History ({patientDietPlans.length})
               </h4>

@@ -37,12 +37,12 @@ export const STATUS_BADGE_MAP: Record<
   graduated: { label: 'Graduated', variant: 'outline' },
 };
 
-export function getBmiCategory(bmi: number): { label: string; color: string } {
-  if (bmi < 18.5) return { label: 'Underweight', color: 'text-info' };
-  if (bmi < 25) return { label: 'Normal Weight', color: 'text-success' };
-  if (bmi < 30) return { label: 'Overweight', color: 'text-warning' };
-  if (bmi < 35) return { label: 'Obese Class I', color: 'text-destructive' };
-  return { label: 'Obese Class II+', color: 'text-destructive' };
+export function getBmiCategory(bmi: number): { label: string; color: string; badgeVariant: 'info' | 'success' | 'warning' | 'destructive' } {
+  if (bmi < 18.5) return { label: 'Underweight', color: 'text-info', badgeVariant: 'info' };
+  if (bmi < 25) return { label: 'Normal Weight', color: 'text-success', badgeVariant: 'success' };
+  if (bmi < 30) return { label: 'Overweight', color: 'text-warning', badgeVariant: 'warning' };
+  if (bmi < 35) return { label: 'Obese Class I', color: 'text-destructive', badgeVariant: 'destructive' };
+  return { label: 'Obese Class II+', color: 'text-destructive', badgeVariant: 'destructive' };
 }
 
 export function PatientSummaryCard({ patient, className }: PatientSummaryCardProps) {
@@ -64,12 +64,12 @@ export function PatientSummaryCard({ patient, className }: PatientSummaryCardPro
   const bmiInfo = getBmiCategory(patient.bmi);
 
   return (
-    <Card className={`p-4 md:p-6 bg-card border-border shadow-xs ${className || ''}`}>
+    <Card className={`p-4 md:p-6 bg-card/90 backdrop-blur-xs border-border shadow-xs hover:border-highlight/40 transition-colors ${className || ''}`}>
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-start gap-4">
-          <Avatar size="lg" className="h-14 w-14 ring-2 ring-primary/20">
+          <Avatar size="lg" className="h-14 w-14 ring-2 ring-highlight/30 shadow-xs">
             {patient.avatarUrl && <AvatarImage src={patient.avatarUrl} alt={patient.name} />}
-            <AvatarFallback className="font-display font-semibold text-base">
+            <AvatarFallback className="font-display font-semibold text-base bg-highlight/10 text-highlight">
               {patient.name.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -140,10 +140,12 @@ export function PatientSummaryCard({ patient, className }: PatientSummaryCardPro
           }}
           footer={
             <>
-              <span className="text-muted-foreground">
-                BMI:{' '}
-                <strong className="text-foreground font-mono font-bold">{patient.bmi}</strong> (
-                {bmiInfo.label})
+              <span className="text-muted-foreground flex items-center gap-1.5">
+                <span>BMI:</span>
+                <strong className="text-foreground font-mono font-bold">{patient.bmi}</strong>
+                <Badge variant={bmiInfo.badgeVariant} size="sm" className="text-[10px] px-1.5 py-0 h-4">
+                  {bmiInfo.label}
+                </Badge>
               </span>
               <span className="text-muted-foreground">
                 Body Fat:{' '}

@@ -137,7 +137,7 @@ export default function PosPage() {
         {/* Left 7 Cols: Product Catalog Grid */}
         <div className="lg:col-span-7 space-y-4">
           {/* Catalog Filter Strip */}
-          <Card className="p-3 bg-card border-border shadow-xs flex flex-col sm:flex-row items-center gap-3">
+          <Card className="p-3 bg-card/90 backdrop-blur-xs border-border/80 shadow-xs flex flex-col sm:flex-row items-center gap-3">
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
@@ -177,7 +177,7 @@ export default function PosPage() {
             {filteredProducts.map((prod) => (
               <Card
                 key={prod.id}
-                className="p-4 bg-card border-border hover:border-primary/50 transition-all flex flex-col justify-between gap-3 shadow-xs"
+                className="p-4 bg-card/90 backdrop-blur-xs border-border/80 hover:border-highlight/50 hover:shadow-sm transition-all flex flex-col justify-between gap-3 shadow-xs"
               >
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
@@ -215,7 +215,7 @@ export default function PosPage() {
 
         {/* Right 5 Cols: Shopping Cart & Checkout Register */}
         <div className="lg:col-span-5 space-y-4">
-          <Card className="p-5 bg-card border-border shadow-xs space-y-5 sticky top-20">
+          <Card className="p-5 bg-card/90 backdrop-blur-xs border-border/80 shadow-xs space-y-5 sticky top-20">
             {/* Cart Header & Patient Assignment */}
             <div className="space-y-3 pb-3 border-b border-border/40">
               <div className="flex items-center justify-between">

@@ -59,16 +59,23 @@ export function ClinicAiCoachDrawer() {
   return (
     <Sheet open={isAiCoachOpen} onOpenChange={(open) => !open && closeAiCoach()}>
       <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto p-6 space-y-6">
-        <SheetHeader className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-highlight/10 text-highlight">
-              <Sparkles className="h-4 w-4" />
+        <SheetHeader className="space-y-1 p-5 border-b border-border bg-gradient-to-r from-success/10 via-highlight/10 to-transparent -mx-6 -mt-6">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-highlight/20 text-highlight border border-highlight/30 shadow-xs">
+              <Sparkles className="h-5 w-5 animate-pulse" />
             </div>
-            <SheetTitle className="font-display text-lg">AI Clinical Coach Assistant</SheetTitle>
+            <div>
+              <SheetTitle className="font-display text-lg flex items-center gap-2">
+                AI Clinical Coach
+                <Badge variant="highlight" className="text-xs font-mono px-1.5 py-0">
+                  Model v3
+                </Badge>
+              </SheetTitle>
+              <SheetDescription className="text-xs">
+                Metabolic trajectory prediction, adherence analytics &amp; safety adjustments.
+              </SheetDescription>
+            </div>
           </div>
-          <SheetDescription className="text-xs">
-            Metabolic trajectory prediction, adherence analytics, and multidisciplinary safety adjustments.
-          </SheetDescription>
         </SheetHeader>
 
         {/* Patient Selector */}

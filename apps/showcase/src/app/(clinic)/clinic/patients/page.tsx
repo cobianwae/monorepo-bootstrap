@@ -165,7 +165,7 @@ export default function PatientsDirectoryPage() {
       />
 
       {/* Filter Toolbar Card */}
-      <Card className="p-4 bg-card border-border shadow-xs">
+      <Card className="p-4 bg-card/90 backdrop-blur-xs border-border/80 shadow-xs">
         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
           {/* Search Input */}
           <div className="relative w-full md:w-80">
@@ -226,7 +226,7 @@ export default function PatientsDirectoryPage() {
       </Card>
 
       {/* Patient Data Table */}
-      <Card className="border-border bg-card shadow-xs overflow-hidden">
+      <Card className="border-border/80 bg-card/90 backdrop-blur-xs shadow-xs overflow-hidden">
         {filteredPatients.length === 0 ? (
           <div className="p-12">
             <EmptyState

@@ -7,15 +7,15 @@ export const cardVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-border bg-card shadow-xs',
+        default: 'border-border bg-card/90 backdrop-blur-xs shadow-xs',
         interactive:
-          'border-border bg-card shadow-xs hover:-translate-y-0.5 hover:shadow-md hover:border-border/80 cursor-pointer active:scale-[0.99]',
+          'border-border bg-card/90 backdrop-blur-xs shadow-xs hover:-translate-y-0.5 hover:shadow-md hover:border-highlight/50 cursor-pointer active:scale-[0.99]',
         selectable:
           'border-border bg-card shadow-xs hover:border-primary/40 cursor-pointer data-[selected=true]:border-primary data-[selected=true]:ring-2 data-[selected=true]:ring-primary/20 data-[selected=true]:bg-primary/[0.02]',
         glass:
-          'border-border/60 bg-card/70 backdrop-blur-md shadow-sm hover:border-border/80',
+          'border-highlight/20 bg-card/70 backdrop-blur-md shadow-sm hover:border-highlight/40',
         gradient:
-          'border-border/60 bg-gradient-to-br from-card to-muted/40 shadow-xs',
+          'border-border/80 bg-gradient-to-br from-card to-muted/40 shadow-xs',
         flat: 'border-transparent bg-muted/40 shadow-none',
       },
       padding: {
@@ -68,7 +68,7 @@ export const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      'text-lg font-semibold leading-none tracking-tight text-foreground',
+      'text-lg font-semibold leading-none tracking-tight text-foreground font-display',
       className
     )}
     {...props}

@@ -150,10 +150,10 @@ export function CrmCopilotDrawer() {
         className="w-full sm:max-w-lg p-0 flex flex-col h-full bg-card border-l border-border shadow-2xl"
       >
         {/* Drawer Header */}
-        <SheetHeader className="p-5 border-b border-border bg-muted/20">
+        <SheetHeader className="p-5 border-b border-border bg-gradient-to-r from-primary/10 via-highlight/10 to-transparent">
           <div className="flex items-center justify-between pr-8">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-highlight/15 text-highlight">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-highlight/20 text-highlight border border-highlight/30 shadow-xs">
                 <Sparkles className="h-5 w-5 animate-pulse" />
               </div>
               <div>
@@ -164,7 +164,7 @@ export function CrmCopilotDrawer() {
                   </Badge>
                 </SheetTitle>
                 <SheetDescription className="text-xs text-muted-foreground">
-                  Contextual lead scoring, generative drafts & pipeline intelligence
+                  Contextual lead scoring, generative drafts &amp; pipeline intelligence
                 </SheetDescription>
               </div>
             </div>

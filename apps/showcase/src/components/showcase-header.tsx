@@ -1,34 +1,74 @@
 'use client';
 
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Sun, Moon, Laptop, ShieldCheck } from 'lucide-react';
-import { Button, SidebarTrigger, useTheme, PaletteSwitcher } from '@ds/ui';
+import {
+  Button,
+  SidebarTrigger,
+  useTheme,
+  PaletteSwitcher,
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@ds/ui';
 
 export function ShowcaseHeader() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
 
-  const getBreadcrumb = () => {
-    const parts = pathname.split('/').filter(Boolean);
-    if (parts.length === 0) return 'Overview';
-    return parts
-      .map((p) => p.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()))
-      .join(' / ');
-  };
+  const pathParts = pathname.split('/').filter(Boolean);
 
   return (
     <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-border bg-background/80 px-4 md:px-6 backdrop-blur-md">
       <div className="flex min-w-0 items-center gap-3">
         <SidebarTrigger className="lg:hidden" />
 
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider hidden sm:inline">
-            Location:
-          </span>
-          <span className="truncate text-sm font-semibold text-foreground font-display">
-            {getBreadcrumb()}
-          </span>
-        </div>
+        <Breadcrumb className="hidden sm:block">
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/" className="font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground">
+                  Docs
+                </Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            {pathParts.map((part, index) => {
+              const isLast = index === pathParts.length - 1;
+              const href = `/${pathParts.slice(0, index + 1).join('/')}`;
+              const label = part.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+              return (
+                <span key={href} className="inline-flex items-center gap-1.5">
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    {isLast ? (
+                      <BreadcrumbPage className="font-display font-semibold text-foreground text-sm">
+                        {label}
+                      </BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink asChild>
+                        <Link href={href} className="text-muted-foreground hover:text-foreground text-xs font-medium">
+                          {label}
+                        </Link>
+                      </BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                </span>
+              );
+            })}
+          </BreadcrumbList>
+        </Breadcrumb>
+
+        {/* Mobile Title */}
+        <span className="sm:hidden truncate text-sm font-semibold text-foreground font-display">
+          {pathParts.length === 0
+            ? 'Overview'
+            : pathParts[pathParts.length - 1].replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+        </span>
       </div>
 
       <div className="flex items-center gap-2.5">

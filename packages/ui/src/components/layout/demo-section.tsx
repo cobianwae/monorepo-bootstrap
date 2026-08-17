@@ -2,12 +2,13 @@ import type * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
-const demoSectionVariants = cva('rounded-xl border bg-card', {
+const demoSectionVariants = cva('rounded-xl border bg-card/90 backdrop-blur-xs shadow-xs', {
   variants: {
     variant: {
-      default: 'border-border',
+      default: 'border-border/80 hover:border-highlight/30 transition-colors',
       transparent: 'border-border/80 bg-transparent',
       dashed: 'border-dashed border-border/80 bg-transparent',
+      glass: 'border-highlight/20 bg-card/60 backdrop-blur-md shadow-sm',
     },
   },
   defaultVariants: {

@@ -9,6 +9,7 @@ import {
   Bell,
   Sun,
   Moon,
+  Laptop,
   RotateCcw,
   CheckCheck,
   Building2,
@@ -200,29 +201,39 @@ export function CrmHeader({ onOpenCommandPalette }: CrmHeaderProps) {
           </PopoverContent>
         </Popover>
 
-        {/* Theme Toggle (Light / Dark) */}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                aria-label="Toggle light/dark mode"
-              >
-                {theme === 'dark' ? (
-                  <Sun className="h-4 w-4" />
-                ) : (
-                  <Moon className="h-4 w-4" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="text-xs">Switch to {theme === 'dark' ? 'Light' : 'Dark'} Mode</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        {/* Theme Mode Selector (Light / Dark / System) */}
+        <div className="flex items-center rounded-lg border border-border bg-card p-0.5">
+          <Button
+            variant={theme === 'light' ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={() => setTheme('light')}
+            className="h-7 w-7 p-0"
+            title="Light mode"
+            aria-label="Light mode"
+          >
+            <Sun className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant={theme === 'dark' ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={() => setTheme('dark')}
+            className="h-7 w-7 p-0"
+            title="Dark mode"
+            aria-label="Dark mode"
+          >
+            <Moon className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant={theme === 'system' ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={() => setTheme('system')}
+            className="h-7 w-7 p-0"
+            title="System theme"
+            aria-label="System theme"
+          >
+            <Laptop className="h-3.5 w-3.5" />
+          </Button>
+        </div>
 
         {/* Reset Demo Data Button */}
         <TooltipProvider>

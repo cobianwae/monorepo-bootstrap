@@ -27,6 +27,11 @@
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
   --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-overlay: var(--surface-overlay);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-overlay: var(--overlay);
@@ -106,6 +111,11 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.18 0.02 260);
 
+  /* Surface Elevation Tiers */
+  --surface-sunken: oklch(0.96 0.005 260);
+  --surface-raised: oklch(1 0 0);
+  --surface-overlay: oklch(1 0 0);
+
   /* Brand / Primary */
   --primary: oklch(0.45 0.18 265);
   --primary-foreground: oklch(0.99 0.002 240);
@@ -123,7 +133,7 @@
   --accent-foreground: oklch(0.18 0.02 260);
 
   /* Signature Highlight (Electric Cyan) */
-  --highlight: oklch(0.48 0.18 195);
+  --highlight: oklch(0.45 0.18 195);
   --highlight-foreground: oklch(0.99 0 0);
   --highlight-soft: oklch(0.94 0.04 195);
 
@@ -146,6 +156,8 @@
 
   /* Borders & Ring */
   --border: oklch(0.88 0.01 260);
+  --border-subtle: oklch(0.92 0.005 260);
+  --border-strong: oklch(0.78 0.015 260);
   --input: oklch(0.88 0.01 260);
   --ring: oklch(0.45 0.18 265);
   --overlay: oklch(0 0 0 / 0.6);
@@ -183,12 +195,17 @@
 .dark[data-theme="pulse"],
 [data-theme="pulse"].dark {
   /* Surface & Base */
-  --background: oklch(0.14 0.015 260);
+  --background: oklch(0.13 0.015 260);
   --foreground: oklch(0.96 0.005 260);
   --card: oklch(0.18 0.018 260);
   --card-foreground: oklch(0.96 0.005 260);
   --popover: oklch(0.18 0.018 260);
   --popover-foreground: oklch(0.96 0.005 260);
+
+  /* Surface Elevation Tiers */
+  --surface-sunken: oklch(0.10 0.012 260);
+  --surface-raised: oklch(0.22 0.020 260);
+  --surface-overlay: oklch(0.26 0.022 260);
 
   /* Brand / Primary */
   --primary: oklch(0.68 0.17 265);
@@ -229,8 +246,10 @@
   --destructive-text: var(--destructive);
 
   /* Borders & Ring */
-  --border: oklch(0.28 0.015 260);
-  --input: oklch(0.28 0.015 260);
+  --border: oklch(0.30 0.018 260);
+  --border-subtle: oklch(0.22 0.012 260);
+  --border-strong: oklch(0.42 0.022 260);
+  --input: oklch(0.30 0.018 260);
   --ring: oklch(0.68 0.17 265);
   --overlay: oklch(0 0 0 / 0.7);
 

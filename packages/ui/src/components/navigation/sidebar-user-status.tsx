@@ -96,7 +96,7 @@ export function SidebarUserStatus({
                 <span className={cn('h-2 w-2 rounded-full', option.dotColor)} />
                 {option.label}
               </span>
-              {status === option.value && <Check className="h-3.5 w-3.5 text-primary" />}
+              {status === option.value && <Check className="h-3.5 w-3.5 text-highlight" />}
             </button>
           ))}
         </div>

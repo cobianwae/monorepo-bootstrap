@@ -9,6 +9,7 @@ import {
   Bell,
   Sun,
   Moon,
+  Laptop,
   RotateCcw,
   CheckCheck,
   HeartPulse,
@@ -204,24 +205,39 @@ export function ClinicHeader({ onOpenCommandPalette }: ClinicHeaderProps) {
         {/* Palette & Theme Switchers */}
         <PaletteSwitcher />
 
-        {/* Light / Dark Toggle */}
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                {theme === 'dark' ? <Sun className="h-4 w-4 text-warning" /> : <Moon className="h-4 w-4" />}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Toggle Theme ({theme === 'dark' ? 'Light' : 'Dark'})</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        {/* Theme Mode Selector (Light / Dark / System) */}
+        <div className="flex items-center rounded-lg border border-border bg-card p-0.5">
+          <Button
+            variant={theme === 'light' ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={() => setTheme('light')}
+            className="h-7 w-7 p-0"
+            title="Light mode"
+            aria-label="Light mode"
+          >
+            <Sun className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant={theme === 'dark' ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={() => setTheme('dark')}
+            className="h-7 w-7 p-0"
+            title="Dark mode"
+            aria-label="Dark mode"
+          >
+            <Moon className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant={theme === 'system' ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={() => setTheme('system')}
+            className="h-7 w-7 p-0"
+            title="System theme"
+            aria-label="System theme"
+          >
+            <Laptop className="h-3.5 w-3.5" />
+          </Button>
+        </div>
 
         {/* Reset Demo Data Button */}
         <TooltipProvider>

@@ -243,7 +243,7 @@ function SortableColumn({ column, items, renderItem, onAddItem }: SortableColumn
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex w-64 shrink-0 flex-col rounded-lg border border-border bg-muted/30',
+        'flex w-64 shrink-0 flex-col rounded-xl border border-border/80 bg-muted/40 shadow-xs',
         isDragging && 'opacity-50'
       )}
     >
@@ -327,8 +327,8 @@ function DefaultItem({ item, dragging }: { item: KanbanItemData; dragging?: bool
   return (
     <div
       className={cn(
-        'rounded-md border border-border bg-card p-3 shadow-xs',
-        dragging && 'rotate-3 shadow-lg'
+        'rounded-lg border border-border/80 bg-card/90 backdrop-blur-xs p-3 shadow-xs hover:border-highlight/40 hover:shadow-sm transition-all',
+        dragging && 'rotate-2 shadow-xl border-highlight ring-2 ring-highlight/20 scale-105'
       )}
     >
       <p className="text-sm font-medium text-foreground">{item.title}</p>

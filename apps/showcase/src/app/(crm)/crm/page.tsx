@@ -218,7 +218,7 @@ export default function CrmDashboardPage() {
       {/* Visual Analytics Grid: Revenue Trend (AreaChartComponent) + Pipeline Stage Breakdown (Donut PieChart) */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Revenue Performance Chart via official DS AreaChartComponent */}
-        <Card className="lg:col-span-2 shadow-xs flex flex-col justify-between">
+        <Card className="lg:col-span-2 border-border/80 bg-card/90 backdrop-blur-xs shadow-xs flex flex-col justify-between hover:border-highlight/30 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-border/40">
             <div className="space-y-1">
               <CardTitle className="text-base font-semibold text-foreground">
@@ -281,7 +281,7 @@ export default function CrmDashboardPage() {
         </Card>
 
         {/* Pipeline Distribution Breakdown: Donut PieChart + Progress bars */}
-        <Card className="shadow-xs flex flex-col justify-between">
+        <Card className="border-border/80 bg-card/90 backdrop-blur-xs shadow-xs flex flex-col justify-between hover:border-highlight/30 transition-colors">
           <CardHeader className="pb-2 border-b border-border/40">
             <div className="space-y-1">
               <CardTitle className="text-base font-semibold text-foreground">

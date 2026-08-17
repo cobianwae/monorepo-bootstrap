@@ -128,6 +128,7 @@ export default function ClinicDashboardPage() {
           value={`Rp ${(metrics.todayRevenue / 1000000).toFixed(1)}M`}
           description="+18.5% vs yesterday"
           icon={DollarSign}
+          variant="highlight"
           delta={{ value: '18.5%', trend: 'up', label: 'vs yesterday' }}
         />
         <StatCard
@@ -159,12 +160,12 @@ export default function ClinicDashboardPage() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <Scale className="h-3.5 w-3.5 text-primary" />
+              <Scale className="h-3.5 w-3.5 text-highlight" />
               Patient Focus Spotlight (EMR Active Selection)
             </span>
             <Link
               href="/clinic/patients"
-              className="text-xs font-mono text-primary hover:underline flex items-center gap-1"
+              className="text-xs font-mono text-highlight hover:underline flex items-center gap-1 font-medium"
             >
               View Full Patient Directory <ArrowRight className="h-3 w-3" />
             </Link>
@@ -176,7 +177,7 @@ export default function ClinicDashboardPage() {
       {/* Analytics & Distribution Grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Weekly Revenue & Target Area Chart */}
-        <Card className="lg:col-span-2 border-border bg-card p-6 shadow-xs flex flex-col">
+        <Card className="lg:col-span-2 border-border/80 bg-card/90 backdrop-blur-xs p-6 shadow-xs flex flex-col hover:border-highlight/30 transition-colors">
           <CardHeader className="p-0 pb-4">
             <div className="flex items-center justify-between">
               <div>
