@@ -16,6 +16,13 @@ import {
   Linkedin,
   ArrowUpRight,
   Rocket,
+  Sun,
+  Moon,
+  Laptop,
+  LayoutDashboard,
+  Users,
+  BarChart3,
+  Settings,
 } from 'lucide-react';
 import {
   Container,
@@ -38,8 +45,14 @@ import {
   CtaBand,
   FaqSection,
   StatsBand,
-  StatItem,
+  GlowOrb,
+  GridPattern,
+  PaletteSwitcher,
+  useTheme,
 } from '@ds/ui';
+import { Reveal } from '@/components/reveal';
+import { AnimatedStat } from '@/components/animated-stat';
+import { ArtDirectionShowcase } from '@/components/art-direction-showcase';
 
 const FEATURES = [
   {
@@ -99,21 +112,58 @@ const FAQ_ITEMS = [
   { question: 'How often is it updated?', answer: 'A What\'s New changelog tracks every release. New UX pattern recipes ship monthly, and the roadmap includes calendar scheduling, rich text editing, and product tours.' },
 ];
 
+const NAV_LINKS = [
+  { label: 'Features', href: '#features' },
+  { label: 'Experience', href: '#experience' },
+  { label: 'Pricing', href: '#pricing' },
+  { label: 'Customers', href: '#testimonials' },
+  { label: 'FAQ', href: '#faq' },
+];
+
+function ThemeModeToggle() {
+  const { theme, setTheme } = useTheme();
+
+  const items = [
+    { mode: 'light', icon: Sun, label: 'Light mode' },
+    { mode: 'dark', icon: Moon, label: 'Dark mode' },
+    { mode: 'system', icon: Laptop, label: 'System theme' },
+  ] as const;
+
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Theme mode"
+      className="flex items-center rounded-lg border border-border bg-card p-0.5"
+    >
+      {items.map(({ mode, icon: Icon, label }) => (
+        <Button
+          key={mode}
+          variant={theme === mode ? 'secondary' : 'ghost'}
+          size="sm"
+          onClick={() => setTheme(mode)}
+          className="h-7 w-7 p-0"
+          aria-label={label}
+          title={label}
+        >
+          <Icon className="h-3.5 w-3.5" />
+        </Button>
+      ))}
+    </div>
+  );
+}
+
+const SIDEBAR_ITEMS = [
+  { icon: LayoutDashboard, label: 'Overview' },
+  { icon: Users, label: 'Customers' },
+  { icon: BarChart3, label: 'Analytics' },
+  { icon: Settings, label: 'Settings' },
+];
+
 export default function LandingDemoPage() {
   const [billingInterval, setBillingInterval] = React.useState<'monthly' | 'yearly'>('monthly');
 
   return (
     <div className="space-y-24">
-      {/* Floating frame note */}
-      <div className="fixed top-4 right-4 z-50 hidden sm:flex items-center gap-2">
-        <Link href="/">
-          <Button variant="outline" size="sm" className="gap-1.5 bg-background/70 backdrop-blur-sm text-xs shadow-sm">
-            <ArrowUpRight className="h-3.5 w-3.5" />
-            Back to Docs
-          </Button>
-        </Link>
-      </div>
-
       {/* NAVBAR */}
       <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-md">
         <Container size="xl" className="flex h-16 items-center justify-between">
@@ -127,18 +177,24 @@ export default function LandingDemoPage() {
             </Badge>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-            <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-            <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
-            <a href="#testimonials" className="hover:text-foreground transition-colors">Customers</a>
-            <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
+          <nav className="hidden xl:flex items-center gap-6 text-sm text-muted-foreground">
+            {NAV_LINKS.map((link) => (
+              <a key={link.href} href={link.href} className="hover:text-foreground transition-colors">
+                {link.label}
+              </a>
+            ))}
           </nav>
 
           <div className="flex items-center gap-2">
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="hidden sm:inline-flex text-sm">Sign in</Button>
+            <Link href="/" className="hidden lg:block">
+              <Button variant="ghost" size="sm" className="text-sm">
+                Docs
+              </Button>
             </Link>
-            <Link href="/#catalog">
+            <PaletteSwitcher />
+            <ThemeModeToggle />
+
+            <Link href="/#catalog" className="hidden sm:block">
               <Button variant="highlight" size="sm" className="gap-1.5 text-sm">
                 Get Started
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -149,19 +205,28 @@ export default function LandingDemoPage() {
       </header>
 
       {/* HERO */}
-      <Hero variant="split" containerSize="xl">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <Hero variant="split" containerSize="xl" className="relative">
+        <GridPattern fade="radial" className="opacity-40" />
+        <GlowOrb color="gradient" size="xl" position="top-right" className="opacity-30" />
+        <GlowOrb color="primary" size="lg" position="bottom-left" className="opacity-20" />
+
+        <div className="relative grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <HeroEyebrow icon={Rocket}>THE DESIGN SYSTEM FOR SERIOUS PRODUCT TEAMS</HeroEyebrow>
-            <HeroTitle gradient>
+            <HeroEyebrow icon={Rocket} className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+              THE DESIGN SYSTEM FOR SERIOUS PRODUCT TEAMS
+            </HeroEyebrow>
+            <HeroTitle
+              gradient
+              className="animate-in fade-in slide-in-from-bottom-3 duration-500 [animation-delay:80ms]"
+            >
               Engineering artistry,<br />
               measurable contrast.
             </HeroTitle>
-            <HeroDescription>
+            <HeroDescription className="animate-in fade-in slide-in-from-bottom-3 duration-500 [animation-delay:160ms]">
               An OKLCH design system with audited WCAG AA/AAA guarantees, Radix-powered
               accessibility, and battle-tested UX scenario recipes — light and dark from day one.
             </HeroDescription>
-            <HeroActions>
+            <HeroActions className="animate-in fade-in slide-in-from-bottom-3 duration-500 [animation-delay:240ms]">
               <Button variant="highlight" size="lg" className="gap-2 shadow-md">
                 <Rocket className="h-4 w-4" />
                 Start Building Free
@@ -171,69 +236,108 @@ export default function LandingDemoPage() {
                 View Components
               </Button>
             </HeroActions>
-            <p className="mt-4 text-xs text-muted-foreground font-mono">
+            <p className="mt-4 text-xs text-muted-foreground font-mono animate-in fade-in duration-500 [animation-delay:320ms]">
               No credit card required · MIT licensed primitives · pnpm monorepo
             </p>
           </div>
 
-          <HeroMedia>
-            <div className="rounded-xl border border-border bg-card overflow-hidden shadow-lg">
-              <div className="flex items-center justify-between border-b border-border/60 px-4 py-3">
-                <div className="flex gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/20" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/20" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-highlight" />
-                </div>
-                <span className="text-xs font-mono text-muted-foreground">app.lumenui.dev/dashboard</span>
-              </div>
-              <div className="grid grid-cols-4 gap-3 p-4">
-                {[Zap, ShieldCheck, Palette, Layers].map((Icon, i) => (
-                  <div key={i} className="rounded-lg border border-border/60 bg-muted/20 p-3 flex flex-col items-center gap-2 text-muted-foreground">
-                    <Icon className="h-5 w-5 text-highlight" />
-                    <span className="text-[10px] font-mono">MOD{i + 1}</span>
-                  </div>
-                ))}
-                <div className="col-span-2 row-span-2 rounded-lg border border-highlight/40 bg-highlight/10 p-4">
-                  <p className="text-xs font-bold text-foreground mb-1">Contrast Audit</p>
-                  <div className="text-3xl font-extrabold font-display text-foreground">AAA</div>
-                  <p className="text-[10px] text-muted-foreground mt-1">160 token pairs verified</p>
-                </div>
-                <div className="col-span-2 rounded-lg border border-border/60 bg-card p-4">
-                  <p className="text-xs font-bold text-foreground mb-2">Dark Mode Parity</p>
+          <div className="relative animate-in fade-in zoom-in-95 duration-700 [animation-delay:200ms]">
+            <GlowOrb color="highlight" size="lg" position="top-right" className="opacity-40" />
+            <HeroMedia className="overflow-hidden">
+              <div className="rounded-xl border border-border bg-card overflow-hidden shadow-2xl shadow-highlight/10 relative">
+                <div className="flex items-center justify-between border-b border-border/60 bg-muted/20 px-4 py-3">
                   <div className="flex gap-1.5">
-                    <div className="h-8 w-8 rounded-md bg-zinc-950 border border-zinc-800" />
-                    <div className="h-8 w-8 rounded-md bg-card border border-border" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-destructive/50" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-warning/50" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-success/50" />
+                  </div>
+                  <span className="text-xs font-mono text-muted-foreground">app.lumenui.dev/dashboard</span>
+                  <Badge variant="outline" className="font-mono text-[10px] text-muted-foreground">OKLCH</Badge>
+                </div>
+
+                <div className="grid grid-cols-[1fr_2fr] gap-3 p-4">
+                  <div className="space-y-1.5 rounded-lg border border-border/60 bg-muted/20 p-2">
+                    {SIDEBAR_ITEMS.map(({ icon: Icon, label }) => (
+                      <div
+                        key={label}
+                        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-[10px] text-muted-foreground transition-colors hover:bg-highlight/10 hover:text-highlight"
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        <span className="font-mono">{label}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="rounded-lg border border-highlight/40 bg-highlight/10 p-4">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-bold text-foreground">Contrast Audit</p>
+                        <Badge variant="success" className="font-mono text-[10px]">7.2:1</Badge>
+                      </div>
+                      <div className="mt-2 flex items-end gap-2">
+                        <span className="text-3xl font-extrabold font-display text-foreground">AAA</span>
+                        <span className="text-[10px] text-muted-foreground mb-1">160 token pairs verified</span>
+                      </div>
+                      <div className="mt-3 flex gap-1.5">
+                        {[0.9, 0.7, 0.95, 0.55, 0.8, 0.6].map((opacity, i) => (
+                          <div
+                            key={i}
+                            className="h-1.5 flex-1 rounded-full bg-gradient-to-r from-highlight to-primary"
+                            style={{ opacity }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-lg border border-border/60 bg-card p-3">
+                      <span className="text-xs font-bold text-foreground">Dark Mode Parity</span>
+                      <div className="flex gap-1.5">
+                        <div className="h-6 w-6 rounded-md bg-zinc-950 border border-zinc-800" />
+                        <div className="h-6 w-6 rounded-md bg-card border border-border" />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/20 p-3">
+                      <span className="text-xs text-muted-foreground">Build time</span>
+                      <Badge variant="success" className="font-mono text-[10px]">2.4s</Badge>
+                    </div>
                   </div>
                 </div>
-                <div className="col-span-4 rounded-lg border border-border/60 bg-muted/20 p-3 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Build time</span>
-                  <Badge variant="success" className="font-mono text-[10px]">2.4s</Badge>
-                </div>
               </div>
-            </div>
-          </HeroMedia>
+            </HeroMedia>
+          </div>
         </div>
       </Hero>
 
+      {/* EXPERIENCE THE SYSTEM */}
+      <div className="relative">
+        <GlowOrb color="gradient" size="xl" position="top-center" className="opacity-20" />
+        <Container size="xl">
+          <ArtDirectionShowcase />
+        </Container>
+      </div>
+
       {/* LOGO CLOUD */}
-      <LogoCloud title="Trusted by product teams shipping on our system" variant="bordered">
-        {['Vercel', 'Linear', 'Ramp', 'Notion', 'Framer'].map((name) => (
-          <LogoItem key={name} name={name} />
-        ))}
-      </LogoCloud>
+      <Reveal variant="fade">
+        <LogoCloud title="Trusted by product teams shipping on our system" variant="bordered">
+          {['Vercel', 'Linear', 'Ramp', 'Notion', 'Framer'].map((name) => (
+            <LogoItem key={name} name={name} />
+          ))}
+        </LogoCloud>
+      </Reveal>
 
       {/* STATS */}
       <StatsBand variant="card" columns={4} containerSize="xl">
-        <StatItem value={160} suffix="+" label="Token pairs" description="Verified against WCAG AA & AAA" />
-        <StatItem value={25} suffix="+" label="Components" description="Built on Radix with cva variants" />
-        <StatItem value={18} suffix="+" label="UX Recipes" description="Wizards, tables, Kanban & more" />
-        <StatItem value={100} suffix="%" label="Audited" description="Automated contrast CI on every commit" />
+        <AnimatedStat value={160} suffix="+" label="Token pairs" description="Verified against WCAG AA & AAA" />
+        <AnimatedStat value={25} suffix="+" label="Components" description="Built on Radix with cva variants" delay={120} />
+        <AnimatedStat value={18} suffix="+" label="UX Recipes" description="Wizards, tables, Kanban & more" delay={240} />
+        <AnimatedStat value={100} suffix="%" label="Audited" description="Automated contrast CI on every commit" delay={360} />
       </StatsBand>
 
       {/* FEATURES */}
       <div id="features" className="scroll-mt-24">
         <Container size="xl">
-          <div className="mx-auto max-w-2xl text-center space-y-3 mb-12">
+          <Reveal className="mx-auto max-w-2xl text-center space-y-3 mb-12">
             <Badge variant="highlight" className="font-mono text-xs">WHY LUMENUI</Badge>
             <h2 className="text-3xl sm:text-4xl font-extrabold font-display tracking-tight text-foreground">
               Everything you need to ship premium interfaces
@@ -242,16 +346,19 @@ export default function LandingDemoPage() {
               From tokens to full scenario recipes — a single source of truth that keeps your product
               coherent, accessible, and fast to assemble.
             </p>
-          </div>
+          </Reveal>
           <FeatureGrid columns={3}>
-            {FEATURES.map((feature) => (
-              <FeatureCard
-                key={feature.title}
-                icon={feature.icon}
-                badge={feature.badge}
-                title={feature.title}
-                description={feature.description}
-              />
+            {FEATURES.map((feature, i) => (
+              <Reveal key={feature.title} delay={i * 90}>
+                <FeatureCard
+                  variant="gradient"
+                  icon={feature.icon}
+                  badge={feature.badge}
+                  title={feature.title}
+                  description={feature.description}
+                  className="h-full"
+                />
+              </Reveal>
             ))}
           </FeatureGrid>
         </Container>
@@ -260,7 +367,7 @@ export default function LandingDemoPage() {
       {/* PRICING */}
       <div id="pricing" className="scroll-mt-24">
         <Container size="xl">
-          <div className="mx-auto max-w-2xl text-center space-y-3 mb-10">
+          <Reveal className="mx-auto max-w-2xl text-center space-y-3 mb-10">
             <Badge variant="highlight" className="font-mono text-xs">PRICING</Badge>
             <h2 className="text-3xl sm:text-4xl font-extrabold font-display tracking-tight text-foreground">
               Simple, transparent plans
@@ -282,22 +389,24 @@ export default function LandingDemoPage() {
                 Yearly <span className="ml-1 text-highlight font-bold">-20%</span>
               </button>
             </div>
-          </div>
+          </Reveal>
 
           <PricingGrid columns={3}>
-            {PRICING_FEATURES.map((plan) => (
-              <PricingCard
-                key={plan.text}
-                name={plan.text}
-                description={plan.description}
-                price={billingInterval === 'yearly' && typeof plan.price === 'number' && plan.price > 0 ? plan.price * 12 : plan.price}
-                period={billingInterval === 'yearly' && typeof plan.price === 'number' && plan.price > 0 ? '/year' : plan.period}
-                badge={plan.text === 'Pro' ? 'Most Popular' : undefined}
-                popular={plan.popular}
-                ctaText={plan.ctaText}
-                ctaVariant={plan.popular ? 'highlight' : 'outline'}
-                features={plan.features}
-              />
+            {PRICING_FEATURES.map((plan, i) => (
+              <Reveal key={plan.text} delay={i * 100} className="h-full">
+                <PricingCard
+                  name={plan.text}
+                  description={plan.description}
+                  price={billingInterval === 'yearly' && typeof plan.price === 'number' && plan.price > 0 ? plan.price * 12 : plan.price}
+                  period={billingInterval === 'yearly' && typeof plan.price === 'number' && plan.price > 0 ? '/year' : plan.period}
+                  badge={plan.text === 'Pro' ? 'Most Popular' : undefined}
+                  popular={plan.popular}
+                  ctaText={plan.ctaText}
+                  ctaVariant={plan.popular ? 'highlight' : 'outline'}
+                  features={plan.features}
+                  className="h-full"
+                />
+              </Reveal>
             ))}
           </PricingGrid>
         </Container>
@@ -306,22 +415,24 @@ export default function LandingDemoPage() {
       {/* TESTIMONIALS */}
       <div id="testimonials" className="scroll-mt-24">
         <Container size="xl">
-          <div className="mx-auto max-w-2xl text-center space-y-3 mb-12">
+          <Reveal className="mx-auto max-w-2xl text-center space-y-3 mb-12">
             <Badge variant="highlight" className="font-mono text-xs">CUSTOMERS</Badge>
             <h2 className="text-3xl sm:text-4xl font-extrabold font-display tracking-tight text-foreground">
               Loved by engineers who care about detail
             </h2>
-          </div>
+          </Reveal>
           <TestimonialGrid columns={3}>
-            {TESTIMONIALS.map((t) => (
-              <TestimonialCard
-                key={t.authorName}
-                quote={t.quote}
-                authorName={t.authorName}
-                authorRole={t.authorRole}
-                authorCompany={t.authorCompany}
-                rating={t.rating}
-              />
+            {TESTIMONIALS.map((t, i) => (
+              <Reveal key={t.authorName} delay={i * 100} className="h-full">
+                <TestimonialCard
+                  quote={t.quote}
+                  authorName={t.authorName}
+                  authorRole={t.authorRole}
+                  authorCompany={t.authorCompany}
+                  rating={t.rating}
+                  className="h-full"
+                />
+              </Reveal>
             ))}
           </TestimonialGrid>
         </Container>
@@ -330,39 +441,48 @@ export default function LandingDemoPage() {
       {/* FAQ */}
       <div id="faq" className="scroll-mt-24">
         <Container size="xl">
-          <div className="mx-auto max-w-2xl text-center space-y-3 mb-10">
+          <Reveal className="mx-auto max-w-2xl text-center space-y-3 mb-10">
             <Badge variant="highlight" className="font-mono text-xs">FAQ</Badge>
             <h2 className="text-3xl sm:text-4xl font-extrabold font-display tracking-tight text-foreground">
               Frequently asked questions
             </h2>
-          </div>
-          <FaqSection items={FAQ_ITEMS} />
+          </Reveal>
+          <Reveal className="mx-auto max-w-3xl">
+            <FaqSection items={FAQ_ITEMS} />
+          </Reveal>
         </Container>
       </div>
 
       {/* CTA */}
-      <CtaBand
-        variant="glow"
-        align="center"
-        badge="GET STARTED"
-        badgeIcon={Rocket}
-        title="Ready to ship interfaces you're proud of?"
-        description="Join teams building accessible, art-directed products with audited contrast and production-ready UX recipes."
-        actions={
-          <>
-            <Button variant="highlight" size="lg" className="gap-2 shadow-md">
-              <Rocket className="h-4 w-4" />
-              Start Building Free
-            </Button>
-            <Button variant="outline" size="lg">
-              Book a Demo
-            </Button>
-          </>
-        }
-      />
+      <div className="relative">
+        <GlowOrb color="gradient" size="xl" position="top-center" className="opacity-25" />
+        <Reveal variant="zoom">
+          <CtaBand
+            variant="glow"
+            align="center"
+            badge="GET STARTED"
+            badgeIcon={Rocket}
+            title="Ready to ship interfaces you're proud of?"
+            description="Join teams building accessible, art-directed products with audited contrast and production-ready UX recipes."
+            actions={
+              <>
+                <Button variant="highlight" size="lg" className="gap-2 shadow-md">
+                  <Rocket className="h-4 w-4" />
+                  Start Building Free
+                </Button>
+                <Button variant="outline" size="lg" className="gap-2">
+                  Book a Demo
+                  <ArrowUpRight className="h-4 w-4" />
+                </Button>
+              </>
+            }
+          />
+        </Reveal>
+      </div>
 
       {/* FOOTER */}
-      <footer className="border-t border-border/60 bg-muted/20">
+      <footer className="border-t border-border/60 bg-muted/20 relative overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-highlight/50 to-transparent" />
         <Container size="xl" className="py-12">
           <div className="grid gap-10 md:grid-cols-4">
             <div className="md:col-span-2 space-y-3">
@@ -408,7 +528,10 @@ export default function LandingDemoPage() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground">
             <p>© 2026 LumenUI. Engineered with OKLCH, Radix, and Tailwind v4.</p>
             <div className="flex gap-4 font-mono">
-              <span>WCAG 2.1 AA</span>
+              <span className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-success" />
+                WCAG 2.1 AA
+              </span>
               <span>·</span>
               <span>OKLCH</span>
               <span>·</span>

@@ -66,7 +66,8 @@ export default function WhatsNewPage() {
       </div>
 
       <div className="rounded-xl border border-border bg-muted/10 p-5 text-xs text-muted-foreground">
-        Next up (roadmap): Calendar &amp; Event Scheduling, Activity Feed / Audit Log, Rich Text Editor, and Guided Product Tour patterns.
+        <p className="font-semibold text-foreground mb-1">Recently shipped (v0.2):</p>
+        Calendar &amp; Event Scheduling · Activity Feed &amp; Audit Log · Settings &amp; Preferences · Billing &amp; Invoices · Media Gallery &amp; Lightbox · Threaded Comments · Rich Text Editor (Tiptap) · Virtualized List (10k rows) · Product Tour &amp; Coach Marks.
       </div>
     </div>
   );
