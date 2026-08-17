@@ -44,10 +44,27 @@ export interface ButtonProps
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, loading = false, disabled, children, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'button';
+    const classNames = cn(buttonVariants({ variant, size, className }));
+
+    // Slot requires exactly one element child — `loading && <Loader2/>`
+    // evaluates to `false`, which React.Children.count still counts, breaking
+    // the slot. The asChild path therefore renders children untouched.
+    if (asChild) {
+      return (
+        <Slot
+          className={classNames}
+          ref={ref}
+          aria-busy={loading ? true : undefined}
+          {...props}
+        >
+          {children}
+        </Slot>
+      );
+    }
+
     return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+      <button
+        className={classNames}
         ref={ref}
         disabled={disabled || loading}
         aria-busy={loading ? true : undefined}
@@ -55,7 +72,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {loading && <Loader2 className="h-4 w-4 animate-spin" />}
         {children}
-      </Comp>
+      </button>
     );
   }
 );
