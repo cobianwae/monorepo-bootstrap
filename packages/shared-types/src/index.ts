@@ -1,3 +1,14 @@
+export * from './enums/pipeline.enums.js';
+export * from './enums/project.enums.js';
+export * from './enums/style.enums.js';
+export * from './enums/media.enums.js';
+export * from './enums/publish.enums.js';
+export * from './domain/channel.types.js';
+export * from './domain/project.types.js';
+export * from './domain/media.types.js';
+export * from './domain/publish.types.js';
+export * from './providers/contracts.js';
+
 export type UserRole = 'admin' | 'editor' | 'viewer';
 export type UserStatus = 'active' | 'inactive' | 'pending';
 
@@ -111,7 +122,7 @@ export interface FooterColumn {
 }
 
 export interface SocialLinkItem {
-  platform: 'github' | 'twitter' | 'discord' | 'linkedin' | 'youtube' | 'instagram';
+  platform: 'github' | 'twitter' | 'linkedin' | 'youtube' | 'instagram';
   href: string;
   label?: string;
 }
@@ -121,7 +132,6 @@ export interface TocHeading {
   text: string;
   level: number;
 }
-
 
 // Type Guards
 export function isUser(obj: unknown): obj is User {

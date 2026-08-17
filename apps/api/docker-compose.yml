@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: video-factory-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: video_factory
+    ports:
+      - "5435:5432"
+    volumes:
+      - video-factory-pgdata:/var/lib/postgresql/data
+
+volumes:
+  video-factory-pgdata:

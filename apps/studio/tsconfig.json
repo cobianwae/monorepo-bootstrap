@@ -1,0 +1,27 @@
+{
+  "extends": "../../packages/config/tsconfig.react.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@ds/ui": ["../../packages/ui/src/index.ts"],
+      "@ds/ui/*": ["../../packages/ui/src/*"],
+      "@ds/tokens": ["../../packages/tokens/src/index.ts"],
+      "@ds/tokens/*": ["../../packages/tokens/src/*"],
+      "@shared/types": ["../../packages/shared-types/src/index.ts"]
+    },
+    "noEmit": true,
+    "incremental": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}

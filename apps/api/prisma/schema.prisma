@@ -1,0 +1,359 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ===== Enums =====
+
+enum PipelineStage {
+  TOPIC      @map("topic")
+  SCRIPT     @map("script")
+  STORYBOARD @map("storyboard")
+  ASSETS     @map("assets")
+  RENDER     @map("render")
+  PUBLISH    @map("publish")
+}
+
+enum AutomationLevel {
+  STAGED @map("staged")
+  HYBRID @map("hybrid")
+  AUTO   @map("auto")
+}
+
+enum GateDecision {
+  APPROVE @map("approve")
+  REJECT  @map("reject")
+}
+
+enum ReviewSource {
+  HUMAN      @map("human")
+  AUTOMATION @map("automation")
+}
+
+enum ProjectStatus {
+  ACTIVE   @map("active")
+  PAUSED   @map("paused")
+  ARCHIVED @map("archived")
+  ERROR    @map("error")
+}
+
+enum StyleType {
+  INFOGRAPHIC @map("infographic")
+  JOURNALISM  @map("journalism")
+  ANIMATION   @map("animation")
+  CINEMATIC   @map("cinematic")
+}
+
+enum Pacing {
+  FAST     @map("fast")
+  BALANCED @map("balanced")
+  SLOW     @map("slow")
+}
+
+enum AudioStrategy {
+  NATIVE_AS_SFX @map("native_as_sfx")
+  NATIVE_ONLY   @map("native_only")
+  SILENT        @map("silent")
+}
+
+enum SceneMode {
+  MULTI_CUT @map("multi_cut")
+  LONG_TAKE @map("long_take")
+}
+
+enum VideoFormat {
+  SHORTS_9_16   @map("shorts_9_16")
+  YOUTUBE_16_9  @map("youtube_16_9")
+}
+
+enum ProviderName {
+  MOCK           @map("mock")
+  VERTEX_GEMINI  @map("vertex_gemini")
+  VERTEX_IMAGEN  @map("vertex_imagen")
+  VERTEX_TTS     @map("vertex_tts")
+  FAL_SEEDANCE   @map("fal_seedance")
+}
+
+enum AssetKind {
+  IMAGE      @map("image")
+  VIDEO_CLIP @map("video_clip")
+  AUDIO_TTS  @map("audio_tts")
+  AUDIO_SFX  @map("audio_sfx")
+  MUSIC      @map("music")
+}
+
+enum AssetStatus {
+  PENDING    @map("pending")
+  GENERATING @map("generating")
+  READY      @map("ready")
+  FAILED     @map("failed")
+}
+
+enum SocialPlatform {
+  YOUTUBE_SHORTS  @map("youtube_shorts")
+  INSTAGRAM_REELS @map("instagram_reels")
+  TIKTOK          @map("tiktok")
+}
+
+enum SocialAccountStatus {
+  CONNECTED @map("connected")
+  EXPIRED   @map("expired")
+  REVOKED   @map("revoked")
+}
+
+enum PublicationStatus {
+  DRAFT      @map("draft")
+  SCHEDULED  @map("scheduled")
+  PUBLISHING @map("publishing")
+  PUBLISHED  @map("published")
+  FAILED     @map("failed")
+}
+
+enum RenderJobStatus {
+  QUEUED    @map("queued")
+  RENDERING @map("rendering")
+  DONE      @map("done")
+  FAILED    @map("failed")
+}
+
+enum ChannelStatus {
+  ACTIVE   @map("active")
+  PAUSED   @map("paused")
+  ARCHIVED @map("archived")
+}
+
+// ===== Models =====
+
+model Channel {
+  id             String   @id @default(uuid()) @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  deletedAt      DateTime? @map("deleted_at")
+  name           String   @db.VarChar(120)
+  niche          String   @db.VarChar(120)
+  targetAudience String   @db.Text
+  status         ChannelStatus @default(ACTIVE) @map("status")
+
+  styleGuide  StyleGuide?
+  projects    VideoProject[]
+  socialAccounts SocialAccount[]
+
+  @@map("channels")
+}
+
+model StyleGuide {
+  id                 String   @id @default(uuid()) @db.Uuid
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  channelId          String   @unique @map("channel_id") @db.Uuid
+  name               String   @db.VarChar(120)
+  styleType          StyleType @map("style_type")
+  voicePreset        String   @db.VarChar(120)
+  pacing             Pacing
+  musicVibe          String   @db.VarChar(120)
+  paletteDescription String   @db.Text
+  lockedPromptSuffix String   @db.Text @map("locked_prompt_suffix")
+  referenceImageUrls Json     @default("[]") @map("reference_image_urls")
+  meta               Json     @default("{}")
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@map("style_guides")
+}
+
+model VideoProject {
+  id              String          @id @default(uuid()) @db.Uuid
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+  deletedAt       DateTime?       @map("deleted_at")
+  channelId       String          @map("channel_id") @db.Uuid
+  title           String          @db.VarChar(255)
+  format          VideoFormat     @default(SHORTS_9_16)
+  stage           PipelineStage   @default(TOPIC)
+  status          ProjectStatus   @default(ACTIVE)
+  automationLevel AutomationLevel @default(STAGED) @map("automation_level")
+  perStageConfig  Json            @default("{}") @map("per_stage_config")
+  errorMessage    String?         @map("error_message") @db.Text
+
+  channel         Channel          @relation(fields: [channelId], references: [id])
+  topic           Topic?
+  scripts         Script[]
+  scenes          Scene[]
+  assets          Asset[]
+  renderJobs      RenderJob[]
+  reviewDecisions ReviewDecision[]
+  publications    Publication[]
+
+  @@index([channelId])
+  @@index([stage])
+  @@map("video_projects")
+}
+
+model Topic {
+  id         String      @id @default(uuid()) @db.Uuid
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  projectId  String      @unique @map("project_id") @db.Uuid
+  title      String      @db.VarChar(255)
+  hook       String      @db.Text
+  angle      String      @db.Text
+  outline    Json        @default("[]")
+  candidates Json        @default("[]")
+  status     AssetStatus @default(PENDING)
+
+  project VideoProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("topics")
+}
+
+model Script {
+  id         String   @id @default(uuid()) @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  projectId  String   @map("project_id") @db.Uuid
+  version    Int      @default(1)
+  hook       String   @db.Text
+  narration  String   @db.Text
+  structure  Json     @default("[]")
+  meta       Json     @default("{}")
+  approvedAt DateTime? @map("approved_at")
+
+  project VideoProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, version])
+  @@index([projectId])
+  @@map("scripts")
+}
+
+model Scene {
+  id             String        @id @default(uuid()) @db.Uuid
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  projectId      String        @map("project_id") @db.Uuid
+  orderIndex     Int           @map("order_index")
+  narrationText  String        @db.Text @map("narration_text")
+  visualPrompt   String        @db.Text @map("visual_prompt")
+  onScreenText   String?       @map("on_screen_text") @db.Text
+  durationSec    Int           @default(5) @map("duration_sec")
+  effectTag      String?       @map("effect_tag") @db.VarChar(60)
+  audioStrategy  AudioStrategy @default(NATIVE_AS_SFX) @map("audio_strategy")
+  sceneMode      SceneMode     @default(MULTI_CUT) @map("scene_mode")
+  status         AssetStatus   @default(PENDING)
+  generationMeta Json?         @map("generation_meta")
+
+  project VideoProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assets  Asset[]
+
+  @@unique([projectId, orderIndex])
+  @@index([projectId])
+  @@map("scenes")
+}
+
+model Asset {
+  id            String      @id @default(uuid()) @db.Uuid
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  projectId     String      @map("project_id") @db.Uuid
+  sceneId       String?     @map("scene_id") @db.Uuid
+  kind          AssetKind
+  provider      ProviderName
+  providerJobId String?     @map("provider_job_id") @db.VarChar(255)
+  url           String?     @db.Text
+  mimeType      String?     @map("mime_type") @db.VarChar(80)
+  sizeBytes     Int?        @map("size_bytes")
+  status        AssetStatus @default(PENDING)
+  meta          Json        @default("{}")
+  errorMessage  String?     @map("error_message") @db.Text
+
+  project VideoProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  scene   Scene?       @relation(fields: [sceneId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([sceneId])
+  @@map("assets")
+}
+
+model RenderJob {
+  id           String          @id @default(uuid()) @db.Uuid
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  projectId    String          @map("project_id") @db.Uuid
+  status       RenderJobStatus @default(QUEUED)
+  format       VideoFormat     @default(SHORTS_9_16)
+  outputUrl    String?         @map("output_url") @db.Text
+  durationSec  Int?            @map("duration_sec")
+  errorMessage String?         @map("error_message") @db.Text
+  meta         Json            @default("{}")
+
+  project VideoProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("render_jobs")
+}
+
+model ReviewDecision {
+  id        String         @id @default(uuid()) @db.Uuid
+  createdAt DateTime       @default(now()) @map("created_at")
+  projectId String         @map("project_id") @db.Uuid
+  stage     PipelineStage
+  decision  GateDecision
+  notes     String?        @db.Text
+  source    ReviewSource   @default(HUMAN)
+  decidedAt DateTime       @default(now()) @map("decided_at")
+
+  project VideoProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([stage])
+  @@map("review_decisions")
+}
+
+model SocialAccount {
+  id           String              @id @default(uuid()) @db.Uuid
+  createdAt    DateTime            @default(now()) @map("created_at")
+  updatedAt    DateTime            @updatedAt @map("updated_at")
+  channelId    String              @map("channel_id") @db.Uuid
+  platform     SocialPlatform
+  displayName  String              @map("display_name") @db.VarChar(120)
+  externalId   String?             @map("external_id") @db.VarChar(255)
+  tokenEncrypted String?           @map("token_encrypted") @db.Text
+  status       SocialAccountStatus @default(CONNECTED)
+  meta         Json                @default("{}")
+
+  channel      Channel       @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  publications Publication[]
+
+  @@unique([channelId, platform])
+  @@map("social_accounts")
+}
+
+model Publication {
+  id              String            @id @default(uuid()) @db.Uuid
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  projectId       String            @map("project_id") @db.Uuid
+  socialAccountId String?           @map("social_account_id") @db.Uuid
+  platform        SocialPlatform
+  status          PublicationStatus @default(DRAFT)
+  title           String            @db.VarChar(255)
+  description     String            @db.Text
+  tags            Json              @default("[]")
+  scheduledAt     DateTime?         @map("scheduled_at")
+  publishedAt     DateTime?         @map("published_at")
+  remoteId        String?           @map("remote_id") @db.VarChar(255)
+  permalink       String?           @db.Text
+  errorMessage    String?           @map("error_message") @db.Text
+
+  project       VideoProject  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  socialAccount SocialAccount? @relation(fields: [socialAccountId], references: [id], onDelete: SetNull)
+
+  @@index([projectId])
+  @@index([socialAccountId])
+  @@index([status])
+  @@map("publications")
+}

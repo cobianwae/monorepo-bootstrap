@@ -1,27 +1,36 @@
-import type { ApiResponse } from '@shared/types';
+import 'reflect-metadata';
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './app.module.js';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter.js';
 
-export class AppService {
-  getHealth(): ApiResponse<{ status: string; uptime: number }> {
-    return {
-      success: true,
-      data: {
-        status: 'healthy',
-        uptime: process.uptime(),
-      },
-    };
-  }
+async function bootstrap(): Promise<void> {
+  const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
+  app.useGlobalFilters(new GlobalExceptionFilter());
+  app.enableCors();
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Video Factory API')
+    .setDescription('Pipeline produksi video AI untuk content creator')
+    .setVersion('0.1.0')
+    .addTag('Channels')
+    .addTag('Projects')
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document);
+
+  const port = Number(process.env.API_PORT ?? 4000);
+  await app.listen(port);
+  console.log(`API ready on http://localhost:${port}/api (docs: /api/docs)`);
 }
 
-export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  getHealth(): ApiResponse<{ status: string; uptime: number }> {
-    return this.appService.getHealth();
-  }
-}
-
-export function bootstrap() {
-  const service = new AppService();
-  const controller = new AppController(service);
-  return controller;
-}
+void bootstrap();
