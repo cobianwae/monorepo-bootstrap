@@ -22,7 +22,7 @@ import {
   Database,
 } from 'lucide-react';
 import { cn } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 const STORAGE_KEY = 'ds-onboarding-dismissed';
 
@@ -33,7 +33,7 @@ const CHECKLIST = [
   { id: 'star', label: 'Bookmark a favorite', description: 'Star your most-used file or page.', icon: Star },
 ];
 
-export default function OnboardingPatternPage() {
+export default function OnboardingPage() {
   const [showBanner, setShowBanner] = React.useState(false);
   const [showModal, setShowModal] = React.useState(false);
   const [completedIds, setCompletedIds] = React.useState<string[]>([]);

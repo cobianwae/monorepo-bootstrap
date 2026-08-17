@@ -49,6 +49,11 @@ import {
   AvatarFallback,
   DataTable,
   KanbanBoard,
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationNext,
   SegmentedControl,
   SegmentedControlItem,
   Select,
@@ -94,9 +99,9 @@ import {
   type KanbanColumnData,
   type KanbanItemData,
 } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 import { useCrm } from '@/scenarios/crm/store/crm-context';
-import { useDebounce } from '@/scenarios/crm/lib/use-debounce';
+import { useDebounce } from '@ds/ui';
 import type { Lead, LeadStage, LeadPriority } from '@/scenarios/crm/types';
 
 const STAGE_CONFIG: Record<
@@ -1000,29 +1005,33 @@ export default function LeadsPage() {
             </span>
 
             {totalPages > 1 && (
-              <div className="flex items-center gap-1.5">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  className="h-8 text-xs"
-                >
-                  Previous
-                </Button>
-                <span className="font-mono px-2">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  className="h-8 text-xs"
-                >
-                  Next
-                </Button>
-              </div>
+              <Pagination className="mx-0 w-auto justify-end">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      aria-disabled={currentPage === 1}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : undefined}
+                      onClick={() => {
+                        if (currentPage > 1) setCurrentPage((p) => Math.max(1, p - 1));
+                      }}
+                    />
+                  </PaginationItem>
+                  <PaginationItem>
+                    <span className="font-mono px-2 text-xs">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                  </PaginationItem>
+                  <PaginationItem>
+                    <PaginationNext
+                      aria-disabled={currentPage === totalPages}
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : undefined}
+                      onClick={() => {
+                        if (currentPage < totalPages) setCurrentPage((p) => Math.min(totalPages, p + 1));
+                      }}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
             )}
           </div>
         </div>

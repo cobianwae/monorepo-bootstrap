@@ -29,7 +29,7 @@ import {
   DollarSign,
   UserPlus,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 interface Notification {
   id: string;

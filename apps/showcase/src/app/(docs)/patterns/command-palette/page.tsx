@@ -25,9 +25,9 @@ import {
   RefreshCw,
   Keyboard,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
-export default function CommandPalettePatternPage() {
+export default function CommandPalettePage() {
   const router = useRouter();
 
   const navigate = (href: string) => () => router.push(href);

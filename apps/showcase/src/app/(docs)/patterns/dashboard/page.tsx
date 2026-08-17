@@ -28,9 +28,9 @@ import {
   Sparkles,
   RefreshCw,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
-export default function DashboardPatternPage() {
+export default function DashboardPage() {
   const [timeRange, setTimeRange] = React.useState('30d');
   const [isLoading, setIsLoading] = React.useState(false);
 

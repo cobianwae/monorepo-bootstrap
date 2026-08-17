@@ -2,25 +2,15 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  LayoutDashboard,
-  Users,
-  Megaphone,
-  Headphones,
-  Sparkles,
-  RotateCcw,
-  Building,
-  Mail,
-  Phone,
-} from 'lucide-react';
+import { RotateCcw, Building, Mail, Phone, Sparkles, Headphones } from 'lucide-react';
 import { CommandPalette, type CommandPaletteGroup } from '@ds/ui';
 import { useCrm } from '../store/crm-context';
+import { CRM_NAV_ITEMS } from '../nav-config';
 
 export function CrmCommandPalette() {
   const router = useRouter();
   const {
     leads,
-    campaigns,
     conversations,
     setSelectedLeadId,
     setSelectedConversationId,
@@ -32,48 +22,14 @@ export function CrmCommandPalette() {
     return [
       {
         heading: 'Quick Navigation',
-        items: [
-          {
-            id: 'nav-dashboard',
-            label: 'CRM Dashboard',
-            description: 'KPIs, pipeline charts and revenue metrics',
-            icon: LayoutDashboard,
-            keywords: ['home', 'metrics', 'overview', 'stats'],
-            onSelect: () => router.push('/crm'),
-          },
-          {
-            id: 'nav-leads',
-            label: 'Leads Pipeline',
-            description: 'Kanban board and table view',
-            icon: Users,
-            keywords: ['deals', 'sales', 'prospects', 'clients'],
-            onSelect: () => router.push('/crm/leads'),
-          },
-          {
-            id: 'nav-campaigns',
-            label: 'Marketing Campaigns',
-            description: 'Email, WhatsApp and omnichannel campaigns',
-            icon: Megaphone,
-            keywords: ['marketing', 'broadcast', 'roi'],
-            onSelect: () => router.push('/crm/campaigns'),
-          },
-          {
-            id: 'nav-contact-center',
-            label: 'Contact Center Inbox',
-            description: 'Omnichannel customer conversations',
-            icon: Headphones,
-            keywords: ['inbox', 'messages', 'chat', 'support', 'tickets'],
-            onSelect: () => router.push('/crm/contact-center'),
-          },
-          {
-            id: 'nav-ai',
-            label: 'AI Copilot Studio',
-            description: 'Lead scoring radar & predictive analytics',
-            icon: Sparkles,
-            keywords: ['artificial intelligence', 'gpt', 'insights', 'drafts'],
-            onSelect: () => router.push('/crm/ai'),
-          },
-        ],
+        items: CRM_NAV_ITEMS.map((item) => ({
+          id: item.id,
+          label: item.label,
+          description: item.description,
+          icon: item.icon,
+          keywords: item.keywords,
+          onSelect: () => router.push(item.href),
+        })),
       },
       {
         heading: 'Search Leads & Deals',
@@ -128,7 +84,6 @@ export function CrmCommandPalette() {
     ];
   }, [
     leads,
-    campaigns,
     conversations,
     router,
     setSelectedLeadId,

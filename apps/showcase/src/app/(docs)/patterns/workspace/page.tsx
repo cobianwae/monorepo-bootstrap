@@ -26,7 +26,7 @@ import {
   PanelLeft,
   CheckCircle,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 const fileTree = [
   { name: 'schema.prisma', icon: Database, size: '2.4 KB' },
@@ -95,7 +95,7 @@ function FileExplorer({
   );
 }
 
-export default function WorkspacePatternPage() {
+export default function WorkspacePage() {
   const [selectedFile, setSelectedFile] = React.useState('schema.prisma');
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
   const [mobileExplorerOpen, setMobileExplorerOpen] = React.useState(false);

@@ -1,13 +1,10 @@
 'use client';
 
 import * as React from 'react';
+import type { TocHeading } from '@shared/types';
 import { cn } from '../../lib/utils';
 
-export interface TocHeading {
-  id: string;
-  text: string;
-  level: number;
-}
+export type { TocHeading };
 
 export function useActiveToc(itemIds: string[]) {
   const [activeId, setActiveId] = React.useState<string>('');

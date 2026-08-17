@@ -23,7 +23,7 @@ import {
   RotateCcw,
   ArrowLeft,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 type ResultState = 'empty' | 'forbidden' | 'error';
 

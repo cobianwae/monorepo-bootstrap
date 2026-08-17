@@ -34,7 +34,7 @@ import {
   RotateCcw,
   UserPlus,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 import type { User } from '@shared/types';
 
 const INITIAL_DATA: User[] = [
@@ -127,7 +127,7 @@ function matchesChips(user: User, chips: FilterChip[]): boolean {
   });
 }
 
-export default function DataTablePatternPage() {
+export default function DataTablePage() {
   const [data, setData] = React.useState<User[]>(INITIAL_DATA);
   const [chips, setChips] = React.useState<FilterChip[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);

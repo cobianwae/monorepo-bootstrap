@@ -40,7 +40,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { cn } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 interface Ticket {
   id: string;
@@ -106,7 +106,7 @@ const PRIORITY_STYLE: Record<Ticket['priority'], string> = {
   high: 'bg-destructive/15 text-destructive',
 };
 
-export default function MasterDetailPatternPage() {
+export default function MasterDetailPage() {
   const [tickets, setTickets] = React.useState<Ticket[]>(INITIAL_TICKETS);
   const [search, setSearch] = React.useState('');
   const [selectedId, setSelectedId] = React.useState<string | null>(null);

@@ -20,7 +20,7 @@ import {
 import { ShieldCheck, Check, Copy, Sparkles, Palette, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 export default function ColorsPage() {
   const tokenPairs = React.useMemo(() => auditSemanticTokenPairs(), []);

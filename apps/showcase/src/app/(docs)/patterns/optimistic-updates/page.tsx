@@ -19,7 +19,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { cn } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 interface Feature {
   id: string;
@@ -80,7 +80,7 @@ function simulateApiCall(successRate = 0.75): Promise<boolean> {
   });
 }
 
-export default function OptimisticUpdatePatternPage() {
+export default function OptimisticUpdatesPage() {
   const [features, setFeatures] = React.useState<Feature[]>(INITIAL_FEATURES);
   const [favorites, setFavorites] = React.useState<Favorite[]>(INITIAL_FAVORITES);
   const [pendingIds, setPendingIds] = React.useState<string[]>([]);

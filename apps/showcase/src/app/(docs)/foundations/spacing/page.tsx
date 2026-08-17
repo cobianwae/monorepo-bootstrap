@@ -4,7 +4,7 @@ import * as React from 'react';
 import { SPACING_SCALE, RADII_SCALE } from '@ds/tokens';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button } from '@ds/ui';
 import { Play, Sparkles } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 export default function SpacingPage() {
   const [animate, setAnimate] = React.useState(false);

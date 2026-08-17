@@ -49,7 +49,6 @@ export * from './components/ui/description-list';
 export * from './components/ui/segmented-control';
 export * from './components/ui/hover-card';
 export * from './components/ui/context-menu';
-export * from './components/ui/menu';
 export * from './components/ui/navigation-menu';
 export * from './components/ui/sortable-list';
 export * from './components/ui/kanban';
@@ -80,10 +79,23 @@ export * from './components/ui/notification';
 export * from './components/ui/container';
 export * from './components/ui/section';
 export * from './components/ui/page-header';
+export * from './components/ui/page-shell';
 export * from './components/ui/app-shell';
 export * from './components/ui/resizable';
 export * from './components/ui/aspect-ratio';
 export * from './components/ui/skip-link';
+
+// Demo / Docs Primitives
+export * from './components/ui/demo-section';
+export * from './components/ui/page-skeleton';
+export * from './components/ui/error-page';
+
+// Scenario / Composite Primitives
+export * from './components/ui/sidebar-nav';
+export * from './components/ui/sidebar-user-status';
+export * from './components/ui/metric-tiles-card';
+export * from './components/ui/chart-a11y-table';
+export * from './hooks/use-debounce';
 
 // Navigation & Menu Primitives
 export * from './components/ui/mega-menu';

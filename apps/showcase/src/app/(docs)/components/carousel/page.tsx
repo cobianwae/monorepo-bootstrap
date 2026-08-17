@@ -42,7 +42,7 @@ import {
   Banner,
 } from '@ds/ui';
 
-export default function CarouselDocsPage() {
+export default function CarouselPage() {
   const [activePage, setActivePage] = React.useState(2);
 
   const sampleCards = [

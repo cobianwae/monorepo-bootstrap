@@ -39,7 +39,7 @@ import {
   AlertTriangle,
   GitFork,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 const DRAFT_KEY = 'ds:dynamic-form-draft';
 

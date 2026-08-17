@@ -12,7 +12,7 @@ import {
 } from '@ds/ui';
 import { Sparkles, Infinity as InfinityIcon, Loader2, Check, RefreshCw } from 'lucide-react';
 import { cn } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 interface FeedItem {
   id: string;
@@ -66,7 +66,7 @@ function generateBatch(start: number, count: number): FeedItem[] {
 const INITIAL_ITEMS = generateBatch(0, BATCH_SIZE);
 const TOTAL_ITEMS = 40;
 
-export default function InfiniteScrollPatternPage() {
+export default function InfiniteScrollPage() {
   const [items, setItems] = React.useState<FeedItem[]>(INITIAL_ITEMS);
   const [isLoading, setIsLoading] = React.useState(false);
   const [hasMore, setHasMore] = React.useState(true);

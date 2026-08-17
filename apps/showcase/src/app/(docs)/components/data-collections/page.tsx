@@ -31,7 +31,7 @@ import {
   Banner,
 } from '@ds/ui';
 
-export default function DataCollectionsDocsPage() {
+export default function DataCollectionsPage() {
   // TreeView State
   const [selectedNode, setSelectedNode] = React.useState<string>('page-header');
   const treeNodes: TreeNode[] = [

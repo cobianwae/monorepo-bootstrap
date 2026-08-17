@@ -13,7 +13,7 @@ import {
   Badge,
 } from '@ds/ui';
 import { BookOpen, Sliders } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 import { useTheme } from '@/components/theme-provider';
 
 const PAIRING_EXAMPLES = [

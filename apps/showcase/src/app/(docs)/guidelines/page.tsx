@@ -16,7 +16,7 @@ import {
   ShieldCheck,
   BookOpen,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 export default function GuidelinesPage() {
   return (

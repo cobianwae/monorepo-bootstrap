@@ -32,7 +32,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 import { useClinic } from '@/scenarios/clinic/store/clinic-context';
 import type { PaymentMethod, Transaction } from '@/scenarios/clinic/types';
 

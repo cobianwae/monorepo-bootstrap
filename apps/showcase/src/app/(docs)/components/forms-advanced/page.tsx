@@ -33,7 +33,7 @@ import {
   Wand2,
   CheckCircle2,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 const SECTION_IDS = [
   { id: 'combobox', label: 'Combobox / Autocomplete' },

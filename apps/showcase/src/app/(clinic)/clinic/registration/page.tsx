@@ -26,7 +26,7 @@ import {
   DescriptionList,
   type DescriptionListItem,
 } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 import { useClinic } from '@/scenarios/clinic/store/clinic-context';
 import type { WeightLossProgram } from '@/scenarios/clinic/types';
 

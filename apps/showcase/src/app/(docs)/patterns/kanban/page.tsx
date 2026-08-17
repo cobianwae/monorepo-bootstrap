@@ -20,7 +20,7 @@ import {
   ArrowRight,
   Briefcase,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 const PRIORITY_BADGE: Record<string, 'destructive' | 'warning' | 'secondary'> = {
   urgent: 'destructive',

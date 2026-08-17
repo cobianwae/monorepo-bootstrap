@@ -24,7 +24,7 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import { cn } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 interface UploadFile {
   id: string;
@@ -56,7 +56,7 @@ function validateFile(file: File): string | null {
   return null;
 }
 
-export default function FileUploadPatternPage() {
+export default function FileUploadPage() {
   const [files, setFiles] = React.useState<UploadFile[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);

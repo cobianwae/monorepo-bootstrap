@@ -28,7 +28,7 @@ import {
   Eye,
   Wand2,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 import { useTheme } from '@/components/theme-provider';
 
 export default function ThemesPage() {

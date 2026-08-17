@@ -28,9 +28,9 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
-export default function AuthPatternPage() {
+export default function AuthPage() {
   const [activeTab, setActiveTab] = React.useState('login');
   const [showPassword, setShowPassword] = React.useState(false);
   const [password, setPassword] = React.useState('');

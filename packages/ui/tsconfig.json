@@ -5,7 +5,8 @@
     "paths": {
       "@ds/ui/*": ["./src/*"],
       "@ds/tokens": ["../tokens/src/index.ts"],
-      "@ds/tokens/*": ["../tokens/src/*"]
+      "@ds/tokens/*": ["../tokens/src/*"],
+      "@shared/types": ["../shared-types/src/index.ts"]
     }
   },
   "include": ["src/**/*"]

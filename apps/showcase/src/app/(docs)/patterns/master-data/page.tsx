@@ -62,7 +62,7 @@ import {
   Stethoscope,
   ArrowRight,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 import type { MasterDataItem } from '@shared/types';
 
 const INITIAL_ITEMS: MasterDataItem[] = [
@@ -118,7 +118,7 @@ const INITIAL_ITEMS: MasterDataItem[] = [
   },
 ];
 
-export default function MasterDataPatternPage() {
+export default function MasterDataPage() {
   const [items, setItems] = React.useState<MasterDataItem[]>(INITIAL_ITEMS);
   const [search, setSearch] = React.useState('');
   const [activeCategory, setActiveCategory] = React.useState('all');

@@ -43,7 +43,7 @@ import {
   AlertDialogTitle,
   EmptyState,
 } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 import { useClinic } from '@/scenarios/clinic/store/clinic-context';
 import type { Treatment, TreatmentCategory } from '@/scenarios/clinic/types';
 

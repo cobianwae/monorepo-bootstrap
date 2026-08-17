@@ -85,7 +85,7 @@ import {
   Zap,
   Layers,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 const COMPONENT_SECTIONS = [
   { id: 'buttons', label: 'Buttons & Actions' },

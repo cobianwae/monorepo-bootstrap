@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { Star, Quote } from 'lucide-react';
+import { Quote } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './avatar';
+import { Rating } from './rating';
 
 export const testimonialCardVariants = cva(
   'relative flex flex-col justify-between rounded-2xl border p-6 sm:p-8 transition-all',
@@ -56,19 +57,7 @@ export const TestimonialCard = React.forwardRef<HTMLDivElement, TestimonialCardP
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            {rating > 0 && (
-              <div className="flex items-center gap-1 text-warning">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={cn(
-                      'h-4 w-4',
-                      i < rating ? 'fill-warning text-warning' : 'text-muted-foreground/30'
-                    )}
-                  />
-                ))}
-              </div>
-            )}
+            {rating > 0 && <Rating value={rating} readOnly size="sm" />}
             <Quote className="h-6 w-6 text-muted-foreground/20 shrink-0" />
           </div>
 

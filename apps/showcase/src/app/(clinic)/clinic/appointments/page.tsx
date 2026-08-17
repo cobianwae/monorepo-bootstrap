@@ -39,8 +39,10 @@ import {
   Avatar,
   AvatarImage,
   AvatarFallback,
+  KanbanBoard,
 } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import type { KanbanColumnData, KanbanItemData } from '@ds/ui';
+import { PageHeader } from '@ds/ui';
 import { useClinic } from '@/scenarios/clinic/store/clinic-context';
 import type {
   AppointmentStatus,
@@ -48,16 +50,12 @@ import type {
   PractitionerRole,
 } from '@/scenarios/clinic/types';
 
-const COLUMNS: Array<{
-  id: AppointmentStatus;
-  title: string;
-  badgeVariant: 'secondary' | 'warning-outline' | 'highlight-outline' | 'success-outline' | 'destructive-outline';
-}> = [
-  { id: 'scheduled', title: 'Scheduled Bookings', badgeVariant: 'secondary' },
-  { id: 'checked-in', title: 'Checked-In (Waiting)', badgeVariant: 'warning-outline' },
-  { id: 'in-consult', title: 'In-Consultation', badgeVariant: 'highlight-outline' },
-  { id: 'completed', title: 'Completed Sessions', badgeVariant: 'success-outline' },
-  { id: 'no-show', title: 'No-Show / Cancelled', badgeVariant: 'destructive-outline' },
+const COLUMNS: Array<{ id: AppointmentStatus; title: string }> = [
+  { id: 'scheduled', title: 'Scheduled Bookings' },
+  { id: 'checked-in', title: 'Checked-In (Waiting)' },
+  { id: 'in-consult', title: 'In-Consultation' },
+  { id: 'completed', title: 'Completed Sessions' },
+  { id: 'no-show', title: 'No-Show / Cancelled' },
 ];
 
 export default function AppointmentsPage() {
@@ -92,6 +90,146 @@ export default function AppointmentsPage() {
       return matchesRole && matchesDate;
     });
   }, [appointments, roleFilter, selectedDate]);
+
+  const kanbanColumns: KanbanColumnData[] = React.useMemo(
+    () =>
+      COLUMNS.map((col) => ({
+        id: col.id,
+        title: col.title,
+        items: filteredAppointments
+          .filter((a) => a.status === col.id)
+          .map((a) => a.id),
+      })),
+    [filteredAppointments]
+  );
+
+  const kanbanItems: Record<string, KanbanItemData> = React.useMemo(
+    () =>
+      Object.fromEntries(
+        filteredAppointments.map((a) => [
+          a.id,
+          { id: a.id, title: a.patientName, label: a.timeSlot },
+        ])
+      ),
+    [filteredAppointments]
+  );
+
+  const handleColumnsChange = (next: KanbanColumnData[]) => {
+    for (const column of next) {
+      const prev = kanbanColumns.find((c) => c.id === column.id);
+      const prevIds = new Set(prev?.items ?? []);
+      for (const itemId of column.items) {
+        if (!prevIds.has(itemId)) {
+          updateAppointmentStatus(itemId, column.id as AppointmentStatus);
+        }
+      }
+    }
+  };
+
+  const renderAppointmentCard = (item: KanbanItemData) => {
+    const appt = appointments.find((a) => a.id === item.id);
+    if (!appt) return null;
+
+    return (
+      <Card className="p-3.5 bg-card border-border shadow-xs hover:border-primary/50 transition-all space-y-2.5">
+        {/* Header: Patient Info & Avatar */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Avatar size="sm" className="h-7 w-7">
+              {appt.patientAvatar && (
+                <AvatarImage src={appt.patientAvatar} alt={appt.patientName} />
+              )}
+              <AvatarFallback className="text-[10px] font-display">
+                {appt.patientName.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="font-display font-bold text-xs text-foreground leading-tight">
+                {appt.patientName}
+              </p>
+              <span className="text-[10px] font-mono text-muted-foreground block">
+                {appt.id}
+              </span>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setApptToCancel(appt.id)}
+            className="text-muted-foreground hover:text-destructive transition-colors p-0.5 cursor-pointer"
+            title="Cancel Appointment"
+          >
+            <Trash2 className="h-3 w-3" />
+          </button>
+        </div>
+
+        {/* Slot & Room */}
+        <div className="space-y-1 text-[11px] text-muted-foreground font-mono">
+          <div className="flex items-center gap-1.5 text-foreground font-medium">
+            <Clock className="h-3 w-3 text-primary" />
+            <span>{appt.timeSlot}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <Building className="h-3 w-3" />
+            <span>
+              {appt.room} • {appt.practitionerName.split(',')[0]}
+            </span>
+          </div>
+        </div>
+
+        {/* Type Badge */}
+        <div>
+          <Badge variant="outline" size="sm" className="text-[10px] h-4">
+            {appt.type}
+          </Badge>
+        </div>
+
+        {appt.notes && (
+          <p className="text-[11px] text-muted-foreground bg-muted/30 p-2 rounded-md leading-tight line-clamp-2">
+            {appt.notes}
+          </p>
+        )}
+
+        {/* Transition Action Buttons */}
+        <div className="pt-1 border-t border-border/30 flex items-center justify-end gap-1.5">
+          {appt.status === 'scheduled' && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => updateAppointmentStatus(appt.id, 'checked-in')}
+              className="h-6 text-[10px] px-2 gap-1 text-warning border-warning/30 hover:bg-warning/10"
+            >
+              <CheckCircle2 className="h-3 w-3" />
+              Check-In
+            </Button>
+          )}
+
+          {appt.status === 'checked-in' && (
+            <Button
+              size="sm"
+              variant="highlight"
+              onClick={() => updateAppointmentStatus(appt.id, 'in-consult')}
+              className="h-6 text-[10px] px-2 gap-1"
+            >
+              <Stethoscope className="h-3 w-3" />
+              Call In
+            </Button>
+          )}
+
+          {appt.status === 'in-consult' && (
+            <Button
+              size="sm"
+              variant="success"
+              onClick={() => updateAppointmentStatus(appt.id, 'completed')}
+              className="h-6 text-[10px] px-2 gap-1"
+            >
+              <CheckCircle2 className="h-3 w-3" />
+              Finish
+            </Button>
+          )}
+        </div>
+      </Card>
+    );
+  };
 
   const handleCreateAppointment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,137 +317,13 @@ export default function AppointmentsPage() {
       </Card>
 
       {/* 5-Column Kanban Board */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {COLUMNS.map((col) => {
-          const colAppts = filteredAppointments.filter((a) => a.status === col.id);
-
-          return (
-            <div key={col.id} className="flex flex-col space-y-3">
-              {/* Column Header */}
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted/40 border border-border/40">
-                <span className="font-display font-semibold text-xs text-foreground">
-                  {col.title}
-                </span>
-                <Badge variant={col.badgeVariant} size="sm" className="h-5 text-[10px] px-1.5">
-                  {colAppts.length}
-                </Badge>
-              </div>
-
-              {/* Column Cards */}
-              <div className="space-y-3 min-h-[400px] p-1 rounded-xl bg-muted/10 border border-border/30">
-                {colAppts.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center h-32 text-center p-3 text-muted-foreground">
-                    <p className="text-[11px] font-mono">No appointments</p>
-                  </div>
-                ) : (
-                  colAppts.map((appt) => {
-                    return (
-                      <Card
-                        key={appt.id}
-                        className="p-3.5 bg-card border-border shadow-xs hover:border-primary/50 transition-all space-y-2.5"
-                      >
-                        {/* Header: Patient Info & Avatar */}
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <Avatar size="sm" className="h-7 w-7">
-                              {appt.patientAvatar && (
-                                <AvatarImage src={appt.patientAvatar} alt={appt.patientName} />
-                              )}
-                              <AvatarFallback className="text-[10px] font-display">
-                                {appt.patientName.slice(0, 2).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-display font-bold text-xs text-foreground leading-tight">
-                                {appt.patientName}
-                              </p>
-                              <span className="text-[10px] font-mono text-muted-foreground block">
-                                {appt.id}
-                              </span>
-                            </div>
-                          </div>
-
-                          <button
-                            onClick={() => setApptToCancel(appt.id)}
-                            className="text-muted-foreground hover:text-destructive transition-colors p-0.5 cursor-pointer"
-                            title="Cancel Appointment"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </button>
-                        </div>
-
-                        {/* Slot & Room */}
-                        <div className="space-y-1 text-[11px] text-muted-foreground font-mono">
-                          <div className="flex items-center gap-1.5 text-foreground font-medium">
-                            <Clock className="h-3 w-3 text-primary" />
-                            <span>{appt.timeSlot}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <Building className="h-3 w-3" />
-                            <span>{appt.room} • {appt.practitionerName.split(',')[0]}</span>
-                          </div>
-                        </div>
-
-                        {/* Type Badge */}
-                        <div>
-                          <Badge variant="outline" size="sm" className="text-[10px] h-4">
-                            {appt.type}
-                          </Badge>
-                        </div>
-
-                        {appt.notes && (
-                          <p className="text-[11px] text-muted-foreground bg-muted/30 p-2 rounded-md leading-tight line-clamp-2">
-                            {appt.notes}
-                          </p>
-                        )}
-
-                        {/* Transition Action Buttons */}
-                        <div className="pt-1 border-t border-border/30 flex items-center justify-end gap-1.5">
-                          {appt.status === 'scheduled' && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => updateAppointmentStatus(appt.id, 'checked-in')}
-                              className="h-6 text-[10px] px-2 gap-1 text-warning border-warning/30 hover:bg-warning/10"
-                            >
-                              <CheckCircle2 className="h-3 w-3" />
-                              Check-In
-                            </Button>
-                          )}
-
-                          {appt.status === 'checked-in' && (
-                            <Button
-                              size="sm"
-                              variant="highlight"
-                              onClick={() => updateAppointmentStatus(appt.id, 'in-consult')}
-                              className="h-6 text-[10px] px-2 gap-1"
-                            >
-                              <Stethoscope className="h-3 w-3" />
-                              Call In
-                            </Button>
-                          )}
-
-                          {appt.status === 'in-consult' && (
-                            <Button
-                              size="sm"
-                              variant="success"
-                              onClick={() => updateAppointmentStatus(appt.id, 'completed')}
-                              className="h-6 text-[10px] px-2 gap-1"
-                            >
-                              <CheckCircle2 className="h-3 w-3" />
-                              Finish
-                            </Button>
-                          )}
-                        </div>
-                      </Card>
-                    );
-                  })
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <KanbanBoard
+        columns={kanbanColumns}
+        items={kanbanItems}
+        onColumnsChange={handleColumnsChange}
+        renderItem={renderAppointmentCard}
+        className="-mx-1 px-1"
+      />
 
       {/* Book Appointment Modal Dialog */}
       <Dialog open={isBookModalOpen} onOpenChange={setIsBookModalOpen}>

@@ -52,7 +52,8 @@ import {
   AvatarImage,
   AvatarFallback,
 } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
+import { useDebounce } from '@ds/ui';
 import { useClinic } from '@/scenarios/clinic/store/clinic-context';
 import {
   PatientSummaryCard,
@@ -75,6 +76,7 @@ export default function PatientsDirectoryPage() {
   } = useClinic();
 
   const [searchTerm, setSearchTerm] = React.useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 250);
   const [selectedProgram, setSelectedProgram] = React.useState<string>('all');
   const [selectedStatus, setSelectedStatus] = React.useState<string>('all');
   const [isEmrOpen, setIsEmrOpen] = React.useState(false);
@@ -90,9 +92,9 @@ export default function PatientsDirectoryPage() {
   const filteredPatients = React.useMemo(() => {
     return patients.filter((p) => {
       const matchesSearch =
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.email.toLowerCase().includes(searchTerm.toLowerCase());
+        p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        p.id.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+        p.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
 
       const matchesProgram =
         selectedProgram === 'all' || p.program === selectedProgram;
@@ -102,7 +104,7 @@ export default function PatientsDirectoryPage() {
 
       return matchesSearch && matchesProgram && matchesStatus;
     });
-  }, [patients, searchTerm, selectedProgram, selectedStatus]);
+  }, [patients, debouncedSearchTerm, selectedProgram, selectedStatus]);
 
   const patientDoctorNotes = React.useMemo(
     () => doctorNotes.filter((n) => n.patientId === activePatient?.id),

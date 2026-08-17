@@ -46,7 +46,7 @@ import {
   GradientText,
 } from '@ds/ui';
 import { useCrm } from '@/scenarios/crm/store/crm-context';
-import { useDebounce } from '@/scenarios/crm/lib/use-debounce';
+import { useDebounce } from '@ds/ui';
 import type { ChannelType, ConversationStatus, Conversation, Lead } from '@/scenarios/crm/types';
 
 const CHANNEL_ICONS: Record<ChannelType, React.ComponentType<{ className?: string }>> = {

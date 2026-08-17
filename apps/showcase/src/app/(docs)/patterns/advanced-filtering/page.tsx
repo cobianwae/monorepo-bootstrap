@@ -51,7 +51,7 @@ import {
   RefreshCw,
   Info,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 interface Task {
   id: string;

@@ -45,7 +45,7 @@ interface FormSchema {
   notes: string;
 }
 
-export default function FormsCoreDocsPage() {
+export default function FormsCorePage() {
   const [submittedData, setSubmittedData] = React.useState<FormSchema | null>(null);
   const [selectedPlan, setSelectedPlan] = React.useState('pro');
 

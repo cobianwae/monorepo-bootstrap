@@ -26,7 +26,7 @@ import {
   TabsContent,
   Slider,
 } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 import { useClinic } from '@/scenarios/clinic/store/clinic-context';
 import { PatientSummaryCard } from '@/scenarios/clinic/components/patient-summary-card';
 import type { ScreeningType } from '@/scenarios/clinic/types';

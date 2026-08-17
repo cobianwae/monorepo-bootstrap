@@ -36,7 +36,7 @@ import {
   GradientText,
   toast,
 } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 import { useCrm } from '@/scenarios/crm/store/crm-context';
 import { streamAiDraftReply } from '@/scenarios/crm/lib/mock-api';
 

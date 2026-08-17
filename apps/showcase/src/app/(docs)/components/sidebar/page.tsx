@@ -35,7 +35,7 @@ import {
   Banner,
 } from '@ds/ui';
 
-export default function SidebarDocsPage() {
+export default function SidebarPage() {
   const [activeItem, setActiveItem] = React.useState('dashboard');
 
   const tocHeadings = [

@@ -6,7 +6,7 @@ import {
   AvatarFallback,
   Badge,
   Card,
-  Progress,
+  MetricTilesCard,
 } from '@ds/ui';
 import type { Patient } from '../types';
 import { TrendingDown } from 'lucide-react';
@@ -45,10 +45,7 @@ export function getBmiCategory(bmi: number): { label: string; color: string } {
   return { label: 'Obese Class II+', color: 'text-destructive' };
 }
 
-export function PatientSummaryCard({
-  patient,
-  className,
-}: PatientSummaryCardProps) {
+export function PatientSummaryCard({ patient, className }: PatientSummaryCardProps) {
   const totalWeightLoss = Number((patient.startWeight - patient.currentWeight).toFixed(1));
   const totalTargetLoss = Math.max(0.1, patient.startWeight - patient.targetWeight);
   const progressPct = Math.min(
@@ -69,7 +66,6 @@ export function PatientSummaryCard({
   return (
     <Card className={`p-4 md:p-6 bg-card border-border shadow-xs ${className || ''}`}>
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-        {/* Left: Patient Avatar & Core Demographics */}
         <div className="flex items-start gap-4">
           <Avatar size="lg" className="h-14 w-14 ring-2 ring-primary/20">
             {patient.avatarUrl && <AvatarImage src={patient.avatarUrl} alt={patient.name} />}
@@ -91,7 +87,9 @@ export function PatientSummaryCard({
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground flex flex-wrap items-center gap-2">
-              <span>{patient.age} y/o {patient.gender}</span>
+              <span>
+                {patient.age} y/o {patient.gender}
+              </span>
               <span>•</span>
               <span>Height: {patient.height} cm</span>
               <span>•</span>
@@ -100,52 +98,64 @@ export function PatientSummaryCard({
               <span>Last Visit: {patient.lastVisit}</span>
             </p>
             <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-muted-foreground font-mono">
-              <span>Doctor: <strong className="text-foreground font-sans font-medium">{patient.assignedDoctor.split(',')[0]}</strong></span>
+              <span>
+                Doctor:{' '}
+                <strong className="text-foreground font-sans font-medium">
+                  {patient.assignedDoctor.split(',')[0]}
+                </strong>
+              </span>
               <span>|</span>
-              <span>Diet: <strong className="text-foreground font-sans font-medium">{patient.assignedDietician.split(',')[0]}</strong></span>
+              <span>
+                Diet:{' '}
+                <strong className="text-foreground font-sans font-medium">
+                  {patient.assignedDietician.split(',')[0]}
+                </strong>
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Right: Weight Metric Tiles & Goal Progress */}
-        <div className="flex flex-col gap-3 min-w-[280px] lg:max-w-md bg-muted/30 p-3.5 rounded-xl border border-border/50">
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="bg-background/80 p-2 rounded-lg border border-border/40">
-              <span className="text-[10px] uppercase font-mono text-muted-foreground block">Start</span>
-              <span className="font-display font-bold text-sm text-foreground">{patient.startWeight} kg</span>
-            </div>
-            <div className="bg-background/80 p-2 rounded-lg border border-border/40 ring-1 ring-primary/30">
-              <span className="text-[10px] uppercase font-mono text-primary font-semibold block">Current</span>
-              <span className="font-display font-bold text-base text-foreground">{patient.currentWeight} kg</span>
-            </div>
-            <div className="bg-background/80 p-2 rounded-lg border border-border/40">
-              <span className="text-[10px] uppercase font-mono text-muted-foreground block">Target</span>
-              <span className="font-display font-bold text-sm text-success">{patient.targetWeight} kg</span>
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <div className="flex justify-between items-center text-xs">
-              <span className="text-muted-foreground flex items-center gap-1 font-medium">
-                <TrendingDown className="h-3.5 w-3.5 text-success" />
-                Lost <strong className="text-success font-bold font-mono">-{totalWeightLoss} kg</strong>
+        <MetricTilesCard
+          tiles={[
+            { label: 'Start', value: patient.startWeight, unit: 'kg' },
+            {
+              label: 'Current',
+              value: patient.currentWeight,
+              unit: 'kg',
+              highlight: true,
+              tone: 'primary',
+            },
+            { label: 'Target', value: patient.targetWeight, unit: 'kg', tone: 'success' },
+          ]}
+          progress={{
+            value: progressPct,
+            label: (
+              <>
+                Lost{' '}
+                <strong className="text-success font-bold font-mono">-{totalWeightLoss} kg</strong>
+              </>
+            ),
+            sublabel: `${progressPct}% to goal`,
+            icon: TrendingDown,
+          }}
+          footer={
+            <>
+              <span className="text-muted-foreground">
+                BMI:{' '}
+                <strong className="text-foreground font-mono font-bold">{patient.bmi}</strong> (
+                {bmiInfo.label})
               </span>
-              <span className="font-mono text-[11px] font-semibold text-foreground">
-                {progressPct}% to goal
+              <span className="text-muted-foreground">
+                Body Fat:{' '}
+                <strong className="text-foreground font-mono font-bold">
+                  {patient.bodyFatPct}%
+                </strong>
               </span>
-            </div>
-            <Progress value={progressPct} className="h-2 bg-muted" />
-          </div>
-
-          <div className="flex items-center justify-between text-[11px] pt-1 border-t border-border/30">
-            <span className="text-muted-foreground">
-              BMI: <strong className="text-foreground font-mono font-bold">{patient.bmi}</strong> ({bmiInfo.label})
-            </span>
-            <span className="text-muted-foreground">
-              Body Fat: <strong className="text-foreground font-mono font-bold">{patient.bodyFatPct}%</strong>
-            </span>
-          </div>
-        </div>
+            </>
+          }
+          className="flex-none lg:max-w-md"
+          containerClassName="min-w-[280px]"
+        />
       </div>
     </Card>
   );

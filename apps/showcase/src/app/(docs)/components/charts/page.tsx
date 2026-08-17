@@ -19,7 +19,7 @@ import {
   SegmentedControlItem,
 } from '@ds/ui';
 import { Sparkles, TrendingUp, DollarSign, Users, ShoppingCart, Activity } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 const MONTHLY = [
   { month: 'Jan', revenue: 4200, cost: 3100, profit: 1100, users: 210 },

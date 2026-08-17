@@ -60,7 +60,7 @@ import {
   Banner,
 } from '@ds/ui';
 
-export default function PrimitivesDocsPage() {
+export default function PrimitivesPage() {
   const [collapsibleOpen, setCollapsibleOpen] = React.useState(false);
   const [activeBottomTab, setActiveBottomTab] = React.useState('home');
 

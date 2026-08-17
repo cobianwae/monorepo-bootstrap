@@ -45,9 +45,9 @@ import {
   SlidersHorizontal,
   FolderLock,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
-export default function OverlaysPatternPage() {
+export default function OverlaysPage() {
   const [dbNameInput, setDbNameInput] = React.useState('');
   const targetDb = 'production-db-v1';
 

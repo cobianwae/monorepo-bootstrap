@@ -35,9 +35,9 @@ import {
   Users,
   HeartPulse,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
-export default function StepperPatternPage() {
+export default function StepperPage() {
   const [currentStep, setCurrentStep] = React.useState(0);
   const [isCompleted, setIsCompleted] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);

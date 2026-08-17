@@ -25,7 +25,7 @@ import {
   Inbox,
   Command,
 } from 'lucide-react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 
 interface SearchableResource {
   value: string;

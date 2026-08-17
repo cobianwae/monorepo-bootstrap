@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { AreaChartComponent, ChartCard } from '@ds/ui';
+import { AreaChartComponent, ChartA11yTable, ChartCard } from '@ds/ui';
 import type { WeightRecord } from '../types';
 
 interface WeightTrajectoryChartProps {
@@ -28,6 +28,17 @@ export function WeightTrajectoryChart({
     }));
   }, [records]);
 
+  const a11yRows = React.useMemo(
+    () =>
+      records.map((r) => ({
+        date: r.date,
+        weight: `${r.weight} kg`,
+        bmi: r.bmi,
+        bodyFat: `${r.bodyFatPct}%`,
+      })),
+    [records]
+  );
+
   return (
     <div className={className}>
       <ChartCard
@@ -36,14 +47,9 @@ export function WeightTrajectoryChart({
         className="border-border bg-card shadow-xs"
       >
         <div className="w-full">
-          <AreaChartComponent
-            data={chartData}
-            dataKey={['weight', 'bodyFat']}
-            xKey="name"
-          />
+          <AreaChartComponent data={chartData} dataKey={['weight', 'bodyFat']} xKey="name" />
         </div>
 
-        {/* Target Weight Marker Strip */}
         {targetWeight && (
           <div className="mt-4 flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2 text-xs border border-border/40">
             <span className="font-mono text-muted-foreground text-[11px]">Target Weight Goal</span>
@@ -51,28 +57,16 @@ export function WeightTrajectoryChart({
           </div>
         )}
 
-        {/* Accessibility sr-only data table mirror */}
-        <table className="sr-only">
-          <caption>Historical weight and body fat measurements</caption>
-          <thead>
-            <tr>
-              <th scope="col">Date</th>
-              <th scope="col">Weight (kg)</th>
-              <th scope="col">BMI</th>
-              <th scope="col">Body Fat (%)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {records.map((r) => (
-              <tr key={r.date}>
-                <td>{r.date}</td>
-                <td>{r.weight} kg</td>
-                <td>{r.bmi}</td>
-                <td>{r.bodyFatPct}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <ChartA11yTable
+          caption="Historical weight and body fat measurements"
+          columns={[
+            { key: 'date', header: 'Date' },
+            { key: 'weight', header: 'Weight (kg)' },
+            { key: 'bmi', header: 'BMI' },
+            { key: 'bodyFat', header: 'Body Fat (%)' },
+          ]}
+          rows={a11yRows}
+        />
       </ChartCard>
     </div>
   );

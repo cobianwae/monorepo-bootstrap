@@ -20,7 +20,7 @@ import {
   BarChartComponent,
   PieChartComponent,
 } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 import { useClinic } from '@/scenarios/clinic/store/clinic-context';
 import { TREATMENT_CATEGORY_DATA } from '@/scenarios/clinic/data/fixtures';
 

@@ -61,9 +61,9 @@ import {
   GradientText,
   toast,
 } from '@ds/ui';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@ds/ui';
 import { useCrm } from '@/scenarios/crm/store/crm-context';
-import { useDebounce } from '@/scenarios/crm/lib/use-debounce';
+import { useDebounce } from '@ds/ui';
 import type { CampaignStatus, CampaignChannel, Campaign } from '@/scenarios/crm/types';
 
 const CHANNEL_CONFIG: Record<
