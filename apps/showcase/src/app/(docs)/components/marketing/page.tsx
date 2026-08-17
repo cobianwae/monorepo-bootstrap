@@ -36,6 +36,8 @@ import {
   FaqSection,
   StatsBand,
   StatItem,
+  StatementCard,
+  DotPattern,
   TableOfContents,
 } from '@ds/ui';
 
@@ -49,6 +51,7 @@ export default function MarketingBlocksPage() {
     { id: 'pricing', text: 'Pricing Matrix', level: 2 },
     { id: 'testimonials', text: 'Testimonials', level: 2 },
     { id: 'logos', text: 'Logo Cloud', level: 2 },
+    { id: 'statement', text: 'Statement Cards', level: 2 },
     { id: 'cta', text: 'Call to Action', level: 2 },
     { id: 'faq', text: 'FAQ Accordion', level: 2 },
   ];
@@ -320,6 +323,54 @@ export default function MarketingBlocksPage() {
                   <LogoItem name="GLOBAL METRICS" />
                   <LogoItem name="APEX STACK" />
                 </LogoCloud>
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* SECTION 6.5: STATEMENT & DOT PATTERN */}
+          <section id="statement" className="space-y-4 scroll-mt-20">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
+                <Sparkles className="h-6 w-6 text-highlight" />
+                <span>Statement Cards & Dot Pattern</span>
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Atmospheric marketing surfaces — statement cards with glow, gradient, and glass variants, plus a decarative dot-pattern backdrop.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <StatementCard variant="neon" glow padding="lg">
+                <h3 className="text-2xl font-extrabold font-display text-foreground mb-2">
+                  Design systems are code, not mood boards.
+                </h3>
+                <p className="statement-muted text-sm text-muted-foreground leading-relaxed">
+                  Every decision is a token, every token is audited, every audit ships in CI.
+                </p>
+              </StatementCard>
+              <StatementCard variant="inverted" padding="lg">
+                <h3 className="text-2xl font-extrabold font-display mb-2">
+                  Perceptual color, guaranteed contrast.
+                </h3>
+                <p className="statement-muted text-sm text-background/70 leading-relaxed">
+                  OKLCH keeps hue stable while lightness moves — so AA/AAA is a property of the system, not a fluke of the design.
+                </p>
+              </StatementCard>
+            </div>
+            <Card>
+              <CardContent className="p-6">
+                <div className="relative overflow-hidden rounded-2xl border border-border bg-muted/20 p-8 sm:p-12 min-h-[180px] flex items-center justify-center">
+                  <DotPattern
+                    width={18}
+                    height={18}
+                    cx={1}
+                    cy={1}
+                    cr={1}
+                    className="opacity-40"
+                  />
+                  <p className="relative z-10 text-sm font-mono text-muted-foreground">
+                    DotPattern · GridPattern · GlowOrb — decorative primitives
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </section>

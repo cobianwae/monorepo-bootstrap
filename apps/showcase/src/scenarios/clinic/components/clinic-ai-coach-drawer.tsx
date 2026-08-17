@@ -54,7 +54,7 @@ export function ClinicAiCoachDrawer() {
     if (isAiCoachOpen && currentPatient) {
       runAnalysis();
     }
-  }, [isAiCoachOpen, currentPatient?.id]);
+  }, [isAiCoachOpen, currentPatient, runAnalysis]);
 
   return (
     <Sheet open={isAiCoachOpen} onOpenChange={(open) => !open && closeAiCoach()}>

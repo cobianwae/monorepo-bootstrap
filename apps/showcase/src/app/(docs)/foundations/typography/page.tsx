@@ -11,10 +11,10 @@ import {
   Input,
   Label,
   Badge,
+  Prose,
 } from '@ds/ui';
 import { BookOpen, Sliders } from 'lucide-react';
-import { PageHeader } from '@ds/ui';
-import { useTheme } from '@/components/theme-provider';
+import { PageHeader, useTheme } from '@ds/ui';
 
 const PAIRING_EXAMPLES = [
   {
@@ -363,6 +363,49 @@ export default function TypographyPage() {
             </Card>
           ))}
         </div>
+      </div>
+
+      {/* Long-Form Reading (Prose) */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-bold text-foreground">Long-Form Reading Surface</h2>
+        <p className="text-sm text-muted-foreground">
+          Rich-text and markdown surfaces use the <code className="font-mono text-xs">Prose</code> component, which styles headings, paragraphs, links, lists, quotes, and code blocks with the typography scale.
+        </p>
+        <Card className="border-border">
+          <CardContent className="p-6 sm:p-8">
+            <Prose>
+              <h2>Design tokens are not a style guide</h2>
+              <p>
+                A token is a <strong>named variable</strong> that encodes a design decision — a color, a
+                spacing step, a duration. What makes a token different from a hardcoded value is
+                <em> provenance</em>: every value traces back to a written rationale and an automated
+                audit, so the system stays coherent as it scales.
+              </p>
+              <blockquote>
+                &ldquo;Consistency is not sameness; it is disciplined variance within a shared language.&rdquo;
+              </blockquote>
+              <h3>Why OKLCH instead of hex or HSL?</h3>
+              <p>
+                OKLCH is a perceptual color space, meaning equal numerical steps produce equal
+                perceived steps. That makes contrast calculations predictable across the entire
+                palette and lets us guarantee WCAG AA/AAA in both light and dark mode.
+              </p>
+              <ul>
+                <li>Perceptually uniform lightness axis (<code>L</code>)</li>
+                <li>Hue (<code>C</code>, <code>H</code>) that stays stable when you scale saturation</li>
+                <li>Automated pairwise contrast auditing in CI</li>
+              </ul>
+              <pre>{`--color-primary: oklch(0.57 0.19 264);
+--color-background: oklch(0.985 0.005 264);
+--color-foreground: oklch(0.19 0.02 264);`}</pre>
+              <hr />
+              <p>
+                Read the <a href="/foundations/colors">Color &amp; Contrast</a> page for the full
+                token table and the audit methodology.
+              </p>
+            </Prose>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

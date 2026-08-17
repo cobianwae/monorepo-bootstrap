@@ -194,8 +194,8 @@ export default function LeadsPage() {
   const sortedLeads = React.useMemo(() => {
     const list = [...filteredLeads];
     list.sort((a, b) => {
-      let aVal: any = a[sortField];
-      let bVal: any = b[sortField];
+      let aVal = a[sortField] as string | number;
+      let bVal = b[sortField] as string | number;
       if (sortField === 'name') {
         aVal = a.name.toLowerCase();
         bVal = b.name.toLowerCase();
@@ -252,14 +252,17 @@ export default function LeadsPage() {
     });
   };
 
-  const handleToggleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortField(field);
-      setSortOrder('desc');
-    }
-  };
+  const handleToggleSort = React.useCallback(
+    (field: SortField) => {
+      if (sortField === field) {
+        setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+      } else {
+        setSortField(field);
+        setSortOrder('desc');
+      }
+    },
+    [sortField]
+  );
 
   const validateLeadForm = (): boolean => {
     const errors: Record<string, string> = {};
@@ -353,13 +356,16 @@ export default function LeadsPage() {
   };
 
   // Bulk operations
-  const handleSelectAllRows = (checked: boolean) => {
-    if (checked) {
-      setSelectedRowIds(new Set(paginatedLeads.map((l) => l.id)));
-    } else {
-      setSelectedRowIds(new Set());
-    }
-  };
+  const handleSelectAllRows = React.useCallback(
+    (checked: boolean) => {
+      if (checked) {
+        setSelectedRowIds(new Set(paginatedLeads.map((l) => l.id)));
+      } else {
+        setSelectedRowIds(new Set());
+      }
+    },
+    [paginatedLeads]
+  );
 
   const handleToggleRowSelect = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -717,6 +723,8 @@ export default function LeadsPage() {
       moveLeadStage,
       openAiDrawer,
       setSelectedLeadId,
+      handleSelectAllRows,
+      handleToggleSort,
     ]
   );
 
@@ -993,6 +1001,9 @@ export default function LeadsPage() {
           <DataTable
             columns={tableColumns}
             data={paginatedLeads}
+            variant="default"
+            size="sm"
+            pagination={{ show: false }}
             onRowClick={(row) => setSelectedLeadId(row.id)}
             emptyTitle="No leads match filters"
             emptyDescription="Try clearing your search query or stage filters to view more opportunities."

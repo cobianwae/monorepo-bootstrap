@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start --port 3001",
     "build:types": "tsc --noEmit",
-    "lint": "echo 'web lint ok'",
+    "lint": "eslint .",
     "test": "echo 'web test ok'"
   },
   "dependencies": {

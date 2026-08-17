@@ -24,15 +24,20 @@ import {
   LayoutDashboard,
   Layers,
   ListTree,
-  PanelLeft,
+  MonitorSmartphone,
+  MousePointerClick,
   Palette,
+  PanelLeft,
   RefreshCw,
+  Rocket,
   Search,
+  Shapes,
   ShieldAlert,
-  SlidersHorizontal,
+  ShieldCheck,
   Sparkles,
   TableProperties,
-  UploadCloud,
+  Timer,
+  Type,
   Wand2,
 } from 'lucide-react';
 import {
@@ -41,8 +46,10 @@ import {
   SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuBadge,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from '@ds/ui';
 
 interface NavItem {
@@ -52,15 +59,30 @@ interface NavItem {
   badge?: string;
 }
 
+interface NavSubSection {
+  label: string;
+  items: NavItem[];
+}
+
 interface NavSection {
   title: string;
-  items: NavItem[];
+  items?: NavItem[];
+  subsections?: NavSubSection[];
 }
 
 export const NAV_SECTIONS: NavSection[] = [
   {
-    title: 'Integrated Scenarios',
+    title: 'Overview',
     items: [
+      { title: 'Introduction', href: '/', icon: Compass },
+      { title: 'Quick Start Guide', href: '/getting-started', icon: Rocket },
+      { title: "What's New", href: '/whats-new', icon: Sparkles, badge: 'v0.2' },
+    ],
+  },
+  {
+    title: 'Playground',
+    items: [
+      { title: 'Landing Page Demo', href: '/landing', icon: Bot, badge: 'Interactive' },
       {
         title: 'CRM Full Suite',
         href: '/crm',
@@ -71,126 +93,93 @@ export const NAV_SECTIONS: NavSection[] = [
         title: 'Weight Loss Clinic (CIS)',
         href: '/clinic',
         icon: HeartPulse,
-        badge: 'New Suite',
+        badge: 'Interactive',
       },
     ],
   },
   {
     title: 'Foundations',
     items: [
-      { title: 'Art Directions', href: '/foundations/themes', icon: Palette, badge: '3 Styles' },
-      { title: 'Color & Contrast Matrix', href: '/foundations/colors', icon: Sparkles },
-      { title: 'Typography Scale', href: '/foundations/typography', icon: BookOpen },
-      { title: 'Spacing, Radius & Motion', href: '/foundations/spacing', icon: Layers },
+      { title: 'Color & Contrast Matrix', href: '/foundations/colors', icon: Palette },
+      { title: 'Typography Scale', href: '/foundations/typography', icon: Type },
+      { title: 'Spacing & Elevation', href: '/foundations/spacing', icon: Layers },
+      { title: 'Motion & Animation', href: '/foundations/motion', icon: Timer },
+      { title: 'Iconography', href: '/foundations/iconography', icon: Shapes },
+      { title: 'Art Directions & Themes', href: '/foundations/themes', icon: Wand2, badge: '3 Styles' },
+      { title: 'Breakpoints & Responsive', href: '/foundations/breakpoints', icon: MonitorSmartphone },
     ],
   },
   {
     title: 'Components',
     items: [
-      { title: 'Core UI Components', href: '/components', icon: Box, badge: '25+' },
-      {
-        title: 'Sidebar Layout System',
-        href: '/components/sidebar',
-        icon: PanelLeft,
-        badge: 'New',
-      },
-      {
-        title: 'Layout & Navigation',
-        href: '/components/layout-nav',
-        icon: Layers,
-        badge: 'New',
-      },
-      {
-        title: 'Carousel & Scroll',
-        href: '/components/carousel',
-        icon: SlidersHorizontal,
-        badge: 'New',
-      },
-      {
-        title: 'Data & Collections',
-        href: '/components/data-collections',
-        icon: Bot,
-        badge: 'New',
-      },
-      {
-        title: 'Marketing Blocks',
-        href: '/components/marketing',
-        icon: Sparkles,
-        badge: 'New',
-      },
-      {
-        title: 'Form Core & Radios',
-        href: '/components/forms-core',
-        icon: FileCheck2,
-        badge: 'New',
-      },
-      {
-        title: 'Advanced Form Kit',
-        href: '/components/forms-advanced',
-        icon: Wand2,
-        badge: 'New',
-      },
-      {
-        title: 'Primitives & Utilities',
-        href: '/components/primitives',
-        icon: Component,
-        badge: 'New',
-      },
-      { title: 'Charts & Data Viz', href: '/components/charts', icon: Activity, badge: 'New' },
+      { title: 'Overview', href: '/components', icon: Box },
+      { title: 'Actions & Inputs', href: '/components/actions-inputs', icon: MousePointerClick },
+      { title: 'Forms', href: '/components/forms', icon: FileCheck2 },
+      { title: 'Layout & Navigation', href: '/components/layout-navigation', icon: PanelLeft },
+      { title: 'Overlays & Menus', href: '/components/overlays-menus', icon: Component },
+      { title: 'Data Display', href: '/components/data-display', icon: TableProperties },
+      { title: 'States & Feedback', href: '/components/states-feedback', icon: ShieldCheck },
+      { title: 'Charts & Data Viz', href: '/components/charts', icon: Activity },
+      { title: 'Marketing', href: '/components/marketing', icon: Sparkles },
     ],
   },
   {
     title: 'UX Scenario Patterns',
-    items: [
-      { title: 'Stepper / Wizard Flow', href: '/patterns/stepper', icon: GitFork, badge: 'UX' },
-      { title: 'Workspace Layout', href: '/patterns/workspace', icon: Layers },
-      { title: 'Data Table & Filtering', href: '/patterns/data-table', icon: TableProperties },
+    subsections: [
       {
-        title: 'Advanced Filtering & Views',
-        href: '/patterns/advanced-filtering',
-        icon: ListTree,
-        badge: 'New',
-      },
-      { title: 'Master Data CRUD', href: '/patterns/master-data', icon: Database },
-      { title: 'Master-Detail Flow', href: '/patterns/master-detail', icon: ListTree },
-      { title: 'Dynamic Form', href: '/patterns/dynamic-form', icon: GitFork, badge: 'New' },
-      {
-        title: 'Kanban & Drag & Drop',
-        href: '/patterns/kanban',
-        icon: Columns3,
-        badge: 'New',
-      },
-      { title: 'Global Search', href: '/patterns/global-search', icon: Search, badge: 'New' },
-      {
-        title: 'Notification Center',
-        href: '/patterns/notifications',
-        icon: BellRing,
-        badge: 'New',
+        label: 'Forms & Flows',
+        items: [
+          { title: 'Stepper / Wizard Flow', href: '/patterns/stepper', icon: GitFork },
+          { title: 'Dynamic Form', href: '/patterns/dynamic-form', icon: Wand2 },
+          { title: 'Master Data CRUD', href: '/patterns/master-data', icon: Database },
+          { title: 'Master-Detail Flow', href: '/patterns/master-detail', icon: ListTree },
+        ],
       },
       {
-        title: 'Result & Error States',
-        href: '/patterns/results',
-        icon: ShieldAlert,
-        badge: 'New',
+        label: 'Data & Productivity',
+        items: [
+          { title: 'Data Table & Filtering', href: '/patterns/data-table', icon: TableProperties },
+          { title: 'Kanban & Drag & Drop', href: '/patterns/kanban', icon: Columns3 },
+          { title: 'Workspace Layout', href: '/patterns/workspace', icon: Layers },
+        ],
       },
-      { title: 'Auth & Onboarding', href: '/patterns/auth', icon: KeyRound },
-      { title: 'Dashboard & Metrics', href: '/patterns/dashboard', icon: LayoutDashboard },
-      { title: 'Overlays & Feedback', href: '/patterns/overlays', icon: BellRing },
       {
-        title: 'Command Palette',
-        href: '/patterns/command-palette',
-        icon: Command,
-        badge: 'New',
+        label: 'Navigation & Search',
+        items: [
+          { title: 'Command Palette', href: '/patterns/command-palette', icon: Command },
+          { title: 'Global Search', href: '/patterns/global-search', icon: Search },
+        ],
       },
-      { title: 'Optimistic Updates', href: '/patterns/optimistic-updates', icon: RefreshCw },
-      { title: 'Infinite Scroll', href: '/patterns/infinite-scroll', icon: InfinityIcon },
-      { title: 'Onboarding Checklist', href: '/patterns/onboarding', icon: Compass },
-      { title: 'File Upload', href: '/patterns/file-upload', icon: UploadCloud },
+      {
+        label: 'Feedback & Async',
+        items: [
+          { title: 'Notification Center', href: '/patterns/notifications', icon: BellRing },
+          { title: 'Optimistic Updates', href: '/patterns/optimistic-updates', icon: RefreshCw },
+          { title: 'Infinite Scroll', href: '/patterns/infinite-scroll', icon: InfinityIcon },
+          { title: 'Result & Error States', href: '/patterns/results', icon: ShieldAlert },
+        ],
+      },
+      {
+        label: 'Access & Onboarding',
+        items: [
+          { title: 'Auth & Security', href: '/patterns/auth', icon: KeyRound },
+          { title: 'Onboarding & First Visit', href: '/patterns/onboarding', icon: Compass },
+        ],
+      },
+      {
+        label: 'Metrics',
+        items: [
+          { title: 'Dashboard & Metrics', href: '/patterns/dashboard', icon: LayoutDashboard },
+        ],
+      },
     ],
   },
   {
     title: 'Design Principles',
-    items: [{ title: 'Visual & A11y Guidelines', href: '/guidelines', icon: BookOpen }],
+    items: [
+      { title: 'Visual & A11y Guidelines', href: '/guidelines', icon: BookOpen },
+      { title: 'Contribution Guide', href: '/contribution', icon: Rocket },
+    ],
   },
 ];
 
@@ -201,12 +190,21 @@ interface ShowcaseNavContentProps {
 export function ShowcaseNavContent({ onNavigate }: ShowcaseNavContentProps) {
   const pathname = usePathname();
 
+  const allItems = useMemo(
+    () =>
+      NAV_SECTIONS.flatMap((section) => [
+        ...(section.items ?? []),
+        ...(section.subsections?.flatMap((sub) => sub.items) ?? []),
+      ]),
+    []
+  );
+
   const activeHref = useMemo(() => {
-    const matches = NAV_SECTIONS.flatMap((section) => section.items).filter(
+    const matches = allItems.filter(
       (item) => pathname === item.href || pathname.startsWith(`${item.href}/`)
     );
     return matches.sort((a, b) => b.href.length - a.href.length)[0]?.href;
-  }, [pathname]);
+  }, [pathname, allItems]);
 
   return (
     <div className="flex-1 space-y-1">
@@ -214,7 +212,7 @@ export function ShowcaseNavContent({ onNavigate }: ShowcaseNavContentProps) {
         <SidebarGroup key={section.title}>
           <SidebarGroupLabel>{section.title}</SidebarGroupLabel>
           <SidebarMenu>
-            {section.items.map((item) => {
+            {section.items?.map((item) => {
               const Icon = item.icon;
               const isActive = activeHref === item.href;
 
@@ -223,22 +221,48 @@ export function ShowcaseNavContent({ onNavigate }: ShowcaseNavContentProps) {
                   <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
                     <Link href={item.href} onClick={onNavigate}>
                       <Icon />
-                      <span>{item.title}</span>
+                      <span className="min-w-0 flex-1 truncate">{item.title}</span>
                       {item.badge && (
-                        <SidebarMenuBadge>
-                          <Badge
-                            variant={isActive ? 'highlight' : 'outline'}
-                            className="text-[10px] px-1.5 py-0.5 font-mono whitespace-nowrap leading-none"
-                          >
-                            {item.badge}
-                          </Badge>
-                        </SidebarMenuBadge>
+                        <Badge
+                          variant={isActive ? 'highlight' : 'outline'}
+                          className="ml-auto shrink-0 text-[10px] px-1.5 py-0.5 font-mono whitespace-nowrap leading-none group-data-[collapsible=icon]:hidden"
+                        >
+                          {item.badge}
+                        </Badge>
                       )}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               );
             })}
+
+            {section.subsections?.map((subsection) => (
+              <SidebarMenuItem key={subsection.label}>
+                <div
+                  className="flex h-7 w-full items-center gap-2 rounded-md px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 select-none"
+                  aria-hidden="true"
+                >
+                  {subsection.label}
+                </div>
+                <SidebarMenuSub>
+                  {subsection.items.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeHref === item.href;
+
+                    return (
+                      <SidebarMenuSubItem key={item.href}>
+                        <SidebarMenuSubButton asChild isActive={isActive}>
+                          <Link href={item.href} onClick={onNavigate}>
+                            <Icon />
+                            <span className="min-w-0 flex-1 truncate">{item.title}</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    );
+                  })}
+                </SidebarMenuSub>
+              </SidebarMenuItem>
+            ))}
           </SidebarMenu>
         </SidebarGroup>
       ))}

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import type * as React from 'react';
 import { CrmProvider } from '@/scenarios/crm/store/crm-context';
 import { CrmSidebar } from '@/scenarios/crm/components/crm-sidebar';
 import { CrmHeader } from '@/scenarios/crm/components/crm-header';

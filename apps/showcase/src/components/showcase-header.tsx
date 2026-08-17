@@ -2,9 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { Sun, Moon, Laptop, ShieldCheck } from 'lucide-react';
-import { Button, SidebarTrigger } from '@ds/ui';
-import { useTheme } from './theme-provider';
-import { PaletteSwitcher } from './palette-switcher';
+import { Button, SidebarTrigger, useTheme, PaletteSwitcher } from '@ds/ui';
 
 export function ShowcaseHeader() {
   const pathname = usePathname();

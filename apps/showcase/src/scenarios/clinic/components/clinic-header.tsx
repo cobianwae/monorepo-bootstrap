@@ -32,10 +32,10 @@ import {
   SidebarTrigger,
   Kbd,
   useSidebar,
+  useTheme,
+  PaletteSwitcher,
 } from '@ds/ui';
 import { useClinic } from '../store/clinic-context';
-import { useTheme } from '@/components/theme-provider';
-import { PaletteSwitcher } from '@/components/palette-switcher';
 
 interface ClinicHeaderProps {
   onOpenCommandPalette: () => void;

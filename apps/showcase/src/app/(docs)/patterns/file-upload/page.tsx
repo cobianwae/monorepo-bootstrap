@@ -194,11 +194,14 @@ error: error ?? undefined,
                     className="flex items-center gap-3 rounded-lg border border-border bg-card/40 p-3"
                   >
                     {file.previewUrl ? (
-                      <img
-                        src={file.previewUrl}
-                        alt=""
-                        className="h-10 w-10 shrink-0 rounded-md object-cover"
-                      />
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={file.previewUrl}
+                          alt=""
+                          className="h-10 w-10 shrink-0 rounded-md object-cover"
+                        />
+                      </>
                     ) : (
                       <div
                         className={cn(

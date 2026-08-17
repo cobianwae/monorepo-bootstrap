@@ -287,7 +287,7 @@ export default function PatientRegistrationPage() {
 
               <div className="space-y-1.5">
                 <Label className="text-xs">Gender *</Label>
-                <Select value={gender} onValueChange={(v: any) => setGender(v)}>
+                <Select value={gender} onValueChange={(v) => setGender(v as 'female' | 'male' | 'other')}>
                   <SelectTrigger className="h-9 text-xs">
                     <SelectValue />
                   </SelectTrigger>

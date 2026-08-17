@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   DollarSign,
   Users,
@@ -52,6 +53,7 @@ const STAGE_PIE_COLORS = [
 ];
 
 export default function CrmDashboardPage() {
+  const router = useRouter();
   const {
     leads,
     activities,
@@ -361,7 +363,7 @@ export default function CrmDashboardPage() {
                 title="No High-Intent Leads Flagged"
                 description="All current opportunities are progressing normally or need initial qualification."
                 actionLabel="View All Leads"
-                onAction={() => window.location.assign('/crm/leads')}
+                onAction={() => router.push('/crm/leads')}
                 className="py-6"
               />
             ) : (

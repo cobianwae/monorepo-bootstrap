@@ -4,9 +4,8 @@ import { useRouter } from 'next/navigation';
 import { Sun, Moon, Laptop, Palette } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { ART_DIRECTIONS, type ThemeId, type ArtDirectionId, getTonesForArtDirection } from '@ds/tokens';
-import { CommandPalette, type CommandPaletteGroup } from '@ds/ui';
+import { CommandPalette, type CommandPaletteGroup, useTheme } from '@ds/ui';
 import { NAV_SECTIONS } from './showcase-nav-content';
-import { useTheme } from './theme-provider';
 
 function itemIcon(kind: 'light' | 'dark' | 'system'): LucideIcon {
   const icons = {
@@ -24,16 +23,20 @@ export function GlobalCommandPalette() {
   const groups: CommandPaletteGroup[] = [
     {
       heading: 'Navigate',
-      items: NAV_SECTIONS.flatMap((section) =>
-        section.items.map((item) => ({
+      items: NAV_SECTIONS.flatMap((section) => {
+        const sectionItems = [
+          ...(section.items ?? []),
+          ...(section.subsections?.flatMap((sub) => sub.items) ?? []),
+        ];
+        return sectionItems.map((item) => ({
           id: item.href,
           label: item.title,
           description: section.title,
           icon: item.icon,
           keywords: [section.title.toLowerCase()],
           onSelect: () => router.push(item.href),
-        }))
-      ),
+        }));
+      }),
     },
     
     {

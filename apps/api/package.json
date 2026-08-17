@@ -6,7 +6,7 @@
     "build": "tsc",
     "build:types": "tsc --noEmit",
     "start": "node dist/main",
-    "lint": "echo 'api lint ok'",
+    "lint": "eslint .",
     "test": "echo 'api test ok'"
   },
   "dependencies": {

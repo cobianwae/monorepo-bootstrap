@@ -237,7 +237,7 @@ export default function ClinicDashboardPage() {
             <div className="flex items-center gap-2">
               <CalendarClock className="h-4 w-4 text-primary" />
               <h3 className="font-display font-bold text-base text-foreground">
-                Today's Schedule ({todayAppointments.length})
+                Today&apos;s Schedule ({todayAppointments.length})
               </h3>
             </div>
             <Link

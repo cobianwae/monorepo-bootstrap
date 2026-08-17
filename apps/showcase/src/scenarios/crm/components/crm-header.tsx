@@ -32,10 +32,10 @@ import {
   SidebarTrigger,
   Kbd,
   useSidebar,
+  useTheme,
+  PaletteSwitcher,
 } from '@ds/ui';
 import { useCrm } from '../store/crm-context';
-import { useTheme } from '@/components/theme-provider';
-import { PaletteSwitcher } from '@/components/palette-switcher';
 
 interface CrmHeaderProps {
   onOpenCommandPalette: () => void;

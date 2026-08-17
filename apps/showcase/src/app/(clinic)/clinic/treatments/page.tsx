@@ -239,17 +239,17 @@ export default function TreatmentsPage() {
             />
           </div>
         ) : (
-          <Table>
-            <TableHeader className="bg-muted/40">
+          <Table variant="striped" size="sm">
+            <TableHeader>
               <TableRow>
-                <TableHead className="font-mono text-[11px] w-32">Code</TableHead>
-                <TableHead className="font-mono text-[11px]">Protocol Name</TableHead>
-                <TableHead className="font-mono text-[11px]">Category</TableHead>
-                <TableHead className="font-mono text-[11px]">Sessions / Duration</TableHead>
-                <TableHead className="font-mono text-[11px]">Retail Price (IDR)</TableHead>
-                <TableHead className="font-mono text-[11px]">Margin</TableHead>
-                <TableHead className="font-mono text-[11px]">Status</TableHead>
-                <TableHead className="text-right font-mono text-[11px]">Actions</TableHead>
+                <TableHead className="w-32">Code</TableHead>
+                <TableHead>Protocol Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Sessions / Duration</TableHead>
+                <TableHead>Retail Price (IDR)</TableHead>
+                <TableHead>Margin</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -261,7 +261,7 @@ export default function TreatmentsPage() {
                 const marginPct = t.price > 0 ? Math.round(((t.price - t.cost) / t.price) * 100) : 0;
 
                 return (
-                  <TableRow key={t.id} className="hover:bg-muted/30 transition-colors">
+                  <TableRow key={t.id}>
                     <TableCell className="font-mono text-xs font-bold text-foreground">
                       {t.code}
                     </TableCell>
@@ -368,7 +368,7 @@ export default function TreatmentsPage() {
 
               <div className="space-y-1">
                 <Label className="text-xs">Category *</Label>
-                <Select value={category} onValueChange={(v: any) => setCategory(v)}>
+                <Select value={category} onValueChange={(v) => setCategory(v as TreatmentCategory)}>
                   <SelectTrigger className="h-9 text-xs">
                     <SelectValue />
                   </SelectTrigger>

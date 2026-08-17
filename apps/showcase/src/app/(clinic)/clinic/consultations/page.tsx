@@ -408,7 +408,7 @@ export default function ConsultationsPage() {
                         <SelectItem value="Julian Hayes, M.Psi.">Julian Hayes, M.Psi.</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Select value={screeningType} onValueChange={(v: any) => setScreeningType(v)}>
+                    <Select value={screeningType} onValueChange={(v) => setScreeningType(v as ScreeningType)}>
                       <SelectTrigger className="h-8 w-36 text-xs font-mono">
                         <SelectValue />
                       </SelectTrigger>
@@ -610,7 +610,7 @@ export default function ConsultationsPage() {
                         <SelectItem value="Tariq Anderson, S.Gz., RD">Tariq Anderson, RD</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Select value={dietPlanType} onValueChange={(v: any) => setDietPlanType(v)}>
+                    <Select value={dietPlanType} onValueChange={(v) => setDietPlanType(v as 'High Protein Balanced' | 'Keto Metabolic' | 'Intermittent 16:8' | 'Plant-Forward GLP-1')}>
                       <SelectTrigger className="h-8 w-48 text-xs">
                         <SelectValue />
                       </SelectTrigger>

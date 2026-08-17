@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono, Space_Grotesk, Sora, IBM_Plex_Sans, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
-import { Toaster } from '@ds/ui';
-import { ThemeProvider } from '../components/theme-provider';
+import { Toaster, ThemeProvider } from '@ds/ui';
 
 const inter = Inter({
   subsets: ['latin'],

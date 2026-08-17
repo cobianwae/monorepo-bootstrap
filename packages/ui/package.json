@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "build:types": "tsc --noEmit",
-    "lint": "echo 'ui lint ok'",
+    "lint": "eslint .",
     "test": "vitest run"
   },
   "dependencies": {

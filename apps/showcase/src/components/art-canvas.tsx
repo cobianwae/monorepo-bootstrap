@@ -1,7 +1,6 @@
 'use client';
 
-import { ArtBackground } from '@ds/ui';
-import { useTheme } from './theme-provider';
+import { ArtBackground, useTheme } from '@ds/ui';
 
 export function ArtCanvas() {
   const { artDirection } = useTheme();

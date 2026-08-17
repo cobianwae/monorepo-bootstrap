@@ -1,4 +1,5 @@
-import { THEMES, ThemeId } from './themes';
+import type { ThemeId } from './themes';
+import { THEMES } from './themes';
 
 export interface RGB {
   r: number;

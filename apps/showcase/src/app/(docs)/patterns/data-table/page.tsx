@@ -14,6 +14,11 @@ import {
   FilterBuilder,
   BulkActionBar,
   Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
   Badge,
   Button,
   Checkbox,
@@ -24,6 +29,7 @@ import {
   ToastAction,
   type FilterChip,
   type FilterFieldDefinition,
+  type SavedFilterView,
 } from '@ds/ui';
 import {
   Trash2,
@@ -127,11 +133,63 @@ function matchesChips(user: User, chips: FilterChip[]): boolean {
   });
 }
 
+const TABLE_VARIANT_SAMPLES = [
+  { name: 'Default', variant: 'default' },
+  { name: 'Striped', variant: 'striped' },
+  { name: 'Bordered', variant: 'bordered' },
+  { name: 'Ghost', variant: 'ghost' },
+] as const;
+
+const TABLE_SIZE_SAMPLES = [
+  { name: 'Compact (sm)', size: 'sm' },
+  { name: 'Default', size: 'default' },
+  { name: 'Relaxed (lg)', size: 'lg' },
+] as const;
+
+const SAMPLE_ROWS = [
+  { id: 'usr_01', name: 'Eleanor Vance', role: 'admin', status: 'active' },
+  { id: 'usr_02', name: 'Marcus Thorne', role: 'editor', status: 'pending' },
+  { id: 'usr_03', name: 'Aria Takahashi', role: 'viewer', status: 'inactive' },
+] as const;
+
+function VariantPreview({
+  variant,
+  size,
+}: {
+  variant?: (typeof TABLE_VARIANT_SAMPLES)[number]['variant'];
+  size?: (typeof TABLE_SIZE_SAMPLES)[number]['size'];
+}) {
+  return (
+    <Table variant={variant} size={size}>
+      <TableHeader>
+        <TableRow>
+          <TableHead>ID</TableHead>
+          <TableHead>Member</TableHead>
+          <TableHead>Role</TableHead>
+          <TableHead>Status</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {SAMPLE_ROWS.map((row) => (
+          <TableRow key={row.id}>
+            <TableCell className="font-mono">{row.id}</TableCell>
+            <TableCell>{row.name}</TableCell>
+            <TableCell className="capitalize">{row.role}</TableCell>
+            <TableCell className="capitalize">{row.status}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
 export default function DataTablePage() {
   const [data, setData] = React.useState<User[]>(INITIAL_DATA);
   const [chips, setChips] = React.useState<FilterChip[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [hasError, setHasError] = React.useState(false);
+  const [views, setViews] = React.useState<SavedFilterView[]>([]);
+  const [activeViewId, setActiveViewId] = React.useState<string | null>(null);
 
   const filteredData = React.useMemo(
     () => (chips.length === 0 ? data : data.filter((u) => matchesChips(u, chips))),
@@ -199,6 +257,62 @@ export default function DataTablePage() {
       setIsLoading(false);
       setHasError(true);
     }, 600);
+  };
+
+  const handleApplyView = (view: SavedFilterView) => {
+    setChips(view.chips);
+    setActiveViewId(view.id);
+    toast({
+      title: 'View applied',
+      description: `${view.name} (${view.chips.length} filter${view.chips.length > 1 ? 's' : ''})`,
+      variant: 'info',
+    });
+  };
+
+  const handleSaveView = (name: string, viewChips: FilterChip[]) => {
+    const newView: SavedFilterView = { id: `v-${Date.now()}`, name, chips: viewChips };
+    setViews((prev) => [...prev, newView]);
+    setActiveViewId(newView.id);
+    toast({
+      title: 'View saved',
+      description: `${name} (${viewChips.length} filter${viewChips.length > 1 ? 's' : ''})`,
+      variant: 'success',
+    });
+  };
+
+  const handleDeleteView = (id: string) => {
+    const target = views.find((v) => v.id === id);
+    setViews((prev) => prev.filter((v) => v.id !== id));
+    if (activeViewId === id) setActiveViewId(null);
+    if (target) {
+      toast({
+        title: 'Saved view removed',
+        description: target.name,
+        variant: 'default',
+        action: (
+          <ToastAction
+            altText="Undo view deletion"
+            onClick={() => {
+              setViews((prev) => [...prev, target]);
+              setActiveViewId(target.id);
+              toast({ title: 'View restored', description: target.name, variant: 'success' });
+            }}
+          >
+            Undo
+          </ToastAction>
+        ),
+      });
+    }
+  };
+
+  const handleUpdateView = (id: string, viewChips: FilterChip[]) => {
+    const target = views.find((v) => v.id === id);
+    setViews((prev) => prev.map((v) => (v.id === id ? { ...v, chips: viewChips } : v)));
+    toast({
+      title: 'View updated',
+      description: `Updated filters for "${target?.name ?? 'view'}"`,
+      variant: 'success',
+    });
   };
 
   return (
@@ -314,10 +428,102 @@ export default function DataTablePage() {
           ]}
         />
       </div>
+
+      <section className="space-y-4">
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-foreground">
+            Saved Views &amp; Advanced Filtering
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Combine multi-criteria <code className="font-mono text-xs">FilterBuilder</code> chips with
+            persistent saved views: name your current filter set, apply a preset in one click, update it
+            as criteria change, and undo a deletion via toast.
+          </p>
+        </div>
+
+        <div className="rounded-md border border-border bg-card shadow-xs p-4 space-y-4">
+          <FilterBuilder
+            fields={FILTER_FIELDS}
+            chips={chips}
+            onChipsChange={(newChips) => {
+              setChips(newChips);
+              if (activeViewId) {
+                const current = views.find((v) => v.id === activeViewId);
+                if (current && JSON.stringify(current.chips) !== JSON.stringify(newChips)) {
+                  setActiveViewId(null);
+                }
+              }
+            }}
+            savedViews={views}
+            activeViewId={activeViewId ?? undefined}
+            onApplyView={handleApplyView}
+            onSaveView={handleSaveView}
+            onDeleteView={handleDeleteView}
+            onUpdateView={handleUpdateView}
+            maxChips={6}
+          />
+          <p className="text-xs text-muted-foreground">
+            Active filter set: <strong className="text-foreground">{chips.length}</strong> condition
+            {chips.length > 1 ? 's' : ''} ·{' '}
+            <strong className="text-foreground">{filteredData.length}</strong> of {data.length} rows match.
+            {activeViewId && (
+              <span className="text-highlight"> · Current view: {views.find((v) => v.id === activeViewId)?.name}</span>
+            )}
+          </p>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-foreground">
+            Table Variants &amp; Density
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Use the same <code className="font-mono text-xs">Table</code>{' '}
+            primitives across every module (CRM, Clinic, docs) and pick a
+            standardized <code className="font-mono text-xs">variant</code>{' '}
+            and <code className="font-mono text-xs">size</code> instead of
+            hand-rolled className overrides.
+          </p>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {TABLE_VARIANT_SAMPLES.map((sample) => (
+            <div
+              key={sample.variant}
+              className="rounded-md border border-border bg-card shadow-xs overflow-hidden"
+            >
+              <div className="border-b border-border px-3 py-2">
+                <p className="font-mono text-xs font-medium text-foreground">
+                  variant=&quot;{sample.name}&quot;
+                </p>
+              </div>
+              <VariantPreview variant={sample.variant} />
+            </div>
+          ))}
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          {TABLE_SIZE_SAMPLES.map((sample) => (
+            <div
+              key={sample.size}
+              className="rounded-md border border-border bg-card shadow-xs overflow-hidden"
+            >
+              <div className="border-b border-border px-3 py-2">
+                <p className="font-mono text-xs font-medium text-foreground">
+                  size=&quot;{sample.name}&quot;
+                </p>
+              </div>
+              <VariantPreview size={sample.size} />
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TanStack ColumnDef TValue invariant, mixed column types
 function buildColumns(): ColumnDef<User, any>[] {
   const columnHelper = createColumnHelper<User>();
 

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "build:types": "tsc --noEmit",
-    "lint": "echo 'showcase lint ok'"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@ds/tokens": "workspace:*",

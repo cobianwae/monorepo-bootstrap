@@ -242,16 +242,16 @@ export default function PatientsDirectoryPage() {
             />
           </div>
         ) : (
-          <Table>
-            <TableHeader className="bg-muted/40">
+          <Table variant="striped" size="sm">
+            <TableHeader>
               <TableRow>
-                <TableHead className="w-12 font-mono text-[11px]">ID</TableHead>
-                <TableHead className="font-mono text-[11px]">Patient</TableHead>
-                <TableHead className="font-mono text-[11px]">Program</TableHead>
-                <TableHead className="font-mono text-[11px]">Weight Trajectory</TableHead>
-                <TableHead className="font-mono text-[11px]">BMI / Status</TableHead>
-                <TableHead className="font-mono text-[11px]">Assigned Doctor</TableHead>
-                <TableHead className="text-right font-mono text-[11px]">Actions</TableHead>
+                <TableHead className="w-12">ID</TableHead>
+                <TableHead>Patient</TableHead>
+                <TableHead>Program</TableHead>
+                <TableHead>Weight Trajectory</TableHead>
+                <TableHead>BMI / Status</TableHead>
+                <TableHead>Assigned Doctor</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -264,7 +264,7 @@ export default function PatientsDirectoryPage() {
                 return (
                   <TableRow
                     key={patient.id}
-                    className="cursor-pointer hover:bg-muted/30 transition-colors"
+                    className="cursor-pointer"
                     onClick={() => handleOpenEmr(patient.id)}
                   >
                     <TableCell className="font-mono text-xs font-semibold text-muted-foreground">
@@ -411,13 +411,13 @@ export default function PatientsDirectoryPage() {
                   <h4 className="text-xs font-semibold font-display uppercase tracking-wider text-foreground">
                     Historical Weigh-In Log ({activePatient.weightHistory.length} readings)
                   </h4>
-                  <Table>
-                    <TableHeader className="bg-muted/40">
+                  <Table variant="default" size="sm">
+                    <TableHeader>
                       <TableRow>
-                        <TableHead className="font-mono text-[11px]">Date</TableHead>
-                        <TableHead className="font-mono text-[11px]">Weight (kg)</TableHead>
-                        <TableHead className="font-mono text-[11px]">BMI</TableHead>
-                        <TableHead className="font-mono text-[11px]">Body Fat (%)</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Weight (kg)</TableHead>
+                        <TableHead>BMI</TableHead>
+                        <TableHead>Body Fat (%)</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

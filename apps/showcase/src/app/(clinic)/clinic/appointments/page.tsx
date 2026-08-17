@@ -357,8 +357,8 @@ export default function AppointmentsPage() {
                 <Label className="text-xs">Practitioner Discipline</Label>
                 <Select
                   value={practitionerRole}
-                  onValueChange={(v: any) => {
-                    setPractitionerRole(v);
+                  onValueChange={(v) => {
+                    setPractitionerRole(v as PractitionerRole);
                     const matched = staff.find((s) => s.role === v);
                     if (matched) {
                       setPractitionerName(matched.name);
@@ -397,7 +397,7 @@ export default function AppointmentsPage() {
 
               <div className="space-y-1">
                 <Label className="text-xs">Appointment Type</Label>
-                <Select value={type} onValueChange={(v: any) => setType(v)}>
+                <Select value={type} onValueChange={(v) => setType(v as AppointmentType)}>
                   <SelectTrigger className="h-9 text-xs">
                     <SelectValue />
                   </SelectTrigger>
@@ -477,7 +477,7 @@ export default function AppointmentsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle className="text-base font-display">Cancel Appointment Booking?</AlertDialogTitle>
             <AlertDialogDescription className="text-xs">
-              This will remove the appointment from today's schedule and notify the patient.
+              This will remove the appointment from today&apos;s schedule and notify the patient.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import type * as React from 'react';
 import { SidebarProvider } from '@ds/ui';
 import { ArtCanvas } from '@/components/art-canvas';
 import { ShowcaseHeader } from '@/components/showcase-header';

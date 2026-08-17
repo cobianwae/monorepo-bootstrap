@@ -1,28 +1,20 @@
 'use client';
 
-import * as React from 'react';
 import { SPACING_SCALE, RADII_SCALE } from '@ds/tokens';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button } from '@ds/ui';
-import { Play, Sparkles } from 'lucide-react';
+import { Card, CardContent } from '@ds/ui';
+import { Sparkles } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
 
 export default function SpacingPage() {
-  const [animate, setAnimate] = React.useState(false);
-
-  const triggerAnimation = () => {
-    setAnimate(false);
-    setTimeout(() => setAnimate(true), 50);
-  };
-
   return (
     <div className="space-y-10 animate-in fade-in-50 duration-200">
       <PageHeader
         eyebrow="Foundations"
         eyebrowIcon={Sparkles}
-        title="Spacing, Radii & Motion"
+        title="Spacing, Radii & Elevation"
         description={
           <>
-            Spatial rhythm based on a strict <strong>4px baseline grid</strong>, ergonomic boundary radii, and natural spring-physics motion tokens for intentional micro-interactions.
+            Spatial rhythm based on a strict <strong>4px baseline grid</strong>, ergonomic boundary radii, and an elevation scale that separates surfaces by depth.
           </>
         }
       />
@@ -73,70 +65,29 @@ export default function SpacingPage() {
         </div>
       </div>
 
-      {/* Motion & Transition Tokens */}
+      {/* Elevation Scale */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-foreground">Motion Tokens & Physics</h2>
-          <Button size="sm" onClick={triggerAnimation} className="gap-1.5">
-            <Play className="h-3.5 w-3.5" />
-            Play Animations
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="border-border">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Fast (150ms)</CardTitle>
-              <CardDescription className="text-xs">
-                Micro-interactions, button active states, tooltip fade-in.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-16 w-full rounded-lg bg-muted p-2 flex items-center">
-                <div
-                  className={`h-12 w-12 rounded-lg bg-primary transition-all duration-150 ease-out motion-reduce:transition-none ${
-                    animate ? 'translate-x-[180px] bg-success' : 'translate-x-0'
-                  }`}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Normal (250ms)</CardTitle>
-              <CardDescription className="text-xs">
-                Dropdown menus, modals, tab switching, and accordion expands.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-16 w-full rounded-lg bg-muted p-2 flex items-center">
-                <div
-                  className={`h-12 w-12 rounded-lg bg-primary transition-all duration-normal ease-spring motion-reduce:transition-none ${
-                    animate ? 'translate-x-[180px] bg-success' : 'translate-x-0'
-                  }`}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Slow (400ms)</CardTitle>
-              <CardDescription className="text-xs">
-                Page transitions, large slide-out drawer sheets, multi-step morphing.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-16 w-full rounded-lg bg-muted p-2 flex items-center">
-                <div
-                  className={`h-12 w-12 rounded-lg bg-primary transition-all duration-slow ease-smooth motion-reduce:transition-none ${
-                    animate ? 'translate-x-[180px] bg-success' : 'translate-x-0'
-                  }`}
-                />
-              </div>
-            </CardContent>
-          </Card>
+        <h2 className="text-lg font-bold text-foreground">Elevation &amp; Shadow Scale</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { name: 'xs', use: 'Cards, buttons, stat tiles' },
+            { name: 'sm', use: 'Hovered cards, dropdown menus' },
+            { name: 'md', use: 'Floating panels, sheets' },
+            { name: 'lg', use: 'Modals, overlays, popovers' },
+          ].map((level) => (
+            <Card key={level.name} className="border-border/60">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-semibold text-foreground">Shadow {level.name}</span>
+                  <span className="font-mono text-muted-foreground">{`shadow-${level.name}`}</span>
+                </div>
+                <div className={`h-16 w-full rounded-lg bg-card border border-border shadow-${level.name} flex items-center justify-center`}>
+                  <span className="text-[10px] font-mono text-muted-foreground">Surface</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground">{level.use}</p>
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     </div>

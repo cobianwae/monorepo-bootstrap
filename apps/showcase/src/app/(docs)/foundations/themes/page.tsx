@@ -28,8 +28,7 @@ import {
   Eye,
   Wand2,
 } from 'lucide-react';
-import { PageHeader } from '@ds/ui';
-import { useTheme } from '@/components/theme-provider';
+import { PageHeader, useTheme } from '@ds/ui';
 
 export default function ThemesPage() {
   const { palette, setPalette, resolvedTheme, artDirection, setArtDirection } = useTheme();
@@ -457,7 +456,7 @@ export default function ThemesPage() {
               2. React Theme Provider & Hook
             </h4>
             <pre className="rounded-lg bg-muted/60 p-3.5 text-xs font-mono text-foreground overflow-x-auto border border-border">
-{`import { useTheme } from '@/components/theme-provider';
+{`import { useTheme } from '@ds/ui';
 
 export function ThemeControl() {
   const { artDirection, setArtDirection, palette, setPalette } = useTheme();

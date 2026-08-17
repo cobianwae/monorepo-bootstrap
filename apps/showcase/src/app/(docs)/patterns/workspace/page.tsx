@@ -234,7 +234,7 @@ export default function WorkspacePage() {
 
             {/* Code / Editor Area */}
             <div className="flex-1 p-4 font-mono text-xs overflow-y-auto bg-card/20 space-y-1">
-              <p className="text-muted-foreground">// Active file: {selectedFile}</p>
+              <p className="text-muted-foreground">&#47;&#47; Active file: {selectedFile}</p>
               <p className="text-primary">export interface Config &#123;</p>
               <p className="text-foreground pl-4">clusterId: string;</p>
               <p className="text-foreground pl-4">replicas: number;</p>
@@ -242,7 +242,7 @@ export default function WorkspacePage() {
               <p className="text-foreground pl-4">autoScale: boolean;</p>
               <p className="text-primary">&#125;</p>
               <br />
-              <p className="text-muted-foreground">// Ready for continuous deployment</p>
+              <p className="text-muted-foreground">&#47;&#47; Ready for continuous deployment</p>
               <p className="text-foreground">export const defaultConfig: Config = &#123;</p>
               <p className="text-foreground pl-4">clusterId: &apos;cls_9281a8c&apos;,</p>
               <p className="text-foreground pl-4">replicas: 3,</p>
