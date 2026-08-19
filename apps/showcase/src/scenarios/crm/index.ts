@@ -7,3 +7,8 @@ export * from './components/crm-command-palette';
 export * from './components/crm-copilot-drawer';
 export * from './components/crm-header';
 export * from './components/crm-sidebar';
+export * from './components/crm-executive-briefing';
+export * from './components/crm-revenue-story-card';
+export * from './components/crm-pipeline-funnel-card';
+export * from './components/crm-deal-radar-card';
+export * from './components/crm-omnichannel-pulse-card';
