@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowLeft, Building2 } from 'lucide-react';
+import { ArrowLeft, Navigation } from 'lucide-react';
 import {
   cn,
   Badge,
@@ -29,10 +29,10 @@ interface CrmSidebarProps {
 }
 
 const AGENT_STATUS_CONFIG: Record<AgentStatus, { label: string; dotColor: string }> = {
-  available: { label: 'Available', dotColor: 'bg-success ring-success/20' },
-  busy: { label: 'Busy on Call', dotColor: 'bg-warning ring-warning/20' },
-  away: { label: 'Away', dotColor: 'bg-muted-foreground ring-muted-foreground/20' },
-  offline: { label: 'Offline', dotColor: 'bg-muted ring-muted/20' },
+  available: { label: 'Available', dotColor: 'bg-success' },
+  busy: { label: 'Busy on Call', dotColor: 'bg-warning' },
+  away: { label: 'Away', dotColor: 'bg-muted-foreground' },
+  offline: { label: 'Offline', dotColor: 'bg-muted' },
 };
 
 const AGENT_STATUS_OPTIONS = (Object.keys(AGENT_STATUS_CONFIG) as AgentStatus[]).map((key) => ({
@@ -68,25 +68,41 @@ export function CrmSidebar({ onNavigateMobile }: CrmSidebarProps) {
   const navItems = CRM_NAV_ITEMS.map((item) => {
     switch (item.id) {
       case 'nav-leads':
-        return { ...item, badge: leads.length.toString(), badgeVariant: 'outline' as const };
+        return {
+          ...item,
+          badge: leads.length > 0 ? leads.length.toString() : undefined,
+          badgeVariant: 'secondary' as const,
+        };
       case 'nav-campaigns':
         return {
           ...item,
           badge: activeCampaignsCount > 0 ? `${activeCampaignsCount} Live` : undefined,
-          badgeVariant: 'highlight' as const,
+          badgeVariant: 'success-outline' as const,
         };
       case 'nav-contact-center':
         return {
           ...item,
           badge: unreadMessagesCount > 0 ? `${unreadMessagesCount}` : undefined,
-          badgeVariant: 'destructive' as const,
+          badgeVariant: 'destructive-outline' as const,
         };
       case 'nav-ai':
-        return { ...item, badge: 'Copilot', badgeVariant: 'highlight' as const };
+        return {
+          ...item,
+          badge: 'Copilot',
+          badgeVariant: 'highlight-outline' as const,
+        };
       default:
         return item;
     }
   });
+
+  const salesItems = navItems.filter((i) => i.id !== 'nav-ai');
+  const aiItems = navItems.filter((i) => i.id === 'nav-ai');
+
+  const navGroups = [
+    { label: 'Sales & Channels', items: salesItems },
+    { label: 'AI & Intelligence', items: aiItems },
+  ];
 
   return (
     <Sidebar collapsible="icon">
@@ -97,18 +113,18 @@ export function CrmSidebar({ onNavigateMobile }: CrmSidebarProps) {
             className="flex items-center gap-2.5 group transition-opacity hover:opacity-90"
             onClick={handleNav}
           >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-highlight text-primary-foreground shadow-xs group-hover:scale-105 transition-transform font-display shrink-0">
-              <Building2 className="h-4.5 w-4.5" />
-            </div>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-background shadow-sm group-hover:scale-105 transition-transform">
+              <Navigation className="h-4 w-4 fill-current" aria-hidden="true" />
+            </span>
             <div className="flex flex-col min-w-0">
-              <span className="font-semibold text-sm tracking-tight text-foreground font-display group-hover:text-highlight transition-colors flex items-center gap-1.5 truncate">
-                Acme CRM
-                <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 font-mono">
+              <span className="font-semibold text-sm tracking-tight text-foreground font-display group-hover:text-primary transition-colors flex items-center gap-1.5 truncate">
+                Arah CRM
+                <Badge variant="highlight-outline" className="text-[10px] px-1.5 py-0 h-4 font-mono font-medium">
                   v2.4
                 </Badge>
               </span>
               <span className="text-[10px] text-muted-foreground uppercase font-mono tracking-wider truncate">
-                Design System Suite
+                Sales & Growth Suite
               </span>
             </div>
           </Link>
@@ -119,13 +135,13 @@ export function CrmSidebar({ onNavigateMobile }: CrmSidebarProps) {
 
       <SidebarContent>
         <SidebarNav
-          groups={[{ label: 'CRM Modules', items: navItems }]}
+          groups={navGroups}
           pathname={pathname}
           onNavigate={handleNav}
           LinkComponent={Link}
         />
 
-        <SidebarGroup className="mt-auto pt-3 pb-0 border-t border-border/40 group-data-[collapsible=icon]:pt-2">
+        <SidebarGroup className="mt-auto pt-2 pb-0 group-data-[collapsible=icon]:pt-1">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip="Back to Design System Docs">

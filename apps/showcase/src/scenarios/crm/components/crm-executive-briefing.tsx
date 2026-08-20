@@ -3,24 +3,19 @@
 import * as React from 'react';
 import Link from 'next/link';
 import {
-  Sparkles,
   RefreshCw,
   Plus,
-  ArrowRight,
+  ArrowUpRight,
   Flame,
-  MessageSquare,
 } from 'lucide-react';
 import {
   Button,
-  Badge,
-  Card,
   Avatar,
   AvatarFallback,
   AvatarImage,
   SegmentedControl,
   SegmentedControlItem,
-  GradientText,
-  Kbd,
+  cn,
 } from '@ds/ui';
 import { useCrm } from '../store/crm-context';
 
@@ -32,6 +27,12 @@ interface CrmExecutiveBriefingProps {
   onRefresh: () => void;
   isLoading?: boolean;
 }
+
+const HORIZONS: { id: TimeHorizon; label: string }[] = [
+  { id: 'mtd', label: 'MTD' },
+  { id: 'q1', label: 'Q1 FY25' },
+  { id: 'ytd', label: 'YTD' },
+];
 
 export function CrmExecutiveBriefing({
   timeHorizon,
@@ -47,124 +48,123 @@ export function CrmExecutiveBriefing({
       .slice(0, 3);
   }, [leads]);
 
-  const urgentTotalValue = React.useMemo(() => {
+  const urgentDealsValue = React.useMemo(() => {
     return urgentDeals.reduce((sum, d) => sum + d.dealValue, 0);
   }, [urgentDeals]);
 
   return (
-    <Card className="relative overflow-hidden border-border/80 bg-card/90 shadow-xs backdrop-blur-sm">
-      <div className="flex flex-col gap-5 p-5 md:p-6">
-        {/* Top bar: Persona / Executive Breadcrumb + Horizon Selector + Quick Actions */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/50 pb-4">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 border border-border/80 shadow-xs">
-              <AvatarImage src={currentAgent.avatarUrl} alt={currentAgent.name} />
-              <AvatarFallback className="font-mono text-xs font-bold">
-                {currentAgent.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-display text-base font-bold text-foreground">
-                  {currentAgent.name}
-                </span>
-                <Badge variant="outline" className="font-mono text-[10px] uppercase">
-                  {currentAgent.role}
-                </Badge>
-                <span className="flex items-center gap-1 text-[11px] text-success font-medium">
-                  <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
-                  Live Sync
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground font-mono">
-                {currentAgent.email} • Rating: {currentAgent.rating.toFixed(1)}/5.0
-              </p>
+    <div className="flex flex-col gap-5 pt-1">
+      {/* Top bar: Overview Context + Unified Controls */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-border/60 pb-4">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-9 w-9 border border-border/80 shadow-2xs">
+            <AvatarImage src={currentAgent.avatarUrl} alt={currentAgent.name} />
+            <AvatarFallback className="font-mono text-xs font-semibold">
+              {currentAgent.name
+                .split(' ')
+                .map((n) => n[0])
+                .join('')}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="font-display text-sm font-semibold text-foreground tracking-tight">
+                Executive Overview
+              </h2>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-medium text-success border border-success/20">
+                <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
+                Live Sync
+              </span>
             </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            {/* Horizon Filter */}
-            <SegmentedControl
-              type="single"
-              value={timeHorizon}
-              onValueChange={(val: string) => {
-                if (val) onTimeHorizonChange(val as TimeHorizon);
-              }}
-              className="h-8"
-            >
-              <SegmentedControlItem value="mtd" className="text-xs px-2.5">
-                MTD
-              </SegmentedControlItem>
-              <SegmentedControlItem value="q1" className="text-xs px-2.5">
-                Q1 FY25
-              </SegmentedControlItem>
-              <SegmentedControlItem value="ytd" className="text-xs px-2.5">
-                YTD
-              </SegmentedControlItem>
-            </SegmentedControl>
-
-            {/* Refresh Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onRefresh}
-              className="h-8 w-8 p-0"
-              aria-label="Refresh revenue data"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            </Button>
-
-            {/* Copilot Trigger */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => openAiDrawer({ type: 'general' })}
-              className="h-8 gap-1.5 border-highlight/40 bg-highlight/10 text-foreground hover:bg-highlight/20 text-xs shadow-xs"
-            >
-              <Sparkles className="h-3.5 w-3.5 text-highlight" />
-              <span>Copilot</span>
-              <Kbd size="sm" className="hidden sm:inline-flex ml-1 text-[10px]">
-                ⌘J
-              </Kbd>
-            </Button>
-
-            {/* New Lead Pipeline Link */}
-            <Link href="/crm/leads">
-              <Button size="sm" className="h-8 gap-1.5 text-xs shadow-xs">
-                <Plus className="h-3.5 w-3.5" />
-                <span>Pipeline</span>
-              </Button>
-            </Link>
+            <p className="text-xs text-muted-foreground font-mono mt-0.5">
+              {currentAgent.name} · {currentAgent.role}
+            </p>
           </div>
         </div>
 
-        {/* Narrative Headline & Synthesis */}
-        <div className="space-y-2">
-          <h1 className="font-display text-xl sm:text-2xl font-extrabold tracking-tight text-foreground">
-            Pipeline velocity is pacing at{' '}
-            <GradientText className="font-extrabold">
-              +{metrics.pipelineGrowthPct}% of target
-            </GradientText>{' '}
-            with ${metrics.totalPipelineValue.toLocaleString()} in play.
-          </h1>
-          <p className="text-sm leading-relaxed text-muted-foreground max-w-4xl">
-            {urgentDeals.length} high-value enterprise accounts (
-            <span className="font-mono font-semibold text-foreground">
-              ${urgentTotalValue.toLocaleString()}
-            </span>
-            ) are in final negotiation or compliance signoff. Review flagged items below to accelerate closing.
-          </p>
-        </div>
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
+          {/* Unified Time Horizon Controls */}
+          <SegmentedControl
+            type="single"
+            value={timeHorizon}
+            onValueChange={(val) => {
+              if (val) onTimeHorizonChange(val as TimeHorizon);
+            }}
+            className="h-8 bg-muted/50 p-0.5 shadow-2xs"
+          >
+            {HORIZONS.map((hz) => (
+              <SegmentedControlItem
+                key={hz.id}
+                value={hz.id}
+                className="h-7 px-2.5 text-xs font-mono"
+              >
+                {hz.label}
+              </SegmentedControlItem>
+            ))}
+          </SegmentedControl>
 
-        {/* 3 Actionable Triage Pills: Direct One-Click Resolutions */}
+          {/* Refresh Action */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onRefresh}
+            className="h-8 w-8 p-0 shadow-2xs"
+            aria-label="Refresh revenue data"
+          >
+            <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} />
+          </Button>
+
+          {/* Primary Action: New Deal */}
+          <Link href="/crm/leads">
+            <Button size="sm" className="h-8 gap-1.5 text-xs shadow-2xs px-3 font-medium">
+              <Plus className="h-3.5 w-3.5" />
+              <span>New Deal</span>
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Narrative Headline & Synthesis (Airy, Direct & Crisp) */}
+      <div className="space-y-2 py-1">
+        <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+          Pipeline pacing at{' '}
+          <span className="text-primary font-extrabold">
+            +{metrics.pipelineGrowthPct}%
+          </span>{' '}
+          with{' '}
+          <span className="font-extrabold">
+            ${metrics.totalPipelineValue.toLocaleString()}
+          </span>{' '}
+          active ARR.
+        </h1>
+        <p className="text-sm leading-relaxed text-muted-foreground max-w-4xl">
+          {urgentDeals.length > 0 ? (
+            <>
+              <span className="font-medium text-foreground">
+                {urgentDeals.length} high-priority enterprise deals
+              </span>{' '}
+              (${Math.round(urgentDealsValue / 1000)}k pipeline) are in late-stage negotiation,
+              sustaining a <span className="font-medium text-foreground">{metrics.winRatePct}%</span> win rate with{' '}
+              <span className="font-medium text-foreground">{metrics.leadsWonThisMonth} closed deals</span> across{' '}
+              {metrics.activeLeadsCount} active accounts this period.
+            </>
+          ) : (
+            <>
+              <span className="font-medium text-foreground">{metrics.leadsWonThisMonth} deals closed</span> this period with a{' '}
+              <span className="font-medium text-foreground">{metrics.winRatePct}%</span> win rate across{' '}
+              {metrics.activeLeadsCount} active opportunities.
+            </>
+          )}
+        </p>
+      </div>
+
+      {/* Clean Priority Deals Strip */}
+      {urgentDeals.length > 0 && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 pt-1">
-          <span className="text-[11px] uppercase tracking-wider font-mono font-semibold text-muted-foreground shrink-0 flex items-center gap-1.5">
-            <Flame className="h-3.5 w-3.5 text-highlight shrink-0" />
-            Immediate Triage:
-          </span>
+          <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider font-mono font-semibold text-muted-foreground shrink-0">
+            <Flame className="h-3.5 w-3.5 text-warning" />
+            <span>Priority Deals:</span>
+          </div>
 
           <div className="flex flex-wrap items-center gap-2">
             {urgentDeals.map((deal) => (
@@ -179,30 +179,21 @@ export function CrmExecutiveBriefing({
                     initialTab: 'lead-scoring',
                   });
                 }}
-                className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-muted/40 px-2.5 py-1 text-xs text-foreground hover:bg-muted hover:border-highlight/40 transition-colors cursor-pointer group"
+                className="inline-flex items-center gap-2 rounded-lg border border-border/80 bg-card px-2.5 py-1 text-xs text-foreground hover:bg-accent/60 hover:border-border transition-all cursor-pointer group shadow-2xs"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-highlight shrink-0" />
-                <span className="font-medium group-hover:text-highlight transition-colors">
+                <span className="h-1.5 w-1.5 rounded-full bg-warning shrink-0" />
+                <span className="font-medium group-hover:text-primary transition-colors">
                   {deal.company}
                 </span>
-                <span className="font-mono font-semibold text-muted-foreground text-[11px]">
-                  (${Math.round(deal.dealValue / 1000)}k)
+                <span className="font-mono text-muted-foreground text-[11px]">
+                  ${Math.round(deal.dealValue / 1000)}k
                 </span>
-                <Sparkles className="h-3 w-3 text-highlight opacity-70 group-hover:opacity-100 transition-opacity ml-0.5" />
+                <ArrowUpRight className="h-3 w-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-hover:text-primary transition-all" />
               </button>
             ))}
-
-            <Link
-              href="/crm/contact-center"
-              className="inline-flex items-center gap-1.5 rounded-md border border-border/80 bg-muted/40 px-2.5 py-1 text-xs text-foreground hover:bg-muted transition-colors"
-            >
-              <MessageSquare className="h-3 w-3 text-primary shrink-0" />
-              <span>3 Inbound VIP Chats</span>
-              <ArrowRight className="h-3 w-3 text-muted-foreground ml-0.5" />
-            </Link>
           </div>
         </div>
-      </div>
-    </Card>
+      )}
+    </div>
   );
 }

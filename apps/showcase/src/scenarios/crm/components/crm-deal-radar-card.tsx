@@ -3,11 +3,10 @@
 import * as React from 'react';
 import Link from 'next/link';
 import {
-  Flame,
-  Sparkles,
+  Zap,
   ArrowRight,
-  Lightbulb,
   Mail,
+  Target,
 } from 'lucide-react';
 import {
   Card,
@@ -44,29 +43,26 @@ export function CrmDealRadarCard({ className }: CrmDealRadarCardProps) {
   }, [highIntentLeads]);
 
   return (
-    <Card className={cn('flex flex-col justify-between shadow-xs border-border/80 bg-card/90 backdrop-blur-sm', className)}>
-      <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border/50">
+    <Card className={cn('flex flex-col justify-between border border-border/80 bg-card p-6 shadow-xs rounded-xl', className)}>
+      <CardHeader className="flex flex-row items-center justify-between p-0 pb-4 border-b border-border/60">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Flame className="h-4 w-4 text-highlight" />
-            <CardTitle className="font-display text-base sm:text-lg font-bold text-foreground">
-              AI Opportunity Radar & Priority Deals
-            </CardTitle>
-          </div>
-          <CardDescription className="text-xs">
-            High-intent deals with contextual catalysts & 1-click Copilot triage
+          <CardTitle className="font-display text-base sm:text-lg font-bold text-foreground">
+            AI Opportunity Radar
+          </CardTitle>
+          <CardDescription className="text-xs text-muted-foreground">
+            High-conviction deals with key catalysts and 1-click Copilot triage
           </CardDescription>
         </div>
 
-        <Badge variant="highlight" className="font-mono text-xs px-2">
+        <Badge variant="highlight-outline" className="font-mono text-xs px-2 shadow-2xs">
           Score ≥ 80
         </Badge>
       </CardHeader>
 
-      <CardContent className="pt-4 space-y-3.5 flex-1 flex flex-col justify-between">
+      <CardContent className="p-0 pt-6 space-y-4 flex-1 flex flex-col justify-between">
         {highIntentLeads.length === 0 ? (
           <EmptyState
-            icon={Sparkles}
+            icon={Target}
             title="No High-Intent Deals Flagged"
             description="All active deals are progressing within standard parameters."
             actionLabel="View All Leads"
@@ -74,116 +70,128 @@ export function CrmDealRadarCard({ className }: CrmDealRadarCardProps) {
             className="py-6"
           />
         ) : (
-          <div className="space-y-3">
-            {highIntentLeads.map((lead) => (
-              <div
-                key={lead.id}
-                className="group relative rounded-xl border border-border/70 bg-card p-3.5 hover:border-highlight/50 hover:shadow-sm transition-all"
-              >
-                {/* Top Row: Lead & Company Info + Deal Value */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <Avatar className="h-8 w-8 rounded-lg border border-border/60">
-                      <AvatarImage src={lead.avatarUrl} alt={lead.name} />
-                      <AvatarFallback className="font-mono text-xs font-bold bg-muted">
-                        {lead.company
-                          .split(' ')
-                          .map((w) => w[0])
-                          .slice(0, 2)
-                          .join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-semibold text-sm text-foreground truncate group-hover:text-primary transition-colors">
-                          {lead.company}
-                        </span>
-                        <Badge variant="outline" className="text-[10px] uppercase font-mono px-1.5 py-0 h-4">
-                          {lead.stage}
-                        </Badge>
+          <div className="space-y-3.5">
+            {highIntentLeads.map((lead) => {
+              // Differentiated sentiment / health signals
+              const isWarning = lead.id === 'lead-102'; // Apex Health has HIPAA block
+              const isFastTrack = lead.id === 'lead-101'; // FinTech Velocity is positive
+
+              return (
+                <div
+                  key={lead.id}
+                  className="group relative rounded-xl border border-border/50 bg-card/90 p-4 shadow-2xs hover:border-highlight/40 hover:shadow-xs transition-all"
+                >
+                  {/* Top Row: Lead & Company Info + Deal Value */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Avatar className="h-9 w-9 rounded-lg border border-border/60 shadow-2xs">
+                        <AvatarImage src={lead.avatarUrl} alt={lead.name} />
+                        <AvatarFallback className="font-mono text-xs font-bold bg-muted">
+                          {lead.company
+                            .split(' ')
+                            .map((w) => w[0])
+                            .slice(0, 2)
+                            .join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm text-foreground truncate group-hover:text-primary transition-colors">
+                            {lead.company}
+                          </span>
+                          <Badge variant="outline" className="text-[10px] uppercase font-mono px-1.5 py-0 h-4">
+                            {lead.stage}
+                          </Badge>
+                          {isWarning ? (
+                            <Badge variant="warning-outline" className="text-[9px] font-mono px-1.5 py-0 h-4">
+                              Review Needed
+                            </Badge>
+                          ) : isFastTrack ? (
+                            <Badge variant="success-outline" className="text-[9px] font-mono px-1.5 py-0 h-4">
+                              Fast-Track
+                            </Badge>
+                          ) : null}
+                        </div>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {lead.name} · {lead.title}
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {lead.name} • {lead.title}
-                      </p>
+                    </div>
+
+                    {/* Deal Value & AI Score */}
+                    <div className="text-right shrink-0">
+                      <span className="font-display font-extrabold text-sm text-foreground tabular-nums">
+                        ${lead.dealValue.toLocaleString()}
+                      </span>
+                      <div className="flex items-center justify-end gap-1 mt-0.5">
+                        <span className="font-mono text-[11px] font-bold text-highlight">
+                          {lead.aiScore}/100
+                        </span>
+                        <span className="text-[10px] text-muted-foreground font-mono">
+                          AI
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Deal Value & Score Tag */}
-                  <div className="text-right shrink-0">
-                    <span className="font-display font-extrabold text-sm text-foreground tabular-nums">
-                      ${lead.dealValue.toLocaleString()}
-                    </span>
-                    <div className="flex items-center justify-end gap-1">
-                      <span className="font-mono text-[11px] font-bold text-highlight">
-                        {lead.aiScore}/100
-                      </span>
-                      <span className="text-[10px] text-muted-foreground uppercase font-mono">
-                        AI
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Middle: AI Key Catalyst / Driver */}
-                <div className="mt-2.5 rounded-lg bg-muted/40 p-2 text-xs text-foreground/90 flex items-start gap-1.5 border border-border/40">
-                  <Lightbulb className="h-3.5 w-3.5 text-highlight shrink-0 mt-0.5" />
-                  <span className="leading-snug text-muted-foreground">
-                    <strong className="text-foreground font-medium">Catalyst: </strong>
+                  {/* Middle: 1-line Catalyst */}
+                  <p className="mt-2.5 text-xs text-muted-foreground leading-relaxed">
+                    <span className="text-foreground font-medium">Catalyst: </span>
                     {lead.aiScoreReason}
-                  </span>
-                </div>
+                  </p>
 
-                {/* Bottom Row: 1-Click Action Bar */}
-                <div className="mt-3 flex items-center justify-between pt-2 border-t border-border/40 text-xs">
-                  <span className="text-[11px] text-muted-foreground font-mono">
-                    Owner: {lead.assignedAgentName.split(' ')[0]}
-                  </span>
+                  {/* Bottom Row: Actions */}
+                  <div className="mt-3 flex items-center justify-between pt-2.5 border-t border-border/30 text-xs">
+                    <span className="text-[11px] text-muted-foreground font-mono">
+                      Owner: {lead.assignedAgentName.split(' ')[0]}
+                    </span>
 
-                  <div className="flex items-center gap-2">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-7 text-xs px-2 gap-1 text-muted-foreground hover:text-foreground"
-                      onClick={() => {
-                        setSelectedLeadId(lead.id);
-                        openAiDrawer({
-                          type: 'lead',
-                          entityId: lead.id,
-                          initialTab: 'draft',
-                        });
-                      }}
-                    >
-                      <Mail className="h-3 w-3" />
-                      <span>Draft Email</span>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 text-xs px-2.5 gap-1.5 text-muted-foreground hover:text-foreground"
+                        onClick={() => {
+                          setSelectedLeadId(lead.id);
+                          openAiDrawer({
+                            type: 'lead',
+                            entityId: lead.id,
+                            initialTab: 'draft',
+                          });
+                        }}
+                      >
+                        <Mail className="h-3 w-3" />
+                        <span>Draft Email</span>
+                      </Button>
 
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="h-7 text-xs px-2.5 gap-1 border-highlight/30 bg-highlight/5 text-foreground hover:bg-highlight/15 transition-colors shadow-xs"
-                      onClick={() => {
-                        setSelectedLeadId(lead.id);
-                        openAiDrawer({
-                          type: 'lead',
-                          entityId: lead.id,
-                          initialTab: 'lead-scoring',
-                        });
-                      }}
-                    >
-                      <Sparkles className="h-3 w-3 text-highlight" />
-                      <span>AI Triage</span>
-                    </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 text-xs px-2.5 gap-1.5 border-highlight/30 bg-highlight/5 text-foreground hover:bg-highlight/15 transition-colors shadow-2xs"
+                        onClick={() => {
+                          setSelectedLeadId(lead.id);
+                          openAiDrawer({
+                            type: 'lead',
+                            entityId: lead.id,
+                            initialTab: 'lead-scoring',
+                          });
+                        }}
+                      >
+                        <Zap className="h-3 w-3 text-highlight" />
+                        <span>AI Triage</span>
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
         {/* Narrative Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-border/40 text-xs text-muted-foreground">
+        <div className="flex items-center justify-between pt-4 border-t border-border/40 text-xs text-muted-foreground">
           <span className="font-medium text-foreground">
-            Total ready-to-close value:{' '}
+            Closing Value:{' '}
             <span className="font-mono font-bold text-highlight">
               ${totalActionableValue.toLocaleString()}
             </span>

@@ -35,10 +35,10 @@ const ROLE_LABELS: Record<PractitionerRole, string> = {
 };
 
 const STAFF_STATUS_CONFIG: Record<StaffStatus, { label: string; dotColor: string }> = {
-  available: { label: 'Available', dotColor: 'bg-success ring-success/20' },
-  'in-consult': { label: 'In Consultation', dotColor: 'bg-highlight ring-highlight/20' },
-  break: { label: 'On Break', dotColor: 'bg-warning ring-warning/20' },
-  'off-duty': { label: 'Off Duty', dotColor: 'bg-muted ring-muted/20' },
+  available: { label: 'Available', dotColor: 'bg-success' },
+  'in-consult': { label: 'In Consultation', dotColor: 'bg-highlight' },
+  break: { label: 'On Break', dotColor: 'bg-warning' },
+  'off-duty': { label: 'Off Duty', dotColor: 'bg-muted' },
 };
 
 const STAFF_STATUS_OPTIONS = (Object.keys(STAFF_STATUS_CONFIG) as StaffStatus[]).map((key) => ({

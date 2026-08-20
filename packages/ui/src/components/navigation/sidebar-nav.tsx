@@ -65,12 +65,19 @@ export function SidebarNav({
                   <SidebarMenuButton asChild isActive={active} tooltip={item.title}>
                     <ItemLink href={item.href} onClick={onNavigate}>
                       <Icon className="h-4 w-4 shrink-0" />
-                      <span className="truncate group-data-[collapsible=icon]:hidden">{item.title}</span>
+                      <span
+                        className={cn(
+                          'truncate group-data-[collapsible=icon]:hidden',
+                          item.badge && 'pr-8'
+                        )}
+                      >
+                        {item.title}
+                      </span>
                       {item.badge && (
                         <SidebarMenuBadge>
                           <Badge
                             variant={item.badgeVariant || (active ? 'highlight' : 'outline')}
-                            className="ml-auto text-[10px] px-1.5 py-0.5 font-mono shrink-0 whitespace-nowrap leading-none group-data-[collapsible=icon]:hidden"
+                            className="text-[10px] px-1.5 py-0.5 font-mono shrink-0 whitespace-nowrap leading-none group-data-[collapsible=icon]:hidden"
                           >
                             {item.badge}
                           </Badge>

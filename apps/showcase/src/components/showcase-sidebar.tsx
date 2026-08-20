@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Navigation } from 'lucide-react';
 import { THEMES } from '@ds/tokens';
 import { cn } from '@ds/ui';
 import {
@@ -26,15 +26,15 @@ export function ShowcaseSidebar() {
       <SidebarHeader className={cn(isCollapsed && 'justify-center px-2')}>
         {!isCollapsed && (
           <Link href="/" className="flex items-center gap-2.5 group min-w-0">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-highlight text-primary-foreground font-bold text-sm shadow-xs group-hover:scale-105 transition-transform font-display">
-              DS
-            </div>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-background shadow-sm group-hover:scale-105 transition-transform">
+              <Navigation className="h-4 w-4 fill-current" aria-hidden="true" />
+            </span>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              <span className="font-semibold text-sm tracking-tight text-foreground font-display group-hover:text-highlight transition-colors">
-                Design System
+              <span className="font-semibold text-sm tracking-tight text-foreground font-display group-hover:text-primary transition-colors">
+                Arah
               </span>
               <span className="text-[10px] text-muted-foreground uppercase font-mono tracking-wider">
-                Tailwind v4 + Radix
+                Design System
               </span>
             </div>
           </Link>

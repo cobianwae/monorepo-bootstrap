@@ -3,7 +3,6 @@
 import * as React from 'react';
 import Link from 'next/link';
 import {
-  Headphones,
   MessageSquare,
   Mail,
   Phone,
@@ -11,9 +10,9 @@ import {
   CheckCircle2,
   Megaphone,
   UserPlus,
-  Sparkles,
   ArrowRight,
   Flame,
+  Activity,
 } from 'lucide-react';
 import {
   Card,
@@ -38,25 +37,22 @@ interface CrmOmnichannelPulseCardProps {
 
 export function CrmOmnichannelPulseCard({ className }: CrmOmnichannelPulseCardProps) {
   const { activities, metrics, agents } = useCrm();
-  const [filterType, setFilterType] = React.useState<'all' | 'deals' | 'ai' | 'messages'>('all');
+  const [filterType, setFilterType] = React.useState<'all' | 'deals' | 'chats'>('all');
 
   const filteredActivities = React.useMemo(() => {
     if (filterType === 'deals') {
       return activities.filter((a) => a.type === 'deal_won' || a.type === 'stage_moved');
     }
-    if (filterType === 'ai') {
-      return activities.filter((a) => a.type === 'ai_insight');
-    }
-    if (filterType === 'messages') {
+    if (filterType === 'chats') {
       return activities.filter((a) => a.type === 'message_sent' || a.type === 'campaign_launched');
     }
     return activities;
   }, [activities, filterType]);
 
   const timelineItems: TimelineItem[] = React.useMemo(() => {
-    return filteredActivities.slice(0, 4).map((act) => {
+    return filteredActivities.slice(0, 3).map((act) => {
       let status: TimelineItemStatus = 'info';
-      let icon = Sparkles;
+      let icon = Activity;
       if (act.type === 'deal_won') {
         status = 'success';
         icon = CheckCircle2;
@@ -87,94 +83,79 @@ export function CrmOmnichannelPulseCard({ className }: CrmOmnichannelPulseCardPr
   }, [filteredActivities]);
 
   return (
-    <Card className={cn('flex flex-col justify-between shadow-xs border-border/80 bg-card/90 backdrop-blur-sm', className)}>
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-border/50">
+    <Card className={cn('flex flex-col justify-between border border-border/80 bg-card p-6 shadow-xs rounded-xl', className)}>
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-0 pb-4 border-b border-border/60">
         <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Headphones className="h-4 w-4 text-primary" />
-            <CardTitle className="font-display text-base sm:text-lg font-bold text-foreground">
-              Omnichannel Pulse & Team Activity
-            </CardTitle>
-          </div>
-          <CardDescription className="text-xs">
-            Live multi-channel response velocity & sales team capacity
+          <CardTitle className="font-display text-base sm:text-lg font-bold text-foreground">
+            Omnichannel Pulse
+          </CardTitle>
+          <CardDescription className="text-xs text-muted-foreground">
+            Multi-channel speed & sales team capacity
           </CardDescription>
         </div>
 
         <div className="flex items-center gap-2">
           <span className="flex items-center gap-1.5 text-xs text-success font-mono font-medium">
             <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
-            {metrics.avgResponseTimeMin}m avg SLA
+            {metrics.avgResponseTimeMin}m SLA
           </span>
-          <Badge variant="outline" className="font-mono text-xs">
+          <Badge variant="outline" className="font-mono text-xs shadow-2xs">
             {metrics.csatScore}% CSAT
           </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="pt-4 space-y-4 flex-1 flex flex-col justify-between">
-        {/* Multi-Channel Barometer (Nested Well) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 rounded-xl border border-border/60 bg-muted/30 p-3">
-          <div className="space-y-1 bg-card/70 p-2 rounded-lg border border-border/40">
-            <div className="flex items-center justify-between text-[11px] font-medium text-foreground">
-              <span className="flex items-center gap-1">
-                <MessageSquare className="h-3 w-3 text-success" />
-                WhatsApp
-              </span>
-              <span className="font-mono text-success text-[10px]">Active</span>
+      <CardContent className="p-0 pt-6 space-y-5 flex-1 flex flex-col justify-between">
+        {/* Channel Barometer Pills (Clean Horizontal Flow with micro-shadow) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="rounded-lg border border-border/50 bg-card/70 p-2.5 shadow-2xs">
+            <div className="flex items-center gap-1.5 text-[11px] font-medium text-foreground">
+              <MessageSquare className="h-3.5 w-3.5 text-success" />
+              <span>WhatsApp</span>
             </div>
-            <p className="font-mono text-xs font-bold text-foreground">89.2% Open</p>
-            <span className="text-[10px] text-muted-foreground block font-mono">14.5% Conv</span>
+            <p className="font-mono text-xs font-bold text-foreground mt-1">89.2% Open</p>
+            <span className="text-[10px] text-muted-foreground font-mono">14.5% Conv</span>
           </div>
 
-          <div className="space-y-1 bg-card/70 p-2 rounded-lg border border-border/40">
-            <div className="flex items-center justify-between text-[11px] font-medium text-foreground">
-              <span className="flex items-center gap-1">
-                <Mail className="h-3 w-3 text-primary" />
-                Email
-              </span>
-              <span className="font-mono text-muted-foreground text-[10px]">48.6% Open</span>
+          <div className="rounded-lg border border-border/50 bg-card/70 p-2.5 shadow-2xs">
+            <div className="flex items-center gap-1.5 text-[11px] font-medium text-foreground">
+              <Mail className="h-3.5 w-3.5 text-primary" />
+              <span>Email</span>
             </div>
-            <p className="font-mono text-xs font-bold text-foreground">2.4m SLA</p>
-            <span className="text-[10px] text-muted-foreground block font-mono">1,420 sent</span>
+            <p className="font-mono text-xs font-bold text-foreground mt-1">2.4m SLA</p>
+            <span className="text-[10px] text-muted-foreground font-mono">1,420 sent</span>
           </div>
 
-          <div className="space-y-1 bg-card/70 p-2 rounded-lg border border-border/40">
-            <div className="flex items-center justify-between text-[11px] font-medium text-foreground">
-              <span className="flex items-center gap-1">
-                <Radio className="h-3 w-3 text-highlight" />
-                Webchat
-              </span>
-              <span className="font-mono text-highlight text-[10px]">Instant</span>
+          <div className="rounded-lg border border-border/50 bg-card/70 p-2.5 shadow-2xs">
+            <div className="flex items-center gap-1.5 text-[11px] font-medium text-foreground">
+              <Radio className="h-3.5 w-3.5 text-highlight" />
+              <span>Webchat</span>
             </div>
-            <p className="font-mono text-xs font-bold text-foreground">98.2% CSAT</p>
-            <span className="text-[10px] text-muted-foreground block font-mono">&lt;45s First Reply</span>
+            <p className="font-mono text-xs font-bold text-foreground mt-1">98.2% CSAT</p>
+            <span className="text-[10px] text-muted-foreground font-mono">&lt;45s Reply</span>
           </div>
 
-          <div className="space-y-1 bg-card/70 p-2 rounded-lg border border-border/40">
-            <div className="flex items-center justify-between text-[11px] font-medium text-foreground">
-              <span className="flex items-center gap-1">
-                <Phone className="h-3 w-3 text-secondary-foreground" />
-                Voice HD
-              </span>
-              <span className="font-mono text-muted-foreground text-[10px]">HIPAA</span>
+          <div className="rounded-lg border border-border/50 bg-card/70 p-2.5 shadow-2xs">
+            <div className="flex items-center gap-1.5 text-[11px] font-medium text-foreground">
+              <Phone className="h-3.5 w-3.5 text-muted-foreground" />
+              <span>Voice HD</span>
             </div>
-            <p className="font-mono text-xs font-bold text-foreground">18m Logged</p>
-            <span className="text-[10px] text-muted-foreground block font-mono">Auto Transcribed</span>
+            <p className="font-mono text-xs font-bold text-foreground mt-1">18m Logged</p>
+            <span className="text-[10px] text-muted-foreground font-mono">HIPAA Secured</span>
           </div>
         </div>
 
-        {/* Activity Filter Tabs & Timeline Feed */}
+        {/* Stream Filter & Timeline */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between border-b border-border/40 pb-2">
-            <span className="text-xs font-semibold text-foreground">Live Audit Stream</span>
+          <div className="flex items-center justify-between border-b border-border/30 pb-2">
+            <span className="text-xs font-semibold text-foreground">Live Activity</span>
             <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => setFilterType('all')}
                 className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors cursor-pointer ${
                   filterType === 'all'
-                    ? 'bg-primary text-primary-foreground font-semibold'
+                    ? 'bg-primary text-primary-foreground font-semibold shadow-2xs'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -185,7 +166,7 @@ export function CrmOmnichannelPulseCard({ className }: CrmOmnichannelPulseCardPr
                 onClick={() => setFilterType('deals')}
                 className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors cursor-pointer ${
                   filterType === 'deals'
-                    ? 'bg-primary text-primary-foreground font-semibold'
+                    ? 'bg-primary text-primary-foreground font-semibold shadow-2xs'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -193,21 +174,10 @@ export function CrmOmnichannelPulseCard({ className }: CrmOmnichannelPulseCardPr
               </button>
               <button
                 type="button"
-                onClick={() => setFilterType('ai')}
+                onClick={() => setFilterType('chats')}
                 className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors cursor-pointer ${
-                  filterType === 'ai'
-                    ? 'bg-primary text-primary-foreground font-semibold'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                AI Alerts
-              </button>
-              <button
-                type="button"
-                onClick={() => setFilterType('messages')}
-                className={`px-2 py-0.5 rounded text-[11px] font-mono transition-colors cursor-pointer ${
-                  filterType === 'messages'
-                    ? 'bg-primary text-primary-foreground font-semibold'
+                  filterType === 'chats'
+                    ? 'bg-primary text-primary-foreground font-semibold shadow-2xs'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -219,58 +189,30 @@ export function CrmOmnichannelPulseCard({ className }: CrmOmnichannelPulseCardPr
           <Timeline items={timelineItems} />
         </div>
 
-        {/* Team Capacity Mini-Leaderboard */}
-        <div className="space-y-2 pt-2 border-t border-border/40">
-          <span className="text-[11px] font-semibold text-muted-foreground uppercase font-mono tracking-wider block">
-            Team Workload & Status
-          </span>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        {/* Team Capacity Mini-Strip */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border/30">
+          <div className="flex items-center gap-3">
             {agents.slice(0, 3).map((agent) => (
-              <div
-                key={agent.id}
-                className="flex items-center justify-between p-2 rounded-lg border border-border/40 bg-muted/20 text-xs"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src={agent.avatarUrl} alt={agent.name} />
-                    <AvatarFallback className="text-[10px]">
-                      {agent.name
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="truncate font-medium text-foreground">
-                    {agent.name.split(' ')[0]}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0 font-mono text-[11px]">
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      agent.status === 'available'
-                        ? 'bg-success'
-                        : agent.status === 'busy'
-                        ? 'bg-warning'
-                        : 'bg-muted-foreground'
-                    }`}
-                  />
-                  <span className="text-muted-foreground">({agent.activeChatsCount} chats)</span>
-                </div>
+              <div key={agent.id} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Avatar className="h-5 w-5 border border-border/50 shadow-2xs">
+                  <AvatarImage src={agent.avatarUrl} alt={agent.name} />
+                  <AvatarFallback className="text-[9px]">
+                    {agent.name[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="font-medium text-foreground text-[11px]">
+                  {agent.name.split(' ')[0]}
+                </span>
+                <span className="h-1.5 w-1.5 rounded-full bg-success" />
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Narrative Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-border/40 text-xs text-muted-foreground">
-          <span className="font-mono text-[11px]">
-            Showing 4 of {activities.length} recent system events
-          </span>
           <Link
             href="/crm/contact-center"
             className="text-xs font-semibold text-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
           >
-            Open Contact Center
+            Open Inbox
             <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
