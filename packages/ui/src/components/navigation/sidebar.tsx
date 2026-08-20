@@ -496,7 +496,7 @@ SidebarMenuSubItem.displayName = 'SidebarMenuSubItem';
 
 export const SidebarMenuSubButton = React.forwardRef<
   HTMLAnchorElement,
-  React.HTMLAttributes<HTMLAnchorElement> & { isActive?: boolean; asChild?: boolean }
+  React.AnchorHTMLAttributes<HTMLAnchorElement> & { isActive?: boolean; asChild?: boolean }
 >(({ className, isActive = false, asChild = false, ...props }, ref) => {
   const Comp = asChild ? Slot : 'a';
 

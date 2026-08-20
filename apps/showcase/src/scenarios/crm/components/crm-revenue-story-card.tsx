@@ -1,6 +1,6 @@
 'use client';
 
-import { TrendingUp } from 'lucide-react';
+import * as React from 'react';
 import {
   Card,
   CardHeader,
@@ -25,26 +25,123 @@ export function CrmRevenueStoryCard({
 }: CrmRevenueStoryCardProps) {
   const currentMonthData = REVENUE_CHART_DATA[5]; // Jan
 
+  // Interactive series selection
+  const [activeSeries, setActiveSeries] = React.useState<{
+    revenue: boolean;
+    target: boolean;
+    pipeline: boolean;
+  }>({
+    revenue: true,
+    target: true,
+    pipeline: false,
+  });
+
+  const toggleSeries = (key: 'revenue' | 'target' | 'pipeline') => {
+    setActiveSeries((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      // Ensure at least one series remains selected
+      if (!next.revenue && !next.target && !next.pipeline) {
+        return prev;
+      }
+      return next;
+    });
+  };
+
+  // Compute selected data keys and color mapping
+  const selectedDataKeys = React.useMemo(() => {
+    const keys: string[] = [];
+    if (activeSeries.revenue) keys.push('revenue');
+    if (activeSeries.target) keys.push('target');
+    if (activeSeries.pipeline) keys.push('pipeline');
+    return keys;
+  }, [activeSeries]);
+
+  const selectedColors = React.useMemo(() => {
+    const colorMap: Record<string, string> = {
+      revenue: 'var(--color-chart-1)',
+      target: 'var(--color-chart-2)',
+      pipeline: 'var(--color-chart-3)',
+    };
+    return selectedDataKeys.map((k) => colorMap[k]);
+  }, [selectedDataKeys]);
+
   return (
-    <Card className={cn('flex flex-col justify-between border border-border/80 bg-card p-6 shadow-xs rounded-xl', className)}>
+    <Card
+      className={cn(
+        'flex flex-col justify-between rounded-xl border border-border/80 bg-card p-6 shadow-xs transition-all duration-200',
+        className
+      )}
+    >
+      {/* =========================================================================
+          HEADER: Title, Time Horizon & Interactive Series Selectors
+          ========================================================================= */}
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-0 pb-4 border-b border-border/60">
         <div className="space-y-1">
-          <CardTitle className="font-display text-base sm:text-lg font-bold text-foreground">
-            Revenue Trajectory & Quota Pacing
-          </CardTitle>
+          <div className="flex items-center gap-2 flex-wrap">
+            <CardTitle className="font-display text-base sm:text-lg font-bold text-foreground">
+              Revenue Trajectory & Quota Pacing
+            </CardTitle>
+            <Badge variant="outline" className="font-mono text-[10px] border-border/70 shadow-2xs">
+              {timeHorizon === 'mtd' ? 'MTD Pacing' : timeHorizon === 'q1' ? 'Q1 FY25' : 'YTD Horizon'}
+            </Badge>
+          </div>
           <CardDescription className="text-xs text-muted-foreground">
             Closed enterprise ARR vs baseline quota with forward run-rate projection
           </CardDescription>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="font-mono text-xs border-border/70 shadow-2xs">
-            {timeHorizon === 'mtd' ? 'MTD Pacing' : timeHorizon === 'q1' ? 'Q1 FY25' : 'YTD Horizon'}
-          </Badge>
-          <Badge variant="success-outline" className="font-mono text-xs flex items-center gap-1 shadow-2xs font-semibold">
-            <TrendingUp className="h-3 w-3" />
-            <span>114% to Target</span>
-          </Badge>
+        {/* Interactive Metric Selection Pills */}
+        <div className="flex items-center gap-1.5 p-1 bg-muted/40 rounded-lg border border-border/40 shrink-0 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => toggleSeries('revenue')}
+            className={cn(
+              'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono transition-all cursor-pointer',
+              activeSeries.revenue
+                ? 'bg-card text-foreground font-semibold shadow-2xs border border-border/60'
+                : 'text-muted-foreground opacity-60 hover:opacity-100 hover:text-foreground'
+            )}
+          >
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: 'var(--color-chart-1)' }}
+            />
+            <span>Revenue</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleSeries('target')}
+            className={cn(
+              'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono transition-all cursor-pointer',
+              activeSeries.target
+                ? 'bg-card text-foreground font-semibold shadow-2xs border border-border/60'
+                : 'text-muted-foreground opacity-60 hover:opacity-100 hover:text-foreground'
+            )}
+          >
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: 'var(--color-chart-2)' }}
+            />
+            <span>Target</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => toggleSeries('pipeline')}
+            className={cn(
+              'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono transition-all cursor-pointer',
+              activeSeries.pipeline
+                ? 'bg-card text-foreground font-semibold shadow-2xs border border-border/60'
+                : 'text-muted-foreground opacity-60 hover:opacity-100 hover:text-foreground'
+            )}
+          >
+            <span
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: 'var(--color-chart-3)' }}
+            />
+            <span>Pipeline</span>
+          </button>
         </div>
       </CardHeader>
 
@@ -74,22 +171,22 @@ export function CrmRevenueStoryCard({
           </table>
         </div>
 
-        {/* Visual Area Chart */}
+        {/* Refined Visual Area Chart with True Luminous Gradients */}
         <div className="w-full h-64 sm:h-72">
           <AreaChartComponent
             data={REVENUE_CHART_DATA}
-            dataKey={['revenue', 'target']}
+            dataKey={selectedDataKeys}
             xKey="month"
-            colors={['var(--color-chart-1)', 'var(--color-chart-2)']}
+            colors={selectedColors}
             grid={true}
-            showLegend={true}
+            showLegend={false}
             variant="gradient"
-            fillOpacity={0.2}
+            fillOpacity={0.3}
             className="border-none p-0 bg-transparent aspect-auto h-full w-full"
           />
         </div>
 
-        {/* Clean Single-Row Metrics Strip */}
+        {/* Clean High-Contrast Metrics Strip */}
         <div className="pt-4 border-t border-border/60">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>

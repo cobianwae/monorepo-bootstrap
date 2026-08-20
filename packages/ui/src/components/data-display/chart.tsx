@@ -168,33 +168,67 @@ export function AreaChartComponent({
   title,
   description,
   variant = 'gradient',
-  fillOpacity = 0.4,
+  fillOpacity = 0.35,
 }: AreaChartProps) {
   const series = Array.isArray(dataKey) ? dataKey : [dataKey];
+  const chartId = React.useId().replace(/:/g, '');
+
   return (
     <ChartContainer title={title} description={description} className={className}>
-      <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 8 }}>
-        {grid && <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />}
+      <AreaChart data={data} margin={{ top: 12, right: 12, bottom: 4, left: 4 }}>
+        {variant === 'gradient' && (
+          <defs>
+            {series.map((key, index) => {
+              const color = colors[index % colors.length];
+              return (
+                <linearGradient
+                  key={`grad-${key}`}
+                  id={`area-grad-${chartId}-${index}`}
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop offset="0%" stopColor={color} stopOpacity={fillOpacity} />
+                  <stop offset="75%" stopColor={color} stopOpacity={Math.max(0.02, fillOpacity * 0.15)} />
+                  <stop offset="100%" stopColor={color} stopOpacity={0} />
+                </linearGradient>
+              );
+            })}
+          </defs>
+        )}
+        {grid && (
+          <CartesianGrid
+            stroke="var(--border)"
+            strokeDasharray="4 4"
+            strokeOpacity={0.4}
+            vertical={false}
+          />
+        )}
         <XAxis
           dataKey={xKey}
           tickLine={false}
           axisLine={false}
-          tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+          tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
           dy={8}
         />
         <YAxis
           tickLine={false}
           axisLine={false}
-          width={40}
-          tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
+          width={44}
+          tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
           tickFormatter={formatCompactTick}
+          dx={-4}
         />
-        <Tooltip content={<ChartTooltipContent />} />
+        <Tooltip
+          content={<ChartTooltipContent />}
+          cursor={{ stroke: 'var(--border)', strokeWidth: 1, strokeDasharray: '4 4' }}
+        />
         {showLegend && (
           <Legend
             iconType="circle"
             iconSize={8}
-            wrapperStyle={{ fontSize: 12, color: 'var(--muted-foreground)' }}
+            wrapperStyle={{ fontSize: 12, color: 'var(--muted-foreground)', paddingTop: 8 }}
           />
         )}
         {series.map((key, index) => (
@@ -203,9 +237,15 @@ export function AreaChartComponent({
             type="monotone"
             dataKey={key}
             stroke={colors[index % colors.length]}
-            fill={colors[index % colors.length]}
-            fillOpacity={variant === 'gradient' ? fillOpacity : 0}
-            strokeWidth={2}
+            fill={variant === 'gradient' ? `url(#area-grad-${chartId}-${index})` : colors[index % colors.length]}
+            fillOpacity={variant === 'gradient' ? 1 : 0}
+            strokeWidth={2.5}
+            activeDot={{
+              r: 4,
+              strokeWidth: 2,
+              fill: 'var(--card)',
+              stroke: colors[index % colors.length],
+            }}
             stackId={stacked ? 'stack' : undefined}
           />
         ))}
