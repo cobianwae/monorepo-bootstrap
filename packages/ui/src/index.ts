@@ -1,4 +1,5 @@
 export * from './lib/utils';
+export * from './lib/format';
 export * from './components/base/theme-provider';
 export * from './components/base/palette-switcher';
 export * from './components/base/button';

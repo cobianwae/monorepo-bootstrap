@@ -22,6 +22,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  Skeleton,
+  formatCurrency,
   cn,
 } from '@ds/ui';
 import { useCrm } from '../store/crm-context';
@@ -37,6 +39,7 @@ interface FunnelStage {
   isHotspot?: boolean;
 }
 
+// Canonical categorical chart tokens: each stage has a distinct, WCAG-tested color encoding
 const STAGE_CONFIGS: { stage: string; key: LeadStage; color: string; passRate: number }[] = [
   { stage: 'New Inbound', key: 'new', color: 'var(--color-chart-1)', passRate: 85 },
   { stage: 'Contacted', key: 'contacted', color: 'var(--color-chart-2)', passRate: 75 },
@@ -48,14 +51,14 @@ const STAGE_CONFIGS: { stage: string; key: LeadStage; color: string; passRate: n
 
 interface CrmPipelineFunnelCardProps {
   className?: string;
+  isLoading?: boolean;
 }
 
-export function CrmPipelineFunnelCard({ className }: CrmPipelineFunnelCardProps) {
+export function CrmPipelineFunnelCard({ className, isLoading = false }: CrmPipelineFunnelCardProps) {
   const { leads } = useCrm();
 
-  // Compute live pipeline statistics dynamically from CRM leads
+  // Compute live pipeline statistics directly from CRM store leads
   const funnelStages: FunnelStage[] = React.useMemo(() => {
-    // Map live leads
     const stages = STAGE_CONFIGS.map((cfg) => {
       const stageLeads = leads.filter((l) => l.stage === cfg.key);
       const count = stageLeads.length;
@@ -63,15 +66,15 @@ export function CrmPipelineFunnelCard({ className }: CrmPipelineFunnelCardProps)
 
       return {
         ...cfg,
-        count: count > 0 ? count : cfg.key === 'new' ? 14 : cfg.key === 'contacted' ? 12 : cfg.key === 'qualified' ? 9 : cfg.key === 'proposal' ? 6 : cfg.key === 'negotiation' ? 4 : 12,
-        value: value > 0 ? value : cfg.key === 'new' ? 164000 : cfg.key === 'contacted' ? 148000 : cfg.key === 'qualified' ? 192000 : cfg.key === 'proposal' ? 218000 : cfg.key === 'negotiation' ? 242000 : 380000,
+        count,
+        value,
       };
     });
 
-    // Identify hotspot
-    const activeStages = stages.filter((s) => s.key !== 'won');
+    // Identify hotspot (active stage with highest value)
+    const activeStages = stages.filter((s) => s.key !== 'won' && s.value > 0);
     let maxVal = 0;
-    let hotspotKey: LeadStage = 'negotiation';
+    let hotspotKey: LeadStage | null = null;
     activeStages.forEach((s) => {
       if (s.value > maxVal) {
         maxVal = s.value;
@@ -81,24 +84,69 @@ export function CrmPipelineFunnelCard({ className }: CrmPipelineFunnelCardProps)
 
     return stages.map((s) => ({
       ...s,
-      isHotspot: s.key === hotspotKey,
+      isHotspot: hotspotKey !== null && s.key === hotspotKey,
     }));
   }, [leads]);
 
-  const totalValue = React.useMemo(() => {
-    return funnelStages.reduce((sum, s) => sum + s.value, 0);
+  // "Active" excludes closed-won outcomes
+  const { totalValue, totalDeals } = React.useMemo(() => {
+    const activeStages = funnelStages.filter((s) => s.key !== 'won');
+    return {
+      totalValue: activeStages.reduce((sum, s) => sum + s.value, 0),
+      totalDeals: activeStages.reduce((sum, s) => sum + s.count, 0),
+    };
   }, [funnelStages]);
 
-  const totalDeals = React.useMemo(() => {
-    return funnelStages.reduce((sum, s) => sum + s.count, 0);
-  }, [funnelStages]);
+  const maxValue = React.useMemo(
+    () => Math.max(...funnelStages.map((s) => s.value), 1),
+    [funnelStages]
+  );
 
-  const maxValue = 400000;
+  if (isLoading) {
+    return (
+      <Card
+        className={cn(
+          'flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 md:p-7 shadow-xs',
+          className
+        )}
+      >
+        <CardHeader className="flex flex-row items-center justify-between p-0 pb-4 border-b border-border/60">
+          <div className="space-y-1.5">
+            <Skeleton className="h-6 w-36" />
+            <Skeleton className="h-3.5 w-48" />
+          </div>
+          <Skeleton className="h-8 w-8 rounded-lg" />
+        </CardHeader>
+
+        <CardContent className="p-0 pt-6 flex-1 flex flex-col justify-between space-y-5">
+          <div className="space-y-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-2 w-2 rounded-full" />
+                    <Skeleton className="h-3.5 w-24" />
+                  </div>
+                  <Skeleton className="h-3.5 w-16" />
+                </div>
+                <Skeleton className="h-2.5 w-full rounded-full" />
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between pt-4 border-t border-border/50">
+            <Skeleton className="h-4 w-44" />
+            <Skeleton className="h-4 w-28" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card
       className={cn(
-        'flex flex-col justify-between rounded-xl border border-border/80 bg-card p-6 shadow-xs transition-all duration-200',
+        'flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 md:p-7 shadow-xs transition-all duration-200',
         className
       )}
     >
@@ -107,7 +155,7 @@ export function CrmPipelineFunnelCard({ className }: CrmPipelineFunnelCardProps)
           ========================================================================= */}
       <CardHeader className="flex flex-row items-center justify-between p-0 pb-4 border-b border-border/60">
         <div className="space-y-1">
-          <CardTitle className="font-display text-base sm:text-lg font-bold text-foreground">
+          <CardTitle className="font-display text-lg sm:text-xl font-bold text-foreground tracking-tight">
             Pipeline Funnel
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground">
@@ -153,14 +201,17 @@ export function CrmPipelineFunnelCard({ className }: CrmPipelineFunnelCardProps)
       {/* =========================================================================
           CONTENT: Stepped Conversion Funnel with Smooth Progress Bars
           ========================================================================= */}
-      <CardContent className="p-0 pt-5 flex-1 flex flex-col justify-between space-y-4">
-        <div className="space-y-3.5">
+      <CardContent className="p-0 pt-6 flex-1 flex flex-col justify-between space-y-5">
+        <div className="space-y-4">
           {funnelStages.map((st, idx) => {
-            const widthPct = Math.min(100, Math.max(15, Math.round((st.value / maxValue) * 100)));
+            const widthPct =
+              st.value > 0
+                ? Math.min(100, Math.max(10, Math.round((st.value / maxValue) * 100)))
+                : 0;
 
             return (
-              <div key={st.key} className="space-y-1.5 group">
-                <div className="flex items-center justify-between text-xs">
+              <div key={st.key} className="space-y-2 group">
+                <div className="flex items-center justify-between gap-3 text-xs">
                   {/* Left: Indicator, Stage Name, Hotspot Tag */}
                   <span className="font-medium text-foreground flex items-center gap-2 truncate">
                     <span
@@ -171,29 +222,29 @@ export function CrmPipelineFunnelCard({ className }: CrmPipelineFunnelCardProps)
                     {st.isHotspot && (
                       <Badge
                         variant="highlight"
-                        className="text-[9px] px-1.5 py-0 h-4 uppercase font-mono tracking-wider ml-1 shadow-2xs font-bold"
+                        className="text-[10px] px-1.5 py-0 h-4 uppercase font-mono tracking-wider ml-1 shadow-2xs font-bold"
                       >
-                        ${(st.value / 1000).toFixed(0)}k Hotspot
+                        {formatCurrency(st.value)} Hotspot
                       </Badge>
                     )}
                   </span>
 
-                  {/* Right: Deal Count, Tabular Value, Pass Rate */}
+                  {/* Right: Deal Count & Tabular Value */}
                   <div className="flex items-center gap-2 font-mono text-[11px] shrink-0">
                     <span className="text-muted-foreground">({st.count})</span>
                     <span className="font-bold text-foreground tabular-nums">
-                      ${(st.value / 1000).toFixed(0)}k
+                      {st.value > 0 ? formatCurrency(st.value) : '$0'}
                     </span>
                     {idx < funnelStages.length - 1 && (
-                      <span className="text-[10px] text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded border border-border/40">
-                        {st.passRate}% pass
+                      <span className="text-[10px] text-muted-foreground">
+                        → {st.passRate}%
                       </span>
                     )}
                   </div>
                 </div>
 
                 {/* Progress Bar Track */}
-                <div className="h-2 w-full bg-muted/40 rounded-full overflow-hidden p-0.5 border border-border/30">
+                <div className="h-2.5 w-full bg-muted/50 rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500 ease-out group-hover:opacity-90"
                     style={{
@@ -212,7 +263,7 @@ export function CrmPipelineFunnelCard({ className }: CrmPipelineFunnelCardProps)
             ========================================================================= */}
         <div className="flex items-center justify-between pt-4 border-t border-border/50 text-xs text-muted-foreground">
           <span className="font-mono text-[11px]">
-            Active: <strong className="text-foreground">${totalValue.toLocaleString()}</strong> ({totalDeals} opportunities)
+            Active: <strong className="text-foreground">{formatCurrency(totalValue)}</strong> ({totalDeals} opportunities)
           </span>
           <Link
             href="/crm/leads"

@@ -15,9 +15,11 @@ import {
   AvatarImage,
   SegmentedControl,
   SegmentedControlItem,
+  formatCurrency,
   cn,
 } from '@ds/ui';
 import { useCrm } from '../store/crm-context';
+import { calculateActivePipeline } from '../lib/pipeline';
 
 export type TimeHorizon = 'mtd' | 'q1' | 'ytd';
 
@@ -42,15 +44,23 @@ export function CrmExecutiveBriefing({
 }: CrmExecutiveBriefingProps) {
   const { currentAgent, metrics, leads, openAiDrawer, setSelectedLeadId } = useCrm();
 
-  const urgentDeals = React.useMemo(() => {
-    return leads
-      .filter((l) => l.priority === 'urgent' && l.stage !== 'won' && l.stage !== 'lost')
-      .slice(0, 3);
+  const activePipelineValue = React.useMemo(() => {
+    return calculateActivePipeline(leads);
   }, [leads]);
 
+  const allUrgentDeals = React.useMemo(() => {
+    return leads.filter((l) => l.priority === 'urgent' && l.stage !== 'won' && l.stage !== 'lost');
+  }, [leads]);
+
+  const urgentDeals = React.useMemo(() => {
+    return allUrgentDeals.slice(0, 3);
+  }, [allUrgentDeals]);
+
+  const urgentDealsOverflowCount = allUrgentDeals.length - urgentDeals.length;
+
   const urgentDealsValue = React.useMemo(() => {
-    return urgentDeals.reduce((sum, d) => sum + d.dealValue, 0);
-  }, [urgentDeals]);
+    return allUrgentDeals.reduce((sum, d) => sum + d.dealValue, 0);
+  }, [allUrgentDeals]);
 
   return (
     <div className="flex flex-col gap-5 pt-1">
@@ -125,25 +135,25 @@ export function CrmExecutiveBriefing({
       </div>
 
       {/* Narrative Headline & Synthesis (Airy, Direct & Crisp) */}
-      <div className="space-y-2 py-1">
-        <h1 className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+      <div className="space-y-3 pt-2">
+        <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground leading-[1.15]">
           Pipeline pacing at{' '}
-          <span className="text-primary font-extrabold">
+          <span className="text-highlight font-extrabold">
             +{metrics.pipelineGrowthPct}%
           </span>{' '}
           with{' '}
           <span className="font-extrabold">
-            ${metrics.totalPipelineValue.toLocaleString()}
+            {formatCurrency(activePipelineValue)}
           </span>{' '}
           active ARR.
         </h1>
-        <p className="text-sm leading-relaxed text-muted-foreground max-w-4xl">
+        <p className="text-sm sm:text-base leading-relaxed text-muted-foreground max-w-2xl">
           {urgentDeals.length > 0 ? (
             <>
               <span className="font-medium text-foreground">
                 {urgentDeals.length} high-priority enterprise deals
               </span>{' '}
-              (${Math.round(urgentDealsValue / 1000)}k pipeline) are in late-stage negotiation,
+              ({formatCurrency(urgentDealsValue)} pipeline) are in late-stage negotiation,
               sustaining a <span className="font-medium text-foreground">{metrics.winRatePct}%</span> win rate with{' '}
               <span className="font-medium text-foreground">{metrics.leadsWonThisMonth} closed deals</span> across{' '}
               {metrics.activeLeadsCount} active accounts this period.
@@ -160,7 +170,7 @@ export function CrmExecutiveBriefing({
 
       {/* Clean Priority Deals Strip */}
       {urgentDeals.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 pt-1">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-2">
           <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider font-mono font-semibold text-muted-foreground shrink-0">
             <Flame className="h-3.5 w-3.5 text-warning" />
             <span>Priority Deals:</span>
@@ -179,18 +189,27 @@ export function CrmExecutiveBriefing({
                     initialTab: 'lead-scoring',
                   });
                 }}
-                className="inline-flex items-center gap-2 rounded-lg border border-border/80 bg-card px-2.5 py-1 text-xs text-foreground hover:bg-accent/60 hover:border-border transition-all cursor-pointer group shadow-2xs"
+                className="inline-flex items-center gap-2 rounded-lg border border-border/80 bg-card px-3 py-1.5 text-xs text-foreground hover:bg-accent/60 hover:border-border transition-all cursor-pointer group shadow-2xs"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-warning shrink-0" />
                 <span className="font-medium group-hover:text-primary transition-colors">
                   {deal.company}
                 </span>
                 <span className="font-mono text-muted-foreground text-[11px]">
-                  ${Math.round(deal.dealValue / 1000)}k
+                  {formatCurrency(deal.dealValue)}
                 </span>
                 <ArrowUpRight className="h-3 w-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-hover:text-primary transition-all" />
               </button>
             ))}
+
+            {urgentDealsOverflowCount > 0 && (
+              <Link
+                href="/crm/leads"
+                className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-muted/40 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-all shadow-2xs font-mono"
+              >
+                <span>+{urgentDealsOverflowCount} more</span>
+                <ArrowUpRight className="h-3 w-3" />
+              </Link>
+            )}
           </div>
         </div>
       )}

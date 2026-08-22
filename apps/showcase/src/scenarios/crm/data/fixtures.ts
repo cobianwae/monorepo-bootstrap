@@ -801,11 +801,16 @@ export const INITIAL_ACTIVITIES: Activity[] = [
 
 export const INITIAL_METRICS: DashboardMetrics = {
   totalPipelineValue: 846000,
+  quotaTarget: 1020000,
   pipelineGrowthPct: 18.4,
   activeLeadsCount: 48,
   leadsWonThisMonth: 12,
   winRatePct: 34.8,
+  winRateDeltaPct: 4.2,
+  avgSalesCycleDays: 18.4,
+  salesCycleDeltaDays: 3.2,
   avgResponseTimeMin: 2.4,
+  responseTimeDeltaMin: 1.8,
   csatScore: 98.2,
   activeCampaignsCount: 3,
   aiSuggestedActionsCount: 6,

@@ -155,11 +155,16 @@ export interface AiLeadInsight {
 
 export interface DashboardMetrics {
   totalPipelineValue: number;
+  quotaTarget: number;
   pipelineGrowthPct: number;
   activeLeadsCount: number;
   leadsWonThisMonth: number;
   winRatePct: number;
+  winRateDeltaPct: number;
+  avgSalesCycleDays: number;
+  salesCycleDeltaDays: number;
   avgResponseTimeMin: number;
+  responseTimeDeltaMin: number;
   csatScore: number;
   activeCampaignsCount: number;
   aiSuggestedActionsCount: number;

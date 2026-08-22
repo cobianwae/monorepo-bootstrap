@@ -1,6 +1,7 @@
 export * from './types';
 export * from './data/fixtures';
 export * from './lib/mock-api';
+export * from './lib/pipeline';
 export * from './nav-config';
 export * from './store/crm-context';
 export * from './components/crm-command-palette';

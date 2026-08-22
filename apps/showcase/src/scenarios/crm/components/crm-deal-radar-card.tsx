@@ -27,10 +27,14 @@ import {
   AvatarFallback,
   AvatarImage,
   EmptyState,
+  Skeleton,
   Tooltip,
   TooltipTrigger,
   TooltipContent,
   TooltipProvider,
+  SegmentedControl,
+  SegmentedControlItem,
+  formatCurrency,
   toast,
   cn,
 } from '@ds/ui';
@@ -41,6 +45,7 @@ export type RadarLens = 'all' | 'closing' | 'risk' | 'plg';
 
 interface CrmDealRadarCardProps {
   className?: string;
+  isLoading?: boolean;
 }
 
 interface SignalClassification {
@@ -211,7 +216,7 @@ function getNextBestAction(lead: Lead): { actionText: string } {
   return { actionText: 'Initiate context-aware Copilot follow-up sequence' };
 }
 
-export function CrmDealRadarCard({ className }: CrmDealRadarCardProps) {
+export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarCardProps) {
   const { leads, openAiDrawer, setSelectedLeadId } = useCrm();
   const [activeLens, setActiveLens] = React.useState<RadarLens>('all');
   const [isScanning, setIsScanning] = React.useState(false);
@@ -312,11 +317,66 @@ export function CrmDealRadarCard({ className }: CrmDealRadarCardProps) {
     }, 500);
   };
 
+  if (isLoading) {
+    return (
+      <Card
+        className={cn(
+          'relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 md:p-7 shadow-xs',
+          className
+        )}
+      >
+        <CardHeader className="p-0 pb-4 space-y-3.5 border-b border-border/60">
+          <div className="flex items-start justify-between gap-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2.5">
+                <Skeleton className="h-6 w-44" />
+                <Skeleton className="h-4 w-24 rounded-full" />
+              </div>
+              <Skeleton className="h-3.5 w-64" />
+            </div>
+            <Skeleton className="h-8 w-8 rounded-lg" />
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 bg-muted/30 rounded-lg">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-7 rounded-md" />
+            ))}
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-0 pt-4 flex-1 flex flex-col justify-between space-y-4">
+          <div className="divide-y divide-border/40">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className={cn('space-y-2.5', i === 0 ? 'pb-4' : i === 2 ? 'pt-4' : 'py-4')}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <div className="space-y-1">
+                      <Skeleton className="h-4 w-28" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                  </div>
+                  <Skeleton className="h-4 w-16" />
+                </div>
+                <Skeleton className="h-12 w-full rounded-lg" />
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between pt-4 border-t border-border/50">
+            <Skeleton className="h-4 w-36" />
+            <Skeleton className="h-4 w-24" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <TooltipProvider>
       <Card
         className={cn(
-          'relative flex flex-col justify-between rounded-xl border border-border/80 bg-card p-6 shadow-xs transition-all duration-200',
+          'relative flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 md:p-7 shadow-xs transition-all duration-200',
           className
         )}
       >
@@ -327,13 +387,13 @@ export function CrmDealRadarCard({ className }: CrmDealRadarCardProps) {
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-1">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <CardTitle className="font-display text-base sm:text-lg font-bold text-foreground">
+                <CardTitle className="font-display text-lg sm:text-xl font-bold text-foreground tracking-tight">
                   AI Opportunity Radar
                 </CardTitle>
 
                 {/* Outline Live Beacon */}
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/25 bg-background text-foreground px-2.5 py-0.5 text-[10px] font-mono font-bold shadow-2xs">
-                  <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-success" />
                   LIVE SWEEP
                 </span>
               </div>
@@ -363,63 +423,46 @@ export function CrmDealRadarCard({ className }: CrmDealRadarCardProps) {
           </div>
 
           {/* Clean Segmented Filter Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 bg-muted/50 rounded-lg border border-border/40">
-            <button
-              type="button"
-              onClick={() => setActiveLens('all')}
-              className={cn(
-                'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-xs transition-all cursor-pointer truncate',
-                activeLens === 'all'
-                  ? 'bg-card text-foreground font-semibold shadow-2xs border border-border/60'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
+          <SegmentedControl
+            type="single"
+            value={activeLens}
+            onValueChange={(val) => {
+              if (val) setActiveLens(val as RadarLens);
+            }}
+            className="h-8 bg-muted/50 p-0.5 shadow-2xs w-full grid grid-cols-4"
+          >
+            <SegmentedControlItem
+              value="all"
+              className="h-7 px-2 text-xs truncate font-mono"
             >
               <span>Hotspots</span>
-              <span className="font-mono text-[10px] opacity-75">({lensCounts.all})</span>
-            </button>
+              <span className="text-[11px] opacity-75">({lensCounts.all})</span>
+            </SegmentedControlItem>
 
-            <button
-              type="button"
-              onClick={() => setActiveLens('closing')}
-              className={cn(
-                'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-xs transition-all cursor-pointer truncate',
-                activeLens === 'closing'
-                  ? 'bg-card text-foreground font-semibold shadow-2xs border border-border/60'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
+            <SegmentedControlItem
+              value="closing"
+              className="h-7 px-2 text-xs truncate font-mono"
             >
               <span>Closing</span>
-              <span className="font-mono text-[10px] opacity-75">({lensCounts.closing})</span>
-            </button>
+              <span className="text-[11px] opacity-75">({lensCounts.closing})</span>
+            </SegmentedControlItem>
 
-            <button
-              type="button"
-              onClick={() => setActiveLens('risk')}
-              className={cn(
-                'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-xs transition-all cursor-pointer truncate',
-                activeLens === 'risk'
-                  ? 'bg-card text-foreground font-semibold shadow-2xs border border-border/60'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
+            <SegmentedControlItem
+              value="risk"
+              className="h-7 px-2 text-xs truncate font-mono"
             >
               <span>Gates</span>
-              <span className="font-mono text-[10px] opacity-75">({lensCounts.risk})</span>
-            </button>
+              <span className="text-[11px] opacity-75">({lensCounts.risk})</span>
+            </SegmentedControlItem>
 
-            <button
-              type="button"
-              onClick={() => setActiveLens('plg')}
-              className={cn(
-                'flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-md text-xs transition-all cursor-pointer truncate',
-                activeLens === 'plg'
-                  ? 'bg-card text-foreground font-semibold shadow-2xs border border-border/60'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
+            <SegmentedControlItem
+              value="plg"
+              className="h-7 px-2 text-xs truncate font-mono"
             >
               <span>PLG Fast</span>
-              <span className="font-mono text-[10px] opacity-75">({lensCounts.plg})</span>
-            </button>
-          </div>
+              <span className="text-[11px] opacity-75">({lensCounts.plg})</span>
+            </SegmentedControlItem>
+          </SegmentedControl>
         </CardHeader>
 
         {/* =========================================================================
@@ -448,7 +491,7 @@ export function CrmDealRadarCard({ className }: CrmDealRadarCardProps) {
                     key={lead.id}
                     className={cn(
                       'group transition-colors duration-150',
-                      index === 0 ? 'pb-4' : index === radarLeads.length - 1 ? 'pt-4' : 'py-4'
+                      index === 0 ? 'pb-3.5' : index === radarLeads.length - 1 ? 'pt-3.5' : 'py-3.5'
                     )}
                   >
                     {/* Row 1: Identity, Signal, Value & Conviction */}
@@ -489,14 +532,14 @@ export function CrmDealRadarCard({ className }: CrmDealRadarCardProps) {
 
                             <Badge
                               variant={signal.badgeVariant}
-                              className="text-[9px] font-mono px-1.5 py-0 h-4 inline-flex items-center gap-1 font-bold"
+                              className="text-[11px] font-mono px-1.5 py-0 h-4 inline-flex items-center gap-1 font-bold"
                             >
                               <SignalIcon className="h-2.5 w-2.5" />
                               <span>{signal.label}</span>
                             </Badge>
                           </div>
                           <p className="text-[11px] text-muted-foreground truncate mt-0.5">
-                            {lead.name} · <span className="uppercase font-mono text-[10px]">{lead.stage}</span>
+                            {lead.name} · <span className="uppercase font-mono text-[11px]">{lead.stage}</span>
                           </p>
                         </div>
                       </div>
@@ -504,7 +547,7 @@ export function CrmDealRadarCard({ className }: CrmDealRadarCardProps) {
                       {/* Right: Deal Value + Dynamic Colored Conviction */}
                       <div className="text-right shrink-0">
                         <div className="font-display font-extrabold text-sm sm:text-base text-foreground tabular-nums">
-                          ${lead.dealValue.toLocaleString()}
+                          {formatCurrency(lead.dealValue)}
                         </div>
                         <div className={cn('inline-flex items-center gap-1 text-[11px] font-mono font-bold mt-0.5', tier.textColor)}>
                           <Flame className="h-2.5 w-2.5 shrink-0" />
@@ -513,64 +556,64 @@ export function CrmDealRadarCard({ className }: CrmDealRadarCardProps) {
                       </div>
                     </div>
 
-                    {/* Row 2: Unified Catalyst & Next-Action Box (Smooth Tier Gradient) */}
+                    {/* Row 2: Unified Catalyst Box with integrated footer actions */}
                     <div
                       className={cn(
-                        'mt-2.5 rounded-r-lg border-l-2 pl-3.5 pr-3 py-2 text-xs space-y-1 transition-all duration-150',
+                        'mt-2.5 rounded-r-lg border-l-2 pl-3.5 pr-3 py-2 text-xs space-y-1.5 transition-all duration-150',
                         tier.borderColor,
                         tier.bgGradient
                       )}
                     >
-                      <p className="text-foreground/90 leading-relaxed">
+                      <p className="text-foreground/90 leading-relaxed text-xs">
                         {lead.aiScoreReason}
                       </p>
-                      <p className="text-[11px] text-muted-foreground pt-0.5">
+                      <p className="text-[11px] text-muted-foreground">
                         <strong className="text-foreground font-medium">Next: </strong>
                         {nba.actionText}
                       </p>
-                    </div>
 
-                    {/* Row 3: Touchpoint Meta & Ghost Action Triggers */}
-                    <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
-                      <span className="font-mono">
-                        {lead.assignedAgentName.split(' ')[0]} · Touch: {lead.lastContactedAt}
-                      </span>
+                      {/* Inline Meta & Action Triggers */}
+                      <div className="pt-1.5 flex items-center justify-between text-[11px] text-muted-foreground border-t border-border/30">
+                        <span className="font-mono">
+                          {lead.assignedAgentName.split(' ')[0]} · Touch: {lead.lastContactedAt}
+                        </span>
 
-                      <div className="flex items-center gap-1.5">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 text-xs px-2.5 gap-1.5 text-muted-foreground hover:text-foreground"
-                          onClick={() => {
-                            setSelectedLeadId(lead.id);
-                            openAiDrawer({
-                              type: 'lead',
-                              entityId: lead.id,
-                              initialTab: 'draft',
-                            });
-                          }}
-                        >
-                          <Mail className="h-3.5 w-3.5" />
-                          <span>Draft</span>
-                        </Button>
+                        <div className="flex items-center gap-1.5">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 text-[11px] px-2 gap-1 text-muted-foreground hover:text-foreground"
+                            onClick={() => {
+                              setSelectedLeadId(lead.id);
+                              openAiDrawer({
+                                type: 'lead',
+                                entityId: lead.id,
+                                initialTab: 'draft',
+                              });
+                            }}
+                          >
+                            <Mail className="h-3 w-3" />
+                            <span>Draft</span>
+                          </Button>
 
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 text-xs px-2.5 gap-1.5 text-muted-foreground hover:text-foreground hover:bg-highlight/10 hover:text-highlight transition-colors"
-                          onClick={() => {
-                            setSelectedLeadId(lead.id);
-                            openAiDrawer({
-                              type: 'lead',
-                              entityId: lead.id,
-                              initialTab: 'lead-scoring',
-                            });
-                          }}
-                        >
-                          <Zap className="h-3.5 w-3.5 text-highlight" />
-                          <span>AI Triage</span>
-                          <ArrowUpRight className="h-3 w-3 opacity-60" />
-                        </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="h-6 text-[11px] px-2 gap-1 text-highlight hover:bg-highlight/10 transition-colors font-medium"
+                            onClick={() => {
+                              setSelectedLeadId(lead.id);
+                              openAiDrawer({
+                                type: 'lead',
+                                entityId: lead.id,
+                                initialTab: 'lead-scoring',
+                              });
+                            }}
+                          >
+                            <Zap className="h-3 w-3" />
+                            <span>AI Triage</span>
+                            <ArrowUpRight className="h-2.5 w-2.5 opacity-70" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -587,7 +630,7 @@ export function CrmDealRadarCard({ className }: CrmDealRadarCardProps) {
               <span className="text-foreground font-medium">
                 In-Scope Value:{' '}
                 <span className="font-mono font-bold text-highlight">
-                  ${totalInScopeValue.toLocaleString()}
+                  {formatCurrency(totalInScopeValue)}
                 </span>
               </span>
               <span className="text-[11px] font-mono text-muted-foreground hidden sm:inline">
