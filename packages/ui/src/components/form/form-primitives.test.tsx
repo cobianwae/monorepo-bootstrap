@@ -63,6 +63,15 @@ describe('Form Primitives', () => {
       fireEvent.click(checkbox);
       expect(checkbox.getAttribute('data-state')).toBe('checked');
     });
+
+    it('keeps the 16px visual while expanding the hit area to 44px', () => {
+      render(<Checkbox aria-label="agree" />);
+      const checkbox = screen.getByRole('checkbox');
+      expect(checkbox.className).toContain('h-4');
+      expect(checkbox.className).toContain('w-4');
+      expect(checkbox.className).toContain('before:absolute');
+      expect(checkbox.className).toContain('before:-inset-3.5');
+    });
   });
 
   describe('Switch', () => {
@@ -71,6 +80,14 @@ describe('Form Primitives', () => {
       const sw = screen.getByRole('switch');
       fireEvent.click(sw);
       expect(sw.getAttribute('data-state')).toBe('checked');
+    });
+
+    it('meets the minimum touch target while keeping a slim track', () => {
+      render(<Switch aria-label="notifications" />);
+      const sw = screen.getByRole('switch');
+      expect(sw.className).toContain('h-6');
+      expect(sw.className).toContain('w-11');
+      expect(sw.className).toContain('before:-inset-y-2.5');
     });
   });
 

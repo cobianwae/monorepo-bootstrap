@@ -31,6 +31,20 @@ describe('Overlay & Menu Components', () => {
       expect(screen.getByText('Edit profile')).toBeDefined();
       expect(screen.getByText('Update your details')).toBeDefined();
     });
+
+    it('renders a close button with an accessible name and 44px hit area', () => {
+      render(
+        <Dialog open>
+          <DialogContent>
+            <DialogTitle>Edit profile</DialogTitle>
+          </DialogContent>
+        </Dialog>
+      );
+      const close = screen.getByRole('button', { name: 'Close' });
+      expect(close.className).toContain('h-8');
+      expect(close.className).toContain('w-8');
+      expect(close.className).toContain('after:-inset-1.5');
+    });
   });
 
   describe('Sheet', () => {
@@ -43,6 +57,20 @@ describe('Overlay & Menu Components', () => {
         </Sheet>
       );
       expect(screen.getByText('Settings')).toBeDefined();
+    });
+
+    it('renders a close button with an accessible name and 44px hit area', () => {
+      render(
+        <Sheet open>
+          <SheetContent>
+            <SheetTitle>Settings</SheetTitle>
+          </SheetContent>
+        </Sheet>
+      );
+      const close = screen.getByRole('button', { name: 'Close' });
+      expect(close.className).toContain('h-8');
+      expect(close.className).toContain('w-8');
+      expect(close.className).toContain('after:-inset-1.5');
     });
   });
 
