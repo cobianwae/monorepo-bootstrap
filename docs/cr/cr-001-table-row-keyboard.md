@@ -1,6 +1,6 @@
 # CR-001 — Keyboard access untuk clickable table row
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit
 **Ref:** `packages/ui/src/components/data-display/data-table.tsx:481`
 
@@ -48,5 +48,5 @@ Commit: `fix: add keyboard access to clickable data table rows [CR-001]`
 - [x] Branch dibuat.
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
 - [x] `docs/STATUS.md` diperbarui bila relevan.
