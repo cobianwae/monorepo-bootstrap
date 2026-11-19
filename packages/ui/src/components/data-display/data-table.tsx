@@ -27,6 +27,7 @@ import {
   Columns3,
   X,
   SlidersHorizontal,
+  AlertTriangle,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
@@ -86,6 +87,8 @@ export interface DataTableProps<TData, TValue>
   skeletonRows?: number;
   emptyTitle?: string;
   emptyDescription?: string;
+  error?: boolean;
+  onRetry?: () => void;
   enableRowSelection?: boolean;
   enableSorting?: boolean;
   enableColumnVisibility?: boolean;
@@ -433,6 +436,8 @@ export interface DataTablePropsBase<TData> {
   skeletonRows?: number;
   emptyTitle?: string;
   emptyDescription?: string;
+  error?: boolean;
+  onRetry?: () => void;
   onRowClick?: (row: TData) => void;
   emptyIcon?: LucideIcon;
 }
@@ -443,6 +448,8 @@ export function DataTableBody<TData>({
   skeletonRows = 6,
   emptyTitle = 'No results',
   emptyDescription = 'Try adjusting your search or filters.',
+  error,
+  onRetry,
   onRowClick,
   emptyIcon,
 }: DataTablePropsBase<TData>) {
@@ -462,8 +469,32 @@ export function DataTableBody<TData>({
     );
   }
 
+  // Urutan prioritas state: loading → error → empty → data.
+  if (error) {
+    return (
+      <TableBody>
+        <TableRow>
+          <TableCell
+            colSpan={table.getVisibleFlatColumns().length}
+            className="h-64 text-center"
+          >
+            <EmptyState
+              variant="error"
+              icon={AlertTriangle}
+              title="Something went wrong"
+              description="There was a problem loading the data."
+              actionLabel={onRetry ? 'Try again' : undefined}
+              onAction={onRetry}
+            />
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    );
+  }
+
   const rows = table.getRowModel().rows;
   if (rows.length === 0) {
+    const hasColumnFilters = table.getState().columnFilters.length > 0;
     return (
       <TableBody>
         <TableRow>
@@ -475,6 +506,8 @@ export function DataTableBody<TData>({
               title={emptyTitle}
               description={emptyDescription}
               icon={emptyIcon}
+              actionLabel={hasColumnFilters ? 'Clear filters' : undefined}
+              onAction={hasColumnFilters ? () => table.resetColumnFilters() : undefined}
             />
           </TableCell>
         </TableRow>
@@ -592,6 +625,8 @@ export function DataTable<TData, TValue>({
   skeletonRows,
   emptyTitle,
   emptyDescription,
+  error,
+  onRetry,
   enableRowSelection,
   enableSorting,
   enableColumnVisibility,
@@ -634,6 +669,8 @@ export function DataTable<TData, TValue>({
             skeletonRows={skeletonRows}
             emptyTitle={emptyTitle}
             emptyDescription={emptyDescription}
+            error={error}
+            onRetry={onRetry}
             onRowClick={onRowClick}
           />
         </Table>
