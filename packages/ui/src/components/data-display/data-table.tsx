@@ -27,6 +27,7 @@ import {
   Columns3,
   X,
   SlidersHorizontal,
+  AlertTriangle,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
@@ -86,6 +87,8 @@ export interface DataTableProps<TData, TValue>
   skeletonRows?: number;
   emptyTitle?: string;
   emptyDescription?: string;
+  error?: boolean;
+  onRetry?: () => void;
   enableRowSelection?: boolean;
   enableSorting?: boolean;
   enableColumnVisibility?: boolean;
@@ -391,9 +394,15 @@ export interface SortableHeaderProps<TData> {
   column: TanStackColumn<TData, unknown>;
   children: React.ReactNode;
   className?: string;
+  sortDirection?: 'ascending' | 'descending' | 'none';
 }
 
-export function SortableHeader<TData>({ column, children, className }: SortableHeaderProps<TData>) {
+export function SortableHeader<TData>({
+  column,
+  children,
+  className,
+  sortDirection,
+}: SortableHeaderProps<TData>) {
   const isSorted = column.getIsSorted();
   return (
     <button
@@ -403,7 +412,11 @@ export function SortableHeader<TData>({ column, children, className }: SortableH
         'group inline-flex items-center gap-1.5 font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm',
         className
       )}
-      aria-label={`Sort by ${column.id}`}
+      aria-label={
+        sortDirection === 'ascending' || sortDirection === 'descending'
+          ? `Sort by ${column.id}, ${sortDirection}`
+          : `Sort by ${column.id}`
+      }
     >
       {children}
       {isSorted === 'asc' ? (
@@ -423,6 +436,8 @@ export interface DataTablePropsBase<TData> {
   skeletonRows?: number;
   emptyTitle?: string;
   emptyDescription?: string;
+  error?: boolean;
+  onRetry?: () => void;
   onRowClick?: (row: TData) => void;
   emptyIcon?: LucideIcon;
 }
@@ -433,6 +448,8 @@ export function DataTableBody<TData>({
   skeletonRows = 6,
   emptyTitle = 'No results',
   emptyDescription = 'Try adjusting your search or filters.',
+  error,
+  onRetry,
   onRowClick,
   emptyIcon,
 }: DataTablePropsBase<TData>) {
@@ -452,8 +469,32 @@ export function DataTableBody<TData>({
     );
   }
 
+  // Urutan prioritas state: loading → error → empty → data.
+  if (error) {
+    return (
+      <TableBody>
+        <TableRow>
+          <TableCell
+            colSpan={table.getVisibleFlatColumns().length}
+            className="h-64 text-center"
+          >
+            <EmptyState
+              variant="error"
+              icon={AlertTriangle}
+              title="Something went wrong"
+              description="There was a problem loading the data."
+              actionLabel={onRetry ? 'Try again' : undefined}
+              onAction={onRetry}
+            />
+          </TableCell>
+        </TableRow>
+      </TableBody>
+    );
+  }
+
   const rows = table.getRowModel().rows;
   if (rows.length === 0) {
+    const hasColumnFilters = table.getState().columnFilters.length > 0;
     return (
       <TableBody>
         <TableRow>
@@ -465,6 +506,8 @@ export function DataTableBody<TData>({
               title={emptyTitle}
               description={emptyDescription}
               icon={emptyIcon}
+              actionLabel={hasColumnFilters ? 'Clear filters' : undefined}
+              onAction={hasColumnFilters ? () => table.resetColumnFilters() : undefined}
             />
           </TableCell>
         </TableRow>
@@ -536,16 +579,24 @@ export function DataTableHeader<TData>({
         <TableRow key={headerGroup.id}>
           {headerGroup.headers.map((header) => {
             const canSort = enableSorting && header.column.getCanSort();
+            const isSorted = header.column.getIsSorted();
+            const sortDirection = canSort
+              ? (isSorted === 'asc' ? 'ascending' : isSorted === 'desc' ? 'descending' : 'none')
+              : undefined;
             return (
               <TableHead
                 key={header.id}
                 className="whitespace-nowrap"
+                sortDirection={sortDirection}
               >
                 {header.isPlaceholder
                   ? null
                   : canSort
                     ? (
-                        <SortableHeader column={header.column}>
+                        <SortableHeader
+                          column={header.column}
+                          sortDirection={sortDirection}
+                        >
                           {flexRender(
                             header.column.columnDef.header,
                             header.getContext()
@@ -574,6 +625,8 @@ export function DataTable<TData, TValue>({
   skeletonRows,
   emptyTitle,
   emptyDescription,
+  error,
+  onRetry,
   enableRowSelection,
   enableSorting,
   enableColumnVisibility,
@@ -616,6 +669,8 @@ export function DataTable<TData, TValue>({
             skeletonRows={skeletonRows}
             emptyTitle={emptyTitle}
             emptyDescription={emptyDescription}
+            error={error}
+            onRetry={onRetry}
             onRowClick={onRowClick}
           />
         </Table>

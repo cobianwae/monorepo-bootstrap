@@ -96,4 +96,36 @@ describe('Table components', () => {
     expect(relaxed.querySelector('table')?.className).toContain('text-base');
     expect(relaxed.querySelector('table')?.className).toContain('py-5');
   });
+
+  it('TableHead exposes aria-sort via sortDirection prop', () => {
+    render(
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead sortDirection="ascending">Name</TableHead>
+            <TableHead sortDirection="descending">Role</TableHead>
+            <TableHead sortDirection="none">Age</TableHead>
+          </TableRow>
+        </TableHeader>
+      </Table>
+    );
+
+    expect(screen.getByRole('columnheader', { name: 'Name' }).getAttribute('aria-sort')).toBe('ascending');
+    expect(screen.getByRole('columnheader', { name: 'Role' }).getAttribute('aria-sort')).toBe('descending');
+    expect(screen.getByRole('columnheader', { name: 'Age' }).getAttribute('aria-sort')).toBe('none');
+  });
+
+  it('TableHead omits aria-sort when sortDirection is not provided', () => {
+    render(
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+          </TableRow>
+        </TableHeader>
+      </Table>
+    );
+
+    expect(screen.getByRole('columnheader', { name: 'Name' }).getAttribute('aria-sort')).toBeNull();
+  });
 });

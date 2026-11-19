@@ -39,6 +39,23 @@ describe('Feedback Components', () => {
       fireEvent.click(screen.getByText('Reset'));
       expect(onAction).toHaveBeenCalledTimes(1);
     });
+
+    it('renders error variant with destructive styling', () => {
+      const { container } = render(
+        <EmptyState
+          variant="error"
+          icon={AlertTriangle}
+          title="Failed to load"
+          description="Please try again."
+        />
+      );
+      const root = container.firstElementChild as HTMLElement;
+      expect(root.className).toContain('border-destructive/40');
+      expect(root.className).toContain('bg-destructive/5');
+      const iconWrapper = root.querySelector('.rounded-full') as HTMLElement | null;
+      expect(iconWrapper?.className).toContain('bg-destructive/10');
+      expect(iconWrapper?.className).toContain('text-destructive');
+    });
   });
 
   describe('Skeleton', () => {

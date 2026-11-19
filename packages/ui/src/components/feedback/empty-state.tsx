@@ -1,9 +1,27 @@
 import * as React from 'react';
 import type { LucideIcon } from 'lucide-react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 import { Button } from '../base/button';
 
-export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
+export const emptyStateVariants = cva(
+  'flex flex-col items-center justify-center rounded-xl border border-dashed p-8 text-center animate-in fade-in-50',
+  {
+    variants: {
+      variant: {
+        default: 'border-border bg-card/50',
+        error: 'border-destructive/40 bg-destructive/5',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  }
+);
+
+export interface EmptyStateProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof emptyStateVariants> {
   icon?: LucideIcon;
   title: string;
   description: string;
@@ -23,6 +41,7 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
       onAction,
       secondaryActionLabel,
       onSecondaryAction,
+      variant,
       className,
       children,
       ...props
@@ -32,14 +51,18 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
     return (
       <div
         ref={ref}
-        className={cn(
-          'flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card/50 p-8 text-center animate-in fade-in-50',
-          className
-        )}
+        className={cn(emptyStateVariants({ variant }), className)}
         {...props}
       >
         {Icon && (
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <div
+            className={cn(
+              'mb-4 flex h-14 w-14 items-center justify-center rounded-full',
+              variant === 'error'
+                ? 'bg-destructive/10 text-destructive'
+                : 'bg-primary/10 text-primary'
+            )}
+          >
             <Icon className="h-7 w-7" />
           </div>
         )}

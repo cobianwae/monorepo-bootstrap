@@ -66,6 +66,21 @@ describe('DataTable component', () => {
     expect(cells[0].textContent).toBe('John');
   });
 
+  it('exposes aria-sort on sortable header and updates direction after sort', () => {
+    render(<StatefulTable />);
+    const nameHeader = screen.getByRole('columnheader', { name: 'Name' });
+    expect(nameHeader.getAttribute('aria-sort')).toBe('none');
+
+    const nameButton = screen.getByLabelText('Sort by name');
+    fireEvent.click(nameButton);
+    expect(nameHeader.getAttribute('aria-sort')).toBe('ascending');
+    expect(nameButton.getAttribute('aria-label')).toBe('Sort by name, ascending');
+
+    fireEvent.click(nameButton);
+    expect(nameHeader.getAttribute('aria-sort')).toBe('descending');
+    expect(nameButton.getAttribute('aria-label')).toBe('Sort by name, descending');
+  });
+
   it('filters rows via global search', () => {
     function WithSearch() {
       const { table, globalFilter, setGlobalFilter } = useDataTable<Person, unknown>({
@@ -202,6 +217,88 @@ describe('DataTable row keyboard access', () => {
     const actionButton = screen.getAllByText('Action')[0];
     fireEvent.keyDown(actionButton, { key: 'Enter' });
     expect(onRowClick).not.toHaveBeenCalled();
+  });
+});
+
+describe('DataTable state matrix', () => {
+  it('renders error state with retry CTA and triggers onRetry', () => {
+    const onRetry = vi.fn();
+    render(
+      <DataTable
+        columns={columns}
+        data={[]}
+        error
+        onRetry={onRetry}
+        pagination={{ show: false }}
+      />
+    );
+    expect(screen.getByText('Something went wrong')).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('omits retry CTA when onRetry is absent', () => {
+    render(
+      <DataTable columns={columns} data={[]} error pagination={{ show: false }} />
+    );
+    expect(screen.getByText('Something went wrong')).toBeDefined();
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
+  });
+
+  it('prioritizes error over empty state', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={[]}
+        error
+        emptyTitle="Nothing here"
+        emptyDescription="Adjust filters"
+        pagination={{ show: false }}
+      />
+    );
+    expect(screen.getByText('Something went wrong')).toBeDefined();
+    expect(screen.queryByText('Nothing here')).toBeNull();
+  });
+
+  it('prioritizes loading over error state', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={[]}
+        loading
+        error
+        pagination={{ show: false }}
+      />
+    );
+    expect(screen.queryByText('Something went wrong')).toBeNull();
+    expect(screen.getAllByRole('row').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('offers Clear filters CTA on empty state and resets column filters', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={DATA}
+        state={{ columnFilters: [{ id: 'role', value: 'Nonexistent' }] }}
+        pagination={{ show: false }}
+      />
+    );
+    expect(screen.getByText('No results')).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: 'Clear filters' }));
+    expect(screen.getByText('Sarah')).toBeDefined();
+    expect(screen.queryByRole('button', { name: 'Clear filters' })).toBeNull();
+  });
+
+  it('does not show Clear filters CTA without active column filters', () => {
+    render(
+      <DataTable
+        columns={columns}
+        data={[]}
+        pagination={{ show: false }}
+      />
+    );
+    expect(screen.getByText('No results')).toBeDefined();
+    expect(screen.queryByRole('button', { name: 'Clear filters' })).toBeNull();
   });
 });
 
