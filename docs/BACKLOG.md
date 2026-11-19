@@ -25,7 +25,7 @@ Hanya user yang boleh menetapkan `approved` dan `done`.
 | ID | Judul | PRD | Status | File |
 |---|---|---|---|---|
 | 001-01 | Komponen FileUpload (inti upload queue) | 001 | done | `docs/stories/001-01-upload-queue.md` |
-| 001-02 | FileUpload: aksi kolektif, sortable, auto-retry, varian compact | 001 | approved | `docs/stories/001-02-upload-queue-enhancements.md` |
+| 001-02 | FileUpload: aksi kolektif, sortable, auto-retry, varian compact | 001 | done | `docs/stories/001-02-upload-queue-enhancements.md` |
 
 ## Change Requests
 

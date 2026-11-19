@@ -627,6 +627,28 @@ export default function FormsPage() {
               />
             </CardContent>
           </Card>
+
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-sm">FileUpload Compact</CardTitle>
+              <CardDescription>
+                Varian compact: baris ringkas tanpa thumbnail secara default, tetap dengan
+                status, progres, aksi kolektif, dan urutan sortable opsional.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <FileUpload
+                variant="compact"
+                uploadHandler={demoUploadHandler}
+                accept=".png,.jpg,.pdf"
+                maxSize={5 * 1024 * 1024}
+                maxConcurrent={2}
+                maxRetries={1}
+                sortable
+                helperText="PNG, JPG, PDF hingga 5MB"
+              />
+            </CardContent>
+          </Card>
         </div>
       </section>
 

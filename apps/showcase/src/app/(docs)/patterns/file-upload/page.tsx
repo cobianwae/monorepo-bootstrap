@@ -26,6 +26,9 @@ export default function FileUploadPage() {
   const [failNames, setFailNames] = React.useState<string[]>(['gagal.pdf']);
   const [latencyMs, setLatencyMs] = React.useState(1200);
   const [maxConcurrent, setMaxConcurrent] = React.useState(2);
+  const [maxRetries, setMaxRetries] = React.useState(0);
+  const [sortable, setSortable] = React.useState(false);
+  const [compact, setCompact] = React.useState(false);
   const [lastResult, setLastResult] = React.useState<string | null>(null);
 
   const uploadHandler = React.useCallback<UploadHandler>(
@@ -64,6 +67,9 @@ export default function FileUploadPage() {
             <FileUpload
               uploadHandler={uploadHandler}
               maxConcurrent={maxConcurrent}
+              maxRetries={maxRetries}
+              sortable={sortable}
+              variant={compact ? 'compact' : 'dropzone'}
               maxSize={MAX_SIZE_MB * 1024 * 1024}
               accept="image/png,image/jpeg,image/webp,application/pdf"
               helperText={`PNG, JPG, WEBP, PDF · maks ${MAX_SIZE_MB} MB per file`}
@@ -137,6 +143,44 @@ export default function FileUploadPage() {
               />
             </div>
 
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="demo-retries">Auto-retry (maxRetries)</Label>
+                <span className="text-xs text-muted-foreground">{maxRetries}x</span>
+              </div>
+              <Slider
+                id="demo-retries"
+                min={0}
+                max={3}
+                step={1}
+                value={[maxRetries]}
+                onValueChange={(values) => setMaxRetries(values[0] ?? 0)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Item gagal otomatis mencoba ulang hingga batas ini sebelum berstatus error final.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+              <div className="space-y-0.5">
+                <Label htmlFor="demo-sortable">Urutkan antrean (sortable)</Label>
+                <p className="text-xs text-muted-foreground">
+                  Drag handle + sensor keyboard, serta tombol pindah atas/bawah.
+                </p>
+              </div>
+              <Switch id="demo-sortable" checked={sortable} onCheckedChange={setSortable} />
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+              <div className="space-y-0.5">
+                <Label htmlFor="demo-compact">Varian compact</Label>
+                <p className="text-xs text-muted-foreground">
+                  Baris ringkas tanpa thumbnail secara default; status dan aksi tetap tersedia.
+                </p>
+              </div>
+              <Switch id="demo-compact" checked={compact} onCheckedChange={setCompact} />
+            </div>
+
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-0.5">
                 <Label htmlFor="demo-abort">Hormati AbortSignal</Label>
@@ -153,6 +197,14 @@ export default function FileUploadPage() {
           Komponen tidak pernah upload sendiri: konsumen menyediakan{' '}
           <code>uploadHandler(file, {'{ onProgress, signal }'})</code> dan wajib menghormati{' '}
           <code>AbortSignal</code>.
+        </p>
+        <p className="text-center text-xs text-muted-foreground">
+          Aksi kolektif: summary bar menampilkan <strong>Ulang semua yang gagal</strong> dan{' '}
+          <strong>Batal semua</strong> secara kondisional. <code>sortable</code> (default{' '}
+          <code>false</code>) mengaktifkan drag handle + sensor keyboard dan tombol pindah
+          atas/bawah. <code>maxRetries</code> (default <code>0</code>) mengaktifkan auto-retry
+          hingga batas sebelum error final. <code>variant=&quot;compact&quot;</code> menampilkan baris
+          ringkas tanpa thumbnail secara default.
         </p>
       </div>
     </div>
