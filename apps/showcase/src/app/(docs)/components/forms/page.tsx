@@ -49,6 +49,8 @@ import {
   Checkbox,
   Switch,
   FileInput,
+  FileUpload,
+  type UploadHandler,
   Combobox,
   DatePicker,
   DateRangePicker,
@@ -141,6 +143,23 @@ export default function FormsPage() {
   const [switchActive, setSwitchActive] = React.useState(true);
   const [checked, setChecked] = React.useState(true);
   const [uploadedFiles, setUploadedFiles] = React.useState<File[]>([]);
+
+  const demoUploadHandler = React.useCallback<UploadHandler>(
+    async (_file, { onProgress, signal }) => {
+      for (let percent = 20; percent <= 100; percent += 20) {
+        if (signal.aborted) throw new Error('Upload dibatalkan.');
+        await new Promise<void>((resolve, reject) => {
+          const timer = window.setTimeout(resolve, 250);
+          signal.addEventListener('abort', () => {
+            window.clearTimeout(timer);
+            reject(new Error('Upload dibatalkan.'));
+          });
+        });
+        onProgress(percent);
+      }
+    },
+    []
+  );
 
   const [member, setMember] = React.useState('');
   const [frameworks, setFrameworks] = React.useState<string[]>(['react']);
@@ -585,6 +604,26 @@ export default function FormsPage() {
                 variant="compact"
                 accept=".csv,.xlsx"
                 helperText="Upload data tabular CSV/Excel"
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle className="text-sm">FileUpload (Upload Queue)</CardTitle>
+              <CardDescription>
+                Antrean upload per file dengan progres, batal, dan ulang. Transport
+                upload disediakan konsumen lewat uploadHandler. Lihat pattern penuh di
+                /patterns/file-upload.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <FileUpload
+                uploadHandler={demoUploadHandler}
+                accept=".png,.jpg,.pdf"
+                maxSize={5 * 1024 * 1024}
+                maxConcurrent={2}
+                helperText="PNG, JPG, PDF hingga 5MB"
               />
             </CardContent>
           </Card>

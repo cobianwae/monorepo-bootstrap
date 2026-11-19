@@ -36,7 +36,7 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 | Kategori | Tujuan | Komponen utama |
 |---|---|---|
 | `base` | Primitive visual dan kontrol dasar | button, badge, card, input, textarea, label, separator, skeleton, avatar, tabs, checkbox, switch, tooltip, progress, spinner, radio-group, slider, accordion, collapsible, kbd, toggle, aspect-ratio, scroll-area, palette-switcher, theme-provider |
-| `form` | Input dan validasi | form, select, combobox, tag-input, date-picker, input-otp, number-input, time-picker, filter-builder, stepper, segmented-control |
+| `form` | Input dan validasi | form, select, combobox, tag-input, date-picker, input-otp, number-input, time-picker, filter-builder, stepper, segmented-control, file-input, file-upload |
 | `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card |
 | `feedback` | Status dan respons sistem | dialog, alert, alert-dialog, toast, toaster, empty-state, use-toast |
 | `navigation` | Navigasi dan pencarian | dropdown-menu, breadcrumb, pagination, command-palette, context-menu, navigation-menu |
@@ -60,7 +60,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Dashboard | Ringkasan metrik, grid responsif |
 | Data Table | Sort, filter, pagination, bulk action |
 | Dynamic Form | Schema-driven, validasi |
-| File Upload | Progress, error, retry |
+| File Upload | Upload queue: validasi batch per file, progres per item, cancel/retry, thumbnail; penyusun: file-upload (baru), file-input, progress, button, badge, alert |
 | Global Search | Query, result grouping, empty |
 | Infinite Scroll | Pagination berbasis viewport |
 | Kanban | Kolom, drag, optimistic move |

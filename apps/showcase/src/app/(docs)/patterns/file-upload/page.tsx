@@ -4,308 +4,155 @@ import * as React from 'react';
 import {
   Card,
   CardContent,
-  Button,
-  Badge,
-  Progress,
-  Alert,
-  AlertTitle,
-  AlertDescription,
-  toast,
+  FileUpload,
+  Label,
+  Slider,
+  Switch,
+  type UploadHandler,
 } from '@ds/ui';
-import {
-  Sparkles,
-  UploadCloud,
-  FileText,
-  File as FileIcon,
-  X,
-  CheckCircle2,
-  AlertCircle,
-  Loader2,
-  Image as ImageIcon,
-} from 'lucide-react';
-import { cn } from '@ds/ui';
+import { Sparkles } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
 
-interface UploadFile {
-  id: string;
-  name: string;
-  size: number;
-  type: string;
-  status: 'uploading' | 'done' | 'error';
-  progress: number;
-  error?: string;
-  previewUrl?: string;
-}
-
 const MAX_SIZE_MB = 2;
-const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf'];
 
-function formatBytes(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-}
-
-function validateFile(file: File): string | null {
-  if (!ACCEPTED_TYPES.includes(file.type)) {
-    return `"${file.type || 'unknown type'}" is not supported. Allowed: PNG, JPG, WEBP, PDF.`;
-  }
-  if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-    return `"${file.name}" exceeds the ${MAX_SIZE_MB} MB limit.`;
-  }
-  return null;
+function abortError(signal: AbortSignal): Error {
+  const error = new Error('Upload dibatalkan.');
+  error.name = 'AbortError';
+  void signal;
+  return error;
 }
 
 export default function FileUploadPage() {
-  const [files, setFiles] = React.useState<UploadFile[]>([]);
-  const [isDragging, setIsDragging] = React.useState(false);
-  const inputRef = React.useRef<HTMLInputElement>(null);
-  const idRef = React.useRef(0);
+  const [failNames, setFailNames] = React.useState<string[]>(['gagal.pdf']);
+  const [latencyMs, setLatencyMs] = React.useState(1200);
+  const [maxConcurrent, setMaxConcurrent] = React.useState(2);
+  const [lastResult, setLastResult] = React.useState<string | null>(null);
 
-  const addFiles = (fileList: FileList | null) => {
-    if (!fileList || fileList.length === 0) return;
-
-    const newFiles: UploadFile[] = Array.from(fileList).map((file) => {
-      const error = validateFile(file);
-      const isImage = file.type.startsWith('image/');
-      const previewUrl = isImage ? URL.createObjectURL(file) : undefined;
-      return {
-        id: `upload_${idRef.current++}`,
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        status: error ? 'error' : 'uploading',
-        progress: error ? 0 : 0,
-error: error ?? undefined,
-        previewUrl,
-      };
-    });
-
-    setFiles((prev) => [...prev, ...newFiles]);
-
-    // Simulate async upload with progress
-    newFiles.forEach((uf) => {
-      if (uf.status === 'error') {
-        toast({
-          variant: 'destructive',
-          title: 'File rejected',
-          description: uf.error,
+  const uploadHandler = React.useCallback<UploadHandler>(
+    async (file, { onProgress, signal }) => {
+      const steps = 10;
+      for (let step = 1; step <= steps; step += 1) {
+        if (signal.aborted) throw abortError(signal);
+        await new Promise<void>((resolve, reject) => {
+          const timer = window.setTimeout(resolve, latencyMs / steps);
+          signal.addEventListener('abort', () => {
+            window.clearTimeout(timer);
+            reject(abortError(signal));
+          });
         });
-        return;
+        onProgress((step / steps) * 100);
       }
-
-      const interval = window.setInterval(() => {
-        setFiles((prev) =>
-          prev.map((f) => {
-            if (f.id !== uf.id) return f;
-            const next = Math.min(100, f.progress + 15 + Math.random() * 25);
-            if (next >= 100) {
-              window.clearInterval(interval);
-              return { ...f, progress: 100, status: 'done' };
-            }
-            return { ...f, progress: next, status: 'uploading' };
-          })
-        );
-      }, 400);
-    });
-  };
-
-  const removeFile = (id: string) => {
-    const target = files.find((f) => f.id === id);
-    if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
-    setFiles((prev) => prev.filter((f) => f.id !== id));
-  };
-
-  const uploadsDone =
-    files.length > 0 && files.every((f) => f.status === 'done');
+      if (failNames.includes(file.name)) {
+        throw new Error(`Server menolak "${file.name}" (simulasi demo).`);
+      }
+    },
+    [failNames, latencyMs]
+  );
 
   return (
-    <div className="space-y-10 animate-in fade-in-50 duration-200">
+    <div className="animate-in fade-in-50 space-y-10 duration-200">
       <PageHeader
         eyebrow="UX Recipe Scenario"
         eyebrowIcon={Sparkles}
         title="File Upload / Drag & Drop"
-        description="Drag & drop zone with keyboard-accessible fallback, client-side validation (type + size), per-file upload progress, inline error feedback, and image previews."
+        description="Dropzone dengan fallback keyboard, validasi per file, antrean upload dengan progres per item, batal/ulang per item, dan ringkasan agregat — semuanya dari komponen FileUpload."
       />
 
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto max-w-2xl space-y-6">
         <Card className="border-border">
-          <CardContent className="p-6 space-y-5">
-            {/* Dropzone */}
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setIsDragging(false);
-                addFiles(e.dataTransfer.files);
-              }}
-              onClick={() => inputRef.current?.click()}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  inputRef.current?.click();
-                }
-              }}
-              role="button"
-              tabIndex={0}
-              aria-label="Upload files by dragging them here or pressing Enter"
-              className={cn(
-                'flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-10 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-                isDragging
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border bg-card/40 hover:border-primary/50'
-              )}
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <UploadCloud className="h-6 w-6" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-foreground">
-                  Drop files here, or click to browse
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  PNG, JPG, WEBP, PDF · max {MAX_SIZE_MB} MB per file
-                </p>
-              </div>
-            </div>
-            <input
-              ref={inputRef}
-              type="file"
-              multiple
-              accept={ACCEPTED_TYPES.join(',')}
-              className="hidden"
-              aria-hidden="true"
-              onChange={(e) => {
-                addFiles(e.target.files);
-                e.target.value = '';
-              }}
+          <CardContent className="space-y-5 p-6">
+            <FileUpload
+              uploadHandler={uploadHandler}
+              maxConcurrent={maxConcurrent}
+              maxSize={MAX_SIZE_MB * 1024 * 1024}
+              accept="image/png,image/jpeg,image/webp,application/pdf"
+              helperText={`PNG, JPG, WEBP, PDF · maks ${MAX_SIZE_MB} MB per file`}
+              onAllDone={(items) => setLastResult(`${items.length} file selesai diunggah.`)}
+              onItemError={(item) =>
+                setLastResult(`Gagal: ${item.file.name} — ${item.error ?? 'kesalahan tidak dikenal'}`)
+              }
             />
-
-            {/* File list */}
-            {files.length > 0 && (
-              <ul className="space-y-3">
-                {files.map((file) => (
-                  <li
-                    key={file.id}
-                    className="flex items-center gap-3 rounded-lg border border-border bg-card/40 p-3"
-                  >
-                    {file.previewUrl ? (
-                      <>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={file.previewUrl}
-                          alt=""
-                          className="h-10 w-10 shrink-0 rounded-md object-cover"
-                        />
-                      </>
-                    ) : (
-                      <div
-                        className={cn(
-                          'flex h-10 w-10 shrink-0 items-center justify-center rounded-md',
-                          file.type.includes('pdf')
-                            ? 'bg-destructive/10 text-destructive'
-                            : 'bg-primary/10 text-primary'
-                        )}
-                      >
-                        {file.type.includes('pdf') ? (
-                          <FileText className="h-5 w-5" />
-                        ) : file.type.startsWith('image/') ? (
-                          <ImageIcon className="h-5 w-5" />
-                        ) : (
-                          <FileIcon className="h-5 w-5" />
-                        )}
-                      </div>
-                    )}
-
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="truncate text-sm font-medium text-foreground">
-                          {file.name}
-                        </p>
-                        <div className="flex shrink-0 items-center gap-2">
-                          {file.status === 'done' && (
-                            <CheckCircle2 className="h-4 w-4 text-success" />
-                          )}
-                          {file.status === 'uploading' && (
-                            <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                          )}
-                          {file.status === 'error' && (
-                            <AlertCircle className="h-4 w-4 text-destructive" />
-                          )}
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            className="h-7 w-7"
-                            onClick={() => removeFile(file.id)}
-                            aria-label={`Remove ${file.name}`}
-                          >
-                            <X className="h-3.5 w-3.5" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                        <span>{formatBytes(file.size)}</span>
-                        <span>·</span>
-                        <Badge
-                          variant={
-                            file.status === 'done'
-                              ? 'success'
-                              : file.status === 'error'
-                              ? 'destructive'
-                              : 'outline'
-                          }
-                          className="text-[10px] h-4 px-1.5"
-                        >
-                          {file.status === 'uploading'
-                            ? `Uploading ${Math.round(file.progress)}%`
-                            : file.status === 'done'
-                            ? 'Uploaded'
-                            : 'Rejected'}
-                        </Badge>
-                      </div>
-
-                      {file.status !== 'error' && (
-                        <Progress value={file.status === 'done' ? 100 : file.progress} className="h-1.5" />
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
+            {lastResult && (
+              <p role="status" className="text-xs text-muted-foreground">
+                {lastResult}
+              </p>
             )}
+          </CardContent>
+        </Card>
 
-            {uploadsDone && (
-              <Alert variant="success" className="animate-in fade-in-50">
-                <CheckCircle2 className="h-4 w-4" />
-                <AlertTitle>All files uploaded</AlertTitle>
-                <AlertDescription>
-                  {files.length} file{files.length > 1 ? 's' : ''} processed successfully.
-                </AlertDescription>
-              </Alert>
-            )}
+        <Card className="border-border">
+          <CardContent className="space-y-5 p-6">
+            <h2 className="text-sm font-semibold text-foreground">Kontrol demo</h2>
 
-            <div className="flex justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  files.forEach((f) => f.previewUrl && URL.revokeObjectURL(f.previewUrl));
-                  setFiles([]);
-                }}
-              >
-                Clear all
-              </Button>
+            <div className="space-y-2">
+              <Label htmlFor="demo-fail">File yang digagalkan (pisahkan koma)</Label>
+              <input
+                id="demo-fail"
+                type="text"
+                value={failNames.join(', ')}
+                onChange={(event) =>
+                  setFailNames(
+                    event.target.value
+                      .split(',')
+                      .map((name) => name.trim())
+                      .filter(Boolean)
+                  )
+                }
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                placeholder="gagal.pdf"
+              />
+              <p className="text-xs text-muted-foreground">
+                File dengan nama ini akan ditolak server pada akhir upload, sehingga state
+                error dan tombol Ulang bisa didemokan.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="demo-latency">Latensi upload</Label>
+                <span className="text-xs text-muted-foreground">{latencyMs} ms</span>
+              </div>
+              <Slider
+                id="demo-latency"
+                min={200}
+                max={4000}
+                step={200}
+                value={[latencyMs]}
+                onValueChange={(values) => setLatencyMs(values[0] ?? 1200)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="demo-concurrent">Upload bersamaan (maxConcurrent)</Label>
+                <span className="text-xs text-muted-foreground">{maxConcurrent}</span>
+              </div>
+              <Slider
+                id="demo-concurrent"
+                min={1}
+                max={5}
+                step={1}
+                value={[maxConcurrent]}
+                onValueChange={(values) => setMaxConcurrent(values[0] ?? 2)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+              <div className="space-y-0.5">
+                <Label htmlFor="demo-abort">Hormati AbortSignal</Label>
+                <p className="text-xs text-muted-foreground">
+                  Mock handler demo mendengarkan signal, jadi Batal berhenti di tengah jalan.
+                </p>
+              </div>
+              <Switch id="demo-abort" checked disabled />
             </div>
           </CardContent>
         </Card>
 
-        <p className="mt-4 text-xs text-muted-foreground text-center">
-          Validation runs client-side: unsupported types and files over {MAX_SIZE_MB} MB are
-          rejected inline with a specific error message.
+        <p className="text-center text-xs text-muted-foreground">
+          Komponen tidak pernah upload sendiri: konsumen menyediakan{' '}
+          <code>uploadHandler(file, {'{ onProgress, signal }'})</code> dan wajib menghormati{' '}
+          <code>AbortSignal</code>.
         </p>
       </div>
     </div>
