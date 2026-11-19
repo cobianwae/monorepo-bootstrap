@@ -35,7 +35,7 @@ Hanya user yang boleh menetapkan `approved` dan `done`.
 | CR-003 | `aria-sort` pada header tabel sortable | audit | done | `docs/cr/cr-003-table-aria-sort.md` |
 | CR-004 | Error state dan CTA empty state DataTable | audit | done | `docs/cr/cr-004-data-table-error-state.md` |
 | CR-005 | Indikator fokus NavbarLink dan kontras highlight/accent | audit | done | `docs/cr/cr-005-navbar-focus-contrast.md` |
-| CR-006 | Eliminasi palette literal | audit | approved | `docs/cr/cr-006-semantic-palette.md` |
+| CR-006 | Eliminasi palette literal | audit | done | `docs/cr/cr-006-semantic-palette.md` |
 
 ## Catatan
 

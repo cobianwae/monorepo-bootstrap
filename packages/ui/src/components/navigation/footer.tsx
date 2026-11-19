@@ -10,7 +10,7 @@ export const footerVariants = cva('w-full border-t border-border transition-colo
       default: 'bg-background text-foreground',
       muted: 'bg-muted/30 text-foreground',
       card: 'bg-card text-card-foreground',
-      dark: 'bg-zinc-950 text-zinc-100 border-zinc-800',
+      dark: 'bg-inverse text-inverse-foreground border-inverse-border',
     },
     spacing: {
       compact: 'py-8 sm:py-12',

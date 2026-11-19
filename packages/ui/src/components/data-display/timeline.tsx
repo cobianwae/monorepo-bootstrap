@@ -26,7 +26,7 @@ export interface TimelineProps extends React.HTMLAttributes<HTMLOListElement> {
 const STATUS_STYLES: Record<TimelineItemStatus, string> = {
   default: 'bg-border text-muted-foreground',
   success: 'bg-success/20 text-success',
-  warning: 'bg-amber-500/20 text-amber-600 dark:text-amber-400',
+  warning: 'bg-warning/20 text-warning-text',
   error: 'bg-destructive/20 text-destructive',
   info: 'bg-primary/20 text-primary',
 };
