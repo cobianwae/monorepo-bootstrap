@@ -82,7 +82,7 @@ Aturan:
 - Tidak ada implementasi fitur tanpa story yang sudah `todo` atau lebih.
 - Baca story, PRD, dan design sebelum coding. Story adalah source of truth.
 - 1 story = 1 branch + 1 PR. Branch `NNN-MM-slug`.
-- Setelah tasks selesai: tick checkbox story, update `BACKLOG.md` dan `STATUS.md`.
+- Setelah tasks selesai: tick checkbox story, append `docs/STATUS-LOG.md` (format `YYYY-MM-DD — ringkasan — referensi`), update `docs/BACKLOG.md` dan `docs/STATUS.md`. Urutan ini bagian dari definisi selesai — menjalankan `node scripts/check-status-log.mjs` sebelum commit adalah wajib.
 - Temuan pada artefak approved/shipped atau story `review`/`done` harus menjadi CR, bukan edit langsung.
 - Artefak draft boleh diedit dengan konfirmasi user.
 - Hanya user yang boleh menetapkan `approved` dan `done`.
