@@ -113,7 +113,7 @@ export function CrmSidebar({ onNavigateMobile }: CrmSidebarProps) {
             className="flex items-center gap-2.5 group transition-opacity hover:opacity-90"
             onClick={handleNav}
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground text-background shadow-sm group-hover:scale-105 transition-transform">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-highlight text-primary-foreground shadow-xs group-hover:scale-105 transition-transform">
               <Navigation className="h-4 w-4 fill-current" aria-hidden="true" />
             </span>
             <div className="flex flex-col min-w-0">

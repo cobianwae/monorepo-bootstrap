@@ -136,7 +136,7 @@ export function CrmExecutiveBriefing({
 
       {/* Narrative Headline & Synthesis (Airy, Direct & Crisp) */}
       <div className="space-y-3 pt-2">
-        <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground leading-[1.15]">
+        <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-foreground leading-[1.1]">
           Pipeline pacing at{' '}
           <span className="text-highlight font-extrabold">
             +{metrics.pipelineGrowthPct}%
@@ -171,7 +171,7 @@ export function CrmExecutiveBriefing({
       {/* Clean Priority Deals Strip */}
       {urgentDeals.length > 0 && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 pt-2">
-          <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider font-mono font-semibold text-muted-foreground shrink-0">
+          <div className="flex items-center gap-1.5 text-micro font-semibold text-muted-foreground shrink-0">
             <Flame className="h-3.5 w-3.5 text-warning" />
             <span>Priority Deals:</span>
           </div>

@@ -10,6 +10,7 @@ export const GradientText = React.forwardRef<HTMLSpanElement, GradientTextProps>
     return (
       <Comp
         ref={ref}
+        data-gradient-text=""
         className={cn(
           'bg-gradient-to-br from-primary to-highlight bg-clip-text text-transparent',
           className

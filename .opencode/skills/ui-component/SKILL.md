@@ -1,49 +1,50 @@
 ---
 name: ui-component
-description: Konvensi pembuatan komponen UI di packages/ui berbasis Tailwind v4, Radix UI primitives, cva variants, dan barrel exports
-tags: [design-system, ui, components, radix, cva, tailwind]
+description: Implementasi komponen UI di packages/ui — pola shadcn/ui (Radix + cva + cn), struktur folder, barrel export, co-located test, dan verification commands
+tags: [design-system, ui, component, radix, cva, implementation, packages]
 compatibility: [next, opencode, claude, cursor]
 ---
 
-# UI Component
+# UI Component Implementation
 
 ## Kapan Pakai
-Saat membuat komponen UI baru atau memodifikasi komponen yang ada di `packages/ui/src/components/ui/`.
+WAJIB sebelum membuat atau mengubah komponen di `packages/ui`. Panggil setelah `product-ux` (framing BA) dan `ux-patterns` (pola interaksi). Gunakan bersama `design-tokens` (warna/spacing) dan `accessibility` (a11y).
 
-## Aturan Utama
-1. **Radix Primitives**: Gunakan `@radix-ui/react-*` untuk komponen interaktif kompleks (Dialog, Popover, Select, DropdownMenu, Tooltip, Tabs) guna menjamin a11y keyboard dan ARIA semantics.
-2. **Class Variance Authority (`cva`)**: Semua variasi visual (variant, size, state) dikelola menggunakan `cva` dan digabungkan melalui utility helper `cn(...)`.
-3. **Polymorphism via `Slot` (`asChild`)**: Untuk tombol atau link, dukung prop `asChild?: boolean` menggunakan `@radix-ui/react-slot`.
-4. **ForwardRef Support**: Semua komponen DOM-level WAJIB dibungkus `React.forwardRef` dengan `displayName` yang jelas.
-5. **Colocation & Barrel Exports**: Setiap komponen diekspor secara rapi di `packages/ui/src/index.ts`.
-6. **Zero Hardcoded Colors**: Gunakan utility Tailwind yang terhubung ke token (`bg-primary text-primary-foreground`, `border-border`, dll).
+## Lokasi & Struktur
 
-## Pola Dasar Komponen
+Komponen tinggal di `packages/ui/src/components/<category>/`. Kategori yang ada:
+
+| Kategori | Isi | Contoh file |
+|----------|-----|-------------|
+| `base` | Primitif & atom | `button.tsx`, `input.tsx`, `badge.tsx`, `skeleton.tsx`, `switch.tsx`, `tabs.tsx`, `tooltip.tsx` |
+| `form` | Input kompleks | `select.tsx`, `combobox.tsx`, `date-picker.tsx`, `tag-input.tsx`, `filter-builder.tsx`, `stepper.tsx` |
+| `overlay` | Popover/sheet/hover-card | `sheet.tsx`, `popover.tsx`, `hover-card.tsx` |
+| `navigation` | Nav & menu | `navbar.tsx`, `sidebar.tsx`, `breadcrumb.tsx`, `pagination.tsx`, `command-palette.tsx` |
+| `data-display` | Table/chart/stat | `table.tsx`, `data-table.tsx`, `chart.tsx`, `stat-card.tsx`, `timeline.tsx` |
+| `feedback` | Alert/dialog/toast/empty | `empty-state.tsx`, `error-page.tsx`, `toaster.tsx`, `banner.tsx` |
+| `layout` | Shell & structure | `page-shell.tsx`, `page-skeleton.tsx`, `container.tsx`, `skip-link.tsx` |
+| `dnd` | Drag & drop | komponen berbasis `@dnd-kit` |
+| `marketing` | Landing/marketing | hero, feature sections |
+
+**Aturan folder:**
+- Kebab-case filename: `filter-builder.tsx`
+- Test co-located: `filter-builder.test.tsx` di folder yang sama (bukan folder `__tests__`)
+- Komponen dan test diekspor? **Tidak** — test cukup ada sebagai file, jangan di-barrel
+
+## Pola Kode (WAJIB Ikuti)
+
+Pola dasar shadcn/ui — tiru `button.tsx`:
 
 ```tsx
 import * as React from 'react';
+import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
-export const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50',
-  {
-    variants: {
-      variant: {
-        default: 'bg-primary text-primary-foreground shadow-xs hover:opacity-95',
-        outline: 'border border-border bg-background hover:bg-accent hover:text-accent-foreground',
-      },
-      size: {
-        default: 'h-9 px-4 py-2',
-        sm: 'h-8 px-3 text-xs',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
-  }
-);
+export const buttonVariants = cva('...base classes...', {
+  variants: { variant: {...}, size: {...} },
+  defaultVariants: { variant: 'default', size: 'default' },
+});
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
@@ -51,43 +52,80 @@ export interface ButtonProps
   asChild?: boolean;
 }
 
-export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => {
-    return (
-      <button
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
-Button.displayName = 'Button';
+export function Button({ className, variant, size, asChild = false, ...props }: ButtonProps) {
+  const Comp = asChild ? Slot : 'button';
+  return <Comp className={cn(buttonVariants({ variant, size }), className)} {...props} />;
+}
 ```
 
-## Katalog Komponen Fondasi (Minimum Viable Set)
+**Checklist kode:**
+- [ ] Menggunakan Radix primitive untuk a11y (kalau komponennya non-trivial) — cek dulu package tersedia di `packages/ui/package.json`; kalau belum, tambahkan dependency
+- [ ] Varian visual pakai `cva`, bukan string ternary bersarang
+- [ ] Class merging pakai `cn()` dari `../../lib/utils` — jangan pakai template string manual
+- [ ] Props di-destructure **di parameter**, bukan di body function
+- [ ] Pindahkan teks/ikon ke props dengan default yang masuk akal (testable + reusable)
+- [ ] Loading state: `Loader2` + `animate-spin`, nonaktifkan interaksi saat loading (`disabled`)
+- [ ] Focus ring selalu ada: `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring`
+- [ ] No `any` — gunakan `unknown` + narrowing, atau generic
+- [ ] Ikon pakai `lucide-react` (sudah dipakai repo)
 
-| Komponen | Direktori | Variants / Sizes | Catatan Implementasi |
-|----------|-----------|------------------|----------------------|
-| **Button** | `ui/button/` | default, secondary, destructive, outline, ghost, link; sm/default/lg/icon | Wajib loading state + `asChild` |
-| **Input** | `ui/input/` | default, error | Support start/end adornment |
-| **Textarea** | `ui/textarea/` | default, error | Native forwardRef, auto-resize opsional |
-| **Select** | `ui/select/` | default, error | `@radix-ui/react-select` |
-| **Checkbox** | `ui/checkbox/` | default | `@radix-ui/react-checkbox` |
-| **Dialog** | `ui/dialog/` | default | `@radix-ui/react-dialog`, trap focus, close Esc |
-| **Toast** | `ui/toast/` | default, destructive, success | Stackable, auto-dismiss, action support |
-| **Badge** | `ui/badge/` | default, secondary, destructive, outline | Inline status visual |
-| **Card** | `ui/card/` | default | Sub-komponen: Header, Title, Description, Content, Footer |
-| **Skeleton** | `ui/skeleton/` | default | Pulse animation untuk loading layout |
-| **Spinner** | `ui/spinner/` | sm, md, lg | SVG spinner + `aria-busy="true"` |
-| **Avatar** | `ui/avatar/` | sm, md, lg | `@radix-ui/react-avatar` (Image + Fallback) |
-| **Dropdown Menu** | `ui/dropdown-menu/` | default | `@radix-ui/react-dropdown-menu` |
-| **Tabs** | `ui/tabs/` | default | `@radix-ui/react-tabs` |
-| **Switch** | `ui/switch/` | default | `@radix-ui/react-switch` |
+## Token & Styling
+
+- Warna WAJIB dari token: `bg-primary text-primary-foreground`, `border-border`, `bg-card`, dll — **dilarang** hex langsung
+- Radius dari scale: `rounded-md`, `rounded-lg`, `rounded-full`
+- Motion dari token: `duration-200`, `transition-all`, `ease-*`
+- Jangan tambah spacing/kontras manual di luar scale tokens
+- Gunakan `@source "./components"` di styles.css sudah mencakup folder components
+
+## Barrel Export
+
+`packages/ui/src/index.ts` adalah satu-satunya entry point publik. Setiap komponen baru WAJIB ditambahkan:
+
+```ts
+export * from './components/<category>/<component>';
+```
+
+Urutan di barrel mengikuti pola existing (grouping per kategori sudah ada — ikuti posisinya).
+
+## Test (Vitest + Testing Library)
+
+- Setiap komponen baru WAJIB punya test co-located
+- Pola yang dipakai repo: render + assert behavior (lih. `button.test.tsx`, `combobox.test.tsx`)
+- Fokus: props/variant render, event handler, disabled/loading state
+- Kalau komponen pakai Radix context, pakai helper render dari `src/test/setup.ts`
+
+## Verification Commands
+
+Jalankan SEMUA sebelum selesai:
+
+```bash
+pnpm --filter @ds/ui lint
+pnpm --filter @ds/ui test
+pnpm --filter @ds/ui build:types
+```
+
+## Anti-Patterns
+
+- ✗ Komponen tanpa test
+- ✗ Styling hardcode warna/hex (harus token)
+- ✗ Props tidak di-destructure di parameter
+- ✗ Bikin ulang primitif Radix (accordion, dialog, dll) padahal sudah ada di package.json
+- ✗ Duplikasi komponen yang sudah ada (cek dulu di folder kategori)
+- ✗ Pakai `any` / `@ts-ignore`
+
+## Integration with Other Skills
+
+- **Sebelum**: `product-ux` (framing fitur), `ux-patterns` (pola interaksi & states)
+- **Selama**: `design-tokens` (warna/spacing), `accessibility` (a11y), `visual-design` (hierarchy)
+- **Setelah**: `accessibility` (audit), `ux-research` (validasi kalau perlu)
 
 ## Checklist
-1. [ ] Komponen menggunakan `React.forwardRef`
-2. [ ] Varian didefinisikan dengan `cva`
-3. [ ] Menggunakan helper `cn()` untuk penggabungan kelas
-4. [ ] Keyboard navigation dan focus rings terlihat jelas
-5. [ ] Diekspor di `packages/ui/src/index.ts`
+
+1. [ ] Kategori folder tepat & kebab-case
+2. [ ] Radix + cva + cn + props di parameter
+3. [ ] Token untuk semua styling
+4. [ ] Loading/disabled state ada
+5. [ ] Focus ring & a11y ok
+6. [ ] Test co-located
+7. [ ] Barrel export ditambahkan
+8. [ ] `lint`, `test`, `build:types` hijau

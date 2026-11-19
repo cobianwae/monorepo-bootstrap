@@ -64,6 +64,7 @@ export * from './components/marketing/section-number';
 
 export * from './components/marketing/art-background';
 export * from './components/marketing/gradient-text';
+export * from './components/marketing/hero-band';
 
 // Newly added components (P0 & P2)
 export * from './components/base/accordion';

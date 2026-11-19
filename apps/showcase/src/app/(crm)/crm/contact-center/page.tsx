@@ -11,6 +11,7 @@ import {
   Zap,
   User,
   ArrowLeft,
+  Search,
 } from 'lucide-react';
 import {
   Button,
@@ -44,6 +45,7 @@ import {
   ScrollArea,
   Rating,
   GradientText,
+  EmptyState,
 } from '@ds/ui';
 import { useCrm } from '@/scenarios/crm/store/crm-context';
 import { useDebounce } from '@ds/ui';
@@ -330,9 +332,17 @@ export default function ContactCenterPage() {
         aria-label="Conversations"
       >
         {filteredConversations.length === 0 ? (
-          <div className="p-8 text-center text-xs text-muted-foreground">
-            No conversations match current filters.
-          </div>
+          <EmptyState
+            icon={Search}
+            title="No conversations"
+            description="No conversations match the current channel or search filters."
+            secondaryActionLabel="Clear filters"
+            onSecondaryAction={() => {
+              setChannelFilter('all');
+              setSearchQuery('');
+            }}
+            className="mx-4 my-6 p-6"
+          />
         ) : (
           filteredConversations.map((conv) => {
             const isSelected = activeConv?.id === conv.id;
@@ -525,12 +535,16 @@ export default function ContactCenterPage() {
       />
     </div>
   ) : (
-    <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground p-8">
-      Select a conversation to start messaging.
-    </div>
+    <EmptyState
+      icon={MessageSquare}
+      title="Select a conversation"
+      description="Choose a conversation from the list to start messaging."
+      className="h-full w-full"
+    />
   );
 
   return (
+    // space-y-6 dipertahankan: contact-center adalah functional workspace (dense layout), bukan content page seperti dashboard/leads/campaigns
     <div className="space-y-6 animate-in fade-in-50 duration-200">
       {/* Official Design System PageHeader */}
       <PageHeader

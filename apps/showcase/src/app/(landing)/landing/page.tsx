@@ -202,7 +202,7 @@ export default function LandingPage() {
                         <span className="text-pink-400">@theme</span>
                         <span className="text-zinc-300">{' {'}</span>
                         {'\n'}
-                        <span className="text-zinc-500">
+                        <span className="text-zinc-400">
                           {'  /* Live values from @ds/tokens */'}
                         </span>
                         {'\n'}

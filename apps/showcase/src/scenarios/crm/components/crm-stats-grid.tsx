@@ -62,7 +62,7 @@ export function CrmStatsGrid({ isLoading = false }: CrmStatsGridProps) {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/20">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/20 animate-float">
                 <DollarSign className="h-4 w-4" />
               </div>
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">

@@ -42,6 +42,9 @@
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
   --radius-2xl: 1rem;
+  /* Radius mapping: page-hero / large panel -> 3xl, feature card -> 2xl,
+     content card -> xl, nested / compact -> lg */
+  --radius-3xl: 1.5rem;
   --radius-full: 9999px;
 
   --font-sans: var(--ad-body, var(--font-inter)), 'Inter', system-ui, -apple-system, sans-serif;
@@ -91,6 +94,14 @@
   --ad-display: var(--font-plex-mono);
   --ad-body: var(--font-plex-sans);
   --ad-mono: var(--font-plex-mono);
+}
+
+/* Gradient text is Aurora's declared signature — render solid accent under
+   Atelier / Blueprint so headings obey the active art direction. */
+[data-art-direction]:not([data-art-direction="aurora"]) [data-gradient-text] {
+  background-image: none;
+  color: var(--color-highlight);
+  -webkit-text-fill-color: var(--color-highlight);
 }
 
 /* ==========================================================================

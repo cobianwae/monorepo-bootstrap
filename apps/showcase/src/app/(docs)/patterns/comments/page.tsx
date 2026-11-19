@@ -94,7 +94,7 @@ const PEOPLE: Person[] = [
     name: 'Maya Anindya',
     handle: 'maya.a',
     initials: 'MA',
-    avatarClass: 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white',
+    avatarClass: 'bg-primary/15 text-primary ring-1 ring-primary/20',
     role: 'Design Lead',
   },
   {
@@ -102,7 +102,7 @@ const PEOPLE: Person[] = [
     name: 'Raka Pratama',
     handle: 'raka',
     initials: 'RP',
-    avatarClass: 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white',
+    avatarClass: 'bg-success/15 text-success ring-1 ring-success/20',
     role: 'Engineer',
   },
   {
@@ -110,7 +110,7 @@ const PEOPLE: Person[] = [
     name: 'Sari Wulandari',
     handle: 'sari.w',
     initials: 'SW',
-    avatarClass: 'bg-gradient-to-br from-pink-500 to-rose-500 text-white',
+    avatarClass: 'bg-highlight/15 text-highlight ring-1 ring-highlight/20',
     role: 'Product',
   },
   {
@@ -118,14 +118,14 @@ const PEOPLE: Person[] = [
     name: 'Dimas Saputra',
     handle: 'dimas',
     initials: 'DS',
-    avatarClass: 'bg-gradient-to-br from-amber-500 to-orange-600 text-white',
+    avatarClass: 'bg-warning/15 text-warning-text ring-1 ring-warning/20',
   },
   {
     id: 'u5',
     name: 'Ayu Lestari',
     handle: 'ayu.l',
     initials: 'AL',
-    avatarClass: 'bg-gradient-to-br from-sky-500 to-blue-600 text-white',
+    avatarClass: 'bg-info/15 text-info ring-1 ring-info/20',
     role: 'QA',
   },
 ];
@@ -135,7 +135,7 @@ const CURRENT_USER: Person = {
   name: 'You',
   handle: 'you',
   initials: 'YO',
-  avatarClass: 'bg-gradient-to-br from-fuchsia-500 to-violet-600 text-white',
+  avatarClass: 'bg-foreground text-background ring-1 ring-foreground/20',
 };
 
 const INITIAL_COMMENTS: CommentData[] = [

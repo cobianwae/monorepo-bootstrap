@@ -12,14 +12,12 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import {
-  PageHeader,
+  HeroBand,
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   Badge,
-  GridPattern,
-  GlowOrb,
   Button,
 } from '@ds/ui';
 import type { LucideIcon } from 'lucide-react';
@@ -104,24 +102,14 @@ export default function ComponentsIndexPage() {
   return (
     <div className="space-y-12 animate-in fade-in-50 duration-300">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-card/95 to-card p-8 sm:p-10 shadow-sm">
-        <GridPattern width={44} height={44} fade="radial" className="opacity-40 dark:opacity-30" />
-        <GlowOrb color="primary" size="lg" position="bottom-left" />
-
-        <div className="relative z-10 max-w-2xl space-y-4">
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1 text-xs font-semibold text-primary font-mono">
-            <Box className="h-3.5 w-3.5 shrink-0" />
-            <span>UI LIBRARY · RADIX + CVA + TAILWIND V4</span>
-          </div>
-
-          <PageHeader
-            eyebrow="Components"
-            eyebrowIcon={Box}
-            title="Component Catalog"
-            description="Accessible, composable UI primitives organized by domain. Every component supports full keyboard interaction, focus rings, WCAG AA contrast, and dark mode parity."
-          />
-
-          <div className="flex flex-wrap items-center gap-3 pt-1">
+      <HeroBand
+        accent="primary"
+        eyebrow="UI LIBRARY · RADIX + CVA + TAILWIND V4"
+        eyebrowIcon={Box}
+        title="Component Catalog"
+        description="Accessible, composable UI primitives organized by domain. Every component supports full keyboard interaction, focus rings, WCAG AA contrast, and dark mode parity."
+        actions={
+          <>
             <Link href="/components/forms">
               <Button variant="highlight" className="gap-2 h-10 px-5 text-sm shadow-md">
                 Start with Forms
@@ -133,9 +121,9 @@ export default function ComponentsIndexPage() {
                 Explore Overlays
               </Button>
             </Link>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* Category Grid */}
       <div className="space-y-5">

@@ -22,6 +22,7 @@ export default function WhatsNewPage() {
   return (
     <div className="space-y-10 animate-in fade-in-50 duration-200">
       <PageHeader
+        variant="feature"
         eyebrow="Overview"
         eyebrowIcon={Sparkles}
         title="What's New"

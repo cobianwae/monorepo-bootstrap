@@ -1,111 +1,98 @@
 ---
 name: ux-patterns
-description: Resep implementasi skenario UX tingkat lanjut dan pola interaksi umum — Stepper, Split Layout, Data Table, CRUD, Feedback, Loading, Error, dan Form
-tags: [design-system, ux, patterns, wizard, datatable, workspace, crud, feedback, loading, forms]
-compatibility: [next, react, opencode, claude, cursor]
+description: Pola interaksi dan state UX — loading skeleton, empty state, error state, pola per kategori komponen, dan dokumentasi scenario di apps/showcase
+tags: [design-system, ux, patterns, loading, empty-state, error-state, interactions, showcase]
+compatibility: [next, opencode, claude, cursor]
 ---
 
-# UX Patterns & Recipes
+# UX Interaction & State Patterns
 
 ## Kapan Pakai
-Saat membuat skenario UX multi-langkah, interaksi halaman yang kompleks, atau membangun pola interaksi umum (form, loading state, empty state, error, konfirmasi, table, dll) pada aplikasi showcase atau consumer app.
+Saat mendesain flow interaksi, menambah komponen, atau membuat data grid/table. Menentukan pola state (loading/empty/error) dan interaksi mana yang dipakai. Dipanggil setelah `product-ux` dan sebelum `ui-component`.
 
-## Prinsip Umum
-1. **Jangan biarkan user menunggu tanpa feedback** — selalu ada skeleton screen atau spinner sesuai konteks.
-2. **Jangan biarkan user bingung tanpa jalan keluar** — selalu ada CTA atau navigasi di empty/error state.
-3. **Jangan biarkan user kehilangan data tanpa peringatan** — selalu konfirmasi destructive action.
-4. **Jangan biarkan user salah tanpa tahu kenapa** — error message harus spesifik, actionable, dan inline.
-5. **Mobile-first, desktop-enhanced** — desain untuk 375px dulu, enhance untuk 1280px+.
+## State yang WAJIB Ada (Per Rule 5 AGENTS.md)
 
-## Daftar Pola Standar
+Setiap data grid/table WAJIB punya 3 state lengkap:
 
-### 1. Stepper / Multi-Step Wizard
-- **State Management**: Simpan state seluruh step terpusat; validasi per-step sebelum memperbolehkan lanjut ke step berikutnya.
-- **Progress Clarity**: Tampilkan nomor step, judul, status (selesai / aktif / mendatang), dan step review sebelum commit akhir.
-- **Reversibility**: Sediakan tombol 'Previous' yang jelas tanpa menghapus input yang telah dimasukkan.
-
-### 2. Workspace & IDE Split Layout
-- **Spatial Ergonomics**: Gunakan collapsible sidebar untuk navigasi modul, breadcrumbs di topbar, dan split panels untuk konten kerja utama.
-- **Global Search**: Sediakan input search terintegrasi dengan shortcut keyboard (`⌘K` / `Ctrl+K`).
-- **Status Visibility**: Tempatkan status bar / log drawer di bagian bawah dengan indikator live connection.
-
-### 3. Advanced Data Table & Filtering
-- **Filtering Suite**: Sediakan fuzzy text search (debounced 300ms) digabung dengan dropdown select filter dan active filter chips.
-- **Sorting & Selection**: Header kolom dapat diklik untuk sorting dengan indikator arah; baris memiliki checkbox untuk bulk actions.
-- **Feedback States**: Sediakan tampilan loading skeleton yang mencerminkan struktur tabel asli, serta empty state dengan aksi reset filter.
-- **Pagination & Scroll**: Sticky header pada scroll, pagination di footer dengan info total data.
-
-### 4. Master Data & Reference CRUD
-- **Unique Code Identifier**: Input kode master data wajib diformat uppercase / slug dan divalidasi keunikannya terhadap data existing.
-- **Context Preservation**: Gunakan slide-over drawer (`Sheet`) untuk form pembuatan dan pengeditan tanpa meninggalkan konteks halaman tabel.
-- **Audit Traceability**: Sediakan drawer riwayat perubahan (siapa, kapan, dan field apa yang diubah).
-
-### 5. Overlays & Action Feedback
-- **Destructive Actions**: Operasi yang tidak dapat dibatalkan (delete, reset) WAJIB dialog konfirmasi dengan destructive variant dan penjelasan dampak.
-- **Non-blocking Toasts**: Toast sukses auto-dismiss (5 detik); toast error **tidak** auto-dismiss; sertakan tombol 'Undo' untuk aksi yang relevan.
-
-## Pola Feedback & Interaksi Dasar
-
-### 1. Loading State
-- **Skeleton Screen**: Gunakan untuk konten halaman (`loading.tsx` / Suspense fallback) dengan layout dan posisi yang sama dengan konten final.
-- **Inline Spinner**: Gunakan untuk aksi dalam tombol (submit/save) dengan button tetap dalam status disabled.
-- Loading > 3 detik wajib menampilkan progress indicator.
+### 1. Loading State (Skeleton)
+- Gunakan `PageSkeleton` dari `layout/page-skeleton.tsx` untuk loading halaman penuh (`cards`, `columns`, `showHeader` props)
+- Untuk tabel/card list: skeleton baris dengan `Skeleton` (`base/skeleton.tsx`) — konsisten dengan lebar kolom asli
+- JANGAN pakai spinner besar untuk konten utama; spinner hanya untuk aksi inline (submit, refresh)
 
 ### 2. Empty State
-- Jelaskan **kenapa kosong** dan **apa yang bisa dilakukan**.
-- Sediakan icon relevan dan CTA utama (Tambah Data / Reset Filter).
+- Gunakan `EmptyState` dari `feedback/empty-state.tsx`
+- Komponen wajib: ikon yang relevan, judul menjelaskan **apa yang kosong**, deskripsi, dan **CTA** (primary action untuk mengisi)
+- Anti-pattern: kosong tanpa pesan, pesan generik "No data", tanpa next step
 
 ### 3. Error State
-- **Inline Field Error**: Tampilkan langsung di bawah field form terkait.
-- **Error Banner**: Untuk error non-blocking setingkat komponen/section dengan tombol 'Coba Lagi' dan dismiss.
-- **Full Page Error (`error.tsx`)**: Error boundary dengan tombol 'Coba Lagi' (reset) dan 'Ke Beranda'.
+- Gunakan `ErrorPage` dari `feedback/error-page.tsx` untuk error fatal/404
+- Untuk error partial/inline: `Alert` (`feedback/alert.tsx`) dengan variant `destructive`
+- Sertakan pesan yang bisa ditindaklanjuti user, bukan stack trace
 
-### 4. Form & Validation
-- Validasi real-time (on blur / on change, bukan hanya on submit).
-- Error message jelas di bawah input; hint text ditampilkan saat tidak ada error.
-- Tombol submit tetap terlihat saat loading dengan state disabled + loading spinner.
+## Pola Loading per Jenis Data
 
-### 5. Responsive Navigation
-- Desktop: Sidebar collapsible atau top navigation bar.
-- Mobile (< 1024px): Hamburger menu membuka slide-over drawer (`Sheet`).
-- Active link di-highlight; sertakan breadcrumbs untuk hierarki halaman dalam.
+| Konten | Pola |
+|--------|------|
+| Halaman penuh | `PageSkeleton` (header + card grid) |
+| Tabel/data grid | Skeleton baris per kolom, header tetap |
+| Form submit | Button loading (`Loader2` spin + `disabled`) |
+| Fetch on scroll | Skeleton blok kecil + spinner inline di footer |
+| Optimistic update | Update UI dulu, tampilkan status pending subtle |
 
-### 6. Onboarding & First Visit
-- Deteksi via `localStorage` atau user flag di backend; tampilkan banner atau modal singkat (maks 3–4 step).
-- Selalu sediakan tombol dismiss / skip yang terlihat jelas.
+## Pola Interaksi Per Kategori
 
-### 7. Optimistic Update
-- Perbarui UI secara instan; lakukan rollback dan tampilkan toast error jika API gagal.
-- Tampilkan subtle syncing indicator jika proses memakan waktu.
+### Form
+- Validasi inline real-time (bukan hanya on submit)
+- Error message dekat field, warna `text-destructive`, ikon jelas
+- Success feedback subtle setelah submit (toast/check)
+- Gunakan komponen `form/*`: `combobox`, `date-picker`, `tag-input`, `filter-builder`, `stepper`, `time-picker`
 
-### 8. Infinite Scroll / Load More
-- Gunakan `IntersectionObserver` pada trigger element di bawah list (bukan scroll event listener).
-- Tampilkan subtle loading spinner di footer saat fetch halaman baru dan hentikan jika seluruh data sudah termuat.
+### Data Display
+- Table: sort/filter/pagination konsisten — pakai `data-table.tsx` / `table.tsx`
+- Sediakan `BulkActionBar` untuk seleksi multi-row
+- Angka besar: `StatCard`; tren: `chart.tsx`
 
-## Quick Reference: Pemilihan Pola
+### Overlay & Feedback
+- Destructive action: konfirmasi via `AlertDialog`, bukan `window.confirm`
+- Toast untuk feedback non-blocking via `toaster.tsx` + `use-toast`
+- Modal complex → `Sheet` (untuk panel samping), `Dialog` (centered)
 
-| Kondisi / Skenario | Pola yang Digunakan |
-|---|---|
-| Halaman pertama load / navigasi | Skeleton Screen (`loading.tsx` / Suspense) |
-| Tidak ada data / hasil pencarian nihil | Empty State + CTA (Tambah / Reset) |
-| API / Runtime error | Error Banner (inline) atau `error.tsx` (full page) |
-| Aksi destruktif (delete, reset) | Confirmation Dialog (destructive variant) |
-| Form input & form multi-langkah | FormField + real-time validation / Stepper Wizard |
-| Kumpulan data terstruktur | Advanced Data Table + SortableHeader + Pagination |
-| Pencarian & filter data | SearchBar (debounced 300ms) + FilterChips |
-| Feedback operasi CRUD | Toast (auto-dismiss sukses / persistent error / Undo) |
-| Navigasi mobile | Slide-over Drawer (`Sheet`) |
-| Pengguna pertama kali | Welcome Banner / Onboarding flow (dismissible) |
-| Toggle / quick inline action | Optimistic Update + auto-rollback on failure |
-| Stream data panjang | Infinite Scroll (`IntersectionObserver`) |
+### Navigation
+- Current state selalu terlihat (active item)
+- Breadcrumb untuk hierarchy; `MegaMenu` untuk banyak kategori
+- `SkipLink` untuk a11y jump
 
-## Checklist & Anti-Patterns
-- [ ] Skenario menangani status loading (skeleton), empty, dan error secara konsisten
-- [ ] Formulir memiliki validasi real-time dan error feedback inline
-- [ ] Aksi destruktif memerlukan konfirmasi eksplisit dengan visual warning yang jelas
-- [ ] Seluruh skenario responsif (mobile drawer + responsive layout)
-- [ ] Toast error tidak auto-dismiss dan menyertakan aksi perbaikan jika relevan
-- [ ] **Anti-Pattern**: Menampilkan halaman kosong tanpa loading indicator / skeleton
-- [ ] **Anti-Pattern**: Memberikan pesan error generik tanpa aksi keluar (retry / reset)
-- [ ] **Anti-Pattern**: Mematikan (disable) tombol tanpa penjelasan atau indikator kenapa
-- [ ] **Anti-Pattern**: Menggunakan infinite scroll tanpa exit condition / batas akhir data
+## Konvensi Kognitif
+
+- Satu primary CTA per screen — lainnya secondary/ghost
+- Komponen yang bisa di-sort/ketik: selalu beri affordance jelas (ikon + tooltip)
+- Consistency: pola yang sama untuk hal yang sama di seluruh app
+- Hindari surprise: destructive selalu butuh confirm, undo untuk aksi berat (via toast action)
+
+## Dokumentasi di apps/showcase
+
+`apps/showcase` adalah living documentation. Setiap pattern baru/berubah WAJIB didokumentasikan di sana agar konsumen (`apps/web`) bisa melihat pola resmi. Tambahkan demo scenario per pola state + interaksi.
+
+## Anti-Patterns
+
+- ✗ Tabel tanpa loading/empty/error state
+- ✗ Spinner untuk konten halaman utama (pakai skeleton)
+- ✗ Empty state tanpa CTA
+- ✗ Error raw/stack trace ke user
+- ✗ `window.confirm` untuk destructive
+- ✗ Banyak CTA primary dalam satu screen
+
+## Integration with Other Skills
+
+- **Sebelum**: `product-ux` (framing fitur & user flow), `ux-psychology` (cognitive load)
+- **Selama**: `ui-component` (implementasi), `visual-design` (hierarchy)
+- **Setelah**: `accessibility` (audit), `ux-research` (usability check)
+
+## Checklist
+
+1. [ ] Loading state (skeleton) ada untuk semua data fetch
+2. [ ] Empty state ada dengan ikon + judul + deskripsi + CTA
+3. [ ] Error state ada (fatal & inline)
+4. [ ] Pola interaksi konsisten per kategori
+5. [ ] Pattern didokumentasikan di showcase
+6. [ ] A11y tidak dikorbankan untuk pola baru

@@ -95,6 +95,7 @@ import {
   AlertDialogAction,
   ToastAction,
   GradientText,
+  Skeleton,
   toast,
   type KanbanColumnData,
   type KanbanItemData,
@@ -149,6 +150,14 @@ export default function LeadsPage() {
   const [onlyHighIntent, setOnlyHighIntent] = React.useState(false);
   const [isCreateOpen, setIsCreateOpen] = React.useState(false);
   const [leadToDelete, setLeadToDelete] = React.useState<Lead | null>(null);
+
+  // Simulated initial load to showcase skeleton states (table + kanban)
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 450);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Sorting & Selection state for Table
   const [sortField, setSortField] = React.useState<SortField>('aiScore');
@@ -731,7 +740,7 @@ export default function LeadsPage() {
   const hasActiveFilters = searchQuery !== '' || stageFilter !== 'all' || onlyHighIntent;
 
   return (
-    <div className="space-y-8 animate-in fade-in-50 duration-200">
+    <div className="space-y-10 animate-in fade-in-50 duration-200">
       {/* Official Design System PageHeader */}
       <PageHeader
         eyebrow="Opportunity Engine"
@@ -886,115 +895,137 @@ export default function LeadsPage() {
       {/* Main Content: Kanban or Table */}
       {viewMode === 'kanban' ? (
         <div className="pt-2">
-          <KanbanBoard
-            columns={kanbanColumns}
-            items={kanbanItems}
-            onColumnsChange={handleKanbanColumnsChange}
-            onAddItem={(columnId) => {
-              setNewLeadForm((prev) => ({ ...prev, stage: columnId as LeadStage }));
-              setIsCreateOpen(true);
-            }}
-            renderItem={(item) => {
-              const lead = leads.find((l) => l.id === item.id);
-              if (!lead) return null;
+          {isLoading ? (
+            <div
+              className="flex gap-4 overflow-x-auto pb-4"
+              aria-hidden="true"
+            >
+              {[0, 1, 2].map((col) => (
+                <div
+                  key={col}
+                  className="flex w-64 shrink-0 flex-col gap-2 rounded-lg border border-border bg-muted/30 p-2"
+                >
+                  <div className="flex items-center justify-between p-3 pb-2">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-6 rounded-full" />
+                  </div>
+                  {[0, 1, 2].map((card) => (
+                    <Skeleton key={card} className="h-24 w-full rounded-lg" />
+                  ))}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <KanbanBoard
+              columns={kanbanColumns}
+              items={kanbanItems}
+              onColumnsChange={handleKanbanColumnsChange}
+              onAddItem={(columnId) => {
+                setNewLeadForm((prev) => ({ ...prev, stage: columnId as LeadStage }));
+                setIsCreateOpen(true);
+              }}
+              renderItem={(item) => {
+                const lead = leads.find((l) => l.id === item.id);
+                if (!lead) return null;
 
-              return (
-                <ContextMenu key={lead.id}>
-                  <ContextMenuTrigger asChild>
-                    <div
-                      onClick={() => setSelectedLeadId(lead.id)}
-                      className="rounded-lg border border-border bg-card p-3.5 shadow-xs hover:shadow-md hover:border-foreground/30 transition-all cursor-pointer space-y-2.5 group"
-                    >
-                      <div className="flex items-start justify-between gap-1.5">
-                        <span className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                          {lead.name}
-                        </span>
-                        <Badge
-                          variant={PRIORITY_BADGE_VARIANT[lead.priority] || 'secondary'}
-                          className="text-xs px-1.5 py-0 capitalize"
-                        >
-                          {lead.priority}
-                        </Badge>
-                      </div>
+                return (
+                  <ContextMenu key={lead.id}>
+                    <ContextMenuTrigger asChild>
+                      <div
+                        onClick={() => setSelectedLeadId(lead.id)}
+                        className="rounded-lg border border-border bg-card p-3.5 shadow-xs hover:shadow-md hover:border-foreground/30 transition-all cursor-pointer space-y-2.5 group"
+                      >
+                        <div className="flex items-start justify-between gap-1.5">
+                          <span className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                            {lead.name}
+                          </span>
+                          <Badge
+                            variant={PRIORITY_BADGE_VARIANT[lead.priority] || 'secondary'}
+                            className="text-xs px-1.5 py-0 capitalize"
+                          >
+                            {lead.priority}
+                          </Badge>
+                        </div>
 
-                      <p className="text-xs text-muted-foreground truncate">
-                        {lead.company}
-                      </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {lead.company}
+                        </p>
 
-                      <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs">
-                        <span className="font-mono font-bold text-sm text-foreground">
-                          ${lead.dealValue.toLocaleString()}
-                        </span>
+                        <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs">
+                          <span className="font-mono font-bold text-sm text-foreground">
+                            ${lead.dealValue.toLocaleString()}
+                          </span>
 
-                        <div className="flex items-center gap-1 font-mono text-xs">
-                          {lead.aiScore >= 80 ? (
-                            <span className="flex items-center text-highlight font-bold">
-                              <Flame className="h-3.5 w-3.5 mr-0.5" />
-                              {lead.aiScore}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">{lead.aiScore}</span>
-                          )}
+                          <div className="flex items-center gap-1 font-mono text-xs">
+                            {lead.aiScore >= 80 ? (
+                              <span className="flex items-center text-highlight font-bold">
+                                <Flame className="h-3.5 w-3.5 mr-0.5" />
+                                {lead.aiScore}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">{lead.aiScore}</span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </ContextMenuTrigger>
-                  <ContextMenuContent className="w-48">
-                    <ContextMenuItem onClick={() => setSelectedLeadId(lead.id)}>
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      View 360 Details
-                    </ContextMenuItem>
-                    {lead.stage !== 'won' && (
-                      <ContextMenuItem
-                        onClick={() => convertLead(lead.id)}
-                        className="text-success focus:text-success"
-                      >
-                        <CheckCircle2 className="h-4 w-4 mr-2" />
-                        Convert to Won Deal
+                    </ContextMenuTrigger>
+                    <ContextMenuContent className="w-48">
+                      <ContextMenuItem onClick={() => setSelectedLeadId(lead.id)}>
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        View 360 Details
                       </ContextMenuItem>
-                    )}
-                    <ContextMenuItem
-                      onClick={() =>
-                        openAiDrawer({
-                          type: 'lead',
-                          entityId: lead.id,
-                          initialTab: 'lead-scoring',
-                        })
-                      }
-                    >
-                      <Sparkles className="h-4 w-4 mr-2 text-highlight" />
-                      AI Copilot Analysis
-                    </ContextMenuItem>
-                    <ContextMenuSub>
-                      <ContextMenuSubTrigger>
-                        <MoveRight className="h-4 w-4 mr-2" />
-                        Move Stage
-                      </ContextMenuSubTrigger>
-                      <ContextMenuSubContent>
-                        {ALL_STAGES.map((st) => (
-                          <ContextMenuItem
-                            key={st}
-                            disabled={lead.stage === st}
-                            onClick={() => moveLeadStage(lead.id, st)}
-                          >
-                            {STAGE_CONFIG[st].label}
-                          </ContextMenuItem>
-                        ))}
-                      </ContextMenuSubContent>
-                    </ContextMenuSub>
-                    <ContextMenuSeparator />
-                    <ContextMenuItem
-                      onClick={() => setLeadToDelete(lead)}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete Lead
-                    </ContextMenuItem>
-                  </ContextMenuContent>
-                </ContextMenu>
-              );
-            }}
-          />
+                      {lead.stage !== 'won' && (
+                        <ContextMenuItem
+                          onClick={() => convertLead(lead.id)}
+                          className="text-success focus:text-success"
+                        >
+                          <CheckCircle2 className="h-4 w-4 mr-2" />
+                          Convert to Won Deal
+                        </ContextMenuItem>
+                      )}
+                      <ContextMenuItem
+                        onClick={() =>
+                          openAiDrawer({
+                            type: 'lead',
+                            entityId: lead.id,
+                            initialTab: 'lead-scoring',
+                          })
+                        }
+                      >
+                        <Sparkles className="h-4 w-4 mr-2 text-highlight" />
+                        AI Copilot Analysis
+                      </ContextMenuItem>
+                      <ContextMenuSub>
+                        <ContextMenuSubTrigger>
+                          <MoveRight className="h-4 w-4 mr-2" />
+                          Move Stage
+                        </ContextMenuSubTrigger>
+                        <ContextMenuSubContent>
+                          {ALL_STAGES.map((st) => (
+                            <ContextMenuItem
+                              key={st}
+                              disabled={lead.stage === st}
+                              onClick={() => moveLeadStage(lead.id, st)}
+                            >
+                              {STAGE_CONFIG[st].label}
+                            </ContextMenuItem>
+                          ))}
+                        </ContextMenuSubContent>
+                      </ContextMenuSub>
+                      <ContextMenuSeparator />
+                      <ContextMenuItem
+                        onClick={() => setLeadToDelete(lead)}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Lead
+                      </ContextMenuItem>
+                    </ContextMenuContent>
+                  </ContextMenu>
+                );
+              }}
+            />
+          )}
         </div>
       ) : (
         <div className="space-y-4">
@@ -1005,6 +1036,8 @@ export default function LeadsPage() {
             size="sm"
             pagination={{ show: false }}
             onRowClick={(row) => setSelectedLeadId(row.id)}
+            loading={isLoading}
+            skeletonRows={5}
             emptyTitle="No leads match filters"
             emptyDescription="Try clearing your search query or stage filters to view more opportunities."
           />

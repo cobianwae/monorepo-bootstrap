@@ -82,7 +82,7 @@ export function CrmHeader({ onOpenCommandPalette }: CrmHeaderProps) {
             className="hidden lg:flex items-center group transition-all duration-200 hover:opacity-90 animate-in fade-in-50"
             title="Arah CRM"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-foreground text-background shadow-sm group-hover:scale-105 transition-transform">
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary via-primary to-highlight text-primary-foreground shadow-xs group-hover:scale-105 transition-transform">
               <Navigation className="h-4 w-4 fill-current" aria-hidden="true" />
             </span>
           </Link>

@@ -52,6 +52,16 @@ describe('Layout Primitives', () => {
       expect(screen.getByText('Real-time KPI metrics')).toBeDefined();
       expect(screen.getByText('Action Button')).toBeDefined();
     });
+
+    it('renders feature variant with decorative panel', () => {
+      const { container } = render(
+        <PageHeader variant="feature" eyebrow="Foundations" title="Color System" />
+      );
+      const root = container.querySelector('div.rounded-3xl');
+      expect(root).toBeDefined();
+      expect(container.querySelector('svg')).toBeDefined();
+      expect(screen.getByText('Color System')).toBeDefined();
+    });
   });
 
   describe('AppShell', () => {

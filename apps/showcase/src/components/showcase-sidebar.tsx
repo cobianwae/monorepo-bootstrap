@@ -33,7 +33,7 @@ export function ShowcaseSidebar() {
               <span className="font-semibold text-sm tracking-tight text-foreground font-display group-hover:text-primary transition-colors">
                 Arah
               </span>
-              <span className="text-[10px] text-muted-foreground uppercase font-mono tracking-wider">
+              <span className="text-micro text-muted-foreground">
                 Design System
               </span>
             </div>
@@ -52,7 +52,7 @@ export function ShowcaseSidebar() {
       <SidebarFooter>
         <div className="rounded-xl bg-muted/40 border border-border/80 p-3 text-xs space-y-2 group-data-[collapsible=icon]:hidden">
           <div className="flex items-center justify-between text-muted-foreground font-medium">
-            <span className="flex items-center gap-1 text-[11px] font-mono uppercase text-muted-foreground">
+            <span className="flex items-center gap-1 text-micro text-muted-foreground">
               <Sparkles className="h-3 w-3 text-highlight" />
               Theme: {currentTheme.name}
             </span>

@@ -9,7 +9,7 @@ export const cardVariants = cva(
       variant: {
         default: 'border-border bg-card shadow-xs',
         interactive:
-          'border-border bg-card shadow-xs hover:-translate-y-0.5 hover:shadow-md hover:border-border/80 cursor-pointer active:scale-[0.99]',
+          'border-border bg-card shadow-xs hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10 hover:border-primary/40 cursor-pointer active:scale-[0.99]',
         selectable:
           'border-border bg-card shadow-xs hover:border-primary/40 cursor-pointer data-[selected=true]:border-primary data-[selected=true]:ring-2 data-[selected=true]:ring-primary/20 data-[selected=true]:bg-primary/[0.02]',
         glass:

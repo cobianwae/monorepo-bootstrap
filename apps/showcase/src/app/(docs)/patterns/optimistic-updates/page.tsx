@@ -289,7 +289,7 @@ export default function OptimisticUpdatesPage() {
                       className={cn(
                         'rounded-md p-1.5 transition-colors cursor-pointer disabled:opacity-60',
                         fav.starred
-                          ? 'text-amber-400 hover:text-amber-500'
+                          ? 'text-warning-text'
                           : 'text-muted-foreground hover:text-foreground'
                       )}
                     >

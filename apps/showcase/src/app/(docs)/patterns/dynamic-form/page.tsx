@@ -242,7 +242,7 @@ export default function DynamicFormPage() {
           <div className="flex items-center gap-2">
             {isDirty && (
               <Badge variant="secondary" className="gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                <span className="h-1.5 w-1.5 rounded-full bg-warning animate-pulse" />
                 Unsaved changes
               </Badge>
             )}
@@ -555,7 +555,7 @@ export default function DynamicFormPage() {
           <CardContent className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-2">
               {isDirty ? (
-                <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5" />
+                <AlertTriangle className="h-4 w-4 text-warning-text mt-0.5" />
               ) : (
                 <ShieldCheck className="h-4 w-4 text-primary mt-0.5" />
               )}

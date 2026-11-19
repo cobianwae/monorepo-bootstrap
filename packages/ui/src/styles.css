@@ -12,6 +12,14 @@
   }
 }
 
+@utility text-micro {
+  font-size: 0.625rem;
+  line-height: 1.4;
+  letter-spacing: 0.125em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
 @utility glass-card {
   background: color-mix(in oklch, var(--card) 85%, transparent);
   backdrop-filter: blur(12px);

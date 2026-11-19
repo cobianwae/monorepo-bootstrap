@@ -1,12 +1,16 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Sun, Moon, Laptop, ShieldCheck } from 'lucide-react';
-import { Button, SidebarTrigger, useTheme, PaletteSwitcher } from '@ds/ui';
+import { Sun, Moon, Laptop, ShieldCheck, Search } from 'lucide-react';
+import { Button, Kbd, SidebarTrigger, useTheme, PaletteSwitcher } from '@ds/ui';
 
 export function ShowcaseHeader() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+
+  const openCommandPalette = () => {
+    window.dispatchEvent(new CustomEvent('ds:open-command-palette'));
+  };
 
   const getBreadcrumb = () => {
     const parts = pathname.split('/').filter(Boolean);
@@ -32,6 +36,21 @@ export function ShowcaseHeader() {
       </div>
 
       <div className="flex items-center gap-2.5">
+        {/* Global Search Trigger */}
+        <button
+          type="button"
+          onClick={openCommandPalette}
+          className="hidden md:flex h-8 w-32 sm:w-44 md:w-52 items-center justify-between rounded-lg border border-border/80 bg-muted/40 px-2.5 text-xs text-muted-foreground hover:border-foreground/30 hover:bg-muted/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+        >
+          <span className="inline-flex items-center gap-1.5 truncate">
+            <Search className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">Search docs...</span>
+          </span>
+          <Kbd size="sm" className="hidden sm:inline-flex">
+            ⌘K
+          </Kbd>
+        </button>
+
         {/* Palette Switcher */}
         <PaletteSwitcher />
 

@@ -87,6 +87,7 @@ export default function GettingStartedPage() {
   return (
     <div className="space-y-10 animate-in fade-in-50 duration-200">
       <PageHeader
+        variant="feature"
         eyebrow="Getting Started"
         eyebrowIcon={Rocket}
         title="Quick Start Guide"

@@ -25,18 +25,19 @@ libs/           # Shared business logic
 ```
 
 ## Rules
-1. Gunakan skill yang sesuai sebelum memulai fitur baru (`design-tokens`, `ui-component`, `ux-patterns`, `visual-design`, `accessibility`).
+1. Gunakan skill yang sesuai sebelum memulai fitur baru. Skills tersedia: `design-tokens`, `ui-component`, `ux-patterns`, `visual-design`, `accessibility`, `product-ux`, `ux-psychology`, `ux-research`, `decision-framework`.
 2. Setiap file baru HARUS mengikuti pola existing di direktori yang sama.
-3. Design tokens: Wajib menggunakan OKLCH, selalu audit kontras WCAG AA (>= 4.5:1 untuk teks), dan sediakan light & dark mode parity.
-4. Komponen UI: Gunakan Radix primitives untuk a11y, `cva` untuk varian visual, `cn()` untuk class merging, dan export via `index.ts`.
-5. UX Scenarios: Sediakan loading skeleton state dan empty state yang komprehensif pada setiap tabel/data grid.
-6. Backend: gunakan class-validator DTO, Proper exception filters, typed responses.
-7. Frontend: server components default, client components hanya saat dibutuhkan (interactivity, hooks, browser API).
-8. Prisma schema changes wajib via `prisma-schema` skill.
-9. Shared types di `packages/shared-types/`, bukan duplikasi.
-10. Testing: unit test untuk services/utils/tokens, integration test untuk API endpoints.
-11. Import path gunakan alias `@ds/ui`, `@ds/tokens`, `@shared/types`, `@app/`, `@web/`.
-12. Commit messages: conventional commits (feat/fix/refactor/chore).
+3. Framing bisnis (BA ringan): sebelum implementasi fitur, klasifikasikan requirement dengan MoSCoW (must/should/could/won't have), tulis user story, dan acceptance criteria (Given/When/Then) via skill `product-ux`. Identitas utama kerja adalah UI/UX — BA cukup untuk membingkai, jangan bertele-tele.
+4. Design tokens: Wajib menggunakan OKLCH, selalu audit kontras WCAG AA (>= 4.5:1 untuk teks), dan sediakan light & dark mode parity (skill `design-tokens`).
+5. Komponen UI: Gunakan Radix primitives untuk a11y, `cva` untuk varian visual, `cn()` untuk class merging, dan export via `index.ts` (skill `ui-component`).
+6. UX Scenarios: Sediakan loading skeleton state dan empty state yang komprehensif pada setiap tabel/data grid (skill `ux-patterns`).
+7. Backend: gunakan class-validator DTO, Proper exception filters, typed responses.
+8. Frontend: server components default, client components hanya saat dibutuhkan (interactivity, hooks, browser API).
+9. Prisma schema changes: ikuti pola existing di `apps/api/prisma` dan update migration dengan benar.
+10. Shared types di `packages/shared-types/`, bukan duplikasi.
+11. Testing: unit test untuk services/utils/tokens, integration test untuk API endpoints.
+12. Import path gunakan alias `@ds/ui`, `@ds/tokens`, `@shared/types`, `@app/`, `@web/`.
+13. Commit messages: conventional commits (feat/fix/refactor/chore).
 
 ## Conventions
 - Naming: PascalCase classes/interfaces/components, camelCase variables/functions, kebab-case filenames.

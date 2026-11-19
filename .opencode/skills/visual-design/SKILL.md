@@ -1,58 +1,80 @@
 ---
 name: visual-design
-description: Prinsip desain visual, estetika artistik, ritme spasial 4px, hierarki visual, koreografi animasi, ikonografi, dan mode gelap berkualitas tinggi
-tags: [design-system, design, visual, aesthetics, motion, dark-mode, typography]
+description: Prinsip visual untuk design system — visual hierarchy, typography scale, spacing rhythm, layout, dan dark mode parity berbasis tokens
+tags: [design-system, visual, design, typography, hierarchy, spacing, dark-mode]
 compatibility: [next, opencode, claude, cursor]
 ---
 
-# Visual Design & Artistic Craft
+# Visual Design System
 
 ## Kapan Pakai
-Saat merancang tampilan baru, mengatur layout, memilih tipografi, menerapkan micro-interactions, atau menyelaraskan estetika visual antar modul.
+Saat membuat layout baru, halaman showcase, atau komponen yang menuntut estetika (marketing, landing, data-viz). Layer visual DI ATAS pola interaksi (`ux-patterns`) dan token (`design-tokens`).
 
-## Prinsip Desain Visual
+## Sumber Style
 
-### 1. Ritme Spasial (4px Baseline Grid)
-- Seluruh ukuran margin, padding, tinggi baris, dan komponen dihitung berbasis kelipatan 4px: `4px`, `8px`, `12px`, `16px`, `24px`, `32px`, `48px`, `64px`.
-- Konsistensi jarak internal kartu (`p-6` atau `p-4`) dan jarak antar elemen (`gap-4` atau `space-y-4`) menciptakan ketenangan visual.
+Semua nilai visual datang dari tokens, bukan tebakan:
+- **Warna**: token semantik di `@theme` — `bg-primary`, `text-muted-foreground`, `border-border`, `bg-card`, `bg-highlight`, `bg-highlight-soft`
+- **Radius**: `--radius-xs` s/d `--radius-full` (0.125rem s/d 9999px)
+- **Font**: `--font-display` (Space Grotesk) untuk heading, `--font-sans` (Inter) untuk body, `--font-mono` (JetBrains Mono) untuk code/angka
+- **Easing/Duration**: `--ease-spring`, `--duration-fast/normal/slow`
+- **Z-index**: token `--z-*`, jangan hardcode `z-9999`
 
-### 2. Hierarki Visual (Weight over Color)
-- Gunakan variasi ukuran font dan optical weight (`font-semibold`, `font-bold`) terlebih dahulu sebelum menambahkan warna aksen.
-- Batasi jumlah warna saturasi tinggi dalam satu viewport; gunakan warna primer hanya untuk panggilan aksi utama (Primary CTA).
-- Teks sekunder dan caption menggunakan token `--muted-foreground` untuk mengurangi kebisingan informasi.
+## Visual Hierarchy
 
-### 3. Keahlian Mode Gelap (Dark Mode Craft)
-- **Hindari Hitam Pekat (#000000)**: Gunakan charcoal bersaturasi lembut (`oklch(0.14 0.015 260)`) untuk kanvas latar agar mata tidak cepat lelah akibat glare.
-- **Kedalaman via Lightness (Elevation)**: Pada mode gelap, bayangan drop-shadow kurang efektif. Gunakan permukaan yang sedikit lebih terang (`--card`, `--popover` dengan lightness 0.18) untuk menunjukkan elevasi lapisan.
-- **Penyesuaian Saturasi**: Warna primer pada mode gelap menggunakan saturasi yang sedikit lebih rendah dan lightness yang lebih tinggi untuk keterbacaan optimal.
+1. **Satu ide utama per screen** — heading paling dominan, sisanya mengecil
+2. **Skala typographic**: display (heading besar) → body (teks utama) → caption (meta/helper). Ukuran relatif, konsisten di seluruh app
+3. **Kontras sebagai alat**: teks terpenting pakai `foreground`, sekunder `muted-foreground`
+4. **Spacing rhythm**: gunakan spacing scale konsisten (gap-4, space-y-4/6/8/10) — jangan nilai random
+5. **Isolasi**: elemen yang paling penting dibuat berbeda (warna/ukuran), bukan semua menonjol
 
-### 4. Koreografi Gerakan (Motion Choreography)
-- Gunakan kurva pegas alami (*spring curves*): `cubic-bezier(0.16, 1, 0.3, 1)`.
-- Skala durasi:
-  - Micro-interactions (hover, active, toggle): `150ms`
-  - Dropdown, popover, dialog: `250ms`
-  - Transisi halaman dan drawer besar: `400ms`
-- Hindari animasi yang bergerak berlebihan tanpa tujuan kontekstual.
+## Layout Principles
 
-### 5. Standar Ikonografi
-- Gunakan ikon dengan ketebalan garis konsisten (**1.5px hingga 2px stroke**) pada ukuran bounding box standar 16px (`h-4 w-4`) atau 20px (`h-5 w-5`).
-- Selalu selaraskan posisi vertikal ikon dengan baseline teks (`items-center gap-2`).
+- Container: gunakan `layout/container.tsx` untuk max-width konsisten
+- Page shell: `layout/page-shell.tsx` + `layout/page-header.tsx`
+- Whitespace: beri ruang antar section (space-y-10 dsb), jangan padat berlebihan
+- Grid: `grid-cols-1` mobile → `sm/lg` breakpoint scaling (lihat pola `page-skeleton.tsx`)
+- Alignment & margin: konsisten — gunakan utility yang sudah ada, jangan inline style
 
-### 6. Komposisi Layout & App Shell
-- **Responsive Container**: `mx-auto w-full max-w-7xl px-4 md:px-6 lg:px-8`.
-- **Section Padding**: `py-8 md:py-12 lg:py-16` untuk ritme vertikal halaman yang konsisten.
-- **App Shell (Sidebar + Main)**: Sidebar `w-64 shrink-0 border-r` berdampingan dengan `main className="flex-1 overflow-y-auto"`.
-- **Card Grid**: `grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3` untuk kumpulan entity cards.
-- **Form Spacing**: Antar field gunakan `space-y-4`, antar grup form gunakan `space-y-6`.
+## Dark Mode Parity
 
-## Anti-Patterns Visual
-- ✗ Menggunakan lebih dari 2 jenis font family dalam satu aplikasi.
-- ✗ Mengandalkan warna merah/hijau semata untuk menandakan status tanpa ikon atau label teks.
-- ✗ Menggunakan bayangan drop shadow pekat dan gelap tanpa blur bertingkat.
-- ✗ Mengabaikan padding tepi pada tampilan mobile (< 640px).
+- Kedua mode WAJIB dicek secara visual
+- Jangan hardcode warna "untuk dark mode" — semua lewat token yang sudah punya varian dark
+- Uji kontras teks di dark mode (sering gagal di dark — periksa dengan `accessibility` skill)
+- Test manual: toggle via `theme-provider`/`palette-switcher` di showcase untuk tiap tema
+
+## Motion & Micro-interaction
+
+- Durasi pakai token: `duration-150/250/400` (fast/normal/slow)
+- Easing spring untuk playful, smooth untuk formal
+- Motion WAJIB bisa dinonaktifkan (prefers-reduced-motion) — kurangi transisi jika diaktifkan
+- Jangan animasi yang menggangu fokus/reading
+
+## Data Visualization
+
+- `chart.tsx` di `data-display` sudah pakai token chart (`--color-chart-1` s/d `chart-5`)
+- Pastikan label, legend, dan value punya kontras cukup
+- Sediakan `chart-a11y-table.tsx` untuk aksesibilitas data (audit dengan `accessibility`)
+
+## Anti-Patterns
+
+- ✗ Hex/hardcode warna — harus token
+- ✗ Font size acak di luar skala
+- ✗ Spacing tidak konsisten (margin manual random)
+- ✗ Dark mode tidak diperiksa
+- ✗ Motion tanpa prefers-reduced-motion
+- ✗ Semua elemen menonjol (no hierarchy)
+
+## Integration with Other Skills
+
+- **Sebelum**: `product-ux` (brand & positioning), `design-tokens` (warna/typography)
+- **Selama**: `ux-patterns` (states), `ui-component` (implementasi)
+- **Setelah**: `accessibility` (kontras & focus), `ux-research` (visual validation)
 
 ## Checklist
-1. [ ] Spacing konsisten dengan kelipatan 4px
-2. [ ] Hierarki judul, subjudul, dan teks isi tampak jelas dalam 3 detik pertama
-3. [ ] Mode gelap tampak proporsional tanpa kontras glare berlebih
-4. [ ] Transisi terasa halus dan responsif
+
+1. [ ] Semua warna dari token
+2. [ ] Skala typographic & spacing konsisten
+3. [ ] Hierarchy jelas (1 ide utama)
+4. [ ] Dark mode parity terverifikasi
+5. [ ] Motion pakai token + reduced-motion
+6. [ ] Chart/visualisasi punya alternatif teks/a11y

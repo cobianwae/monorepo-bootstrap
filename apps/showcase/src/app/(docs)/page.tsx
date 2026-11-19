@@ -47,10 +47,11 @@ import {
   CardDescription,
   Button,
   Badge,
-  GridPattern,
-  GlowOrb,
+  HeroBand,
+  GradientText,
   SectionNumber,
 } from '@ds/ui';
+import { Reveal } from '@/components/reveal';
 
 export default function OverviewPage() {
   const sections = [
@@ -386,42 +387,24 @@ export default function OverviewPage() {
 
   return (
     <div className="space-y-12 animate-in fade-in-50 duration-300">
-      {/* Hero Header with Ambient Aura & Pattern Grid */}
-      <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-card via-card/95 to-card p-8 sm:p-12 shadow-sm">
-        {/* Background Accents */}
-        <GridPattern
-          width={44}
-          height={44}
-          squares={[
-            [4, 1],
-            [6, 3],
-            [12, 2],
-            [15, 4],
-          ]}
-          fade="radial"
-          className="opacity-40 dark:opacity-30"
-        />
-        <GlowOrb color="highlight" size="xl" position="top-right" />
-        <GlowOrb color="primary" size="lg" position="bottom-left" />
-
-        <div className="relative z-10 max-w-3xl space-y-5">
-          <div className="inline-flex items-center gap-2 rounded-full border border-highlight/30 bg-highlight/10 px-3.5 py-1 text-xs font-semibold text-highlight font-mono">
-            <Sparkles className="h-3.5 w-3.5 shrink-0" />
-            <span>TAILWIND V4 + RADIX + OKLCH TOKENS</span>
-          </div>
-
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground font-display leading-[1.1]">
-            Engineering Artistry in{' '}
-            <span className="bg-gradient-to-r from-primary via-highlight to-primary bg-clip-text text-transparent">
-              Design Systems
-            </span>
-          </h1>
-
-          <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl">
-            A comprehensive, character-rich design system featuring <strong>4 curated art directions</strong>, strict WCAG 2.1 AA/AAA contrast guarantees, and production-ready UX scenario patterns.
-          </p>
-
-          <div className="flex flex-wrap items-center gap-3 pt-3">
+{/* Hero Header with Ambient Aura & Pattern Grid */}
+      <HeroBand
+        eyebrow="TAILWIND V4 + RADIX + OKLCH TOKENS"
+        eyebrowIcon={Sparkles}
+        title={
+          <>
+            Engineering Artistry in <GradientText>Design Systems</GradientText>
+          </>
+        }
+        description={
+          <>
+            A comprehensive, character-rich design system featuring{' '}
+            <strong>4 curated art directions</strong>, strict WCAG 2.1 AA/AAA
+            contrast guarantees, and production-ready UX scenario patterns.
+          </>
+        }
+        actions={
+          <>
             <Link href="/crm">
               <Button variant="highlight" className="gap-2 h-10 px-5 font-semibold text-sm shadow-md">
                 <Briefcase className="h-4 w-4" />
@@ -437,14 +420,16 @@ export default function OverviewPage() {
             <Link href="/patterns/stepper">
               <Button variant="ghost" className="gap-2 h-10 px-4 text-sm text-muted-foreground hover:text-foreground">
                 UX Recipes
+                <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {/* Feature Highlights Grid with Monospace Indexing */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <Reveal>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="border-border/80 relative overflow-hidden group hover:border-highlight/50 transition-all duration-200">
           <div className="absolute top-0 right-0 p-4">
             <SectionNumber number="01" />
@@ -496,9 +481,11 @@ export default function OverviewPage() {
           </CardHeader>
         </Card>
       </div>
+      </Reveal>
 
       {/* Showcase Sections Navigation Grid */}
-      <div className="space-y-5">
+      <Reveal delay={100}>
+        <div className="space-y-5">
         <div className="flex items-center justify-between border-b border-border pb-3">
           <div>
             <h2 className="text-xl font-bold tracking-tight text-foreground font-display">
@@ -555,7 +542,8 @@ export default function OverviewPage() {
             );
           })}
         </div>
-      </div>
+        </div>
+      </Reveal>
     </div>
   );
 }
