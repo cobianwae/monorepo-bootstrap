@@ -12,12 +12,14 @@ CR-001 (keyboard access clickable table row) selesai (`done`).
 CR-002 (touch target ≥44px) selesai (`done`).
 CR-003 (`aria-sort` header tabel sortable) selesai (`done`).
 CR-004 (error state dan CTA empty state DataTable) selesai (`done`).
+CR-005 (indikator fokus NavbarLink dan kontras highlight/accent) selesai (`done`).
+CR-006 (eliminasi palette literal, token `inverse` baru) selesai (`done`).
 
 ## Next
 
 1. Validasi command `/start`, `/prd`, `/review`, dan `/audit` di sesi baru.
 2. Lengkapi `docs/design/object-model.md` dan `sitemap.md` dengan inventaris aktual.
-3. Lanjutkan CR berikutnya (CR-006 dst.) ke branch `dev`.
+3. Tidak ada CR tertunda; pilih target berikutnya (PRD/story) atau CR baru dari audit.
 
 ## Known Issues
 

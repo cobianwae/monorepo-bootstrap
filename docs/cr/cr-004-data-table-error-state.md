@@ -1,6 +1,6 @@
 # CR-004 — Error state dan CTA empty state untuk DataTable
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit / ux
 **Ref:** `packages/ui/src/components/data-display/data-table.tsx:85-101,430-493`, `packages/ui/src/components/data-display/data-table.tsx:464-468`
 
