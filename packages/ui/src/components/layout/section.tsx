@@ -17,7 +17,7 @@ export const sectionVariants = cva('relative w-full overflow-hidden', {
       muted: 'bg-muted/40 text-foreground border-y border-border/50',
       card: 'bg-card text-card-foreground',
       subtle: 'bg-accent/30 text-foreground',
-      dark: 'bg-zinc-950 text-zinc-50 dark:bg-zinc-900',
+      dark: 'bg-inverse text-inverse-foreground',
       primary: 'bg-primary text-primary-foreground',
       highlight: 'bg-highlight/10 text-foreground border-y border-highlight/20',
       transparent: 'bg-transparent text-foreground',

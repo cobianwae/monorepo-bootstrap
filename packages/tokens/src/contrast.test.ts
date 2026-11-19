@@ -55,6 +55,8 @@ describe('WCAG 2.1 Contrast Calculation Engine', () => {
       { name: 'Destructive Text', fg: '#B91C1C', bg: '#FFFFFF' },
       { name: 'Warning Text', fg: '#FBBF24', bg: '#141620' },
       { name: 'Destructive Text', fg: '#F87171', bg: '#141620' },
+      // Inverse surface is fixed across all 8 themes and both modes (CR-006)
+      { name: 'Inverse Foreground', fg: '#F4F4F5', bg: '#09090B' },
     ];
     for (const c of cases) {
       const ratio = getContrastRatio(c.fg, c.bg);

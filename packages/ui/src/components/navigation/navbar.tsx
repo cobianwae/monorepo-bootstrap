@@ -17,7 +17,7 @@ export const navbarVariants = cva(
           'max-w-7xl mx-auto my-3 rounded-2xl border border-border/80 bg-background/90 backdrop-blur-lg shadow-md px-4 sm:px-6',
         transparent: 'bg-transparent border-transparent text-foreground',
         glass:
-          'border-b border-white/10 dark:border-white/5 bg-background/60 backdrop-blur-xl',
+          'border-b border-border/10 bg-background/60 backdrop-blur-xl',
         solid: 'border-b border-border bg-card text-card-foreground',
       },
       sticky: {

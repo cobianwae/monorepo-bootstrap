@@ -11,7 +11,7 @@ export const ctaBandVariants = cva(
       variant: {
         glow: 'border border-highlight/40 bg-gradient-to-br from-highlight/15 via-primary/10 to-transparent shadow-xl',
         card: 'border border-border bg-card text-card-foreground shadow-md',
-        dark: 'border border-zinc-800 bg-zinc-950 text-zinc-100 shadow-2xl',
+        dark: 'border border-inverse-border bg-inverse text-inverse-foreground shadow-2xl',
         highlight: 'bg-highlight text-highlight-foreground shadow-lg',
       },
       align: {

@@ -28,6 +28,9 @@
   --color-info-foreground: var(--info-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
+  --color-inverse: var(--inverse);
+  --color-inverse-foreground: var(--inverse-foreground);
+  --color-inverse-border: var(--inverse-border);
   --color-ring: var(--ring);
   --color-overlay: var(--overlay);
   --color-chart-1: var(--chart-1);
@@ -102,6 +105,17 @@
   background-image: none;
   color: var(--color-highlight);
   -webkit-text-fill-color: var(--color-highlight);
+}
+
+/* ==========================================================================
+   INVERSE SURFACE — fixed dark block, identical in light and dark mode and
+   across all 8 themes. For `dark` component variants that must stay dark
+   regardless of color scheme (see CR-006).
+   ========================================================================== */
+:root {
+  --inverse: oklch(0.141 0.005 286);
+  --inverse-foreground: oklch(0.967 0.001 286);
+  --inverse-border: oklch(0.274 0.006 286);
 }
 
 /* ==========================================================================
