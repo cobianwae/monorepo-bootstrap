@@ -110,6 +110,17 @@ describe('Navigation Primitives', () => {
       expect(screen.getByText('Foundations')).toBeDefined();
       expect(screen.getByText('Get Started')).toBeDefined();
     });
+
+    it('applies focus-visible ring and non-highlight active state', () => {
+      render(<NavbarLink href="/components" active>Components</NavbarLink>);
+      const link = screen.getByText('Components') as HTMLAnchorElement;
+      expect(link.className).toContain('focus-visible:ring-ring');
+      expect(link.className).toContain('focus-visible:ring-2');
+      expect(link.className).not.toMatch(/(^|\s)focus:outline-none/);
+      expect(link.className).toContain('text-foreground');
+      expect(link.className).not.toContain('text-highlight');
+      expect(link.className).toContain('font-semibold');
+    });
   });
 
   describe('Footer', () => {
