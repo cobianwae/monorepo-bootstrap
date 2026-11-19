@@ -102,9 +102,9 @@ export const NavbarLink = React.forwardRef<HTMLAnchorElement, NavbarLinkProps>(
     <a
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus:bg-accent',
+        'inline-flex items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:bg-accent',
         active
-          ? 'bg-accent/70 text-foreground font-semibold text-highlight'
+          ? 'bg-accent/70 text-foreground font-semibold'
           : 'text-muted-foreground',
         className
       )}
