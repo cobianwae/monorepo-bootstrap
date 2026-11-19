@@ -1,6 +1,6 @@
 # CR-005 — Indikator fokus NavbarLink dan kontras `highlight`/`accent`
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit / a11y
 **Ref:** `packages/ui/src/components/navigation/navbar.tsx:105-108`
 
@@ -52,4 +52,4 @@ Commit: `fix: navbar focus ring and contrast audit [CR-005]`
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan.
 - [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
