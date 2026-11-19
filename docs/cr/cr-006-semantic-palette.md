@@ -1,6 +1,6 @@
 # CR-006 — Eliminasi palette literal (bypass token semantik)
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit / token
 **Ref:** `packages/ui/src/components/data-display/timeline.tsx:29`, `packages/ui/src/components/marketing/cta-band.tsx:14`, `packages/ui/src/components/layout/section.tsx:20`, `packages/ui/src/components/navigation/footer.tsx:13`, `packages/ui/src/components/navigation/navbar.tsx:20`
 
