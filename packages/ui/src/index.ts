@@ -73,6 +73,7 @@ export * from './components/base/toggle';
 export * from './components/base/scroll-area';
 export * from './components/base/kbd';
 export * from './components/form/file-input';
+export * from './components/form/file-upload';
 export * from './components/marketing/carousel';
 export * from './components/data-display/rating';
 export * from './components/data-display/code-block';

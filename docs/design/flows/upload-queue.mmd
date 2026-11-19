@@ -1,0 +1,27 @@
+<!-- Flow upload queue — PRD 001 (RM-01), layar S-005.10 -->
+<!-- Satu job-to-be-done: mengunggah batch file dengan kontrol per file -->
+
+```mermaid
+flowchart TD
+  A[User memilih atau drag-drop beberapa file] --> B{Validasi per file: tipe, ukuran, jumlah}
+  B -- invalid --> C[Tolak file dengan alasan spesifik; file valid tetap masuk queue]
+  B -- valid --> D[File masuk queue sebagai Menunggu]
+  D --> E{Slot upload paralel tersedia?}
+  E -- tidak --> F[Item tetap Menunggu]
+  E -- ya --> G[Upload dimulai, status Mengunggah]
+  G --> H[Progres per file diperbarui]
+  H --> I{Hasil upload?}
+  I -- selesai --> J[Status Selesai]
+  I -- gagal --> K[Status Gagal dengan alasan per file]
+  K --> L{User mengulang file ini?}
+  L -- ya --> G
+  L -- tidak --> M[Item tetap Gagal; file lain tidak terpengaruh]
+  G --> N{User membatalkan file ini?}
+  N -- ya --> O[Proses dihentikan, status Dibatalkan]
+  O --> P{User mengulang?}
+  P -- ya --> D
+  P -- tidak --> Q[Item tetap Dibatalkan]
+  J --> R{Semua file selesai?}
+  R -- ya --> S[Ringkasan sukses ditampilkan]
+  R -- tidak --> E
+```
