@@ -1,6 +1,7 @@
 ---
 description: Read-only code scout — menelusuri monorepo design system dan mengembalikan temuan ringkas path:line. Dipakai untuk eksplorasi luas tanpa mengubah file.
 mode: subagent
+model: nim-coder/nim-coder
 steps: 10
 permissions:
   - action: edit
