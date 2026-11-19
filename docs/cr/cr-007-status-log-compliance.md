@@ -1,6 +1,6 @@
 # CR-007 — Agent tidak patuh mengisi STATUS-LOG
 
-**Status:** approved
+**Status:** done
 **Sumber:** review
 **Ref:** `docs/STATUS.md:31-35`, `docs/STATUS-LOG.md:1-6`, `AGENTS.md:80-88`, `.opencode/commands/implement.md:27`, `opencode.json:3`
 

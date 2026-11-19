@@ -3,15 +3,18 @@
  * check-status-log.mjs — kepatuhan CR-007.
  *
  * Gagal bila ada artefak berstatus `done` di docs/BACKLOG.md
- * yang tidak memiliki baris di docs/STATUS-LOG.md.
- * Node murni, tanpa dependency.
+ * atau docs/BACKLOG-ARCHIVE.md yang tidak memiliki baris di
+ * docs/STATUS-LOG.md. Node murni, tanpa dependency.
  */
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const backlog = readFileSync(join(root, 'docs', 'BACKLOG.md'), 'utf8');
+const backlog = [
+  readFileSync(join(root, 'docs', 'BACKLOG.md'), 'utf8'),
+  readFileSync(join(root, 'docs', 'BACKLOG-ARCHIVE.md'), 'utf8'),
+].join('\n');
 const log = readFileSync(join(root, 'docs', 'STATUS-LOG.md'), 'utf8');
 
 const doneIds = [];

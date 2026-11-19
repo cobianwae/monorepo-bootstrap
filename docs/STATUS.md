@@ -6,27 +6,21 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 ## Posisi Saat Ini
 
-Struktur OpenCode sudah terpasang: config root, docs-as-state, agents, commands, dan workflow skills.
-Validasi baseline `typecheck`, `lint`, dan `test` sudah hijau.
-CR-001 (keyboard access clickable table row) selesai (`done`).
-CR-002 (touch target ≥44px) selesai (`done`).
-CR-003 (`aria-sort` header tabel sortable) selesai (`done`).
-CR-004 (error state dan CTA empty state DataTable) selesai (`done`).
-CR-005 (indikator fokus NavbarLink dan kontras highlight/accent) selesai (`done`).
-CR-006 (eliminasi palette literal, token `inverse` baru) selesai (`done`).
+Struktur OpenCode terpasang (config root, docs-as-state, agents, commands, workflow skills); baseline `typecheck`, `lint`, dan `test` hijau.
+CR-001–CR-007 selesai (`done`, ter-merge ke `dev`); kepatuhan `STATUS-LOG` dikunci via CR-007 (backfill + aturan append + `scripts/check-status-log.mjs`).
+Story 001-01 dan 001-02 (upload queue) selesai (`done`, ter-merge ke `dev`).
 
 ## Next
 
-1. Story 001-02 selesai (`done`, ter-merge ke dev) — aksi kolektif, sortable, auto-retry, compact. Roadmap: `docs/discussions/component-roadmap.md`.
+1. PRD 001 (upload queue) masih `approved` — kedua story selesai `done`; tetapkan `shipped` bila sudah sesuai keputusan user, lalu arsipkan dari `BACKLOG.md`.
 2. Validasi command `/start`, `/prd`, `/review`, dan `/audit` di sesi baru.
-3. CR-007 selesai (`done`, branch `cr-007-status-log-compliance`) — kepatuhan STATUS-LOG dikunci via backfill + aturan append + `scripts/check-status-log.mjs`.
+3. Lengkapi `docs/design/object-model.md` dan `sitemap.md` dengan inventaris aktual.
 4. Tidak ada CR tertunda; pilih target berikutnya (PRD/story) atau CR baru dari audit.
 
 ## Known Issues
 
 - Graphify bersifat per-machine; graph tidak di-commit.
 - `apps/web` dan `apps/api` masih tipis; integration test belum aktif.
-- Sebagian route showcase belum punya screen ID di sitemap.
 
 ## Aturan Update
 
