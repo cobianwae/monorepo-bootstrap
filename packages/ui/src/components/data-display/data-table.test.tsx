@@ -94,6 +94,27 @@ describe('DataTable component', () => {
     expect(within(rows).queryByText('Sarah')).toBeNull();
   });
 
+  it('renders a 44px hit area on the remove-filter button', async () => {
+    function WithFilter() {
+      const { table } = useDataTable<Person, unknown>({
+        columns,
+        data: DATA,
+        state: { columnFilters: [{ id: 'role', value: 'Admin' }] },
+        pagination: { show: false },
+      });
+      return <DataTableToolbar table={table} />;
+    }
+    render(<WithFilter />);
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'Filters' }), {
+      button: 0,
+      ctrlKey: false,
+    });
+    const remove = await screen.findByRole('button', { name: 'Remove role filter' });
+    expect(remove.className).toContain('h-8');
+    expect(remove.className).toContain('w-8');
+    expect(remove.className).toContain('after:-inset-1.5');
+  });
+
   it('paginates when pagination enabled', () => {
     const bigData = Array.from({ length: 25 }, (_, i) => ({
       id: String(i),

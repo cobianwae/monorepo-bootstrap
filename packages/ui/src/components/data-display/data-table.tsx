@@ -293,7 +293,7 @@ export function DataTableToolbar<TData>({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-5 w-5"
+                    className="relative h-8 w-8 after:absolute after:-inset-1.5 after:content-['']"
                     onClick={() => table.getColumn(filter.id)?.setFilterValue(undefined)}
                     aria-label={`Remove ${filter.id} filter`}
                   >
