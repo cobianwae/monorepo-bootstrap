@@ -17,7 +17,7 @@ CR-006 (eliminasi palette literal, token `inverse` baru) selesai (`done`).
 
 ## Next
 
-1. Story 001-02 selesai diimplementasi (`review`) di branch `001-02-file-upload-enhancements` (aksi kolektif, sortable, auto-retry, compact); menunggu review user sebelum merge ke dev.
+1. Story 001-02 selesai (`done`, ter-merge ke dev) — aksi kolektif, sortable, auto-retry, compact. Roadmap: `docs/discussions/component-roadmap.md`.
 2. Validasi command `/start`, `/prd`, `/review`, dan `/audit` di sesi baru.
 3. Lengkapi `docs/design/object-model.md` dan `sitemap.md` dengan inventaris aktual.
 4. Tidak ada CR tertunda; pilih target berikutnya (PRD/story) atau CR baru dari audit.

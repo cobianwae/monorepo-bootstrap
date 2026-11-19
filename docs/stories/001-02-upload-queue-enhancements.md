@@ -1,6 +1,6 @@
 # 001-02 — FileUpload: aksi kolektif, sortable, auto-retry, varian compact
 
-Status: review
+Status: done
 PRD: `docs/prd/001-upload-queue.md`
 FR: `FR-010`, `FR-011`, `FR-013`, `FR-014`
 Screens: `S-004.03`, `S-005.10`
