@@ -478,8 +478,37 @@ export function DataTableBody<TData>({
         <TableRow
           key={row.id}
           data-state={row.getIsSelected() && 'selected'}
+          role={onRowClick ? 'button' : undefined}
+          tabIndex={onRowClick ? 0 : undefined}
           onClick={onRowClick ? () => onRowClick(row.original) : undefined}
-          className={onRowClick ? 'cursor-pointer' : undefined}
+          onKeyDown={
+            onRowClick
+              ? (event) => {
+                  if (event.key !== 'Enter' && event.key !== ' ') {
+                    return;
+                  }
+                  event.preventDefault();
+                  const target = event.target as Element | null;
+                  // Biarkan elemen interaktif di dalam sel (tombol, link, input, dsb.)
+                  // menangani Enter/Space sendiri agar baris tidak terpicu dua kali.
+                  if (
+                    target &&
+                    target !== event.currentTarget &&
+                    target.closest(
+                      'button, a[href], input, select, textarea, [tabindex]'
+                    )
+                  ) {
+                    return;
+                  }
+                  onRowClick(row.original);
+                }
+              : undefined
+          }
+          className={cn(
+            onRowClick
+              ? 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring'
+              : undefined
+          )}
         >
           {row.getVisibleCells().map((cell) => (
             <TableCell key={cell.id}>

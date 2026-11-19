@@ -7,13 +7,13 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 ## Posisi Saat Ini
 
 Struktur OpenCode sudah terpasang: config root, docs-as-state, agents, commands, dan workflow skills.
-Validasi baseline `typecheck`, `lint`, dan `test` sudah hijau. Fokus berikutnya adalah uji alur PRD → design → story → implement → review.
+Validasi baseline `typecheck`, `lint`, dan `test` sudah hijau. CR-001 (keyboard access clickable table row) sudah diimplementasikan dan terverifikasi di branch `cr-001-table-row-keyboard`; status artefak tetap `approved` menunggu review user.
 
 ## Next
 
 1. Validasi command `/start`, `/prd`, `/review`, dan `/audit` di sesi baru.
 2. Lengkapi `docs/design/object-model.md` dan `sitemap.md` dengan inventaris aktual.
-3. Mulai satu perubahan kecil lewat jalur CR untuk menguji workflow end-to-end.
+3. Review implementasi CR-001 lalu tetapkan status `done`.
 
 ## Known Issues
 

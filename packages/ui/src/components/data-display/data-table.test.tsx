@@ -123,6 +123,67 @@ describe('DataTable component', () => {
   });
 });
 
+describe('DataTable row keyboard access', () => {
+  it('makes clickable rows focusable and activatable via Enter and Space', () => {
+    const onRowClick = vi.fn();
+    render(
+      <DataTable
+        columns={columns}
+        data={DATA}
+        onRowClick={onRowClick}
+        pagination={{ show: false }}
+      />
+    );
+
+    const row = screen.getByText('Sarah').closest('tr') as HTMLElement;
+    expect(row).not.toBeNull();
+    expect(row.getAttribute('role')).toBe('button');
+    expect(row.getAttribute('tabindex')).toBe('0');
+
+    fireEvent.keyDown(row, { key: 'Enter' });
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+    expect(onRowClick).toHaveBeenCalledWith(DATA[0]);
+
+    fireEvent.keyDown(row, { key: ' ' });
+    expect(onRowClick).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not expose row activation when onRowClick is absent', () => {
+    render(<StatefulTable />);
+    const row = screen.getByText('Sarah').closest('tr') as HTMLElement;
+    expect(row.getAttribute('role')).toBeNull();
+    expect(row.getAttribute('tabindex')).toBeNull();
+  });
+
+  it('does not double-trigger row click for Enter on interactive cell elements', () => {
+    const onRowClick = vi.fn();
+    const columnsWithAction: ColumnDef<Person, unknown>[] = [
+      ...columns,
+      columnHelper.display({
+        id: 'actions',
+        cell: () => (
+          <button type="button" onClick={() => undefined}>
+            Action
+          </button>
+        ),
+      }),
+    ];
+
+    render(
+      <DataTable
+        columns={columnsWithAction}
+        data={DATA}
+        onRowClick={onRowClick}
+        pagination={{ show: false }}
+      />
+    );
+
+    const actionButton = screen.getAllByText('Action')[0];
+    fireEvent.keyDown(actionButton, { key: 'Enter' });
+    expect(onRowClick).not.toHaveBeenCalled();
+  });
+});
+
 describe('useDataTable hook', () => {
   it('fires onStateChange with table state', () => {
     const onStateChange = vi.fn();
