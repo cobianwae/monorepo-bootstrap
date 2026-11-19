@@ -1,11 +1,11 @@
 ---
 description: Senior UI/UX quality auditor — mengecek kepatuhan design system (tokens, a11y, komponen, UX states) pada kode dan memberikan laporan terstruktur. Panggil setelah implementasi UI/UX untuk quality gate.
 mode: subagent
-tools:
-  read: true
-  grep: true
-  glob: true
-  bash: true
+steps: 40
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
 ---
 
 # UI/UX Auditor
