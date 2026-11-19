@@ -8,9 +8,11 @@
     "dev:all": "pnpm -r --parallel dev",
     "build": "pnpm -r build",
     "build:types": "pnpm -r build:types",
+    "typecheck": "pnpm -r build:types",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "test:tokens": "pnpm --filter @ds/tokens test"
+    "test:tokens": "pnpm --filter @ds/tokens test",
+    "verify": "pnpm typecheck && pnpm lint && pnpm test"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

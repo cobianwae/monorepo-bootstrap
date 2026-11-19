@@ -9,6 +9,10 @@ out/
 # Build outputs
 dist/
 build/
+**/*.tsbuildinfo
+
+# Graphify (per-machine code graph)
+graphify-out/
 
 # Turbo & caches
 .turbo/

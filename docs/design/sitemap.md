@@ -1,0 +1,99 @@
+# Sitemap
+
+Inventaris layar showcase dan docs. Semua layar **wajib terdaftar di sini sebelum wireframe**.
+Status: `planned`, `in-design`, `implemented`, `documented`.
+
+## Konvensi ID
+
+| Objek | Format | Contoh |
+|---|---|---|
+| Layar utama | `S-NNN` | `S-010` |
+| Child panel / tab | `S-NNN.MM` | `S-003.01` |
+| Modal | `M-NNN` | `M-001` |
+| Pattern | `S-005.MM` | `S-005.08` |
+
+## Screen Registry
+
+| ID | Layar | Route | Status |
+|---|---|---|---|
+| S-001 | Docs Home | `/` | implemented |
+| S-002 | Getting Started | `/getting-started` | implemented |
+| S-003 | Foundations (shell) | `/foundations/*` | implemented |
+| S-003.01 | Colors | `/foundations/colors` | implemented |
+| S-003.02 | Themes | `/foundations/themes` | implemented |
+| S-003.03 | Typography | `/foundations/typography` | implemented |
+| S-003.04 | Spacing | `/foundations/spacing` | implemented |
+| S-003.05 | Motion | `/foundations/motion` | implemented |
+| S-003.06 | Breakpoints | `/foundations/breakpoints` | implemented |
+| S-003.07 | Iconography | `/foundations/iconography` | implemented |
+| S-004 | Components (shell) | `/components/*` | implemented |
+| S-004.01 | Components Overview | `/components` | implemented |
+| S-004.02 | Actions & Inputs | `/components/actions-inputs` | implemented |
+| S-004.03 | Forms | `/components/forms` | implemented |
+| S-004.04 | Data Display | `/components/data-display` | implemented |
+| S-004.05 | States & Feedback | `/components/states-feedback` | implemented |
+| S-004.06 | Layout & Navigation | `/components/layout-navigation` | implemented |
+| S-004.07 | Overlays & Menus | `/components/overlays-menus` | implemented |
+| S-004.08 | Marketing | `/components/marketing` | implemented |
+| S-004.09 | Charts | `/components/charts` | implemented |
+| S-005 | Patterns (shell) | `/patterns/*` | implemented |
+| S-005.01 | Activity Feed | `/patterns/activity-feed` | implemented |
+| S-005.02 | Auth | `/patterns/auth` | implemented |
+| S-005.03 | Billing | `/patterns/billing` | implemented |
+| S-005.04 | Calendar | `/patterns/calendar` | implemented |
+| S-005.05 | Comments | `/patterns/comments` | implemented |
+| S-005.06 | Command Palette | `/patterns/command-palette` | implemented |
+| S-005.07 | Dashboard | `/patterns/dashboard` | implemented |
+| S-005.08 | Data Table | `/patterns/data-table` | implemented |
+| S-005.09 | Dynamic Form | `/patterns/dynamic-form` | implemented |
+| S-005.10 | File Upload | `/patterns/file-upload` | implemented |
+| S-005.11 | Global Search | `/patterns/global-search` | implemented |
+| S-005.12 | Infinite Scroll | `/patterns/infinite-scroll` | implemented |
+| S-005.13 | Kanban | `/patterns/kanban` | implemented |
+| S-005.14 | Master Data | `/patterns/master-data` | implemented |
+| S-005.15 | Master Detail | `/patterns/master-detail` | implemented |
+| S-005.16 | Media Gallery | `/patterns/media-gallery` | implemented |
+| S-005.17 | Notifications | `/patterns/notifications` | implemented |
+| S-005.18 | Onboarding | `/patterns/onboarding` | implemented |
+| S-005.19 | Optimistic Updates | `/patterns/optimistic-updates` | implemented |
+| S-005.20 | Product Tour | `/patterns/product-tour` | implemented |
+| S-005.21 | Results | `/patterns/results` | implemented |
+| S-005.22 | Rich Text Editor | `/patterns/rich-text-editor` | implemented |
+| S-005.23 | Settings | `/patterns/settings` | implemented |
+| S-005.24 | Stepper | `/patterns/stepper` | implemented |
+| S-005.25 | Virtualized List | `/patterns/virtualized-list` | implemented |
+| S-005.26 | Workspace | `/patterns/workspace` | implemented |
+| S-006 | Guidelines | `/guidelines` | implemented |
+| S-007 | Contribution | `/contribution` | implemented |
+| S-008 | What's New | `/whats-new` | implemented |
+| S-010 | CRM Dashboard | `/crm` | implemented |
+| S-011 | CRM Leads | `/crm/leads` | implemented |
+| S-012 | CRM Campaigns | `/crm/campaigns` | implemented |
+| S-013 | CRM AI | `/crm/ai` | implemented |
+| S-014 | CRM Contact Center | `/crm/contact-center` | implemented |
+| S-020 | Clinic Dashboard | `/clinic` | implemented |
+| S-021 | Clinic Patients | `/clinic/patients` | implemented |
+| S-022 | Clinic Appointments | `/clinic/appointments` | implemented |
+| S-023 | Clinic Consultations | `/clinic/consultations` | implemented |
+| S-024 | Clinic Treatments | `/clinic/treatments` | implemented |
+| S-025 | Clinic POS | `/clinic/pos` | implemented |
+| S-026 | Clinic Reports | `/clinic/reports` | implemented |
+| S-027 | Clinic Registration | `/clinic/registration` | implemented |
+| S-030 | Landing | `/landing` | implemented |
+| S-031 | Scratch (internal) | `/scratch` | implemented |
+
+## Route Groups
+
+| Group | Prefix | Catatan |
+|---|---|---|
+| Docs | `/(docs)` | Living documentation design system |
+| CRM | `/(crm)/crm` | Scenario CRM |
+| Clinic | `/(clinic)/clinic` | Scenario clinic |
+| Landing | `/(landing)` | Landing dan scratch |
+
+## Aturan
+
+1. Layar baru harus mendapat ID sebelum wireframe dibuat.
+2. Child panel/tab memakai `S-NNN.MM`; modal memakai `M-NNN`.
+3. Status diperbarui setelah implementasi dan dokumentasi.
+4. Route yang dihapus tetap dicatat sebagai `removed` selama satu siklus.
