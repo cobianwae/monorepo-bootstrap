@@ -61,7 +61,7 @@ export default function WebHomePage() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Announcement Banner */}
-      <Banner variant="highlight" actionText="Explore CRM" actionHref="http://localhost:3000/crm">
+      <Banner variant="highlight" actionText="Explore CRM" actionHref="http://localhost:4000/crm">
         <strong>Apex Design System v2.2:</strong> Complete Layouts, Mega Menus & Fullstack Monorepo!
       </Banner>
 
@@ -123,7 +123,7 @@ export default function WebHomePage() {
                     badge="Interactive"
                     title="Live Showcase Suite"
                     description="Explore 25+ UX patterns, full CRM scenarios, and OKLCH color matrix."
-                    href="http://localhost:3000"
+                    href="http://localhost:4000"
                     ctaText="Open Showcase"
                   />
                 </MegaMenuGrid>

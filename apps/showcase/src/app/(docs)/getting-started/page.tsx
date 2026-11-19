@@ -169,7 +169,7 @@ export default function GettingStartedPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           <CodeBlock
-            code={`pnpm dev          # run the showcase app (living docs) on :3000
+            code={`pnpm dev          # run the showcase app (living docs) on :4000
 pnpm test         # run all unit & integration tests (-r)
 pnpm lint         # ESLint flat config, all workspaces
 pnpm build:types  # typecheck every package (tsc --noEmit)`}

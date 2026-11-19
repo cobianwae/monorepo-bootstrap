@@ -258,7 +258,7 @@ export default function WorkspacePage() {
                   <Terminal className="h-3.5 w-3.5" />
                   <span className="font-semibold uppercase tracking-wider">Terminal Output</span>
                 </div>
-                <span className="text-[10px] text-success">● Live (port 3000)</span>
+                <span className="text-[10px] text-success">● Live (port 4000)</span>
               </div>
               <div className="pt-2 text-muted-foreground space-y-0.5">
                 <p>
