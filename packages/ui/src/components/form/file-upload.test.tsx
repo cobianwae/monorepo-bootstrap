@@ -203,4 +203,130 @@ describe('FileUpload component', () => {
     });
     expect(container.querySelector('img')).not.toBeNull();
   });
+
+  it('retries all failed items collectively', async () => {
+    let shouldFail = true;
+    const handler: UploadHandler = async (file, { onProgress }) => {
+      if (shouldFail && file.name.startsWith('gagal')) throw new Error('Jaringan putus');
+      onProgress(100);
+    };
+    const { container } = render(<FileUpload uploadHandler={handler} />);
+    selectFiles(container, [makeFile('gagal1.txt'), makeFile('gagal2.txt'), makeFile('ok.txt')]);
+
+    await waitFor(() => {
+      expect(screen.getByText('1/3 selesai · 2 gagal')).toBeDefined();
+    });
+
+    shouldFail = false;
+    fireEvent.click(screen.getByLabelText('Ulang semua file yang gagal'));
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Selesai')).toHaveLength(3);
+      expect(screen.queryByText('1/3 selesai · 2 gagal')).toBeNull();
+    });
+  });
+
+  it('cancels all active items collectively', async () => {
+    const handler: UploadHandler = (_file, { signal }) =>
+      new Promise<void>((_resolve, reject) => {
+        signal.addEventListener('abort', () => reject(new Error('aborted')));
+      });
+    const { container } = render(<FileUpload uploadHandler={handler} maxConcurrent={3} />);
+    selectFiles(container, [makeFile('a.txt'), makeFile('b.txt')]);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Batalkan semua upload yang sedang berjalan')).toBeDefined();
+    });
+
+    fireEvent.click(screen.getByLabelText('Batalkan semua upload yang sedang berjalan'));
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Dibatalkan')).toHaveLength(2);
+    });
+    expect(screen.queryByLabelText('Batalkan semua upload yang sedang berjalan')).toBeNull();
+  });
+
+  it('auto-retries up to maxRetries before final error', async () => {
+    let calls = 0;
+    const handler: UploadHandler = async () => {
+      calls += 1;
+      throw new Error('Selalu gagal');
+    };
+    const { container } = render(<FileUpload uploadHandler={handler} maxRetries={2} />);
+    selectFiles(container, [makeFile('a.txt')]);
+
+    await waitFor(() => {
+      expect(screen.getByText('Selalu gagal')).toBeDefined();
+    });
+    // 1 percobaan awal + 2 auto-retry = 3 panggilan
+    expect(calls).toBe(3);
+  });
+
+  it('does not auto-retry when maxRetries is 0 (default)', async () => {
+    let calls = 0;
+    const handler: UploadHandler = async () => {
+      calls += 1;
+      throw new Error('Gagal sekali');
+    };
+    const { container } = render(<FileUpload uploadHandler={handler} />);
+    selectFiles(container, [makeFile('a.txt')]);
+
+    await waitFor(() => {
+      expect(screen.getByText('Gagal sekali')).toBeDefined();
+    });
+    expect(calls).toBe(1);
+  });
+
+  it('renders drag handles and keyboard reorder buttons when sortable', async () => {
+    const { container } = render(<FileUpload uploadHandler={instantHandler} sortable />);
+    selectFiles(container, [makeFile('a.txt'), makeFile('b.txt')]);
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Selesai')).toHaveLength(2);
+    });
+
+    expect(screen.getAllByLabelText(/Seret untuk mengurutkan/).length).toBeGreaterThan(0);
+    expect(screen.getByLabelText('Pindahkan a.txt ke bawah')).toBeDefined();
+    expect(screen.getByLabelText('Pindahkan b.txt ke atas')).toBeDefined();
+  });
+
+  it('does not render sortable controls by default', async () => {
+    const { container } = render(<FileUpload uploadHandler={instantHandler} />);
+    selectFiles(container, [makeFile('a.txt')]);
+
+    await waitFor(() => {
+      expect(screen.getByText('Selesai')).toBeDefined();
+    });
+    expect(screen.queryByLabelText(/Seret untuk mengurutkan/)).toBeNull();
+    expect(screen.queryByLabelText(/Pindahkan/)).toBeNull();
+  });
+
+  it('reorders items via keyboard move buttons when sortable', async () => {
+    const handler: UploadHandler = () => new Promise<void>(() => undefined);
+    const { container } = render(<FileUpload uploadHandler={handler} sortable />);
+    selectFiles(container, [makeFile('a.txt'), makeFile('b.txt')]);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Pindahkan a.txt ke bawah')).toBeDefined();
+    });
+
+    fireEvent.click(screen.getByLabelText('Pindahkan a.txt ke bawah'));
+
+    const names = screen.getAllByText(/\.txt$/).map((el) => el.textContent);
+    expect(names).toEqual(['b.txt', 'a.txt']);
+  });
+
+  it('renders compact variant without thumbnail by default', async () => {
+    const { container } = render(
+      <FileUpload uploadHandler={instantHandler} variant="compact" />
+    );
+    selectFiles(container, [makeFile('pic.png', 10, 'image/png')]);
+
+    await waitFor(() => {
+      expect(screen.getByText('Selesai')).toBeDefined();
+    });
+    // Compact: tanpa thumbnail secara default, status+aksi tetap ada
+    expect(container.querySelector('img')).toBeNull();
+    expect(screen.getByLabelText('Hapus pic.png')).toBeDefined();
+  });
 });

@@ -1,6 +1,6 @@
 # 001-02 — FileUpload: aksi kolektif, sortable, auto-retry, varian compact
 
-Status: approved
+Status: review
 PRD: `docs/prd/001-upload-queue.md`
 FR: `FR-010`, `FR-011`, `FR-013`, `FR-014`
 Screens: `S-004.03`, `S-005.10`
@@ -54,16 +54,16 @@ Goal: Melengkapi `FileUpload` dengan fitur should/could PRD 001 — retry semua 
 
 ## Tasks
 
-- [ ] Tambah tombol "Ulang semua yang gagal" dan "Batal semua" di summary bar, muncul kondisional, dengan `aria-label` jelas
-- [ ] Implementasikan `sortable` (default `false`) via dnd-kit (dependency sudah ada di `packages/ui`) + sensor keyboard
-- [ ] Implementasikan auto-retry memakai counter `attempts` yang sudah ada dari `001-01`
-- [ ] Tambah varian `compact` pada cva + layout ringkas tanpa thumbnail default
-- [ ] Test: aksi kolektif, reorder + jalur keyboard, auto-retry stop di `maxRetries`, varian compact
-- [ ] Perluas demo S-005.10 dengan kontrol fitur baru (toggle sortable, set `maxRetries`, varian compact)
-- [ ] Tambah contoh varian compact di S-004.03
-- [ ] Update dokumentasi pattern file-upload (aksi kolektif, sortable, auto-retry)
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
-- [ ] Tick tasks story ini, update `docs/BACKLOG.md` dan `docs/STATUS.md`
+- [x] Tambah tombol "Ulang semua yang gagal" dan "Batal semua" di summary bar, muncul kondisional, dengan `aria-label` jelas
+- [x] Implementasikan `sortable` (default `false`) via dnd-kit (dependency sudah ada di `packages/ui`) + sensor keyboard
+- [x] Implementasikan auto-retry memakai counter `attempts` yang sudah ada dari `001-01`
+- [x] Tambah varian `compact` pada cva + layout ringkas tanpa thumbnail default
+- [x] Test: aksi kolektif, reorder + jalur keyboard, auto-retry stop di `maxRetries`, varian compact
+- [x] Perluas demo S-005.10 dengan kontrol fitur baru (toggle sortable, set `maxRetries`, varian compact)
+- [x] Tambah contoh varian compact di S-004.03
+- [x] Update dokumentasi pattern file-upload (aksi kolektif, sortable, auto-retry)
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
+- [x] Tick tasks story ini, update `docs/BACKLOG.md` dan `docs/STATUS.md`
 
 ## Dependencies
 
