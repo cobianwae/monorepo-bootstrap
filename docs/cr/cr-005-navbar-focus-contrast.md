@@ -30,17 +30,17 @@
 
 | # | Keputusan | Alasan |
 |---|---|---|
-| 1 | — | — |
+| 1 | Hapus `text-highlight` di atas `bg-accent/70`; aktif kini `text-foreground` + `font-semibold` | Audit 8 tema light+dark: light gagal (2.58–3.37:1), dark lolos; pasangan bukan token terdefinisi. |
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA.
-- [ ] Perilaku Radix/a11y tidak rusak.
-- [ ] API `cva` dan export tetap konsisten.
-- [ ] State loading, empty, dan error relevan tersedia.
-- [ ] Showcase/docs diperbarui bila perlu.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA.
+- [x] Perilaku Radix/a11y tidak rusak.
+- [x] API `cva` dan export tetap konsisten.
+- [x] State loading, empty, dan error relevan tersedia.
+- [x] Showcase/docs diperbarui bila perlu.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
 
 ## Eksekusi
 

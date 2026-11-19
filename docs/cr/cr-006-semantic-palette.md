@@ -56,4 +56,4 @@ Commit: `fix: replace literal palettes with semantic tokens [CR-006]`
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan.
 - [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
