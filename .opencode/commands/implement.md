@@ -24,7 +24,7 @@ Target: `$ARGUMENTS`
    - `pnpm test`
    - `pnpm test:tokens` bila token berubah
    - `pnpm -C apps/showcase build` bila showcase berubah
-8. Tick checkbox, ubah status story menjadi `review`, update `docs/BACKLOG.md` dan `docs/STATUS.md`.
+8. Tick checkbox, ubah status story menjadi `review`, append `docs/STATUS-LOG.md` (`YYYY-MM-DD — ringkasan — referensi`), update `docs/BACKLOG.md` dan `docs/STATUS.md`, lalu jalankan `node scripts/check-status-log.mjs` (harus hijau sebelum commit).
 9. Commit dengan format `type: deskripsi [NNN-MM]` atau `[CR-NNN]`.
 10. Jangan push atau membuat PR tanpa izin eksplisit.
 

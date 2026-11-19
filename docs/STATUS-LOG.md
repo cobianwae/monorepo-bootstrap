@@ -4,3 +4,12 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 
 - 2026-11-19 — Adopsi struktur OpenCode: config root, docs-as-state, agents, commands, workflow skills — `chore/opencode-workflow`.
 - 2026-11-19 — Validasi baseline: graphify MCP connected, `pnpm typecheck`, `pnpm lint`, dan `pnpm test` hijau — `chore/opencode-workflow`.
+- 2026-11-19 — CR-001 keyboard access clickable table row selesai — `CR-001`.
+- 2026-11-20 — CR-002 touch target ≥44px selesai — `CR-002`.
+- 2026-11-20 — CR-003 `aria-sort` header tabel sortable selesai — `CR-003`.
+- 2026-11-20 — CR-004 error state dan CTA empty state DataTable selesai — `CR-004`.
+- 2026-11-20 — CR-005 indikator fokus NavbarLink dan kontras highlight/accent selesai — `CR-005`.
+- 2026-11-20 — CR-006 eliminasi palette literal, token `inverse` baru selesai — `CR-006`.
+- 2026-11-20 — Story 001-01 komponen FileUpload inti upload queue selesai — `001-01`.
+- 2026-11-20 — Story 001-02 aksi kolektif, sortable, auto-retry, varian compact selesai — `001-02`.
+- 2026-11-20 — CR-007 kunci kepatuhan STATUS-LOG: backfill histori, samakan aturan append di AGENTS/implement, tambahkan check ringan — `CR-007`.
