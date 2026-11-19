@@ -88,12 +88,18 @@ export const TableRow = React.forwardRef<
 ));
 TableRow.displayName = 'TableRow';
 
+export interface TableHeadProps
+  extends React.ThHTMLAttributes<HTMLTableCellElement> {
+  sortDirection?: 'ascending' | 'descending' | 'none';
+}
+
 export const TableHead = React.forwardRef<
   HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
+  TableHeadProps
+>(({ className, sortDirection, ...props }, ref) => (
   <th
     ref={ref}
+    aria-sort={sortDirection}
     className={cn(
       'text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0',
       className

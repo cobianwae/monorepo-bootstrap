@@ -391,9 +391,15 @@ export interface SortableHeaderProps<TData> {
   column: TanStackColumn<TData, unknown>;
   children: React.ReactNode;
   className?: string;
+  sortDirection?: 'ascending' | 'descending' | 'none';
 }
 
-export function SortableHeader<TData>({ column, children, className }: SortableHeaderProps<TData>) {
+export function SortableHeader<TData>({
+  column,
+  children,
+  className,
+  sortDirection,
+}: SortableHeaderProps<TData>) {
   const isSorted = column.getIsSorted();
   return (
     <button
@@ -403,7 +409,11 @@ export function SortableHeader<TData>({ column, children, className }: SortableH
         'group inline-flex items-center gap-1.5 font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm',
         className
       )}
-      aria-label={`Sort by ${column.id}`}
+      aria-label={
+        sortDirection === 'ascending' || sortDirection === 'descending'
+          ? `Sort by ${column.id}, ${sortDirection}`
+          : `Sort by ${column.id}`
+      }
     >
       {children}
       {isSorted === 'asc' ? (
@@ -536,16 +546,24 @@ export function DataTableHeader<TData>({
         <TableRow key={headerGroup.id}>
           {headerGroup.headers.map((header) => {
             const canSort = enableSorting && header.column.getCanSort();
+            const isSorted = header.column.getIsSorted();
+            const sortDirection = canSort
+              ? (isSorted === 'asc' ? 'ascending' : isSorted === 'desc' ? 'descending' : 'none')
+              : undefined;
             return (
               <TableHead
                 key={header.id}
                 className="whitespace-nowrap"
+                sortDirection={sortDirection}
               >
                 {header.isPlaceholder
                   ? null
                   : canSort
                     ? (
-                        <SortableHeader column={header.column}>
+                        <SortableHeader
+                          column={header.column}
+                          sortDirection={sortDirection}
+                        >
                           {flexRender(
                             header.column.columnDef.header,
                             header.getContext()

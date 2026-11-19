@@ -66,6 +66,21 @@ describe('DataTable component', () => {
     expect(cells[0].textContent).toBe('John');
   });
 
+  it('exposes aria-sort on sortable header and updates direction after sort', () => {
+    render(<StatefulTable />);
+    const nameHeader = screen.getByRole('columnheader', { name: 'Name' });
+    expect(nameHeader.getAttribute('aria-sort')).toBe('none');
+
+    const nameButton = screen.getByLabelText('Sort by name');
+    fireEvent.click(nameButton);
+    expect(nameHeader.getAttribute('aria-sort')).toBe('ascending');
+    expect(nameButton.getAttribute('aria-label')).toBe('Sort by name, ascending');
+
+    fireEvent.click(nameButton);
+    expect(nameHeader.getAttribute('aria-sort')).toBe('descending');
+    expect(nameButton.getAttribute('aria-label')).toBe('Sort by name, descending');
+  });
+
   it('filters rows via global search', () => {
     function WithSearch() {
       const { table, globalFilter, setGlobalFilter } = useDataTable<Person, unknown>({

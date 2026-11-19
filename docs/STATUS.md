@@ -10,12 +10,13 @@ Struktur OpenCode sudah terpasang: config root, docs-as-state, agents, commands,
 Validasi baseline `typecheck`, `lint`, dan `test` sudah hijau.
 CR-001 (keyboard access clickable table row) selesai (`done`).
 CR-002 (touch target ≥44px) selesai (`done`).
+CR-003 (`aria-sort` header tabel sortable) selesai (`done`).
 
 ## Next
 
 1. Validasi command `/start`, `/prd`, `/review`, dan `/audit` di sesi baru.
 2. Lengkapi `docs/design/object-model.md` dan `sitemap.md` dengan inventaris aktual.
-3. Lanjutkan CR berikutnya (CR-003 dst.) ke branch `dev`.
+3. Lanjutkan CR berikutnya (CR-004 dst.) ke branch `dev`.
 
 ## Known Issues
 
