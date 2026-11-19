@@ -66,6 +66,12 @@ Semua nilai visual datang dari tokens, bukan tebakan:
 
 ## Integration with Other Skills
 
+### Batas dengan `visual-designer`
+
+- `visual-design` adalah referensi prinsip visual: hierarchy, typography, spacing, color, motion.
+- `visual-designer` memiliki alur arah visual (`/design-language`) dan uplift (`/polish-ui`), termasuk `docs/design/visual-language.md` dan CR per cluster.
+- Gunakan `visual-design` saat butuh prinsip; gunakan `visual-designer` saat butuh keputusan dan eksekusi visual end-to-end.
+
 - **Sebelum**: `product-ux` (brand & positioning), `design-tokens` (warna/typography)
 - **Selama**: `ux-patterns` (states), `ui-component` (implementasi)
 - **Setelah**: `accessibility` (kontras & focus), `ux-research` (visual validation)

@@ -460,6 +460,12 @@ Memberi gambaran MVP = jalur backbone lengkap tanpa boleh ada gap.
 
 ## Integration with Other Skills
 
+### Batas dengan Workflow Design System
+
+- `product-ux` membingkai masalah, persona, JTBD, metrik, MoSCoW, user story, dan acceptance criteria.
+- `prd-writer` memiliki template PRD, penomoran `FR-NNN`, dan Gate 1. Jangan menduplikasi template PRD di sini.
+- Untuk perubahan kecil (bug, a11y, token, docs, microcopy), gunakan CR langsung; tidak perlu PRD penuh.
+
 ### Before Design:
 1. Use `product-ux` to understand users and business
 2. Use `ux-psychology` to understand cognitive factors

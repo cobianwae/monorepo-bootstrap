@@ -97,6 +97,12 @@ A11y bukan trade-off — ini baseline. Baik untuk semua user. Auditing ada di: k
 
 ## Integration with Other Skills
 
+### Batas dengan `ui-ux-auditor`
+
+- `accessibility` adalah panduan implementasi dan perbaikan a11y.
+- `ui-ux-auditor` adalah audit read-only kode (via `/audit`) yang menghasilkan temuan `critical`/`warning` dengan `file:line`.
+- Temuan audit yang disetujui dieksekusi lewat CR, bukan edit langsung.
+
 - **Selama**: `ui-component` (implementasi), `design-tokens` (kontras)
 - **Setelah**: `decision-framework` (kalau konflik visual vs a11y → a11y menang), `ux-research` (validate dengan user)
 

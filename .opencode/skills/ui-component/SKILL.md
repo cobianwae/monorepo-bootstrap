@@ -115,6 +115,12 @@ pnpm --filter @ds/ui build:types
 
 ## Integration with Other Skills
 
+### Batas dengan `ui-designer`
+
+- `ui-component` dipakai untuk membangun komponen baru atau mengubah kontrak komponen.
+- `ui-designer` dipakai untuk poles UI yang sudah terimplementasi (hierarchy, spacing, warna semantik, state, microcopy) tanpa mengubah API publik.
+- Jika poles menyentuh API publik, naikkan ke `ui-component` dan minta konfirmasi.
+
 - **Sebelum**: `product-ux` (framing fitur), `ux-patterns` (pola interaksi & states)
 - **Selama**: `design-tokens` (warna/spacing), `accessibility` (a11y), `visual-design` (hierarchy)
 - **Setelah**: `accessibility` (audit), `ux-research` (validasi kalau perlu)

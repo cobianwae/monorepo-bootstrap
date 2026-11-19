@@ -85,6 +85,12 @@ pnpm --filter @ds/tokens build:types
 
 ## Integration with Other Skills
 
+### Batas dengan `designer`
+
+- `design-tokens` adalah panduan implementasi token dan audit kontras.
+- `designer` menentukan kebutuhan token/desain sebelum implementasi (object model, state, theme).
+- Perubahan nilai token kecil boleh lewat CR; penambahan/penghapusan token atau perubahan kontrak tema butuh konfirmasi.
+
 - **Selama**: `ui-component` (konsumsi token di komponen), `visual-design` (typography/spacing scale)
 - **Audit**: `accessibility` (checklist kontras menyeluruh)
 - **Setelah**: `ux-research` (verifikasi preferensi dark mode users)

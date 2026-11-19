@@ -12,17 +12,37 @@ Saat menghadapi keputusan desain yang kompleks, konflik antar prinsip (visual vs
 
 ## Decision Trees
 
+### 0. Design System Change Routing
+
+```
+START: Perubahan apa yang akan dilakukan?
+│
+├─ Bug, regresi, a11y, nilai token, docs, microcopy, varian kecil?
+│   └─→ CR langsung: docs/cr/CR-NNN-slug.md + skill terkait
+│
+├─ Komponen baru tanpa pattern baru?
+│   └─→ designer (spec singkat) → story-writer (1 story) → implementasi
+│
+└─ Fitur/pattern baru, area app baru, lintas package, dependency baru?
+    └─→ prd-writer (gate 1) → designer (gate 2) → story-writer (gate 3) → implementasi
+```
+
+Gunakan `decision-framework` untuk memilih jalur, lalu panggil skill domain yang relevan.
+
 ### 1. Skill Selection Decision Tree
 
 ```
 START: Apa yang sedang kamu kerjakan?
 │
 ├─ Memulai fitur baru?
-│   └─→ 1. product-ux (personas, JTBD, metrics)
-│       2. ux-psychology (cognitive considerations)
-│       3. ux-patterns (interaction patterns)
-│       4. visual-design (aesthetics)
-│       5. ui-component (implementation)
+│   └─→ 1. prd-writer (PRD + gate 1)
+│       2. product-ux (personas, JTBD, metrics)
+│       3. designer (object model, sitemap, flow, wireframe)
+│       4. ux-psychology (cognitive considerations)
+│       5. ux-patterns (interaction patterns)
+│       6. visual-design (aesthetics)
+│       7. story-writer (story + gate 3)
+│       8. ui-component (implementation)
 │
 ├─ Mengaudit UX existing?
 │   └─→ 1. ux-research (analytics, testing)
@@ -328,23 +348,30 @@ When building MVP:
 ### Workflow 1: New Feature Development
 
 ```yaml
+Phase 0 - Framing:
+  1. product-ux → Problem, personas, JTBD, metrics
+  2. prd-writer → PRD, FR-NNN, non-goals (gate 1)
+
 Phase 1 - Discovery:
-  1. product-ux → Define personas, JTBD, metrics
-  2. ux-research → User interviews if needed
-  3. ux-psychology → Understand cognitive factors
+  1. ux-research → User interviews if needed
+  2. ux-psychology → Understand cognitive factors
 
 Phase 2 - Design:
-  1. ux-patterns → Select interaction patterns
-  2. visual-design → Apply aesthetic principles
-  3. accessibility → Ensure a11y from start
-  4. decision-framework → Resolve conflicts
+  1. designer → Object model, sitemap, flow, wireframe, state matrix (gate 2)
+  2. ux-patterns → Select interaction patterns
+  3. visual-design → Apply aesthetic principles
+  4. accessibility → Ensure a11y from start
+  5. decision-framework → Resolve conflicts
 
-Phase 3 - Build:
+Phase 3 - Story:
+  1. story-writer → Vertical slice, AC Given/When/Then, dependencies (gate 3)
+
+Phase 4 - Build:
   1. design-tokens → Apply tokens
   2. ui-component → Build components
   3. accessibility → Implement a11y features
 
-Phase 4 - Validate:
+Phase 5 - Validate:
   1. ux-research → Usability testing
   2. accessibility → A11y audit
   3. product-ux → Metric tracking setup
@@ -368,6 +395,16 @@ Phase 4 - Validate:
 3. ux-patterns → Identify friction points
 4. ux-research → A/B test design
 5. visual-design → Visual hierarchy audit
+```
+
+### Workflow 4: Design System Change (CR)
+
+```yaml
+1. decision-framework → Pilih jalur CR vs design+story vs PRD
+2. ui-ux-auditor → Audit kode read-only (/audit) bila perlu
+3. ui-designer / visual-designer / design-tokens / accessibility → Susun perbaikan
+4. reviewer → Review artefak dan temuan
+5. CR → branch cr-NNN-slug, commit [CR-NNN], verifikasi, update BACKLOG/STATUS
 ```
 
 ---

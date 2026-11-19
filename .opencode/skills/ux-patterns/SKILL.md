@@ -84,6 +84,12 @@ Setiap data grid/table WAJIB punya 3 state lengkap:
 
 ## Integration with Other Skills
 
+### Batas dengan `designer`
+
+- `ux-patterns` menyediakan pola interaksi dan state (loading/empty/error/success).
+- `designer` memakai pola tersebut untuk state matrix dan wireframe di `docs/design/wireframes/`.
+- Pattern baru yang belum ada di showcase harus melalui PRD/design sebelum implementasi.
+
 - **Sebelum**: `product-ux` (framing fitur & user flow), `ux-psychology` (cognitive load)
 - **Selama**: `ui-component` (implementasi), `visual-design` (hierarchy)
 - **Setelah**: `accessibility` (audit), `ux-research` (usability check)
