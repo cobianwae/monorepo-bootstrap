@@ -1,6 +1,6 @@
 # CR-002 — Touch target di bawah minimum 24px
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit / a11y
 **Ref:** `packages/ui/src/components/base/checkbox.tsx:15`, `packages/ui/src/components/base/switch.tsx:13`, `packages/ui/src/components/data-display/data-table.tsx:296`, `packages/ui/src/components/feedback/dialog.tsx:43`, `packages/ui/src/components/overlay/sheet.tsx:63`
 
@@ -37,7 +37,7 @@
 | 1 | Checkbox memakai hit-area 44×44px via pseudo-element; visual tetap 16×16px | `docs/TESTING.md` menetapkan target 44px; pseudo-element tidak menggeser layout |
 | 2 | Switch memakai visual 24×44px (`h-6 w-11`) plus hit-area vertikal 44px | Memenuhi minimum WCAG 24px sekaligus standar proyek 44px |
 | 3 | Tombol close dan hapus filter memakai visual 32×32px plus hit-area 44px | Menjaga kepadatan UI tanpa mengorbankan target sentuh |
-| 4 | Status `done` menunggu user | Hanya user yang boleh menetapkan `done` |
+| 4 | Status `done` ditetapkan setelah approval user | Hanya user yang boleh menetapkan `done` |
 
 ## Design System Checks
 
@@ -58,5 +58,5 @@ Commit: `fix: enlarge touch targets to wcag minimum [CR-002]`
 - [x] Branch dibuat.
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan (`typecheck`, `lint`, `test`, `apps/showcase build`).
-- [x] CR di-tick; status `BACKLOG.md` tetap `approved` sampai user menetapkan `done`.
+- [x] CR di-tick dan status `BACKLOG.md` diperbarui menjadi `done`.
 - [x] `docs/STATUS.md` diperbarui bila relevan.

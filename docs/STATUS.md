@@ -8,13 +8,14 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 Struktur OpenCode sudah terpasang: config root, docs-as-state, agents, commands, dan workflow skills.
 Validasi baseline `typecheck`, `lint`, dan `test` sudah hijau.
-CR-002 (touch target ≥44px) sudah diimplementasikan di worktree `cr-002-touch-targets`; typecheck, lint, test, dan build showcase hijau, menunggu keputusan user untuk `done`.
+CR-001 (keyboard access clickable table row) selesai (`done`).
+CR-002 (touch target ≥44px) selesai (`done`).
 
 ## Next
 
-1. Review CR-002, lalu tetapkan `done` bila disetujui.
-2. Validasi command `/start`, `/prd`, `/review`, dan `/audit` di sesi baru.
-3. Lengkapi `docs/design/object-model.md` dan `sitemap.md` dengan inventaris aktual.
+1. Validasi command `/start`, `/prd`, `/review`, dan `/audit` di sesi baru.
+2. Lengkapi `docs/design/object-model.md` dan `sitemap.md` dengan inventaris aktual.
+3. Lanjutkan CR berikutnya (CR-003 dst.) ke branch `dev`.
 
 ## Known Issues
 
