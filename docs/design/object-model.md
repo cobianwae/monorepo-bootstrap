@@ -37,7 +37,7 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 |---|---|---|
 | `base` | Primitive visual dan kontrol dasar | button, badge, card, input, textarea, label, separator, skeleton, avatar, tabs, checkbox, switch, tooltip, progress, spinner, radio-group, slider, accordion, collapsible, kbd, toggle, aspect-ratio, scroll-area, palette-switcher, theme-provider |
 | `form` | Input dan validasi | form, select, combobox, tag-input, date-picker, input-otp, number-input, time-picker, filter-builder, stepper, segmented-control, file-input, file-upload |
-| `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card |
+| `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart |
 | `feedback` | Status dan respons sistem | dialog, alert, alert-dialog, toast, toaster, empty-state, use-toast |
 | `navigation` | Navigasi dan pencarian | dropdown-menu, breadcrumb, pagination, command-palette, context-menu, navigation-menu |
 | `overlay` | Lapisan di atas konten | sheet, popover, hover-card |
@@ -71,6 +71,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Notifications | Toast/inbox, read state |
 | Onboarding | Step, skip, progress |
 | Optimistic Updates | Perubahan langsung + rollback |
+| Org Chart | Diagram hierarki organisasi read-only: node kaya (avatar/jabatan/badge), collapse/expand, pan/zoom, orientasi top-down/left-right, highlight pencarian (composed, kategori `data-display`); penyusun: org-chart (baru), avatar, badge, skeleton, empty-state, alert, search-input, button |
 | Product Tour | Highlight, step, dismiss |
 | Results | Sukses/gagal, next action |
 | Rich Text Editor | Toolbar, konten, a11y |

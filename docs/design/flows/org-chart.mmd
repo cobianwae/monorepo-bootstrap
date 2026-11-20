@@ -1,0 +1,58 @@
+<!-- Flow org chart — PRD 003 (RM-06), layar S-005.28 -->
+<!-- Job utama: memahami garis pelaporan dengan melipat/membuka cabang; -->
+<!-- pendukung: cari orang (highlight + buka path) dan zoom/pan kanvas -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman org chart] --> B{Data organisasi siap?}
+  B -- masih dimuat --> L[Tampilkan skeleton diagram]
+  L --> B
+  B -- gagal / data tidak valid --> ERR[Tampilkan pesan error: penyebab dan id pelanggaran pertama]
+  ERR --> E2[User memperbaiki data atau mencoba lagi]
+  E2 --> A
+  B -- tanpa data --> EMP[Tampilkan empty state + petunjuk mengisi data]
+  EMP --> E3[User menyediakan data]
+  E3 --> A
+  B -- siap --> C[Diagram dirender: node kaya + konektor siku]
+  C --> D{User melipat atau membuka cabang?}
+  D -- ya --> E[Subtree dan konektor anaknya ikut muncul / hilang]
+  E --> D
+  D -- tidak --> F{User memilih node?}
+  F -- ya --> G[Aplikasi menerima data node terpilih via callback]
+  G --> H[User membuka detail unit/orang di aplikasi konsumen]
+  F -- tidak --> D
+  H --> D
+```
+
+```mermaid
+flowchart TD
+  A[User mengetik nama atau jabatan di pencarian] --> B{Ada node yang cocok?}
+  B -- tidak --> C[Tampilkan pesan tidak ada hasil via live region; diagram tetap]
+  C --> A
+  B -- ya --> D[Node cocok disorot dengan ring; bukan hanya warna]
+  D --> E[Path ke ancestor node cocok terbuka otomatis]
+  E --> F[User meninjau hasil: jumlah cocok diumumkan]
+  F --> G{User memilih node hasil?}
+  G -- ya --> H[Node terpilih; konteks pelaporan terlihat]
+  G -- tidak --> I[User menghapus query; sorotan hilang]
+  H --> A
+  I --> A
+```
+
+```mermaid
+flowchart TD
+  A[User fokus ke kanvas diagram] --> B{Ingin melihat lebih luas atau lebih dekat?}
+  B -- lebih dekat --> C[Perbesar via tombol plus / ctrl+scroll / tombol plus keyboard]
+  B -- lebih luas --> D[Perkecil via tombol minus / ctrl+scroll / tombol minus keyboard]
+  B -- reset --> E[Reset ke 100 persen dan posisi awal]
+  C --> F{Batas zoom tercapai?}
+  D --> F
+  F -- ya --> G[Zoom berhenti di batas; level diumumkan]
+  F -- belum --> H[Kanvas menskalakan; konektor tetap rapi]
+  A --> I[User geser kanvas: drag atau panah saat kanvas fokus]
+  I --> J[Viewport mengikuti; scroll halaman tidak ikut bergeser]
+  E --> I
+  G --> I
+  H --> I
+  J --> A
+```

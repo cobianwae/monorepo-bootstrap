@@ -66,7 +66,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.27 | File Manager | `/patterns/file-manager` | in-design |
 | S-005.27.01 | File Manager — konten list/grid | `/patterns/file-manager` (panel konten) | in-design |
 | S-005.27.02 | File Manager — panel konteks | `/patterns/file-manager` (panel upload/quota/detail) | in-design |
-| S-005.28 | Org Chart | `/patterns/org-chart` | planned |
+| S-005.28 | Org Chart | `/patterns/org-chart` | in-design |
 | S-005.29 | Flow Editor | `/patterns/flow-editor` | planned |
 | S-005.30 | Transfer List | `/patterns/transfer-list` | planned |
 | S-005.31 | Cascader & Tree Select | `/patterns/cascader-tree-select` | planned |
