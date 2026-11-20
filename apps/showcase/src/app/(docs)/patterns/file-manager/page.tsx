@@ -58,6 +58,8 @@ function toastAction(title: string, count?: number) {
 }
 
 export default function FileManagerPage() {
+  const [folderList, setFolderList] = React.useState<FileFolder[]>(folders);
+  const [itemList, setItemList] = React.useState<FileItem[]>(items);
   const [activeFolderId, setActiveFolderId] = React.useState('dokumen');
   const [sidebarState, setSidebarState] = React.useState<SidebarState>('normal');
   const [contentState, setContentState] = React.useState<ContentState>('normal');
@@ -87,11 +89,39 @@ export default function FileManagerPage() {
     toast({
       variant: 'success',
       title: 'Folder aktif berubah',
-      description: `Folder aktif: ${folders.find((f) => f.id === folderId)?.name ?? folderId}`,
+      description: `Folder aktif: ${folderList.find((f) => f.id === folderId)?.name ?? folderId}`,
     });
   };
 
-  const shownItems = contentState === 'empty' ? [] : items;
+  const shownItems = contentState === 'empty' ? [] : itemList;
+
+  // Handler demo stateful (FR-010): pattern tetap murni memanggil handler,
+  // consumer yang menerapkan perubahan ke datanya sendiri.
+  const handleRename = (item: FileItem, nextName: string) => {
+    setItemList((prev) => prev.map((i) => (i.id === item.id ? { ...i, name: nextName } : i)));
+    toastAction(`Ganti nama ${item.name} → ${nextName}`);
+  };
+
+  const handleCreateFolder = (parentId: string, name: string) => {
+    const id = `folder-baru-${folderList.length + 1}`;
+    setFolderList((prev) => [...prev, { id, name, parentId: parentId || null }]);
+    toastAction(`Folder baru: ${name}`);
+  };
+
+  const handleDelete = (selected: FileItem[]) => {
+    setItemList((prev) => prev.filter((i) => !selected.some((s) => s.id === i.id)));
+    toastAction('Hapus', selected.length);
+  };
+
+  const handleMove = (selected: FileItem[], targetFolderId: string) => {
+    setItemList((prev) =>
+      prev.map((i) => (selected.some((s) => s.id === i.id) ? { ...i, folderId: targetFolderId } : i))
+    );
+    toastAction(
+      `Pindah ke ${folderList.find((f) => f.id === targetFolderId)?.name ?? targetFolderId}`,
+      selected.length
+    );
+  };
 
   return (
     <div className="animate-in fade-in-50 space-y-10 duration-200">
@@ -164,7 +194,7 @@ export default function FileManagerPage() {
           Buka preview
         </span>
         {previewTypes.map((type) => {
-          const item = items.find((i) => i.type === type);
+          const item = itemList.find((i) => i.type === type);
           if (!item) return null;
           return (
             <Button key={type} size="sm" variant="outline" onClick={() => openPreviewFor(item)}>
@@ -175,7 +205,7 @@ export default function FileManagerPage() {
       </div>
 
       <FileManager
-        folders={isEmpty ? [] : folders}
+        folders={isEmpty ? [] : folderList}
         items={shownItems}
         activeFolderId={activeFolderId}
         view={view}
@@ -197,9 +227,10 @@ export default function FileManagerPage() {
         uploadHandler={mockUploadHandler}
         onPreview={(item) => toastAction(`Buka ${item.name}`)}
         onDownload={(selected) => toastAction('Unduh', selected.length)}
-        onMove={(selected) => toastAction('Pindah', selected.length)}
-        onDelete={(selected) => toastAction('Hapus', selected.length)}
-        onRename={(item) => toastAction(`Ganti nama ${item.name}`)}
+        onMove={handleMove}
+        onDelete={handleDelete}
+        onRename={handleRename}
+        onCreateFolder={handleCreateFolder}
         onRetry={() => {
           setSidebarState('normal');
           setContentState('normal');
@@ -219,6 +250,9 @@ export default function FileManagerPage() {
           <li>Panel konteks berisi upload queue, quota (total/terpakai/sisa + pesan teks, bukan hanya warna), dan detail item terpilih.</li>
           <li>Preview M-001 terbuka via Enter pada baris item atau menu Buka/Pratinjau; fokus terjebak di dalamnya, Esc menutup, fokus kembali ke baris pemicu.</li>
           <li>PDF dirender dengan sandbox tanpa script ditambah tombol unduh; tipe tak didukung jatuh ke fallback generik.</li>
+          <li>Dialog kelola M-002 (rename/folder baru) memvalidasi nama kosong/duplikat dengan pesan inline; M-003 meminta konfirmasi hapus atau pilihan folder tujuan move — Batal menutup tanpa efek, seleksi dibersihkan setelah aksi.</li>
+          <li>Tab order: toolbar → sidebar → konten → panel konteks → bulk bar (saat muncul) → modal; seleksi massal via Shift/Ctrl-klik dan Shift+Panah; header sortir mengekspos aria-sort.</li>
+          <li>Transisi view dan progress dihormati via prefers-reduced-motion (motion-reduce); semua state memakai token semantik sehingga light/dark parity terjaga.</li>
         </ul>
       </section>
     </div>
