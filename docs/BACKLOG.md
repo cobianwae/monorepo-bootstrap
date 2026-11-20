@@ -51,7 +51,7 @@ Tidak ada story aktif; yang selesai diarsipkan ke `docs/BACKLOG-ARCHIVE.md`.
 
 | ID | Judul | Status | File |
 |---|---|---|---|
-| CR-008 | Perapian dokumen PRD 001 & design upload-queue | draft | `docs/cr/cr-008-prd001-cleanup.md` |
+| CR-008 | Perapian dokumen PRD 001 & design upload-queue | approved | `docs/cr/cr-008-prd001-cleanup.md` |
 
 ## Catatan
 

@@ -1,6 +1,6 @@
 # CR-008 — Perapian dokumen PRD 001 & design upload-queue
 
-Status: draft
+Status: approved
 Sumber: review
 Refness: `docs/prd/001-upload-queue.md:81-82`, `docs/design/upload-queue.md:18`
 
