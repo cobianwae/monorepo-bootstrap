@@ -1,6 +1,6 @@
 # 002-01 — Shell tiga zona + navigasi tree-breadcrumb
 
-Status: review (gate 3)
+Status: done (gate 3)
 PRD: `docs/prd/002-file-manager.md`
 FR: `FR-001`, `FR-002`, `FR-010`
 Screens: `S-005.27`
