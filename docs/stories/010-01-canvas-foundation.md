@@ -1,6 +1,6 @@
 # 010-01 — Fondasi canvas editable: xyflow + layout + node token
 
-Status: review
+Status: done
 PRD: `docs/prd/010-org-chart-editor.md`
 Design: `docs/design/org-chart-editor.md`
 FR: `FR-001`, `FR-007`, `FR-008`, `FR-009`, `FR-011`, `FR-014`

@@ -41,3 +41,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-20 — Approve spec desain PRD 010 org chart editor (gate 2): wrapper xyflow 13.0.2 + tidy-tree reuse + reparent langsung + inspector anti-truncate + kategori `canvas/`; OQ#1 disetujui formal install; artefak `docs/design/org-chart-editor.md`, `docs/design/wireframes/org-chart-editor.md`, `docs/design/flows/org-chart-editor.mmd`, `S-005.33` + `M-004`/`M-005` — design PRD 010
 - 2026-11-20 — Approve story 010-01–010-04 org chart editor (gate 3): fondasi canvas, CRUD inspector, reparent + undo, search + states + showcase + a11y — `010-01`, `010-02`, `010-03`, `010-04`
 - 2026-11-20 — Story 010-01 fondasi OrgChartEditor (xyflow 13.0.2 + tidy-tree reuse + node token + collapse/expand controlled + controls/minimap token + role=application, 13 test) selesai, status review — `010-01`
+- 2026-11-20 — Story 010-01 fondasi OrgChartEditor selesai (`done`, ter-merge ke `dev`) — `010-01`
