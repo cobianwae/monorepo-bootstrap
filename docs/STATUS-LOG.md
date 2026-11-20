@@ -29,3 +29,5 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-20 — Approve spec desain PRD 003 org chart (gate 2): komponen `OrgChart` data-display standalone tanpa dependency, tidy-tree + konektor token, contract flat/nested + validasi, state matrix + a11y dua mode fokus; artefak `docs/design/org-chart.md`, `docs/design/wireframes/org-chart.md`, `docs/design/flows/org-chart.mmd` — design PRD 003
 - 2026-11-20 — Story 003-01 fondasi OrgChart (normalisasi flat/nested + validasi + tidy-tree + konektor elbow token) selesai, status review — `003-01`
 - 2026-11-20 — Story 003-01 fondasi OrgChart (normalisasi flat/nested + validasi + tidy-tree + konektor elbow token) selesai (`done`, ter-merge ke `dev`) — `003-01`
+- 2026-11-20 — Story 003-02 node kaya OrgChart (avatar/badge/strip aksen token, renderNode, expand/collapse uncontrolled & controlled, onSelect/selectedId) + audit kontras strip aksen selesai, status review — `003-02`
+- 2026-11-20 — Story 003-02 node kaya OrgChart (avatar/badge/strip aksen token, renderNode, expand/collapse uncontrolled & controlled, onSelect/selectedId) selesai (`done`, ter-merge ke `dev`) — `003-02`
