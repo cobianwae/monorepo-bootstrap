@@ -52,6 +52,8 @@ START: Perubahan menyentuh area mana?
 
 Urutan tetap mengikuti gate: PRD → design → story → implementasi. Skill fullstack tidak membuat gate baru.
 
+**Aturan decision points**: detail implementasi (authn, authz engine, rate limit, idempotency, storage, dll) adalah keputusan yang ditentukan di PRD/design — skills hanya memetakan opsi dan edge cases, tidak memilih. Bila PRD belum menjawab decision point yang relevan, agent berhenti dan bertanya.
+
 ### 1. Skill Selection Decision Tree
 
 ```

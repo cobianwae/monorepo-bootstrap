@@ -92,6 +92,24 @@ pnpm typecheck
 - ✗ Kolom tanpa index yang jadi filter utama query
 - ✗ Menambah dependency Prisma/engine tanpa konfirmasi
 
+## Decision Points (ditentukan PRD/design — bukan di sini)
+
+| Decision Point | Opsi umum | Kapan pilih mana |
+|---|---|---|
+| Soft delete vs hard delete | `deletedAt` vs hapus fisik | regulasi/audit vs kesederhanaan (PRD) |
+| Optimistic locking | `version` field vs last-write-wins | frekuensi concurrent edit per entitas |
+| Cascade strategy | `Cascade` vs `SetNull` vs `Restrict` per relation | ekspektasi lifecycle data di PRD |
+| Generator ID | uuid vs cuid vs ulid | sortability & ukuran index |
+| Archival/partition | tabel panas vs arsip | volume data jangka panjang (bisa nanti, 3x rule) |
+
+## Edge Cases Umum (kandidat AC story)
+
+- [ ] Unique constraint race (dua register email sama bersamaan)
+- [ ] Lost update (dua edit bersamaan, satu tertimpa diam-diam)
+- [ ] Cascade delete yang tidak disengaja (hapus parent menghapus data penting)
+- [ ] Migration di tabel besar → lock/downtime; butuh strategi batch
+- [ ] Enum Prisma drift dengan union type di `@shared/types`
+
 ## Integration with Other Skills
 
 - **Sebelum**: `decision-framework`, konfirmasi dependency saat first-time setup
