@@ -78,6 +78,24 @@ pnpm --filter @app/api build:types
 - ✗ Duplikasi tipe fixture yang sudah ada di `@shared/types`
 - ✗ Menunda test "nanti" untuk endpoint baru — test ikut di story yang sama
 
+## Decision Points (ditentukan PRD/design — bukan di sini)
+
+| Decision Point | Opsi umum | Kapan pilih mana |
+|---|---|---|
+| Integration strategy | app instance in-memory vs HTTP server penuh | kecepatan vs realisme (design) |
+| Data layer test | mock repository vs test database | isolasi vs confidence endpoint |
+| Fixture strategy | static fixture vs factory | variasi data yang dibutuhkan AC |
+| Coverage boundary | unit service vs integration endpoint | logika bisnis vs wiring — jangan double test |
+
+## Edge Cases Umum (kandidat AC story)
+
+- [ ] Auth path: endpoint tanpa auth (401) vs auth tanpa hak (403)
+- [ ] Validation path per field, bukan cuma satu payload invalid
+- [ ] Pagination di batas: halaman terakhir, `hasNextPage` false, result kosong
+- [ ] Duplicate/concurrent request ke endpoint mutating
+- [ ] Error tak terduga → filter tetap hasilkan envelope, tanpa leak stack
+- [ ] Empty state: collection kosong menghasilkan `data: []` + meta benar
+
 ## Integration with Other Skills
 
 - **Sebelum**: `backend-nestjs` (implementasi), `shared-types` (shape fixture)

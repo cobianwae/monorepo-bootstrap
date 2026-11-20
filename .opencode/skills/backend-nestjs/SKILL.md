@@ -76,6 +76,28 @@ pnpm typecheck          # saat tipe shared ikut berubah
 - ✗ Duplikasi tipe dari `@shared/types` di dalam `apps/api`
 - ✗ Logic visual/rendering di API
 
+## Decision Points (ditentukan PRD/design — bukan di sini)
+
+Skill TIDAK memilih mekanisme; agent wajib baca PRD/design dulu. Bila PRD belum menjawab decision point yang relevan: **STOP dan tanya**, jangan memilih sendiri.
+
+| Decision Point | Opsi umum | Kapan pilih mana |
+|---|---|---|
+| AuthN | session cookie vs JWT vs provider eksternal | scope auth PRD (regulasi, multi-device, dsb) |
+| AuthZ | role guard statis vs policy engine (mis. CASL) | permission statis per-role vs dinamis per-resource |
+| Rate limit | per-IP vs per-user, global vs per-endpoint | profil risiko endpoint di PRD |
+| Idempotency | idempotency key vs dedup natural | endpoint mutating yang rawan retry |
+| Pagination | offset vs cursor | ukuran data & sorting di PRD |
+| Storage/file | lokal vs object storage (S3-compatible) | skala & deploy target |
+
+## Edge Cases Umum (kandidat AC story)
+
+- [ ] Ownership: user A akses resource user B — 403 vs 404 (information disclosure)
+- [ ] 401 (belum auth) vs 403 (auth tapi tidak berhak) terpisah jelas
+- [ ] Payload besar / batch input tanpa batas → DoS
+- [ ] Duplicate submit/race → butuh idempotency atau unique constraint
+- [ ] Partial failure pada multi-step write → data setengah jadi
+- [ ] Envelope error konsisten, tanpa stack trace
+
 ## Integration with Other Skills
 
 - **Sebelum**: `decision-framework` (routing), `shared-types` (definisikan/perbarui kontrak dulu)

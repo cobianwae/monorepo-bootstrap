@@ -85,6 +85,26 @@ pnpm typecheck          # wajib saat consumer ikut berubah
 - ✗ Logika runtime berat (validator class, ORM client) — hanya tipe, const, dan guard murni
 - ✗ Mengubah shape publik tanpa cek consumer (`grep` alias `@shared/types` dulu)
 
+## Decision Points (ditentukan PRD/design — bukan di sini)
+
+Keputusan berikut bergantung scope; skill hanya memetakan opsi dan menandai siapa yang memutuskan:
+
+| Decision Point | Opsi umum | Ditentukan di |
+|---|---|---|
+| Pecah file domain vs monolith `index.ts` | monolith → `src/<domain>.ts` | 3x rule, saat file membesar |
+| Representasi ID & tanggal | `string` uuid vs number, ISO string vs timestamp | PRD/design (kontrak awal) |
+| Soft delete vs hard delete | flag `deletedAt` vs status enum vs hapus fisik | PRD |
+| Versioning kontrak | additive optional vs breaking + migrasi consumer | PRD/CR bila breaking |
+| Enum drift (Prisma vs union type) | sinkron manual vs generate | design |
+
+## Edge Cases Umum (kandidat AC story)
+
+- [ ] Field baru wajib pada consumer lama → breaking; tambah optional dulu
+- [ ] `null` vs key tidak ada di JSON — guard harus membedakan
+- [ ] Enum baru di schema Prisma belum ada di union type `@shared/types`
+- [ ] Rename field tanpa migrasi consumer → build pecah lintas app
+- [ ] Timestamp timezone (ISO tanpa offset vs dengan offset)
+
 ## Integration with Other Skills
 
 - **Sebelum**: `decision-framework` (routing perubahan fullstack)

@@ -64,6 +64,23 @@ Setelah targeted hijau, baru jalankan full suite. Perubahan tipe di `shared-type
 - ✗ Hanya menjalankan targeted test lalu mengklaim selesai
 - ✗ Menambah dependency/config CI baru tanpa konfirmasi
 
+## Decision Points (ditentukan PRD/design — bukan di sini)
+
+| Decision Point | Opsi umum | Kapan pilih mana |
+|---|---|---|
+| Granularitas verifikasi | per-package filter vs full suite | iterasi cepat vs pre-commit (invariant: full suite sebelum commit) |
+| Jalur docs-only | skip build berat | perubahan murni `.md`/docs |
+| Kebijakan baseline gagal | fix di luar scope vs catat known issue | invariant: selalu catat, fix butuh CR terpisah |
+| Perluasan CI | job tambahan (build showcase, migration dry-run) | saat pola kebutuhan muncul 3x |
+
+## Edge Cases Umum (kandidat AC story)
+
+- [ ] Flaky test (pass/fail acak) → jangan ignore diam-diam; catat & perbaiki
+- [ ] Typecheck hijau tapi runtime gagal → jalankan build app yang disentuh
+- [ ] Lockfile/`pnpm` version mismatch antar kontributor
+- [ ] Perubahan tipe `shared-types` tanpa verifikasi consumer lintas app
+- [ ] Commit tanpa `check-status-log` saat ada artefak `done`
+
 ## Integration with Other Skills
 
 - **Setelah semua skill domain**: ini langkah penutup.
