@@ -44,6 +44,7 @@ export * from './components/base/slider';
 export * from './components/form/number-input';
 export * from './components/form/time-picker';
 export * from './components/data-display/org-chart';
+export * from './components/canvas/org-chart-editor';
 export * from './components/data-display/file-manager';
 export * from './components/data-display/data-table';
 export * from './components/form/filter-builder';

@@ -57,7 +57,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 003-03 | A11y penuh: role tree + navigasi keyboard | done | `docs/stories/003-03-a11y-tree-keyboard.md` |
 | 003-04 | Pan/zoom kanvas + kontrol zoom + orientasi | done | `docs/stories/003-04-pan-zoom-orientation.md` |
 | 003-05 | State matrix + highlight pencarian + scenario showcase | done | `docs/stories/003-05-states-search-showcase.md` |
-| 010-01 | Org editor fondasi canvas xyflow + layout + node token | todo | `docs/stories/010-01-canvas-foundation.md` |
+| 010-01 | Org editor fondasi canvas xyflow + layout + node token | review | `docs/stories/010-01-canvas-foundation.md` |
 | 010-02 | Org editor CRUD inspector tambah/edit/hapus anti-truncate | todo | `docs/stories/010-02-crud-inspector.md` |
 | 010-03 | Org editor reparent drag + move dialog + undo/redo | todo | `docs/stories/010-03-reparent-undo.md` |
 | 010-04 | Org editor search + states + showcase + a11y penuh | todo | `docs/stories/010-04-search-states-showcase.md` |
