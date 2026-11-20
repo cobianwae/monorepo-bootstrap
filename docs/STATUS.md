@@ -11,6 +11,7 @@ CR-001–CR-007 selesai (`done`, ter-merge ke `dev`); kepatuhan `STATUS-LOG` dik
 Story 001-01 dan 001-02 (upload queue) selesai (`done`, ter-merge ke `dev`).
 PRD 002–006 (`approved`, gate 1) dan spec RM-02/03/10 (`approved`, story 007-01, 008-01/008-02, 009-01) selesai review dan disetujui user; CR-008 (`draft`) mengajukan perapian dokumen PRD 001.
 Story 002-01 (`done`, ter-merge ke `dev`) — pattern `FileManager` shell tiga zona + navigasi tree-breadcrumb di `packages/ui` data-display + showcase `/patterns/file-manager` (S-005.27).
+Story 002-02 (`done`, ter-merge ke `dev`) — zona konten list/grid + seleksi massal + context menu di `file-manager.tsx` + showcase S-005.27.01.
 
 ## Next
 

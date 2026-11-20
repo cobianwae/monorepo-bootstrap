@@ -1,6 +1,6 @@
 # 002-02 — Konten list/grid + seleksi massal + context menu
 
-Status: approved (gate 3)
+Status: done
 PRD: `docs/prd/002-file-manager.md`
 FR: `FR-003`, `FR-004`, `FR-005`, `FR-012`
 Screens: `S-005.27`, `S-005.27.01`
@@ -42,15 +42,15 @@ Goal: Zona konten utama `S-005.27.01` dengan mode list (basis `data-table`) dan 
 
 ## Tasks
 
-- [ ] Implementasi zona konten `S-005.27.01` di `file-manager.tsx`: mode list basis `data-table` (header sortir + checkbox) + mode grid thumbnail (nama + meta ringkas, seleksi setara)
-- [ ] State `selectedIds` sebagai sumber kebenaran; toggle view tidak me-reset seleksi/urutan; ingat pilihan selama sesi
-- [ ] Compose `bulk-action-bar` existing (download, move, delete) + `aria-live` pengumuman seleksi
-- [ ] Compose `context-menu` existing per item dengan 6 aksi; buka via klik kanan + keyboard (Menu/Shift+F10)
-- [ ] Sortir kolom (nama, ukuran, tanggal) + `aria-sort` + filter tipe file mode list
-- [ ] State konten loading/empty/error sesuai §6
-- [ ] Test co-located: toggle persist seleksi, bulk bar muncul + handler, context menu keyboard + handler, sortir/filter tanpa fetch
-- [ ] Showcase `S-005.27.01`: kontrol demo toggle view, seleksi, sortir/filter, pemicu loading/empty/error konten
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
+- [x] Implementasi zona konten `S-005.27.01` di `file-manager.tsx`: mode list basis `data-table` (header sortir + checkbox) + mode grid thumbnail (nama + meta ringkas, seleksi setara)
+- [x] State `selectedIds` sebagai sumber kebenaran; toggle view tidak me-reset seleksi/urutan; ingat pilihan selama sesi
+- [x] Compose `bulk-action-bar` existing (download, move, delete) + `aria-live` pengumuman seleksi
+- [x] Compose `context-menu` existing per item dengan 6 aksi; buka via klik kanan + keyboard (Menu/Shift+F10)
+- [x] Sortir kolom (nama, ukuran, tanggal) + `aria-sort` + filter tipe file mode list
+- [x] State konten loading/empty/error sesuai §6
+- [x] Test co-located: toggle persist seleksi, bulk bar muncul + handler, context menu keyboard + handler, sortir/filter tanpa fetch
+- [x] Showcase `S-005.27.01`: kontrol demo toggle view, seleksi, sortir/filter, pemicu loading/empty/error konten
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
 
 ## Dependencies
 
