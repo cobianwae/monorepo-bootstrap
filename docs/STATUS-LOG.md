@@ -2,6 +2,8 @@
 
 Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 
+- 2026-11-21 — Story 004-01 fondasi EventCalendar + month view + navigasi selesai (9 test hijau; kegagalan typecheck/test/build hanya baseline `@xyflow/react` lama) — `004-01`.
+
 - 2026-11-19 — Adopsi struktur OpenCode: config root, docs-as-state, agents, commands, workflow skills — `chore/opencode-workflow`.
 - 2026-11-19 — Validasi baseline: graphify MCP connected, `pnpm typecheck`, `pnpm lint`, dan `pnpm test` hijau — `chore/opencode-workflow`.
 - 2026-11-19 — CR-001 keyboard access clickable table row selesai — `CR-001`.
