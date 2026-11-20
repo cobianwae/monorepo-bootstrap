@@ -1,6 +1,6 @@
 # 004-01 — Fondasi EventCalendar + month view + navigasi
 
-Status: review
+Status: done
 PRD: `docs/prd/004-calendar-scheduler.md`
 Design: `docs/design/calendar-scheduler.md` (approved, gate 2)
 FR: `FR-001` (month), `FR-002`, `FR-003` (dasar), `FR-007`
