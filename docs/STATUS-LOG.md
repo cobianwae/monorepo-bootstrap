@@ -34,3 +34,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-20 — Story 003-03 a11y penuh OrgChart (role tree/treeitem + aria-level/expanded/selected, roving tabindex + navigasi keyboard DFS/Home/End/Enter-Space, focus ring primary offset 2px + skip disabled, transisi motion-safe) selesai, status review — `003-03`
 - 2026-11-20 — Story 003-03 a11y penuh OrgChart selesai (`done`, ter-merge ke `dev`) — `003-03`
 - 2026-11-20 — Story 003-04 pan/zoom kanvas OrgChart (wrapper overflow-hidden + transform translate/scale, kontrol zoom mengambang [−][%][+][reset] aria-live polite, zoom tombol & Ctrl/Cmd+wheel & keyboard, clamp 0.5–2 step 0.25 via zoomRange, pan drag + panah 40px, kanvas role=region stop fokus terpisah, orientasi left-right swap sumbu + mirror konektor terverifikasi) selesai, status review — `003-04`
+- 2026-11-20 — Story 003-04 pan/zoom kanvas OrgChart selesai (`done`, ter-merge ke `dev`) — `003-04`

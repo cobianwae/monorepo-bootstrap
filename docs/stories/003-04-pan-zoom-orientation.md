@@ -1,6 +1,6 @@
 # 003-04 — Pan/zoom kanvas, kontrol zoom, orientasi top-down & left-right
 
-Status: review
+Status: done
 PRD: `docs/prd/003-org-chart.md`
 FR: `FR-006`, `FR-008`
 Screens: `S-005.28`
