@@ -18,7 +18,40 @@ import {
 import { cn } from '../../lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../base/avatar';
 import { Badge } from '../base/badge';
+import { Button } from '../base/button';
+import { Input } from '../base/input';
+import { Label } from '../base/label';
+import { RadioGroup, RadioGroupItem } from '../base/radio-group';
 import { Skeleton } from '../base/skeleton';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../form/select';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from '../navigation/context-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../feedback/dialog';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '../overlay/sheet';
 import { EmptyState } from '../feedback/empty-state';
 import {
   getAncestors,
@@ -257,9 +290,24 @@ export type OrgFlowNodeData = {
   isHighlighted: boolean;
   onToggle: (id: string) => void;
   onSelectNode: ((node: OrgNodeNormalized) => void) | undefined;
+  onAddChild?: (node: OrgNodeNormalized) => void;
+  onAddSibling?: (node: OrgNodeNormalized) => void;
+  onOpenInspector?: (node: OrgNodeNormalized) => void;
+  onRequestDelete?: (node: OrgNodeNormalized) => void;
   renderExtra: ((node: OrgNodeNormalized) => React.ReactNode) | undefined;
   nodeTitle: string;
 };
+
+function generateNodeId(existing: Set<string>): string {
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    const candidate =
+      typeof crypto !== 'undefined' && 'randomUUID' in crypto
+        ? crypto.randomUUID().slice(0, 8)
+        : `n-${Math.random().toString(36).slice(2, 10)}`;
+    if (!existing.has(candidate)) return candidate;
+  }
+  return `n-${Date.now().toString(36)}`;
+}
 
 export type OrgFlowNode = Node<OrgFlowNodeData, 'orgNode'>;
 export type OrgFlowEdge = Edge;
@@ -273,6 +321,10 @@ export function toFlowNodes(
   handlers: {
     onToggle: OrgFlowNodeData['onToggle'];
     onSelectNode: OrgFlowNodeData['onSelectNode'];
+    onAddChild?: OrgFlowNodeData['onAddChild'];
+    onAddSibling?: OrgFlowNodeData['onAddSibling'];
+    onOpenInspector?: OrgFlowNodeData['onOpenInspector'];
+    onRequestDelete?: OrgFlowNodeData['onRequestDelete'];
     renderExtra: OrgFlowNodeData['renderExtra'];
     nodeTitle?: string;
   },
@@ -293,6 +345,10 @@ export function toFlowNodes(
           isHighlighted: highlightedSet.has(node.id),
           onToggle: handlers.onToggle,
           onSelectNode: handlers.onSelectNode,
+          onAddChild: handlers.onAddChild,
+          onAddSibling: handlers.onAddSibling,
+          onOpenInspector: handlers.onOpenInspector,
+          onRequestDelete: handlers.onRequestDelete,
           renderExtra: handlers.renderExtra,
           nodeTitle: handlers.nodeTitle ?? '',
         },
@@ -344,18 +400,40 @@ function getInitials(title: string): string {
 }
 
 function OrgEditorNode({ data }: { data: OrgFlowNodeData }) {
-  const { node, isExpanded, isSelected, isHighlighted, onToggle, onSelectNode, renderExtra } = data;
+  const {
+    node,
+    isExpanded,
+    isSelected,
+    isHighlighted,
+    onToggle,
+    onSelectNode,
+    onAddChild,
+    onAddSibling,
+    onOpenInspector,
+    onRequestDelete,
+    renderExtra,
+  } = data;
   const badgeVariant = node.accent ? ACCENT_BADGE_VARIANT[node.accent as OrgChartEditorAccent] : 'secondary';
+  const fullTitle = `${node.title}${node.subtitle ? ` — ${node.subtitle}` : ''}${node.badge ? ` (${node.badge})` : ''}`;
   return (
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
     <div
       data-testid="org-editor-node"
       data-node-id={node.id}
       data-selected={isSelected ? 'true' : undefined}
       data-highlighted={isHighlighted ? 'true' : undefined}
-      title={`${node.title}${node.subtitle ? ` — ${node.subtitle}` : ''}`}
+      title={fullTitle}
+      tabIndex={0}
       onClick={() => onSelectNode?.(node)}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          onOpenInspector?.(node);
+        }
+      }}
       className={cn(
-        'flex h-[72px] w-[200px] items-center gap-2 rounded-md border bg-card pl-4 pr-2 text-card-foreground',
+        'relative flex h-[72px] w-[200px] items-center gap-2 rounded-md border bg-card pl-4 pr-2 text-card-foreground',
         'hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         isSelected || isHighlighted ? 'border-primary ring-2 ring-ring' : 'border-border',
       )}
@@ -404,7 +482,38 @@ function OrgEditorNode({ data }: { data: OrgFlowNodeData }) {
           ) : null}
         </>
       )}
+      <button
+        type="button"
+        aria-label={`Tambah bawahan ${node.title}`}
+        title={fullTitle}
+        onClick={(event) => {
+          event.stopPropagation();
+          onAddChild?.(node);
+        }}
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm border border-border text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        <Plus className="h-4 w-4" aria-hidden="true" />
+      </button>
     </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem onSelect={() => onAddChild?.(node)}>Tambah bawahan</ContextMenuItem>
+        <ContextMenuItem disabled={node.parentId === null} onSelect={() => onAddSibling?.(node)}>
+          Tambah sibling
+        </ContextMenuItem>
+        <ContextMenuItem onSelect={() => onOpenInspector?.(node)}>Edit / inspector</ContextMenuItem>
+        <ContextMenuItem disabled title="Pindah node tersedia di 010-03">
+          Pindah…
+        </ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuItem onSelect={() => onToggle(node.id)}>
+          {isExpanded ? 'Collapse' : 'Perluas'}
+        </ContextMenuItem>
+        <ContextMenuItem disabled={node.parentId === null} variant="destructive" onSelect={() => onRequestDelete?.(node)}>
+          Hapus
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }
 
@@ -496,8 +605,165 @@ export function OrgChartEditor({
   ariaLabel = 'Org chart editor',
   className,
 }: OrgChartEditorProps) {
-  void onChange;
-  const normalized = React.useMemo(() => normalizeEditorInput(data), [data]);
+  const [internalFlat, setInternalFlat] = React.useState<OrgNodeFlat[]>(() =>
+    Array.isArray(data) ? [...data] : flattenNested(data),
+  );
+  const dataRef = React.useRef(data);
+  React.useEffect(() => {
+    if (dataRef.current !== data) {
+      dataRef.current = data;
+      setInternalFlat(Array.isArray(data) ? [...data] : flattenNested(data));
+    }
+  }, [data]);
+
+  const [selectedId, setSelectedId] = React.useState<string | null>(null);
+  const [inspectorOpen, setInspectorOpen] = React.useState(false);
+  const [inspectorMode, setInspectorMode] = React.useState<'edit' | 'add-child' | 'add-sibling'>('edit');
+  const [addParentId, setAddParentId] = React.useState<string | null>(null);
+  const [draft, setDraft] = React.useState({ title: '', subtitle: '', badge: '', avatarSrc: '', accent: '' });
+  const [titleInvalid, setTitleInvalid] = React.useState(false);
+  const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(null);
+  const [deleteMode, setDeleteMode] = React.useState<'reparent' | 'subtree'>('reparent');
+  const returnFocusIdRef = React.useRef<string | null>(null);
+
+  const commit = React.useCallback(
+    (next: OrgNodeFlat[]) => {
+      setInternalFlat(next);
+      onChange?.(next);
+    },
+    [onChange],
+  );
+
+  const normalized = React.useMemo(() => normalizeEditorInput(internalFlat), [internalFlat]);
+  const selectedNode = selectedId ? (normalized.byId.get(selectedId) ?? null) : null;
+
+  const openInspectorFor = React.useCallback(
+    (node: OrgNodeNormalized, mode: 'edit' | 'add-child' | 'add-sibling') => {
+      setSelectedId(node.id);
+      setInspectorMode(mode);
+      setAddParentId(mode === 'add-child' ? node.id : mode === 'add-sibling' ? node.parentId : null);
+      setDraft({
+        title: mode === 'edit' ? node.title : '',
+        subtitle: mode === 'edit' ? (node.subtitle ?? '') : '',
+        badge: mode === 'edit' ? (node.badge ?? '') : '',
+        avatarSrc: mode === 'edit' ? (node.avatarSrc ?? '') : '',
+        accent: mode === 'edit' ? (node.accent ?? '') : '',
+      });
+      setTitleInvalid(false);
+      setInspectorOpen(true);
+    },
+    [],
+  );
+
+  const handleSelectNode = React.useCallback(
+    (node: OrgNodeNormalized) => {
+      setSelectedId(node.id);
+      onSelect?.(node);
+    },
+    [onSelect],
+  );
+
+  const handleAddChild = React.useCallback(
+    (node: OrgNodeNormalized) => openInspectorFor(node, 'add-child'),
+    [openInspectorFor],
+  );
+  const handleAddSibling = React.useCallback(
+    (node: OrgNodeNormalized) => {
+      if (node.parentId !== null) openInspectorFor(node, 'add-sibling');
+    },
+    [openInspectorFor],
+  );
+  const handleOpenInspector = React.useCallback(
+    (node: OrgNodeNormalized) => {
+      setSelectedId(node.id);
+      openInspectorFor(node, 'edit');
+    },
+    [openInspectorFor],
+  );
+  const handleRequestDelete = React.useCallback((node: OrgNodeNormalized) => {
+    if (node.parentId === null) return;
+    setDeleteTargetId(node.id);
+    setDeleteMode(node.hasChildren ? 'reparent' : 'subtree');
+  }, []);
+
+  const saveInspector = () => {
+    const title = draft.title.trim();
+    if (!title) {
+      setTitleInvalid(true);
+      return;
+    }
+    setTitleInvalid(false);
+    if (inspectorMode === 'edit') {
+      if (!selectedNode) return;
+      const next = internalFlat.map((node) =>
+        node.id === selectedNode.id
+          ? {
+              ...node,
+              title,
+              subtitle: draft.subtitle.trim() || undefined,
+              badge: draft.badge.trim() || undefined,
+              avatarSrc: draft.avatarSrc.trim() || undefined,
+              accent: (draft.accent || undefined) as OrgChartEditorAccent | undefined,
+            }
+          : node,
+      );
+      commit(next);
+      returnFocusIdRef.current = selectedNode.id;
+    } else {
+      const parentId = addParentId;
+      if (parentId === null) return;
+      const newId = generateNodeId(new Set(internalFlat.map((node) => node.id)));
+      const next: OrgNodeFlat[] = [
+        ...internalFlat,
+        {
+          id: newId,
+          parentId,
+          title,
+          subtitle: draft.subtitle.trim() || undefined,
+          badge: draft.badge.trim() || undefined,
+          avatarSrc: draft.avatarSrc.trim() || undefined,
+          accent: (draft.accent || undefined) as OrgChartEditorAccent | undefined,
+        },
+      ];
+      commit(next);
+      setSelectedId(newId);
+      returnFocusIdRef.current = newId;
+    }
+    setInspectorOpen(false);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTargetId) return;
+    const target = normalized.byId.get(deleteTargetId);
+    if (!target || target.parentId === null) return;
+    let next: OrgNodeFlat[];
+    if (deleteMode === 'reparent' && target.hasChildren) {
+      const grandparentId = target.parentId;
+      next = internalFlat
+        .filter((node) => node.id !== target.id)
+        .map((node) => (node.parentId === target.id ? { ...node, parentId: grandparentId } : node));
+    } else {
+      const toRemove = new Set<string>();
+      const collect = (id: string): void => {
+        toRemove.add(id);
+        for (const childId of normalized.byId.get(id)?.childIds ?? []) collect(childId);
+      };
+      collect(target.id);
+      next = internalFlat.filter((node) => !toRemove.has(node.id));
+    }
+    commit(next);
+    setDeleteTargetId(null);
+    setSelectedId(null);
+    setInspectorOpen(false);
+  };
+
+  React.useEffect(() => {
+    if (inspectorOpen) return;
+    const focusId = returnFocusIdRef.current;
+    if (!focusId) return;
+    returnFocusIdRef.current = null;
+    document.querySelector<HTMLElement>(`[data-node-id="${focusId}"]`)?.focus();
+  }, [inspectorOpen]);
 
   const parentIds = React.useMemo(
     () => normalized.nodes.filter((node) => node.hasChildren).map((node) => node.id),
@@ -553,13 +819,17 @@ export function OrgChartEditor({
 
   const flowNodes = React.useMemo(
     () =>
-      toFlowNodes(normalized, positions, expandedSet, highlightedSet, null, {
+      toFlowNodes(normalized, positions, expandedSet, highlightedSet, selectedId, {
         onToggle: toggleExpanded,
-        onSelectNode: onSelect,
+        onSelectNode: handleSelectNode,
+        onAddChild: handleAddChild,
+        onAddSibling: handleAddSibling,
+        onOpenInspector: handleOpenInspector,
+        onRequestDelete: handleRequestDelete,
         renderExtra: renderNodeExtra,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [normalized, positions, expandedSet, highlightedSet, onSelect, renderNodeExtra],
+    [normalized, positions, expandedSet, highlightedSet, selectedId, handleSelectNode, handleAddChild, handleAddSibling, handleOpenInspector, handleRequestDelete, renderNodeExtra],
   );
 
   const flowEdges = React.useMemo(() => toFlowEdges(normalized, visibleIds), [normalized, visibleIds]);
@@ -569,6 +839,10 @@ export function OrgChartEditor({
     if (event.key === 'f' || event.key === 'F') {
       event.preventDefault();
       document.querySelector<HTMLButtonElement>('[aria-label="Fit view"]')?.click();
+    }
+    if ((event.key === 'Delete' || event.key === 'Backspace') && selectedNode) {
+      event.preventDefault();
+      handleRequestDelete(selectedNode);
     }
   };
 
@@ -641,16 +915,213 @@ export function OrgChartEditor({
     </div>
   );
 
+  const pathTitles =
+    selectedNode != null
+      ? [...getAncestors(internalFlat, selectedNode.id).map((id) => normalized.byId.get(id)?.title ?? id), selectedNode.title]
+      : [];
+  const parentTitle = selectedNode?.parentId ? (normalized.byId.get(selectedNode.parentId)?.title ?? selectedNode.parentId) : '—';
+  const deleteTarget = deleteTargetId ? (normalized.byId.get(deleteTargetId) ?? null) : null;
+  const isRootSelected = selectedNode?.parentId === null;
+
+  const editorUi = (
+    <>
+      <div className="mb-2 flex flex-wrap items-center gap-2" data-testid="org-editor-toolbar">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!selectedNode}
+          onClick={() => selectedNode && handleAddChild(selectedNode)}
+        >
+          Tambah bawahan
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!selectedNode || selectedNode.parentId === null}
+          onClick={() => selectedNode && handleAddSibling(selectedNode)}
+        >
+          Tambah sibling
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!selectedNode}
+          onClick={() => selectedNode && handleOpenInspector(selectedNode)}
+        >
+          Edit
+        </Button>
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
+          disabled={!selectedNode || isRootSelected}
+          title={isRootSelected ? 'Root tidak dapat dihapus' : undefined}
+          onClick={() => selectedNode && handleRequestDelete(selectedNode)}
+        >
+          Hapus
+        </Button>
+        {isRootSelected ? <span className="text-sm text-muted-foreground">Root tidak dapat dihapus</span> : null}
+      </div>
+      {canvas}
+
+      <Sheet open={inspectorOpen} onOpenChange={setInspectorOpen}>
+        <SheetContent side="right" aria-describedby={undefined}>
+          <SheetHeader>
+            <SheetTitle>{inspectorMode === 'edit' ? selectedNode?.title : 'Tambah node baru'}</SheetTitle>
+            <SheetDescription>
+              {inspectorMode === 'edit'
+                ? 'Ubah properti node. Semua field ditampilkan penuh tanpa truncate.'
+                : `Node baru akan ditambahkan di bawah: ${addParentId ? (normalized.byId.get(addParentId)?.title ?? addParentId) : '—'}`}
+            </SheetDescription>
+          </SheetHeader>
+          {selectedNode && inspectorMode === 'edit' ? (
+            <div className="mt-4 space-y-2 text-sm text-foreground" data-testid="org-editor-inspector-meta">
+              <p>
+                <span className="text-muted-foreground">Path: </span>
+                <span className="break-words">{pathTitles.join(' / ')}</span>
+              </p>
+              <p>
+                <span className="text-muted-foreground">Atasan: </span>
+                {parentTitle}
+              </p>
+              <p>
+                <span className="text-muted-foreground">Anak: </span>
+                {selectedNode.childIds.length > 0
+                  ? selectedNode.childIds.map((id) => normalized.byId.get(id)?.title ?? id).join(', ')
+                  : '—'}
+              </p>
+            </div>
+          ) : null}
+          <form
+            className="mt-4 space-y-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              saveInspector();
+            }}
+          >
+            <div className="space-y-2">
+              <Label htmlFor="org-editor-title">Nama</Label>
+              <Input
+                id="org-editor-title"
+                value={draft.title}
+                aria-invalid={titleInvalid}
+                onChange={(event) => {
+                  setDraft((d) => ({ ...d, title: event.target.value }));
+                  if (event.target.value.trim()) setTitleInvalid(false);
+                }}
+              />
+              {titleInvalid ? (
+                <p role="alert" className="text-sm text-destructive">Nama tidak boleh kosong.</p>
+              ) : null}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="org-editor-subtitle">Subtitle</Label>
+              <Input
+                id="org-editor-subtitle"
+                value={draft.subtitle}
+                onChange={(event) => setDraft((d) => ({ ...d, subtitle: event.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="org-editor-badge">Badge</Label>
+              <Input
+                id="org-editor-badge"
+                value={draft.badge}
+                onChange={(event) => setDraft((d) => ({ ...d, badge: event.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="org-editor-avatar">Avatar URL</Label>
+              <Input
+                id="org-editor-avatar"
+                value={draft.avatarSrc}
+                onChange={(event) => setDraft((d) => ({ ...d, avatarSrc: event.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="org-editor-accent">Accent</Label>
+              <Select value={draft.accent} onValueChange={(value) => setDraft((d) => ({ ...d, accent: value }))}>
+                <SelectTrigger id="org-editor-accent">
+                  <SelectValue placeholder="Tanpa accent" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="primary">primary</SelectItem>
+                  <SelectItem value="success">success</SelectItem>
+                  <SelectItem value="warning">warning</SelectItem>
+                  <SelectItem value="info">info</SelectItem>
+                  <SelectItem value="destructive">destructive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button type="submit" size="sm">Simpan</Button>
+              <Button type="button" variant="outline" size="sm" onClick={() => setInspectorOpen(false)}>
+                Batal
+              </Button>
+              {selectedNode && inspectorMode === 'edit' ? (
+                <>
+                  <Button type="button" variant="outline" size="sm" disabled title="Pindah node tersedia di 010-03">
+                    Pindah…
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    disabled={isRootSelected}
+                    title={isRootSelected ? 'Root tidak dapat dihapus' : undefined}
+                    onClick={() => handleRequestDelete(selectedNode)}
+                  >
+                    Hapus
+                  </Button>
+                </>
+              ) : null}
+            </div>
+          </form>
+        </SheetContent>
+      </Sheet>
+
+      <Dialog open={deleteTarget !== null} onOpenChange={(open) => { if (!open) setDeleteTargetId(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Hapus node</DialogTitle>
+            <DialogDescription>
+              Hapus &quot;{deleteTarget?.title}&quot;{deleteTarget?.hasChildren ? ' beserta pilihan untuk anaknya' : ''}?
+            </DialogDescription>
+          </DialogHeader>
+          {deleteTarget?.hasChildren ? (
+            <RadioGroup value={deleteMode} onValueChange={(value) => setDeleteMode(value as 'reparent' | 'subtree')}>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="reparent" id="org-delete-reparent" />
+                <Label htmlFor="org-delete-reparent">Pindahkan anak ke atasan ({parentTitle})</Label>
+              </div>
+              <div className="flex items-center gap-2">
+                <RadioGroupItem value="subtree" id="org-delete-subtree" />
+                <Label htmlFor="org-delete-subtree">Hapus subtree (node beserta semua anak)</Label>
+              </div>
+            </RadioGroup>
+          ) : null}
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setDeleteTargetId(null)}>Batal</Button>
+            <Button type="button" variant="destructive" onClick={confirmDelete}>Hapus</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+
   if (error) {
     return (
       <div className="w-full space-y-2">
         <div role="alert" className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-foreground">
           {error}
         </div>
-        {canvas}
+        {editorUi}
       </div>
     );
   }
 
-  return canvas;
+  return <div className="w-full">{editorUi}</div>;
 }

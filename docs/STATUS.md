@@ -23,7 +23,7 @@ Story 003-01 (`done`, ter-merge ke `dev`) — fondasi `OrgChart` di `packages/ui
 ## Next
 
 1. Eksekusi CR-008 (perapian FR PRD 001 + rujukan `CR-006`) — butuh `approved` user.
-2. Story 010-01 (`done`, ter-merge ke `dev`) — fondasi `OrgChartEditor` canvas xyflow 13.0.2 + layout tidy reuse + node token + collapse/expand + controls/minimap token; target berikut: 010-02–010-04 atau lightweight (007-01/008-01/008-02/009-01) — satu target per sesi sesuai BACKLOG.
+2. Story 010-01 (`done`, ter-merge ke `dev`) — fondasi `OrgChartEditor` canvas xyflow 13.0.2 + layout tidy reuse + node token + collapse/expand + controls/minimap token. Story 010-02 (`review`) — CRUD inspector anti-truncate (tombol `+`, context-menu, toolbar, sheet form + validasi, dialog M-004 reparent/subtree, proteksi root, `onChange` sekali per commit); target berikut: 010-03–010-04 atau lightweight (007-01/008-01/008-02/009-01) — satu target per sesi sesuai BACKLOG.
 3. PRD 001 masih `approved` — tetapkan `shipped` bila sudah sesuai keputusan user, lalu arsipkan dari `BACKLOG.md`.
 4. Lengkapi `docs/design/object-model.md` (kategori `canvas` bila perlu + entri komponen baru) dan `sitemap.md` (S-005.29–S-005.32 masih `planned`).
 

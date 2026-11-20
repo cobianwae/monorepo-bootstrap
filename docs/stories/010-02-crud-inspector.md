@@ -1,6 +1,6 @@
 # 010-02 — CRUD inspector: tambah/edit/hapus anti-truncate
 
-Status: todo
+Status: review
 PRD: `docs/prd/010-org-chart-editor.md`
 Design: `docs/design/org-chart-editor.md`
 FR: `FR-002`, `FR-003`, `FR-005`, `FR-006`, `FR-007`
@@ -35,12 +35,12 @@ Goal: Jalur CRUD lengkap via tombol `+` node, context-menu, toolbar, dan inspect
 
 ## Tasks
 
-- [ ] Node custom: tombol `+` (`aria-label "Tambah bawahan <nama>"`) + context-menu (tambah/pindah/hapus/expand) + tooltip penuh
-- [ ] Inspector sheet: header penuh + form (title wajib, subtitle, badge, avatarSrc, accent) + meta atasan/anak/path + aksi tambah/pindah/hapus
-- [ ] Dialog M-004 hapus (radio reparent vs subtree) + proteksi root
-- [ ] Kontrak `data` + `onChange(flat)` sekali per commit; uncontrolled internal untuk demo
-- [ ] Test: truncate vs tooltip, tambah child/sibling, edit live + validasi kosong, hapus daun/parent/root, `onChange` payload
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
+- [x] Node custom: tombol `+` (`aria-label "Tambah bawahan <nama>"`) + context-menu (tambah/pindah/hapus/expand) + tooltip penuh
+- [x] Inspector sheet: header penuh + form (title wajib, subtitle, badge, avatarSrc, accent) + meta atasan/anak/path + aksi tambah/pindah/hapus
+- [x] Dialog M-004 hapus (radio reparent vs subtree) + proteksi root
+- [x] Kontrak `data` + `onChange(flat)` sekali per commit; uncontrolled internal untuk demo
+- [x] Test: truncate vs tooltip, tambah child/sibling, edit live + validasi kosong, hapus daun/parent/root, `onChange` payload
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
 
 ## Dependencies
 
