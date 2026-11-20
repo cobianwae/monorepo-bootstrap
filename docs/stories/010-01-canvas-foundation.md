@@ -1,6 +1,6 @@
 # 010-01 — Fondasi canvas editable: xyflow + layout + node token
 
-Status: todo
+Status: done
 PRD: `docs/prd/010-org-chart-editor.md`
 Design: `docs/design/org-chart-editor.md`
 FR: `FR-001`, `FR-007`, `FR-008`, `FR-009`, `FR-011`, `FR-014`
@@ -35,13 +35,13 @@ Goal: Komponen `OrgChartEditor` di `packages/ui/components/canvas` berdiri di at
 
 ## Tasks
 
-- [ ] Install formal `@xyflow/react` 13.0.2 di `packages/ui` (butuh approval OQ#1 — jangan install sebelum user setuju) + matikan/map default CSS ke token
-- [ ] Buat `components/canvas/org-chart-editor.tsx` + tipe `OrgChartEditorProps` (design §2) + konversi flat → `nodes`/`edges` xyflow
-- [ ] Reuse normalisasi + validasi 003 + `getAncestors`; layout tidy reuse + mapping posisi
-- [ ] Node custom `OrgNode`: avatar/badge/strip aksen + expander + tooltip `title` (tanpa CRUD di story ini)
-- [ ] Controls + minimap token-mapped, `ariaLabel` default, `role="application"`
-- [ ] Barrel export + test co-located (flat=nested, invalid 4 jenis, layout deterministik, toggle expand, fit-view dipanggil)
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
+- [x] Install formal `@xyflow/react` 13.0.2 di `packages/ui` (butuh approval OQ#1 — jangan install sebelum user setuju) + matikan/map default CSS ke token
+- [x] Buat `components/canvas/org-chart-editor.tsx` + tipe `OrgChartEditorProps` (design §2) + konversi flat → `nodes`/`edges` xyflow
+- [x] Reuse normalisasi + validasi 003 + `getAncestors`; layout tidy reuse + mapping posisi
+- [x] Node custom `OrgNode`: avatar/badge/strip aksen + expander + tooltip `title` (tanpa CRUD di story ini)
+- [x] Controls + minimap token-mapped, `ariaLabel` default, `role="application"`
+- [x] Barrel export + test co-located (flat=nested, invalid 4 jenis, layout deterministik, toggle expand, fit-view dipanggil)
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
 
 ## Dependencies
 
