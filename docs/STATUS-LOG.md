@@ -2,6 +2,9 @@
 
 Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 
+- 2026-11-21 — Story 004-01 fondasi EventCalendar + month view + navigasi selesai (9 test hijau; kegagalan typecheck/test/build hanya baseline `@xyflow/react` lama) — `004-01`.
+- 2026-11-21 — Story 004-01 `done` (approved oleh user) dan di-merge ke `dev` — `004-01`.
+
 - 2026-11-19 — Adopsi struktur OpenCode: config root, docs-as-state, agents, commands, workflow skills — `chore/opencode-workflow`.
 - 2026-11-19 — Validasi baseline: graphify MCP connected, `pnpm typecheck`, `pnpm lint`, dan `pnpm test` hijau — `chore/opencode-workflow`.
 - 2026-11-19 — CR-001 keyboard access clickable table row selesai — `CR-001`.
@@ -46,3 +49,7 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-20 — Story 010-02 CRUD inspector OrgChartEditor selesai (`done`, ter-merge ke `dev`) — `010-02`
 - 2026-11-20 — Approve spec desain PRD 004 calendar & scheduler (gate 2): komponen `EventCalendar` data-display tanpa dependency baru, 3 view + agenda + all-day + slot booking, contract deklaratif + validasi, state matrix + a11y grid keyboard; artefak `docs/design/calendar-scheduler.md`, `docs/design/wireframes/calendar-scheduler.md`, `docs/design/flows/calendar-scheduler.mmd`, `S-005.04.01–.04` + `M-006` — design PRD 004
 - 2026-11-20 — Approve story 004-01–004-04 calendar & scheduler (gate 3): fondasi + month, week/day + slot, multi-hari + overlap + detail + DnD, locale + agenda + states + showcase + a11y — `004-01`, `004-02`, `004-03`, `004-04`
+- 2026-11-21 — Story 010-03 reparent drag + move dialog M-005 + undo/redo OrgChartEditor selesai, status review: drag reparent xyflow (nearest target valid ring success vs invalid destructive+teks, snap-back derivasi data, alert siklus), dialog M-005 RadioGroup setara keyboard (diri/descendant disabled + alasan, preview path, root proteksi), undo/redo internal <=50 mencakup tambah/hapus/pindah/edit + toolbar + Ctrl+Z/Y + live region, helper diekspor validateReparentTarget/getDescendantIds/UNDO_LIMIT; verifikasi typecheck/lint/test hijau (375 test @ds/ui) — `010-03`
+- 2026-11-21 — Story 010-03 reparent drag + move dialog + undo/redo OrgChartEditor selesai (`done`, ter-merge ke `dev`) — `010-03`
+- 2026-11-21 — Story 010-04 search + states + showcase + a11y penuh selesai, status review: showcase /patterns/org-chart-editor (S-005.33) controlled data+onChange, search highlight + auto-expand getAncestors + live region, state matrix 6 demo (loading aria-busy, empty role=status + CTA buat root, error invalid role=alert + id + salin detail, error eksternal di atas diagram), tab Daftar pohon SR reuse OrgChart role=tree, papan keyboard + catatan a11y; OrgChartEditor tambah prop opsional emptyActionLabel/onEmptyAction + tombol salin detail error (tanpa ubah API publik lain); verifikasi typecheck/lint/test hijau (379 test @ds/ui) + showcase build hijau — `010-04`
+- 2026-11-21 — Story 010-04 search + states + showcase + a11y penuh selesai (`done`, ter-merge ke `dev`) — `010-04`
