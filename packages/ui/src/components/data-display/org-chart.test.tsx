@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { OrgChart, type OrgChartInput } from './org-chart';
 
 const flatData: OrgChartInput = [
@@ -111,12 +111,121 @@ describe('OrgChart', () => {
       el.getAttribute('data-node-id'),
     );
     expect(ids).toEqual(['ceo', 'eng', 'ops']);
-    expect(container.querySelectorAll('path')).toHaveLength(1);
+    expect(container.querySelectorAll('[data-testid="org-chart-connector"]')).toHaveLength(1);
+  });
+
+  it('003-02 AC-01: node kaya menampilkan avatar fallback inisial, badge, dan strip aksen token', () => {
+    const data: OrgChartInput = [
+      { id: 'ceo', parentId: null, title: 'Sinta Maharani', subtitle: 'CEO', badge: 'Eksekutif', accent: 'success' },
+      { id: 'eng', parentId: 'ceo', title: 'Budi Santoso', subtitle: 'CTO', badge: 'Engineering', accent: 'info', avatarSrc: 'https://example.com/budi.png' },
+    ];
+    const { container } = render(<OrgChart data={data} />);
+    expect(screen.getByText('Sinta Maharani')).toBeTruthy();
+    expect(screen.getByText('CEO')).toBeTruthy();
+    expect(screen.getByText('Eksekutif')).toBeTruthy();
+    // Fallback inisial dari dua kata pertama
+    expect(screen.getByText('SM')).toBeTruthy();
+    const strips = container.querySelectorAll('[data-testid="org-chart-accent-strip"]');
+    expect(strips).toHaveLength(2);
+    // Token semantik, bukan hex literal inline
+    expect(strips[0].className).toContain('bg-success');
+    expect(strips[1].className).toContain('bg-info');
+    expect(container.querySelector('[style*="background-color"]')).toBeNull();
+    // Badge memakai varian semantik sesuai aksen
+    expect(screen.getByText('Engineering').className).toContain('bg-info');
+  });
+
+  it('003-02 AC-02: renderNode mengganti isi tengah, expander dan strip tetap milik komponen', () => {
+    const data: OrgChartInput = [
+      { id: 'ceo', parentId: null, title: 'CEO Asli', accent: 'primary' },
+      { id: 'eng', parentId: 'ceo', title: 'Engineering' },
+    ];
+    const { container } = render(
+      <OrgChart data={data} renderNode={(node) => <span>Custom {node.id}</span>} />,
+    );
+    expect(screen.getByText('Custom ceo')).toBeTruthy();
+    expect(screen.queryByText('CEO Asli')).toBeNull();
+    expect(container.querySelector('[data-testid="org-chart-accent-strip"]')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Collapse CEO Asli' })).toBeTruthy();
+  });
+
+  it('003-02 AC-03: expander uncontrolled mengubah subtree dan konektor, onExpandedChange terpanggil', () => {
+    const onExpandedChange = vi.fn();
+    const { container } = render(<OrgChart data={flatData} onExpandedChange={onExpandedChange} />);
+    expect(container.querySelectorAll('[data-testid="org-chart-node"]')).toHaveLength(5);
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse Engineering' }));
+    const ids = Array.from(container.querySelectorAll('[data-testid="org-chart-node"]')).map((el) =>
+      el.getAttribute('data-node-id'),
+    );
+    expect(ids).toEqual(['ceo', 'eng', 'ops']);
+    expect(container.querySelectorAll('[data-testid="org-chart-connector"]')).toHaveLength(1);
+    expect(onExpandedChange).toHaveBeenCalledWith(['ceo']);
+    // Expand kembali
+    fireEvent.click(screen.getByRole('button', { name: 'Perluas Engineering' }));
+    expect(container.querySelectorAll('[data-testid="org-chart-node"]')).toHaveLength(5);
+    expect(container.querySelectorAll('[data-testid="org-chart-connector"]')).toHaveLength(2);
+    expect(onExpandedChange).toHaveBeenLastCalledWith(['ceo', 'eng']);
+  });
+
+  it('003-02 AC-03: mode controlled expandedIds tidak berubah tanpa prop baru', () => {
+    const onExpandedChange = vi.fn();
+    const { container } = render(
+      <OrgChart data={flatData} expandedIds={['ceo', 'eng']} onExpandedChange={onExpandedChange} />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse Engineering' }));
+    expect(onExpandedChange).toHaveBeenCalledWith(['ceo']);
+    // Controlled: tetap terbuka karena expandedIds tidak berubah
+    expect(container.querySelectorAll('[data-testid="org-chart-node"]')).toHaveLength(5);
+  });
+
+  it('003-02 AC-03: controlled expandedIds=[] merender hanya root', () => {
+    const { container } = render(<OrgChart data={flatData} expandedIds={[]} />);
+    const ids = Array.from(container.querySelectorAll('[data-testid="org-chart-node"]')).map((el) =>
+      el.getAttribute('data-node-id'),
+    );
+    expect(ids).toEqual(['ceo']);
+    expect(container.querySelectorAll('[data-testid="org-chart-connector"]')).toHaveLength(0);
+  });
+
+  it('003-02 AC-04: onSelect menerima node ternormalisasi, selectedId menandai aria-selected, disabled tidak bisa dipilih', () => {
+    const onSelect = vi.fn();
+    const data: OrgChartInput = [
+      { id: 'ceo', parentId: null, title: 'CEO' },
+      { id: 'eng', parentId: 'ceo', title: 'Engineering', disabled: true },
+    ];
+    const { container } = render(<OrgChart data={data} selectedId="ceo" onSelect={onSelect} />);
+    const ceoEl = container.querySelector('[data-node-id="ceo"]');
+    expect(ceoEl?.getAttribute('aria-selected')).toBe('true');
+    expect(ceoEl?.className).toContain('border-primary');
+    fireEvent.click(ceoEl as HTMLElement);
+    expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ id: 'ceo', title: 'CEO', hasChildren: true, depth: 0 }));
+    const engEl = container.querySelector('[data-node-id="eng"]');
+    expect(engEl?.getAttribute('aria-selected')).toBe('false');
+    fireEvent.click(engEl as HTMLElement);
+    expect(onSelect).toHaveBeenCalledTimes(1);
+  });
+
+  it('003-02 AC-04: klik expander tidak memanggil onSelect', () => {
+    const onSelect = vi.fn();
+    render(<OrgChart data={flatData} onSelect={onSelect} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse Engineering' }));
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('003-02 AC-01: expander hanya untuk node beranak dan berukuran minimal 32x32', () => {
+    const { container } = render(<OrgChart data={flatData} />);
+    const buttons = Array.from(container.querySelectorAll('button'));
+    // ceo + eng
+    expect(buttons).toHaveLength(2);
+    for (const button of buttons) {
+      expect(button.className).toContain('h-8');
+      expect(button.className).toContain('w-8');
+    }
   });
 
   it('AC-04: satu path elbow per parent dengan stroke token border', () => {
     const { container } = render(<OrgChart data={flatData} />);
-    const paths = container.querySelectorAll('path');
+    const paths = container.querySelectorAll('[data-testid="org-chart-connector"]');
     // Parent dengan anak: ceo (2 anak) + eng (2 anak)
     expect(paths).toHaveLength(2);
     for (const path of Array.from(paths)) {

@@ -1,6 +1,6 @@
 # 003-02 — Node kaya, aksen departemen, expand/collapse, select
 
-Status: approved (gate 3)
+Status: review
 PRD: `docs/prd/003-org-chart.md`
 FR: `FR-002`, `FR-003`, `FR-005`, `FR-007`
 Screens: `S-005.28`
@@ -40,13 +40,13 @@ Goal: Anatomy node lengkap (avatar, title, subtitle, badge, strip aksen), konten
 
 ## Tasks
 
-- [ ] Anatomy node sesuai wireframe §2: avatar/title/subtitle/badge/strip aksen/expander (compose `base/avatar`, `base/badge`)
-- [ ] Slot `renderNode` + area aksi sekunder kosong (slot konsumen, v1 default kosong)
-- [ ] Expand/collapse: `defaultCollapsedIds` (uncontrolled, default terbuka, tanpa auto-collapse) & `expandedIds` + `onExpandedChange` (controlled); collapse menyembunyikan subtree + konektor anak (design D4)
-- [ ] `onSelect` klik + state `selectedId` (border + ring `primary`); node `disabled` skip interaksi
-- [ ] Aksen token semantik per node; verifikasi ulang kontras strip aksen di atas `card` light & dark (test/catatan audit)
-- [ ] Test co-located: anatomy node, fallback avatar, controlled vs uncontrolled, payload onSelect, konektor ikut hilang saat collapse
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
+- [x] Anatomy node sesuai wireframe §2: avatar/title/subtitle/badge/strip aksen/expander (compose `base/avatar`, `base/badge`)
+- [x] Slot `renderNode` + area aksi sekunder kosong (slot konsumen, v1 default kosong)
+- [x] Expand/collapse: `defaultCollapsedIds` (uncontrolled, default terbuka, tanpa auto-collapse) & `expandedIds` + `onExpandedChange` (controlled); collapse menyembunyikan subtree + konektor anak (design D4)
+- [x] `onSelect` klik + state `selectedId` (border + ring `primary`); node `disabled` skip interaksi
+- [x] Aksen token semantik per node; verifikasi ulang kontras strip aksen di atas `card` light & dark (test/catatan audit)
+- [x] Test co-located: anatomy node, fallback avatar, controlled vs uncontrolled, payload onSelect, konektor ikut hilang saat collapse
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
 
 ## Dependencies
 
@@ -56,4 +56,5 @@ Goal: Anatomy node lengkap (avatar, title, subtitle, badge, strip aksen), konten
 ## Notes
 
 - Risiko: strip aksen di atas permukaan `card` berpotensi gagal kontras di salah satu mode — mitigasi verifikasi ulang eksplisit (design §6).
+- Audit kontras strip aksen di atas `card` (tema default pulse, konversi OKLCH→sRGB via `@csstools/color-helpers`): light primary 7.78, success 6.51, warning 4.03, info 5.09, destructive 5.43; dark primary 6.37, success 6.97, warning 8.25, info 6.81, destructive 4.64 — semua > 3:1 (WCAG grafis non-teks); test mengunci kelas token semantik tanpa hex literal.
 - Keputusan: `Enter` keyboard select masuk scope `003-03` bersama navigasi keyboard (FR-010); story ini mengunci perilaku pointer.

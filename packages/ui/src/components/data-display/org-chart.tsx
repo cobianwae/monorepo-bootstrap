@@ -1,7 +1,10 @@
 'use client';
 
 import * as React from 'react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '../base/avatar';
+import { Badge } from '../base/badge';
 
 export type OrgChartAccent = 'primary' | 'success' | 'warning' | 'info' | 'destructive';
 
@@ -303,39 +306,104 @@ function buildConnectorPaths(
   return paths;
 }
 
+const ACCENT_STRIP_CLASS: Record<OrgChartAccent, string> = {
+  primary: 'bg-primary',
+  success: 'bg-success',
+  warning: 'bg-warning',
+  info: 'bg-info',
+  destructive: 'bg-destructive',
+};
+
+const ACCENT_BADGE_VARIANT: Record<
+  OrgChartAccent,
+  React.ComponentProps<typeof Badge>['variant']
+> = {
+  primary: 'default',
+  success: 'success',
+  warning: 'warning',
+  info: 'info',
+  destructive: 'destructive',
+};
+
+function getInitials(title: string): string {
+  const parts = title.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+}
+
 export function OrgChart({
   data,
   orientation = 'top-down',
   defaultCollapsedIds = [],
   expandedIds,
+  onExpandedChange,
+  selectedId,
+  renderNode,
+  onSelect,
   ariaLabel = 'Org chart',
   className,
 }: OrgChartProps) {
-  const collapsedIds = expandedIds !== undefined ? expandedIds : defaultCollapsedIds;
-  const collapsedKey = collapsedIds.join('|');
+  const normalized = React.useMemo(() => normalizeInput(data), [data]);
 
-  const normalized = React.useMemo(
-    () => normalizeInput(data),
-    // collapsedKey dihitung dari expandedIds/default agar memo mengikuti expanded
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data, collapsedKey],
+  const parentIds = React.useMemo(
+    () => normalized.nodes.filter((node) => node.hasChildren).map((node) => node.id),
+    [normalized],
   );
+  const parentIdsKey = parentIds.join('|');
+
+  // Uncontrolled: semua parent terbuka kecuali defaultCollapsedIds.
+  // Controlled: expandedIds adalah daftar lengkap id yang terbuka (pola tree-view).
+  const [internalExpandedIds, setInternalExpandedIds] = React.useState<string[]>(() =>
+    parentIds.filter((id) => !defaultCollapsedIds.includes(id)),
+  );
+  const isControlled = expandedIds !== undefined;
+  const effectiveExpandedIds = isControlled ? expandedIds : internalExpandedIds;
+
+  React.useEffect(() => {
+    if (isControlled) return;
+    setInternalExpandedIds((current) => {
+      const valid = current.filter((id) => parentIds.includes(id));
+      const missing = parentIds.filter(
+        (id) => !valid.includes(id) && !defaultCollapsedIds.includes(id),
+      );
+      return [...valid, ...missing];
+    });
+    // parentIdsKey memicu sinkronisasi saat struktur data berubah
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parentIdsKey]);
+
+  const expandedSet = React.useMemo(() => new Set(effectiveExpandedIds), [effectiveExpandedIds]);
+
+  const toggleExpanded = (id: string) => {
+    const next = new Set(expandedSet);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    const nextIds = parentIds.filter((parentId) => next.has(parentId));
+    if (!isControlled) {
+      setInternalExpandedIds(nextIds);
+    }
+    onExpandedChange?.(nextIds);
+  };
 
   const visibleIds = React.useMemo(() => {
     const visible = new Set<string>();
     if (normalized.rootId === null || normalized.error !== null) return visible;
-    const collapsed = new Set(collapsedIds);
     const walk = (id: string): void => {
       visible.add(id);
-      if (collapsed.has(id)) return;
+      if (!expandedSet.has(id)) return;
       for (const childId of normalized.byId.get(id)?.childIds ?? []) {
         walk(childId);
       }
     };
     walk(normalized.rootId);
     return visible;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [normalized, collapsedKey]);
+  }, [normalized, expandedSet]);
 
   const layout = React.useMemo(
     () => computeLayout(normalized, visibleIds, orientation),
@@ -377,24 +445,80 @@ export function OrgChart({
         focusable="false"
       >
         {connectorPaths.map((d, index) => (
-          <path key={index} d={d} fill="none" stroke="var(--border)" strokeWidth={2} />
+          <path key={index} data-testid="org-chart-connector" d={d} fill="none" stroke="var(--border)" strokeWidth={2} />
         ))}
       </svg>
       {visibleNodes.map((node) => {
         const position = positionById.get(node.id);
         if (!position) return null;
+        const isSelected = selectedId != null && selectedId === node.id;
+        const isExpanded = expandedSet.has(node.id);
+        const badgeVariant = node.accent ? ACCENT_BADGE_VARIANT[node.accent] : 'secondary';
         return (
           <div
             key={node.id}
             data-testid="org-chart-node"
             data-node-id={node.id}
-            className="absolute flex flex-col justify-center rounded-md border border-border bg-card px-3 text-card-foreground"
+            data-selected={isSelected ? 'true' : undefined}
+            aria-selected={isSelected}
+            aria-expanded={node.hasChildren ? isExpanded : undefined}
+            aria-disabled={node.disabled ? true : undefined}
+            onClick={() => {
+              if (node.disabled) return;
+              onSelect?.(node);
+            }}
+            className={cn(
+              'absolute flex items-center gap-2 rounded-md border bg-card pl-4 pr-2 text-card-foreground',
+              'hover:border-primary/60',
+              isSelected ? 'border-primary ring-2 ring-ring' : 'border-border',
+              node.disabled && 'cursor-not-allowed opacity-50',
+              !node.disabled && onSelect && 'cursor-pointer',
+            )}
             style={{ left: position.x, top: position.y, width: NODE_WIDTH, height: NODE_HEIGHT }}
           >
-            <span className="truncate text-sm font-medium">{node.title}</span>
-            {node.subtitle ? (
-              <span className="truncate text-xs text-muted-foreground">{node.subtitle}</span>
+            {node.accent ? (
+              <span
+                aria-hidden="true"
+                data-testid="org-chart-accent-strip"
+                className={cn('absolute left-0 top-0 h-full w-[3px] rounded-l-md', ACCENT_STRIP_CLASS[node.accent])}
+              />
             ) : null}
+            {node.hasChildren ? (
+              <button
+                type="button"
+                disabled={node.disabled}
+                aria-label={isExpanded ? `Collapse ${node.title}` : `Perluas ${node.title}`}
+                aria-expanded={isExpanded}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  toggleExpanded(node.id);
+                }}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed"
+              >
+                {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+              </button>
+            ) : null}
+            {renderNode ? (
+              <div className="min-w-0 flex-1">{renderNode(node)}</div>
+            ) : (
+              <>
+                <Avatar size="sm">
+                  {node.avatarSrc ? <AvatarImage src={node.avatarSrc} alt="" /> : null}
+                  <AvatarFallback>{getInitials(node.title)}</AvatarFallback>
+                </Avatar>
+                <div className="flex min-w-0 flex-1 flex-col justify-center">
+                  <span className="truncate text-sm font-medium text-foreground">{node.title}</span>
+                  {node.subtitle ? (
+                    <span className="truncate text-xs text-muted-foreground">{node.subtitle}</span>
+                  ) : null}
+                </div>
+                {node.badge ? (
+                  <Badge variant={badgeVariant} size="sm" className="max-w-[72px] truncate">
+                    {node.badge}
+                  </Badge>
+                ) : null}
+              </>
+            )}
           </div>
         );
       })}
