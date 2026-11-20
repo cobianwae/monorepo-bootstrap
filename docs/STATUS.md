@@ -9,13 +9,14 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 Struktur OpenCode terpasang (config root, docs-as-state, agents, commands, workflow skills); baseline `typecheck`, `lint`, dan `test` hijau.
 CR-001–CR-007 selesai (`done`, ter-merge ke `dev`); kepatuhan `STATUS-LOG` dikunci via CR-007 (backfill + aturan append + `scripts/check-status-log.mjs`).
 Story 001-01 dan 001-02 (upload queue) selesai (`done`, ter-merge ke `dev`).
+PRD 002–006 (`approved`, gate 1) dan spec RM-02/03/10 (`approved`, story 007-01, 008-01/008-02, 009-01) selesai review dan disetujui user; CR-008 (`draft`) mengajukan perapian dokumen PRD 001.
 
 ## Next
 
-1. PRD 001 (upload queue) masih `approved` — kedua story selesai `done`; tetapkan `shipped` bila sudah sesuai keputusan user, lalu arsipkan dari `BACKLOG.md`.
-2. Validasi command `/start`, `/prd`, `/review`, dan `/audit` di sesi baru.
-3. Lengkapi `docs/design/object-model.md` dan `sitemap.md` dengan inventaris aktual.
-4. Tidak ada CR tertunda; pilih target berikutnya (PRD/story) atau CR baru dari audit.
+1. Eksekusi CR-008 (perapian FR PRD 001 + rujukan `CR-006`) — butuh `approved` user.
+2. Mulai gate 2 PRD 002 (file manager) atau eksekusi story lightweight (007-01/008-01/008-02/009-01) — pilih target satu sesi sesuai BACKLOG.
+3. PRD 001 masih `approved` — tetapkan `shipped` bila sudah sesuai keputusan user, lalu arsipkan dari `BACKLOG.md`.
+4. Lengkapi `docs/design/object-model.md` (tambah kategori `canvas` + entri komponen baru) dan `sitemap.md` (S-005.27–S-005.32 sudah terdaftar `planned`).
 
 ## Known Issues
 

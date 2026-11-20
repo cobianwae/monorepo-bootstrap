@@ -63,6 +63,12 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.24 | Stepper | `/patterns/stepper` | implemented |
 | S-005.25 | Virtualized List | `/patterns/virtualized-list` | implemented |
 | S-005.26 | Workspace | `/patterns/workspace` | implemented |
+| S-005.27 | File Manager | `/patterns/file-manager` | planned |
+| S-005.28 | Org Chart | `/patterns/org-chart` | planned |
+| S-005.29 | Flow Editor | `/patterns/flow-editor` | planned |
+| S-005.30 | Transfer List | `/patterns/transfer-list` | planned |
+| S-005.31 | Cascader & Tree Select | `/patterns/cascader-tree-select` | planned |
+| S-005.32 | Mention & Emoji | `/patterns/mention-emoji` | planned |
 | S-006 | Guidelines | `/guidelines` | implemented |
 | S-007 | Contribution | `/contribution` | implemented |
 | S-008 | What's New | `/whats-new` | implemented |

@@ -13,3 +13,5 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-20 — Story 001-01 komponen FileUpload inti upload queue selesai — `001-01`.
 - 2026-11-20 — Story 001-02 aksi kolektif, sortable, auto-retry, varian compact selesai — `001-02`.
 - 2026-11-20 — CR-007 kunci kepatuhan STATUS-LOG: backfill histori, samakan aturan append di AGENTS/implement, tambahkan check ringan — `CR-007`.
+- 2026-11-20 — Draft PRD 002–006 (file manager RM-04+05, org chart RM-06, calendar RM-08, flow editor RM-09, rich text RM-11) dan spec singkat RM-02/03/10 dari component roadmap — `component-roadmap`.
+- 2026-11-20 — Approve PRD 002–006 (gate 1) dan spec RM-02/03/10; roadmap disinkronkan, S-005.27–S-005.32 terdaftar planned — review PRD 002–006
