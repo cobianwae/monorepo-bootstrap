@@ -59,6 +59,7 @@ export * from './components/navigation/navigation-menu';
 export * from './components/dnd/sortable-list';
 export * from './components/dnd/kanban';
 export * from './components/data-display/chart';
+export * from './components/data-display/event-calendar';
 export * from './components/marketing/grid-pattern';
 export * from './components/marketing/dot-pattern';
 export * from './components/marketing/glow-orb';
