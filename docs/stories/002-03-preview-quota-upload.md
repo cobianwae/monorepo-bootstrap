@@ -1,6 +1,6 @@
 # 002-03 — Preview media + quota + upload compose
 
-Status: review
+Status: done
 PRD: `docs/prd/002-file-manager.md`
 FR: `FR-006`, `FR-007`, `FR-008`
 Screens: `S-005.27`, `S-005.27.02`, `M-001`
