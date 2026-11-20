@@ -1,6 +1,6 @@
 # 010-03 — Reparent drag + move dialog + undo/redo
 
-Status: todo
+Status: review
 PRD: `docs/prd/010-org-chart-editor.md`
 Design: `docs/design/org-chart-editor.md`
 FR: `FR-004`, `FR-012`, `FR-015`
@@ -35,12 +35,12 @@ Goal: Pindah node via drag reparent tervalidasi dan dialog keyboard-setara, sikl
 
 ## Tasks
 
-- [ ] Drag reparent xyflow: `onNodeDragStop` → hitung parent target (nearest / drop-on) → validasi (ada, bukan diri/descendant) → commit atau snap-back + pesan
-- [ ] Dialog M-005: select atasan (filter + disable invalid) + preview path + konfirmasi
-- [ ] Undo stack internal (tambah/hapus/pindah/edit) ≤50 + toolbar + shortcut + live region
-- [ ] State drag-target valid (`success` ring) vs invalid (`destructive` + teks, bukan warna saja)
-- [ ] Test: reparent valid, siklus ke descendant/diri ditolak, dialog keyboard, undo/redo round-trip, stack limit
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
+- [x] Drag reparent xyflow: `onNodeDragStop` → hitung parent target (nearest / drop-on) → validasi (ada, bukan diri/descendant) → commit atau snap-back + pesan
+- [x] Dialog M-005: select atasan (filter + disable invalid) + preview path + konfirmasi
+- [x] Undo stack internal (tambah/hapus/pindah/edit) ≤50 + toolbar + shortcut + live region
+- [x] State drag-target valid (`success` ring) vs invalid (`destructive` + teks, bukan warna saja)
+- [x] Test: reparent valid, siklus ke descendant/diri ditolak, dialog keyboard, undo/redo round-trip, stack limit
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
 
 ## Dependencies
 

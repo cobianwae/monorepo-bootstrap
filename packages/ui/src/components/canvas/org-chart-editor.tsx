@@ -14,6 +14,7 @@ import {
   useReactFlow,
   type Edge,
   type Node,
+  type NodeChangeset,
 } from '@xyflow/react';
 import { cn } from '../../lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../base/avatar';
@@ -235,6 +236,53 @@ function normalizeEditorInput(data: OrgChartInput): NormalizedEditorResult {
   return { nodes, byId: new Map(nodes.map((node) => [node.id, node])), rootId, error: null, isEmpty: false };
 }
 
+export const UNDO_LIMIT = 50;
+
+export type ReparentReason = 'ok' | 'missing' | 'self' | 'descendant' | 'same-parent' | 'root';
+
+export interface ReparentValidation {
+  valid: boolean;
+  reason: ReparentReason;
+}
+
+export function getDescendantIds(flat: OrgNodeFlat[], id: string): string[] {
+  const childIdsByParent = new Map<string, string[]>();
+  for (const node of flat) {
+    if (node.parentId !== null) {
+      const list = childIdsByParent.get(node.parentId) ?? [];
+      list.push(node.id);
+      childIdsByParent.set(node.parentId, list);
+    }
+  }
+  const descendants: string[] = [];
+  const walk = (currentId: string): void => {
+    for (const childId of childIdsByParent.get(currentId) ?? []) {
+      descendants.push(childId);
+      walk(childId);
+    }
+  };
+  walk(id);
+  return descendants;
+}
+
+export function validateReparentTarget(
+  flat: OrgNodeFlat[],
+  draggedId: string,
+  targetId: string,
+): ReparentValidation {
+  const byId = new Map(flat.map((node) => [node.id, node]));
+  const dragged = byId.get(draggedId);
+  const target = byId.get(targetId);
+  if (!dragged || !target) return { valid: false, reason: 'missing' };
+  if (targetId === draggedId) return { valid: false, reason: 'self' };
+  if (dragged.parentId === null) return { valid: false, reason: 'root' };
+  if (dragged.parentId === targetId) return { valid: false, reason: 'same-parent' };
+  if (getDescendantIds(flat, draggedId).includes(targetId)) {
+    return { valid: false, reason: 'descendant' };
+  }
+  return { valid: true, reason: 'ok' };
+}
+
 export interface EditorPosition {
   id: string;
   x: number;
@@ -283,17 +331,21 @@ export function computeEditorPositions(
   return positions;
 }
 
+export type DragState = 'none' | 'valid' | 'invalid';
+
 export type OrgFlowNodeData = {
   node: OrgNodeNormalized;
   isExpanded: boolean;
   isSelected: boolean;
   isHighlighted: boolean;
+  dragState: DragState;
   onToggle: (id: string) => void;
   onSelectNode: ((node: OrgNodeNormalized) => void) | undefined;
   onAddChild?: (node: OrgNodeNormalized) => void;
   onAddSibling?: (node: OrgNodeNormalized) => void;
   onOpenInspector?: (node: OrgNodeNormalized) => void;
   onRequestDelete?: (node: OrgNodeNormalized) => void;
+  onRequestMove?: (node: OrgNodeNormalized) => void;
   renderExtra: ((node: OrgNodeNormalized) => React.ReactNode) | undefined;
   nodeTitle: string;
 };
@@ -325,9 +377,11 @@ export function toFlowNodes(
     onAddSibling?: OrgFlowNodeData['onAddSibling'];
     onOpenInspector?: OrgFlowNodeData['onOpenInspector'];
     onRequestDelete?: OrgFlowNodeData['onRequestDelete'];
+    onRequestMove?: OrgFlowNodeData['onRequestMove'];
     renderExtra: OrgFlowNodeData['renderExtra'];
     nodeTitle?: string;
   },
+  dragHover: { targetId: string; valid: boolean } | null = null,
 ): OrgFlowNode[] {
   const positionById = new Map(positions.map((position) => [position.id, position]));
   return normalized.nodes
@@ -338,17 +392,26 @@ export function toFlowNodes(
         id: node.id,
         type: 'orgNode',
         position: { x: position.x, y: position.y },
+        width: NODE_WIDTH,
+        height: NODE_HEIGHT,
         data: {
           node,
           isExpanded: expandedSet.has(node.id),
           isSelected: selectedId !== null && selectedId === node.id,
           isHighlighted: highlightedSet.has(node.id),
+          dragState:
+            dragHover !== null && dragHover.targetId === node.id
+              ? dragHover.valid
+                ? 'valid'
+                : 'invalid'
+              : 'none',
           onToggle: handlers.onToggle,
           onSelectNode: handlers.onSelectNode,
           onAddChild: handlers.onAddChild,
           onAddSibling: handlers.onAddSibling,
           onOpenInspector: handlers.onOpenInspector,
           onRequestDelete: handlers.onRequestDelete,
+          onRequestMove: handlers.onRequestMove,
           renderExtra: handlers.renderExtra,
           nodeTitle: handlers.nodeTitle ?? '',
         },
@@ -411,6 +474,8 @@ function OrgEditorNode({ data }: { data: OrgFlowNodeData }) {
     onAddSibling,
     onOpenInspector,
     onRequestDelete,
+    onRequestMove,
+    dragState,
     renderExtra,
   } = data;
   const badgeVariant = node.accent ? ACCENT_BADGE_VARIANT[node.accent as OrgChartEditorAccent] : 'secondary';
@@ -423,6 +488,7 @@ function OrgEditorNode({ data }: { data: OrgFlowNodeData }) {
       data-node-id={node.id}
       data-selected={isSelected ? 'true' : undefined}
       data-highlighted={isHighlighted ? 'true' : undefined}
+      data-drag-state={dragState !== 'none' ? dragState : undefined}
       title={fullTitle}
       tabIndex={0}
       onClick={() => onSelectNode?.(node)}
@@ -435,9 +501,27 @@ function OrgEditorNode({ data }: { data: OrgFlowNodeData }) {
       className={cn(
         'relative flex h-[72px] w-[200px] items-center gap-2 rounded-md border bg-card pl-4 pr-2 text-card-foreground',
         'hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        isSelected || isHighlighted ? 'border-primary ring-2 ring-ring' : 'border-border',
+        isSelected || isHighlighted
+          ? 'border-primary ring-2 ring-ring'
+          : dragState === 'valid'
+            ? 'border-success ring-2 ring-success'
+            : dragState === 'invalid'
+              ? 'border-destructive ring-2 ring-destructive'
+              : 'border-border',
       )}
     >
+      {dragState !== 'none' ? (
+        <span
+          data-testid="org-editor-drag-chip"
+          className={
+            dragState === 'valid'
+              ? 'absolute -top-2 left-2 z-10 rounded-sm bg-success px-1 text-[10px] leading-4 text-success-foreground'
+              : 'absolute -top-2 left-2 z-10 rounded-sm bg-destructive px-1 text-[10px] leading-4 text-destructive-foreground'
+          }
+        >
+          {dragState === 'valid' ? 'Target valid' : 'Tidak valid'}
+        </span>
+      ) : null}
       {node.accent ? (
         <span
           aria-hidden="true"
@@ -502,7 +586,7 @@ function OrgEditorNode({ data }: { data: OrgFlowNodeData }) {
           Tambah sibling
         </ContextMenuItem>
         <ContextMenuItem onSelect={() => onOpenInspector?.(node)}>Edit / inspector</ContextMenuItem>
-        <ContextMenuItem disabled title="Pindah node tersedia di 010-03">
+        <ContextMenuItem disabled={node.parentId === null} onSelect={() => onRequestMove?.(node)}>
           Pindah…
         </ContextMenuItem>
         <ContextMenuSeparator />
@@ -551,24 +635,96 @@ function EditorCanvas({
   nodes,
   edges,
   ariaLabel,
+  onDragHover,
+  onDrop,
 }: {
   nodes: OrgFlowNode[];
   edges: OrgFlowEdge[];
   ariaLabel: string;
+  onDragHover: (draggedId: string, targetId: string | null) => void;
+  onDrop: (draggedId: string, targetId: string | null) => void;
 }) {
   const [zoomLabel, setZoomLabel] = React.useState('100%');
+  const { getIntersectingNodes } = useReactFlow();
+  // Posisi visual selama drag; dibersihkan saat drop selesai sehingga
+  // posisi selalu kembali ke derivasi `data` (snap-back otomatis).
+  const [overrides, setOverrides] = React.useState<Map<string, { x: number; y: number }>>(new Map());
+  const mergedNodes = React.useMemo(
+    () =>
+      nodes.map((node) => {
+        const override = overrides.get(node.id);
+        return override ? { ...node, position: override } : node;
+      }),
+    [nodes, overrides],
+  );
+
+  const findTargetId = React.useCallback(
+    (dragged: OrgFlowNode): string | null => {
+      const intersecting = getIntersectingNodes(dragged).filter((node) => node.id !== dragged.id);
+      if (intersecting.length === 0) return null;
+      const centerX = dragged.position.x + (dragged.width ?? NODE_WIDTH) / 2;
+      const centerY = dragged.position.y + (dragged.height ?? NODE_HEIGHT) / 2;
+      let best: OrgFlowNode | null = null;
+      let bestDistance = Number.POSITIVE_INFINITY;
+      for (const candidate of intersecting) {
+        const candidateCenterX = candidate.position.x + (candidate.width ?? NODE_WIDTH) / 2;
+        const candidateCenterY = candidate.position.y + (candidate.height ?? NODE_HEIGHT) / 2;
+        const distance = Math.hypot(candidateCenterX - centerX, candidateCenterY - centerY);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          best = candidate as OrgFlowNode;
+        }
+      }
+      return best?.id ?? null;
+    },
+    [getIntersectingNodes],
+  );
+
+  const handleNodesChange = React.useCallback(
+    (changes: NodeChangeset<OrgFlowNode>) => {
+      let next: Map<string, { x: number; y: number }> | null = null;
+      for (const change of changes) {
+        if (change.type === 'position' && change.position) {
+          next ??= new Map(overrides);
+          next.set(change.id, change.position);
+        }
+      }
+      if (next) setOverrides(next);
+    },
+    [overrides],
+  );
+
+  const handleNodeDrag = React.useCallback(
+    (_event: MouseEvent | TouchEvent, node: OrgFlowNode) => {
+      onDragHover(node.id, findTargetId(node));
+    },
+    [findTargetId, onDragHover],
+  );
+
+  const handleNodeDragStop = React.useCallback(
+    (_event: MouseEvent | TouchEvent, node: OrgFlowNode) => {
+      const targetId = findTargetId(node);
+      setOverrides(new Map());
+      onDrop(node.id, targetId);
+    },
+    [findTargetId, onDrop],
+  );
+
   return (
     <div className="relative h-[480px] w-full overflow-hidden rounded-md border border-border bg-background">
       <ReactFlow
-        nodes={nodes}
+        nodes={mergedNodes}
         edges={edges}
         nodeTypes={nodeTypes}
+        onNodesChange={handleNodesChange}
+        onNodeDrag={handleNodeDrag}
+        onNodeDragStop={handleNodeDragStop}
         fitView
         fitViewOptions={{ padding: 0.2 }}
         zoomOnScroll={false}
         zoomOnPinch
         panOnDrag
-        nodesDraggable={false}
+        nodesDraggable
         nodesConnectable={false}
         elementsSelectable
         proOptions={{ hideAttribution: true }}
@@ -609,12 +765,6 @@ export function OrgChartEditor({
     Array.isArray(data) ? [...data] : flattenNested(data),
   );
   const dataRef = React.useRef(data);
-  React.useEffect(() => {
-    if (dataRef.current !== data) {
-      dataRef.current = data;
-      setInternalFlat(Array.isArray(data) ? [...data] : flattenNested(data));
-    }
-  }, [data]);
 
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [inspectorOpen, setInspectorOpen] = React.useState(false);
@@ -624,15 +774,72 @@ export function OrgChartEditor({
   const [titleInvalid, setTitleInvalid] = React.useState(false);
   const [deleteTargetId, setDeleteTargetId] = React.useState<string | null>(null);
   const [deleteMode, setDeleteMode] = React.useState<'reparent' | 'subtree'>('reparent');
+  const [moveTargetId, setMoveTargetId] = React.useState<string | null>(null);
+  const [moveSelection, setMoveSelection] = React.useState<string | null>(null);
+  const [dragHover, setDragHover] = React.useState<{ draggedId: string; targetId: string; valid: boolean } | null>(
+    null,
+  );
+  const [dropAlert, setDropAlert] = React.useState<string | null>(null);
+  const [announcement, setAnnouncement] = React.useState('');
+  const [past, setPast] = React.useState<{ flat: OrgNodeFlat[]; label: string }[]>([]);
+  const [future, setFuture] = React.useState<{ flat: OrgNodeFlat[]; label: string }[]>([]);
   const returnFocusIdRef = React.useRef<string | null>(null);
 
+  React.useEffect(() => {
+    if (dataRef.current === data) return;
+    dataRef.current = data;
+    const nextFlat = Array.isArray(data) ? [...data] : flattenNested(data);
+    setInternalFlat(nextFlat);
+    // Reset riwayat hanya untuk perubahan eksternal; echo `onChange`
+    // sendiri (konten sama dengan state internal) tidak mereset undo.
+    if (JSON.stringify(nextFlat) !== JSON.stringify(internalFlat)) {
+      setPast([]);
+      setFuture([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
+
   const commit = React.useCallback(
-    (next: OrgNodeFlat[]) => {
+    (next: OrgNodeFlat[], label: string) => {
+      setPast((current) => {
+        const trimmed = current.length >= UNDO_LIMIT ? current.slice(current.length - (UNDO_LIMIT - 1)) : current;
+        return [...trimmed, { flat: internalFlat, label }];
+      });
+      setFuture([]);
       setInternalFlat(next);
       onChange?.(next);
     },
-    [onChange],
+    [internalFlat, onChange],
   );
+
+  const applyHistory = React.useCallback(
+    (snapshot: { flat: OrgNodeFlat[]; label: string }, direction: 'undo' | 'redo') => {
+      if (direction === 'undo') {
+        setFuture((current) => [...current, { flat: internalFlat, label: snapshot.label }]);
+        setPast((current) => current.slice(0, -1));
+      } else {
+        setPast((current) => {
+          const trimmed = current.length >= UNDO_LIMIT ? current.slice(current.length - (UNDO_LIMIT - 1)) : current;
+          return [...trimmed, { flat: internalFlat, label: snapshot.label }];
+        });
+        setFuture((current) => current.slice(0, -1));
+      }
+      setInternalFlat(snapshot.flat);
+      onChange?.(snapshot.flat);
+      setAnnouncement(`${direction === 'undo' ? 'Urungkan' : 'Ulangi'} ${snapshot.label}`);
+    },
+    [internalFlat, onChange],
+  );
+
+  const undo = React.useCallback(() => {
+    const snapshot = past[past.length - 1];
+    if (snapshot) applyHistory(snapshot, 'undo');
+  }, [past, applyHistory]);
+
+  const redo = React.useCallback(() => {
+    const snapshot = future[future.length - 1];
+    if (snapshot) applyHistory(snapshot, 'redo');
+  }, [future, applyHistory]);
 
   const normalized = React.useMemo(() => normalizeEditorInput(internalFlat), [internalFlat]);
   const selectedNode = selectedId ? (normalized.byId.get(selectedId) ?? null) : null;
@@ -686,6 +893,69 @@ export function OrgChartEditor({
     setDeleteMode(node.hasChildren ? 'reparent' : 'subtree');
   }, []);
 
+  const handleRequestMove = React.useCallback(
+    (node: OrgNodeNormalized) => {
+      if (node.parentId === null) return;
+      setMoveTargetId(node.id);
+      setMoveSelection(node.parentId);
+      setDropAlert(null);
+    },
+    [],
+  );
+
+  const confirmMove = React.useCallback(() => {
+    if (!moveTargetId || !moveSelection) return;
+    const validation = validateReparentTarget(internalFlat, moveTargetId, moveSelection);
+    if (!validation.valid) return;
+    const targetTitle = normalized.byId.get(moveSelection)?.title ?? moveSelection;
+    const next = internalFlat.map((node) =>
+      node.id === moveTargetId ? { ...node, parentId: moveSelection } : node,
+    );
+    commit(next, 'Pindah node');
+    setAnnouncement(`Dipindah ke ${targetTitle}`);
+    setMoveTargetId(null);
+    setMoveSelection(null);
+  }, [commit, internalFlat, moveSelection, moveTargetId, normalized]);
+
+  const handleDragHover = React.useCallback(
+    (draggedId: string, targetId: string | null) => {
+      if (!targetId) {
+        setDragHover((current) => (current?.draggedId === draggedId ? null : current));
+        return;
+      }
+      const valid = validateReparentTarget(internalFlat, draggedId, targetId).valid;
+      setDragHover((current) =>
+        current?.draggedId === draggedId && current.targetId === targetId && current.valid === valid
+          ? current
+          : { draggedId, targetId, valid },
+      );
+    },
+    [internalFlat],
+  );
+
+  const handleDrop = React.useCallback(
+    (draggedId: string, targetId: string | null) => {
+      setDragHover(null);
+      if (!targetId) return;
+      const validation = validateReparentTarget(internalFlat, draggedId, targetId);
+      if (validation.reason === 'same-parent' || validation.reason === 'missing') return;
+      if (!validation.valid) {
+        setDropAlert(
+          validation.reason === 'self'
+            ? 'Tidak bisa menjadi bawahan diri sendiri'
+            : 'Tidak bisa menjadi bawahan turunan sendiri',
+        );
+        return;
+      }
+      setDropAlert(null);
+      const targetTitle = normalized.byId.get(targetId)?.title ?? targetId;
+      const next = internalFlat.map((node) => (node.id === draggedId ? { ...node, parentId: targetId } : node));
+      commit(next, 'Pindah node');
+      setAnnouncement(`Dipindah ke ${targetTitle}`);
+    },
+    [commit, internalFlat, normalized],
+  );
+
   const saveInspector = () => {
     const title = draft.title.trim();
     if (!title) {
@@ -707,7 +977,7 @@ export function OrgChartEditor({
             }
           : node,
       );
-      commit(next);
+      commit(next, 'Edit node');
       returnFocusIdRef.current = selectedNode.id;
     } else {
       const parentId = addParentId;
@@ -725,7 +995,7 @@ export function OrgChartEditor({
           accent: (draft.accent || undefined) as OrgChartEditorAccent | undefined,
         },
       ];
-      commit(next);
+      commit(next, 'Tambah node');
       setSelectedId(newId);
       returnFocusIdRef.current = newId;
     }
@@ -751,7 +1021,7 @@ export function OrgChartEditor({
       collect(target.id);
       next = internalFlat.filter((node) => !toRemove.has(node.id));
     }
-    commit(next);
+    commit(next, 'Hapus node');
     setDeleteTargetId(null);
     setSelectedId(null);
     setInspectorOpen(false);
@@ -819,17 +1089,26 @@ export function OrgChartEditor({
 
   const flowNodes = React.useMemo(
     () =>
-      toFlowNodes(normalized, positions, expandedSet, highlightedSet, selectedId, {
-        onToggle: toggleExpanded,
-        onSelectNode: handleSelectNode,
-        onAddChild: handleAddChild,
-        onAddSibling: handleAddSibling,
-        onOpenInspector: handleOpenInspector,
-        onRequestDelete: handleRequestDelete,
-        renderExtra: renderNodeExtra,
-      }),
+      toFlowNodes(
+        normalized,
+        positions,
+        expandedSet,
+        highlightedSet,
+        selectedId,
+        {
+          onToggle: toggleExpanded,
+          onSelectNode: handleSelectNode,
+          onAddChild: handleAddChild,
+          onAddSibling: handleAddSibling,
+          onOpenInspector: handleOpenInspector,
+          onRequestDelete: handleRequestDelete,
+          onRequestMove: handleRequestMove,
+          renderExtra: renderNodeExtra,
+        },
+        dragHover ? { targetId: dragHover.targetId, valid: dragHover.valid } : null,
+      ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [normalized, positions, expandedSet, highlightedSet, selectedId, handleSelectNode, handleAddChild, handleAddSibling, handleOpenInspector, handleRequestDelete, renderNodeExtra],
+    [normalized, positions, expandedSet, highlightedSet, selectedId, handleSelectNode, handleAddChild, handleAddSibling, handleOpenInspector, handleRequestDelete, handleRequestMove, renderNodeExtra, dragHover],
   );
 
   const flowEdges = React.useMemo(() => toFlowEdges(normalized, visibleIds), [normalized, visibleIds]);
@@ -843,6 +1122,15 @@ export function OrgChartEditor({
     if ((event.key === 'Delete' || event.key === 'Backspace') && selectedNode) {
       event.preventDefault();
       handleRequestDelete(selectedNode);
+    }
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+      event.preventDefault();
+      if (event.shiftKey) redo();
+      else undo();
+    }
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'y') {
+      event.preventDefault();
+      redo();
     }
   };
 
@@ -910,10 +1198,23 @@ export function OrgChartEditor({
       )}
     >
       <ReactFlowProvider>
-        <EditorCanvas nodes={flowNodes} edges={flowEdges} ariaLabel={ariaLabel} />
+        <EditorCanvas
+          nodes={flowNodes}
+          edges={flowEdges}
+          ariaLabel={ariaLabel}
+          onDragHover={handleDragHover}
+          onDrop={handleDrop}
+        />
       </ReactFlowProvider>
     </div>
   );
+
+  const moveNode = moveTargetId ? (normalized.byId.get(moveTargetId) ?? null) : null;
+  const moveDescendantIds = moveNode ? new Set(getDescendantIds(internalFlat, moveNode.id)) : new Set<string>();
+  const movePreviewPath =
+    moveSelection && moveNode
+      ? [...getAncestors(internalFlat, moveSelection).map((id) => normalized.byId.get(id)?.title ?? id), normalized.byId.get(moveSelection)?.title ?? moveSelection, moveNode.title]
+      : [];
 
   const pathTitles =
     selectedNode != null
@@ -955,6 +1256,21 @@ export function OrgChartEditor({
         </Button>
         <Button
           type="button"
+          variant="outline"
+          size="sm"
+          disabled={!selectedNode || selectedNode.parentId === null}
+          onClick={() => selectedNode && handleRequestMove(selectedNode)}
+        >
+          Pindah
+        </Button>
+        <Button type="button" variant="outline" size="sm" disabled={past.length === 0} onClick={undo}>
+          Urungkan
+        </Button>
+        <Button type="button" variant="outline" size="sm" disabled={future.length === 0} onClick={redo}>
+          Ulangi
+        </Button>
+        <Button
+          type="button"
           variant="destructive"
           size="sm"
           disabled={!selectedNode || isRootSelected}
@@ -965,6 +1281,14 @@ export function OrgChartEditor({
         </Button>
         {isRootSelected ? <span className="text-sm text-muted-foreground">Root tidak dapat dihapus</span> : null}
       </div>
+      <div aria-live="polite" role="status" className="sr-only" data-testid="org-editor-live">
+        {announcement}
+      </div>
+      {dropAlert ? (
+        <p key={dropAlert} role="alert" className="mb-2 rounded-md border border-destructive/40 bg-destructive/5 p-2 text-sm text-foreground">
+          {dropAlert}
+        </p>
+      ) : null}
       {canvas}
 
       <Sheet open={inspectorOpen} onOpenChange={setInspectorOpen}>
@@ -1063,7 +1387,13 @@ export function OrgChartEditor({
               </Button>
               {selectedNode && inspectorMode === 'edit' ? (
                 <>
-                  <Button type="button" variant="outline" size="sm" disabled title="Pindah node tersedia di 010-03">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={isRootSelected}
+                    onClick={() => handleRequestMove(selectedNode)}
+                  >
                     Pindah…
                   </Button>
                   <Button
@@ -1106,6 +1436,69 @@ export function OrgChartEditor({
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setDeleteTargetId(null)}>Batal</Button>
             <Button type="button" variant="destructive" onClick={confirmDelete}>Hapus</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={moveNode !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setMoveTargetId(null);
+            setMoveSelection(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Pilih atasan baru</DialogTitle>
+            <DialogDescription>
+              Pindahkan &quot;{moveNode?.title}&quot; ke atasan baru. Node itu sendiri dan turunannya tidak dapat dipilih.
+            </DialogDescription>
+          </DialogHeader>
+          <RadioGroup value={moveSelection ?? ''} onValueChange={setMoveSelection}>
+            <div className="max-h-64 space-y-2 overflow-y-auto" data-testid="org-editor-move-options">
+              {normalized.nodes.map((candidate) => {
+                const isSelf = candidate.id === moveNode?.id;
+                const isDescendant = moveDescendantIds.has(candidate.id);
+                const disabled = isSelf || isDescendant;
+                const reason = isSelf ? 'Node itu sendiri' : isDescendant ? 'Turunan node ini' : null;
+                return (
+                  <div key={candidate.id} className="flex items-center gap-2">
+                    <RadioGroupItem value={candidate.id} id={`org-move-${candidate.id}`} disabled={disabled} />
+                    <Label htmlFor={`org-move-${candidate.id}`} className={disabled ? 'text-muted-foreground' : undefined}>
+                      {candidate.title}
+                      {reason ? <span className="ml-2 text-xs">({reason})</span> : null}
+                    </Label>
+                  </div>
+                );
+              })}
+            </div>
+          </RadioGroup>
+          {movePreviewPath.length > 0 ? (
+            <p className="text-sm text-foreground" data-testid="org-editor-move-preview">
+              <span className="text-muted-foreground">Path baru: </span>
+              <span className="break-words">{movePreviewPath.join(' / ')}</span>
+            </p>
+          ) : null}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setMoveTargetId(null);
+                setMoveSelection(null);
+              }}
+            >
+              Batal
+            </Button>
+            <Button
+              type="button"
+              disabled={!moveSelection || moveSelection === moveNode?.parentId}
+              onClick={confirmMove}
+            >
+              Pindahkan
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
