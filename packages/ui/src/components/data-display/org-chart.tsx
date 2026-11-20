@@ -420,6 +420,87 @@ export function OrgChart({
     [normalized, positionById, orientation],
   );
 
+  const containerRef = React.useRef<HTMLDivElement>(null);
+
+  // Urutan DFS node visible — basis navigasi keyboard ↑↓/Home/End (pola tree-view).
+  const dfsVisibleIds = React.useMemo(() => {
+    const ids: string[] = [];
+    if (normalized.rootId === null || normalized.error !== null) return ids;
+    const walk = (id: string): void => {
+      if (!visibleIds.has(id)) return;
+      ids.push(id);
+      if (!expandedSet.has(id)) return;
+      for (const childId of normalized.byId.get(id)?.childIds ?? []) {
+        walk(childId);
+      }
+    };
+    walk(normalized.rootId);
+    return ids;
+  }, [normalized, visibleIds, expandedSet]);
+
+  // Node disabled dilewati fokus keyboard dan roving tabindex.
+  const focusableIds = React.useMemo(
+    () => dfsVisibleIds.filter((id) => !normalized.byId.get(id)?.disabled),
+    [dfsVisibleIds, normalized],
+  );
+
+  const [activeId, setActiveId] = React.useState<string | null>(null);
+  const effectiveActiveId =
+    activeId !== null && focusableIds.includes(activeId) ? activeId : (focusableIds[0] ?? null);
+
+  const focusNode = (id: string | null | undefined) => {
+    if (!id) return;
+    setActiveId(id);
+    containerRef.current?.querySelector<HTMLElement>(`[data-node-id="${id}"]`)?.focus();
+  };
+
+  const onNodeKeyDown = (event: React.KeyboardEvent, node: OrgNodeNormalized) => {
+    if (node.disabled) return;
+    const focusIdx = focusableIds.indexOf(node.id);
+    switch (event.key) {
+      case 'ArrowDown':
+        event.preventDefault();
+        focusNode(focusableIds[Math.min(focusIdx + 1, focusableIds.length - 1)] ?? null);
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        focusNode(focusIdx > 0 ? focusableIds[focusIdx - 1] : (focusableIds[0] ?? null));
+        break;
+      case 'ArrowRight':
+        event.preventDefault();
+        if (node.hasChildren && !expandedSet.has(node.id)) {
+          toggleExpanded(node.id);
+          setActiveId(node.id);
+        } else if (node.hasChildren) {
+          const firstChildId = node.childIds[0];
+          if (firstChildId) focusNode(firstChildId);
+        }
+        break;
+      case 'ArrowLeft':
+        event.preventDefault();
+        if (node.hasChildren && expandedSet.has(node.id)) {
+          toggleExpanded(node.id);
+          setActiveId(node.id);
+        } else if (node.parentId) {
+          focusNode(node.parentId);
+        }
+        break;
+      case 'Home':
+        event.preventDefault();
+        focusNode(focusableIds[0] ?? null);
+        break;
+      case 'End':
+        event.preventDefault();
+        focusNode(focusableIds[focusableIds.length - 1] ?? null);
+        break;
+      case 'Enter':
+      case ' ':
+        event.preventDefault();
+        onSelect?.(node);
+        break;
+    }
+  };
+
   if (normalized.error !== null) {
     return (
       <div role="alert" className={cn('rounded-md border border-border bg-card p-4 text-sm text-foreground', className)}>
@@ -432,9 +513,10 @@ export function OrgChart({
 
   return (
     <div
+      ref={containerRef}
       className={cn('relative overflow-auto', className)}
       style={{ width: layout.width, height: layout.height }}
-      role="group"
+      role="tree"
       aria-label={ariaLabel}
     >
       <svg
@@ -454,22 +536,33 @@ export function OrgChart({
         const isSelected = selectedId != null && selectedId === node.id;
         const isExpanded = expandedSet.has(node.id);
         const badgeVariant = node.accent ? ACCENT_BADGE_VARIANT[node.accent] : 'secondary';
+        const siblingIds = node.parentId
+          ? (normalized.byId.get(node.parentId)?.childIds ?? [])
+          : (normalized.rootId ? [normalized.rootId] : []);
+        const siblingIndex = siblingIds.indexOf(node.id);
         return (
           <div
             key={node.id}
+            role="treeitem"
+            aria-level={node.depth + 1}
+            aria-setsize={siblingIds.length}
+            aria-posinset={siblingIndex + 1}
             data-testid="org-chart-node"
             data-node-id={node.id}
             data-selected={isSelected ? 'true' : undefined}
+            tabIndex={node.disabled ? -1 : effectiveActiveId === node.id ? 0 : -1}
             aria-selected={isSelected}
             aria-expanded={node.hasChildren ? isExpanded : undefined}
             aria-disabled={node.disabled ? true : undefined}
             onClick={() => {
               if (node.disabled) return;
+              setActiveId(node.id);
               onSelect?.(node);
             }}
+            onKeyDown={(event) => onNodeKeyDown(event, node)}
             className={cn(
-              'absolute flex items-center gap-2 rounded-md border bg-card pl-4 pr-2 text-card-foreground',
-              'hover:border-primary/60',
+              'absolute flex items-center gap-2 rounded-md border bg-card pl-4 pr-2 text-card-foreground motion-safe:transition-colors',
+              'hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
               isSelected ? 'border-primary ring-2 ring-ring' : 'border-border',
               node.disabled && 'cursor-not-allowed opacity-50',
               !node.disabled && onSelect && 'cursor-pointer',
@@ -493,9 +586,13 @@ export function OrgChart({
                   event.stopPropagation();
                   toggleExpanded(node.id);
                 }}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed"
               >
-                {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                {isExpanded ? (
+                  <ChevronDown className="h-4 w-4 motion-safe:transition-transform" aria-hidden="true" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 motion-safe:transition-transform" aria-hidden="true" />
+                )}
               </button>
             ) : null}
             {renderNode ? (
