@@ -44,6 +44,7 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 | `layout` | Kerangka halaman | app-shell, page-header, page-shell, page-skeleton, container, section, prose, demo-section, resizable, skip-link |
 | `marketing` | Blok presentasi | hero, hero-band, feature-grid, faq, logo-cloud, carousel, cta-band, statement-card, art-background, grid-pattern, dot-pattern, glow-orb, stats-band, section-number, pricing, testimonial, gradient-text |
 | `dnd` | Drag and drop | sortable-list, tree-view, kanban |
+| `canvas` | Kanvas interaktif (xyflow, token-mapped) | org-chart-editor, flow-editor (planned) |
 
 ## 4. Pattern Inventory
 
@@ -72,6 +73,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Onboarding | Step, skip, progress |
 | Optimistic Updates | Perubahan langsung + rollback |
 | Org Chart | Diagram hierarki organisasi read-only: node kaya (avatar/jabatan/badge), collapse/expand, pan/zoom, orientasi top-down/left-right, highlight pencarian (composed, kategori `data-display`); penyusun: org-chart (baru), avatar, badge, skeleton, empty-state, alert, search-input, button |
+| Org Chart Editor | Editor hierarki organisasi: tambah/pindah/hapus node via kanvas + inspector, drag reparent tervalidasi, undo/redo, minimap/fit-view, tooltip + inspector anti-truncate (composed, kategori `canvas` xyflow token-mapped); penyusun: org-chart-editor (baru), sheet, context-menu, tooltip, form, badge, avatar, skeleton, empty-state, button |
 | Product Tour | Highlight, step, dismiss |
 | Results | Sukses/gagal, next action |
 | Rich Text Editor | Toolbar, konten, a11y |

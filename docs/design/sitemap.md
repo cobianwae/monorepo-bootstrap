@@ -71,6 +71,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.30 | Transfer List | `/patterns/transfer-list` | planned |
 | S-005.31 | Cascader & Tree Select | `/patterns/cascader-tree-select` | planned |
 | S-005.32 | Mention & Emoji | `/patterns/mention-emoji` | planned |
+| S-005.33 | Org Chart Editor | `/patterns/org-chart-editor` | in-design |
 | S-006 | Guidelines | `/guidelines` | implemented |
 | S-007 | Contribution | `/contribution` | implemented |
 | S-008 | What's New | `/whats-new` | implemented |
@@ -97,6 +98,8 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | M-001 | File Preview (sheet di desktop, dialog full-screen di mobile) | S-005.27 | in-design |
 | M-002 | Rename / Folder baru (dialog + validasi nama) | S-005.27 | in-design |
 | M-003 | Konfirmasi hapus & pilih folder tujuan move | S-005.27 | in-design |
+| M-004 | Konfirmasi hapus node org chart (reparent vs hapus subtree) | S-005.33 | in-design |
+| M-005 | Pilih atasan baru (dialog pindah + validasi siklus) | S-005.33 | in-design |
 
 ## Route Groups
 

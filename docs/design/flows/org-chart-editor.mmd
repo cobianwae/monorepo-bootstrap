@@ -1,0 +1,76 @@
+<!-- Flow org chart editor — PRD 010, layar S-005.33 -->
+<!-- Job utama: tambah/pindah/hapus node langsung di diagram; -->
+<!-- pendukung: cari orang (highlight + buka path) dan navigasi kanvas -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman org chart editor] --> B{Data organisasi siap?}
+  B -- masih dimuat --> L[Tampilkan skeleton kanvas + inspector]
+  L --> B
+  B -- gagal / tidak valid --> ERR[Tampilkan pesan error: penyebab + id pelanggar pertama]
+  ERR --> E2[User memperbaiki data atau memuat contoh]
+  E2 --> A
+  B -- tanpa data --> EMP[Tampilkan empty state + CTA buat node pertama]
+  EMP --> E3[User membuat root; fokus ke inspector]
+  E3 --> A
+  B -- siap --> C[Diagram dirender: node + edge + minimap + inspector]
+  C --> D{User melipat atau membuka cabang?}
+  D -- ya --> E[Subtree dan edge anak ikut muncul / hilang]
+  E --> D
+  D -- tidak --> F[User memilih node; inspector menampilkan info penuh]
+  F --> D
+```
+
+```mermaid
+flowchart TD
+  A[User menambah, memindah, atau menghapus node] --> B{Jenis operasi?}
+  B -- tambah child/sibling --> C[Form inspector terisi awal; simpan memanggil onChange]
+  B -- pindah via drag --> D{Target valid: bukan diri atau turunan?}
+  D -- tidak --> E[Tolak dengan pesan + snap-back; umumkan via alert]
+  D -- ya --> F[Parent berubah; layout dihitung ulang; dorong undo]
+  B -- pindah via dialog --> G[Pilih atasan baru; preview path; konfirmasi]
+  G --> F
+  B -- hapus --> H{Node punya anak?}
+  H -- ya --> I[Pilih: pindahkan anak ke kakek atau hapus subtree]
+  H -- tidak --> J[Minta konfirmasi hapus]
+  I --> J
+  J -- batal --> A
+  J -- ya --> K[Hapus dan panggil onChange; dorong undo]
+  C --> L[Undo atau edit lanjutan tersedia]
+  F --> L
+  K --> L
+  E --> A
+  L --> A
+```
+
+```mermaid
+flowchart TD
+  A[User mengetik nama atau jabatan di pencarian] --> B{Ada node yang cocok?}
+  B -- tidak --> C[Umumkan tidak ada hasil; diagram tetap]
+  C --> A
+  B -- ya --> D[Sorot node dengan ring; buka path ancestor otomatis]
+  D --> E[Umumkan jumlah cocok dan fokus opsi fit-view]
+  E --> F{User memilih hasil?}
+  F -- ya --> G[Node terpilih; inspector menampilkan detail penuh]
+  G --> A
+  F -- tidak --> H[User menghapus query; sorotan hilang]
+  H --> A
+```
+
+```mermaid
+flowchart TD
+  A[User fokus ke kanvas] --> B{Ingin melihat lebih luas atau dekat?}
+  B -- lebih dekat --> C[Perbesar via controls, ctrl+scroll, atau tombol keyboard]
+  B -- lebih luas --> D[Perkecil dengan cara yang sama]
+  B -- reset --> E[Reset 100 persen atau fit-view seluruh diagram]
+  C --> F{Batas tercapai?}
+  D --> F
+  F -- ya --> G[Hentikan di batas; umumkan level]
+  F -- belum --> H[Skalakan kanvas dan minimap; edge tetap rapi]
+  A --> I[Geser via drag, panah, atau klik minimap]
+  I --> J[Viewport mengikuti; scroll halaman aman]
+  E --> I
+  G --> I
+  H --> I
+  J --> A
+```
