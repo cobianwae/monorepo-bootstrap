@@ -136,7 +136,7 @@ Komponen dirujuk dengan nama file/export, bukan ID terpisah.
 
 ## Rules
 
-1. Gunakan skill yang sesuai sebelum memulai fitur baru. Skills tersedia: `design-tokens`, `ui-component`, `ux-patterns`, `visual-design`, `accessibility`, `product-ux`, `ux-psychology`, `ux-research`, `decision-framework`, `prd-writer`, `designer`, `story-writer`, `reviewer`, `ui-designer`, `visual-designer`.
+1. Gunakan skill yang sesuai sebelum memulai fitur baru. Skills tersedia: `design-tokens`, `ui-component`, `ux-patterns`, `visual-design`, `accessibility`, `product-ux`, `ux-psychology`, `ux-research`, `decision-framework`, `prd-writer`, `designer`, `story-writer`, `reviewer`, `ui-designer`, `visual-designer`, `shared-types`, `backend-nestjs`, `prisma-schema`, `api-testing`, `monorepo-ci`.
 2. Setiap file baru HARUS mengikuti pola existing di direktori yang sama.
 3. Framing bisnis (BA ringan): sebelum implementasi fitur, klasifikasikan requirement dengan MoSCoW (must/should/could/won't have), tulis user story, dan acceptance criteria (Given/When/Then) via skill `product-ux`. Identitas utama kerja adalah UI/UX — BA cukup untuk membingkai, jangan bertele-tele.
 4. Design tokens: Wajib menggunakan OKLCH, selalu audit kontras WCAG AA (>= 4.5:1 untuk teks), dan sediakan light & dark mode parity (skill `design-tokens`).

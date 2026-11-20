@@ -1,6 +1,6 @@
 ---
 name: decision-framework
-description: Integration layer untuk memilih skill yang tepat — trade-off analysis, prioritization matrix, dan decision trees untuk visual vs UX vs a11y vs business
+description: Integration layer untuk memilih skill yang tepat — trade-off analysis, prioritization matrix, decision trees untuk visual vs UX vs a11y vs business, dan routing fullstack (shared-types, NestJS, Prisma, testing, CI)
 tags: [design-system, decision, framework, trade-offs, prioritization, integration]
 compatibility: [next, opencode, claude, cursor]
 ---
@@ -28,6 +28,29 @@ START: Perubahan apa yang akan dilakukan?
 ```
 
 Gunakan `decision-framework` untuk memilih jalur, lalu panggil skill domain yang relevan.
+
+### 0b. Fullstack Change Routing
+
+```
+START: Perubahan menyentuh area mana?
+│
+├─ Tipe/DTO di packages/shared-types?
+│   └─→ shared-types → cek consumer (api/web/showcase) → monorepo-ci (typecheck workspace)
+│
+├─ Endpoint/service/module di apps/api?
+│   └─→ shared-types (kontrak dulu) → backend-nestjs → api-testing → monorepo-ci
+│
+├─ Schema/migration database?
+│   └─→ prisma-schema (konfirmasi dependency bila first-time) → shared-types (sinkron tipe) → backend-nestjs → api-testing
+│
+├─ Test API saja?
+│   └─→ api-testing → monorepo-ci
+│
+└─ Komponen UI / token / showcase?
+    └─→ kembali ke routing Design System (0a) di atas
+```
+
+Urutan tetap mengikuti gate: PRD → design → story → implementasi. Skill fullstack tidak membuat gate baru.
 
 ### 1. Skill Selection Decision Tree
 
@@ -405,6 +428,25 @@ Phase 5 - Validate:
 3. ui-designer / visual-designer / design-tokens / accessibility → Susun perbaikan
 4. reviewer → Review artefak dan temuan
 5. CR → branch cr-NNN-slug, commit [CR-NNN], verifikasi, update BACKLOG/STATUS
+```
+
+### Workflow 5: Fullstack Feature (API + Types)
+
+```yaml
+Phase 0 - Framing:
+  1. product-ux / prd-writer → PRD dengan FR-NNN (gate 1) — workflow UI tetap berlaku
+
+Phase 1 - Contract:
+  1. shared-types → definisikan/perbarui tipe request-response di @shared/types
+  2. Cek consumer: apps/api, apps/web, apps/showcase
+
+Phase 2 - Implementasi:
+  1. prisma-schema → model + migration bila perlu persistence (konfirmasi dependency first-time)
+  2. backend-nestjs → module + DTO class-validator + exception filter + typed ApiResponse
+  3. api-testing → unit service + integration endpoint
+
+Phase 3 - Verify:
+  1. monorepo-ci → typecheck workspace, lint, test, check-status-log
 ```
 
 ---
