@@ -5,6 +5,8 @@ import { ChevronDown, ChevronRight, Maximize, Minus, Plus } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../base/avatar';
 import { Badge } from '../base/badge';
+import { Skeleton } from '../base/skeleton';
+import { EmptyState } from '../feedback/empty-state';
 
 export type OrgChartAccent = 'primary' | 'success' | 'warning' | 'info' | 'destructive';
 
@@ -47,6 +49,8 @@ export interface OrgChartProps {
   renderNode?: (node: OrgNodeNormalized) => React.ReactNode;
   onSelect?: (node: OrgNodeNormalized) => void;
   ariaLabel?: string;
+  emptyActionLabel?: string;
+  onEmptyAction?: () => void;
   className?: string;
 }
 
@@ -68,6 +72,20 @@ interface NormalizedResult {
   byId: Map<string, OrgNodeNormalized>;
   rootId: string | null;
   error: OrgChartError | null;
+  isEmpty: boolean;
+}
+
+export function getAncestors(nodes: OrgNodeFlat[], id: string): string[] {
+  const byId = new Map(nodes.map((node) => [node.id, node]));
+  const ancestors: string[] = [];
+  const seen = new Set<string>([id]);
+  let current = byId.get(id);
+  while (current?.parentId != null && !seen.has(current.parentId)) {
+    seen.add(current.parentId);
+    ancestors.push(current.parentId);
+    current = byId.get(current.parentId);
+  }
+  return ancestors.reverse();
 }
 
 function flattenNested(root: OrgNodeNested): OrgNodeFlat[] {
@@ -86,6 +104,10 @@ function flattenNested(root: OrgNodeNested): OrgNodeFlat[] {
 function normalizeInput(data: OrgChartInput): NormalizedResult {
   const flat: OrgNodeFlat[] = Array.isArray(data) ? [...data] : flattenNested(data);
 
+  if (flat.length === 0) {
+    return { nodes: [], byId: new Map(), rootId: null, error: null, isEmpty: true };
+  }
+
   const byId = new Map<string, OrgNodeFlat>();
   for (const node of flat) {
     if (byId.has(node.id)) {
@@ -98,6 +120,7 @@ function normalizeInput(data: OrgChartInput): NormalizedResult {
           message: `ID duplikat: "${node.id}" muncul lebih dari sekali.`,
           nodeId: node.id,
         },
+        isEmpty: false,
       };
     }
     byId.set(node.id, node);
@@ -115,6 +138,7 @@ function normalizeInput(data: OrgChartInput): NormalizedResult {
         message: `Harus tepat satu root, ditemukan ${roots.length}.`,
         nodeId: extra ? extra.id : null,
       },
+      isEmpty: false,
     };
   }
   const rootId = roots[0].id;
@@ -130,6 +154,7 @@ function normalizeInput(data: OrgChartInput): NormalizedResult {
           message: `Parent "${node.parentId}" dari node "${node.id}" tidak ditemukan.`,
           nodeId: node.id,
         },
+        isEmpty: false,
       };
     }
   }
@@ -182,6 +207,7 @@ function normalizeInput(data: OrgChartInput): NormalizedResult {
         message: `Siklus terdeteksi pada node "${cycleId}".`,
         nodeId: cycleId,
       },
+      isEmpty: false,
     };
   }
 
@@ -196,7 +222,7 @@ function normalizeInput(data: OrgChartInput): NormalizedResult {
   });
   const normalizedById = new Map(nodes.map((node) => [node.id, node]));
 
-  return { nodes, byId: normalizedById, rootId, error: null };
+  return { nodes, byId: normalizedById, rootId, error: null, isEmpty: false };
 }
 
 interface OrgNodePosition {
@@ -341,10 +367,15 @@ export function OrgChart({
   expandedIds,
   onExpandedChange,
   selectedId,
+  highlightedIds = [],
+  loading = false,
+  error,
   zoomRange,
   renderNode,
   onSelect,
   ariaLabel = 'Org chart',
+  emptyActionLabel,
+  onEmptyAction,
   className,
 }: OrgChartProps) {
   const normalized = React.useMemo(() => normalizeInput(data), [data]);
@@ -602,10 +633,58 @@ export function OrgChart({
     }
   };
 
+  const highlightedSet = new Set(highlightedIds);
+
+  if (loading) {
+    return (
+      <div
+        aria-busy="true"
+        aria-label={`${ariaLabel} loading`}
+        className={cn(
+          'relative flex min-h-[320px] w-full flex-col items-center justify-center gap-6 overflow-hidden rounded-md border border-border bg-background p-8 md:min-h-[480px]',
+          className,
+        )}
+      >
+        <div className="flex flex-col items-center gap-4" aria-hidden="true">
+          <Skeleton data-testid="org-chart-skeleton-box" className="h-[72px] w-[200px]" />
+          <div className="h-8 w-px bg-border" />
+          <div className="flex gap-4">
+            <Skeleton data-testid="org-chart-skeleton-box" className="h-[72px] w-[200px]" />
+            <Skeleton data-testid="org-chart-skeleton-box" className="h-[72px] w-[200px]" />
+            <Skeleton data-testid="org-chart-skeleton-box" className="h-[72px] w-[200px]" />
+          </div>
+          <div className="flex gap-4">
+            <Skeleton data-testid="org-chart-skeleton-box" className="h-[72px] w-[200px]" />
+            <Skeleton data-testid="org-chart-skeleton-box" className="h-[72px] w-[200px]" />
+            <Skeleton data-testid="org-chart-skeleton-box" className="h-[72px] w-[200px]" />
+            <Skeleton data-testid="org-chart-skeleton-box" className="h-[72px] w-[200px]" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (normalized.error !== null) {
     return (
       <div role="alert" className={cn('rounded-md border border-border bg-card p-4 text-sm text-foreground', className)}>
-        {normalized.error.message}
+        <p>{normalized.error.message}</p>
+        {normalized.error.nodeId ? (
+          <p className="mt-1 text-muted-foreground">Node terkait: &quot;{normalized.error.nodeId}&quot;</p>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (normalized.isEmpty) {
+    return (
+      <div className={cn('w-full', className)}>
+        <EmptyState
+          role="status"
+          title="Belum ada data organisasi"
+          description="Sediakan data flat (id/parentId) atau nested (children) dengan tepat satu root. Contoh: [{ id: 'ceo', parentId: null, title: 'CEO' }]."
+          actionLabel={emptyActionLabel}
+          onAction={onEmptyAction}
+        />
       </div>
     );
   }
@@ -614,7 +693,7 @@ export function OrgChart({
 
   const zoomPercent = Math.round(zoomLevel * 100);
 
-  return (
+  const canvas = (
     <div
       ref={canvasRef}
       role="region"
@@ -658,6 +737,7 @@ export function OrgChart({
         const position = positionById.get(node.id);
         if (!position) return null;
         const isSelected = selectedId != null && selectedId === node.id;
+        const isHighlighted = highlightedSet.has(node.id);
         const isExpanded = expandedSet.has(node.id);
         const badgeVariant = node.accent ? ACCENT_BADGE_VARIANT[node.accent] : 'secondary';
         const siblingIds = node.parentId
@@ -674,6 +754,7 @@ export function OrgChart({
             data-testid="org-chart-node"
             data-node-id={node.id}
             data-selected={isSelected ? 'true' : undefined}
+            data-highlighted={isHighlighted ? 'true' : undefined}
             tabIndex={node.disabled ? -1 : effectiveActiveId === node.id ? 0 : -1}
             aria-selected={isSelected}
             aria-expanded={node.hasChildren ? isExpanded : undefined}
@@ -687,7 +768,7 @@ export function OrgChart({
             className={cn(
               'absolute flex items-center gap-2 rounded-md border bg-card pl-4 pr-2 text-card-foreground motion-safe:transition-colors',
               'hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-              isSelected ? 'border-primary ring-2 ring-ring' : 'border-border',
+              isSelected || isHighlighted ? 'border-primary ring-2 ring-ring' : 'border-border',
               node.disabled && 'cursor-not-allowed opacity-50',
               !node.disabled && onSelect && 'cursor-pointer',
             )}
@@ -781,4 +862,20 @@ export function OrgChart({
       </div>
     </div>
   );
+
+  if (error) {
+    return (
+      <div className="w-full space-y-2">
+        <div
+          role="alert"
+          className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-foreground"
+        >
+          {error}
+        </div>
+        {canvas}
+      </div>
+    );
+  }
+
+  return canvas;
 }

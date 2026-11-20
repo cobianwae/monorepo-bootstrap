@@ -55,7 +55,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 003-02 | Node kaya + aksen + expand/collapse + select | done | `docs/stories/003-02-rich-node-expand-select.md` |
 | 003-03 | A11y penuh: role tree + navigasi keyboard | done | `docs/stories/003-03-a11y-tree-keyboard.md` |
 | 003-04 | Pan/zoom kanvas + kontrol zoom + orientasi | done | `docs/stories/003-04-pan-zoom-orientation.md` |
-| 003-05 | State matrix + highlight pencarian + scenario showcase | todo | `docs/stories/003-05-states-search-showcase.md` |
+| 003-05 | State matrix + highlight pencarian + scenario showcase | review | `docs/stories/003-05-states-search-showcase.md` |
 
 ## Change Requests
 

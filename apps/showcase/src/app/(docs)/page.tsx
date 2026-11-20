@@ -43,6 +43,7 @@ import {
   Upload,
   Wand2,
   ListTree,
+  Network,
 } from 'lucide-react';
 import {
   Card,
@@ -224,6 +225,14 @@ export default function OverviewPage() {
       description: 'Folder tree + breadcrumb, list/grid content, bulk actions, upload quota, and media preview.',
       href: '/patterns/file-manager',
       icon: FolderOpen,
+      badge: 'Composed',
+      tag: 'PATTERN',
+    },
+    {
+      title: 'Org Chart',
+      description: 'Hierarki organisasi 40 orang dengan state matrix, highlight pencarian, toggle orientasi, dan pan/zoom keyboard.',
+      href: '/patterns/org-chart',
+      icon: Network,
       badge: 'Composed',
       tag: 'PATTERN',
     },

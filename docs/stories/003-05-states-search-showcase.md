@@ -1,6 +1,6 @@
 # 003-05 — State matrix, highlight pencarian, scenario showcase final
 
-Status: approved (gate 3)
+Status: review
 PRD: `docs/prd/003-org-chart.md`
 FR: `FR-011`, `FR-009`, `FR-012` (penguat `FR-001`, `FR-007`, `FR-008`)
 Screens: `S-005.28`
@@ -34,11 +34,11 @@ Goal: Menutup state matrix (loading/empty/error) pada komponen, menyediakan high
 
 ## Tasks
 
-- [ ] State matrix komponen: loading skeleton (`aria-busy`), empty (`role="status"`), error data invalid (`role="alert"`, penyebab + id pertama), error eksternal prop (alert di atas kanvas) — wireframe §4
-- [ ] `highlightedIds` (ring + `data-highlighted`) + export util `getAncestors(flatNodes, id)` (design D8)
-- [ ] Showcase `/patterns/org-chart`: data ±40 orang / 4 tingkat / 4 departemen; toolbar demo (pencarian + live region, toggle orientasi, pemicu state, dataset invalid); papan zoom/pan keyboard; catatan a11y; light/dark
-- [ ] Update `docs/BACKLOG.md` + `docs/STATUS.md` + append `docs/STATUS-LOG.md`
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test` → `pnpm -C apps/showcase build`
+- [x] State matrix komponen: loading skeleton (`aria-busy`), empty (`role="status"`), error data invalid (`role="alert"`, penyebab + id pertama), error eksternal prop (alert di atas kanvas) — wireframe §4
+- [x] `highlightedIds` (ring + `data-highlighted`) + export util `getAncestors(flatNodes, id)` (design D8)
+- [x] Showcase `/patterns/org-chart`: data ±40 orang / 4 tingkat / 4 departemen; toolbar demo (pencarian + live region, toggle orientasi, pemicu state, dataset invalid); papan zoom/pan keyboard; catatan a11y; light/dark
+- [x] Update `docs/BACKLOG.md` + `docs/STATUS.md` + append `docs/STATUS-LOG.md`
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test` → `pnpm -C apps/showcase build`
 
 ## Dependencies
 

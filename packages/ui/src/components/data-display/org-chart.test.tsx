@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { OrgChart, type OrgChartInput } from './org-chart';
+import { OrgChart, getAncestors, type OrgChartInput } from './org-chart';
 
 const flatData: OrgChartInput = [
   { id: 'ceo', parentId: null, title: 'CEO' },
@@ -481,6 +481,63 @@ describe('OrgChart', () => {
       }
       expect(lrPositions[0].id).toBe('ceo');
       expect(lrPositions[0].left).toBe('0px');
+    });
+  });
+
+  describe('003-05 state matrix, highlight, dan getAncestors', () => {
+    it('AC-01: loading menampilkan skeleton 8 kotak dengan aria-busy', () => {
+      const { container } = render(<OrgChart data={flatData} loading />);
+      const busy = container.querySelector('[aria-busy="true"]');
+      expect(busy).toBeTruthy();
+      expect(container.querySelectorAll('[data-testid="org-chart-skeleton-box"]')).toHaveLength(8);
+      expect(screen.queryByRole('tree')).toBeNull();
+    });
+
+    it('AC-01: data kosong menampilkan empty-state role=status dengan CTA keyboard', () => {
+      const onEmptyAction = vi.fn();
+      render(<OrgChart data={[]} emptyActionLabel="Muat data contoh" onEmptyAction={onEmptyAction} />);
+      const status = screen.getByRole('status');
+      expect(status.textContent).toContain('Belum ada data organisasi');
+      const cta = screen.getByRole('button', { name: 'Muat data contoh' });
+      fireEvent.click(cta);
+      expect(onEmptyAction).toHaveBeenCalledTimes(1);
+    });
+
+    it('AC-01: error invalid menampilkan penyebab dan id pertama', () => {
+      const data: OrgChartInput = [
+        { id: 'a', parentId: null, title: 'A' },
+        { id: 'b', parentId: 'missing', title: 'B' },
+      ];
+      render(<OrgChart data={data} />);
+      const alert = screen.getByRole('alert');
+      expect(alert.textContent).toContain('tidak ditemukan');
+      expect(alert.textContent).toContain('"b"');
+    });
+
+    it('AC-01: error eksternal tampil di atas kanvas dan diagram tetap tampil', () => {
+      render(<OrgChart data={flatData} error="Gagal memuat data organisasi." />);
+      expect(screen.getByRole('alert').textContent).toContain('Gagal memuat');
+      expect(screen.getByRole('tree')).toBeTruthy();
+      expect(screen.getAllByRole('treeitem').length).toBeGreaterThan(0);
+    });
+
+    it('AC-02: highlightedIds memberi ring dan data-highlighted pada node target', () => {
+      const { container } = render(<OrgChart data={flatData} highlightedIds={['fe']} />);
+      const target = container.querySelector('[data-node-id="fe"]');
+      expect(target?.getAttribute('data-highlighted')).toBe('true');
+      expect(target?.className).toContain('ring-2');
+      expect(container.querySelector('[data-node-id="be"]')?.getAttribute('data-highlighted')).toBeNull();
+    });
+
+    it('AC-02: getAncestors mengembalikan path root sampai parent', () => {
+      const flat = [
+        { id: 'ceo', parentId: null, title: 'CEO' },
+        { id: 'eng', parentId: 'ceo', title: 'Engineering' },
+        { id: 'fe', parentId: 'eng', title: 'Frontend' },
+      ];
+      expect(getAncestors(flat, 'fe')).toEqual(['ceo', 'eng']);
+      expect(getAncestors(flat, 'ceo')).toEqual([]);
+      expect(getAncestors(flat, 'unknown')).toEqual([]);
     });
   });
 });
