@@ -1,4 +1,4 @@
-import { fireEvent, render, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   OrgChartEditor,
@@ -182,6 +182,94 @@ describe('OrgChartEditor fondasi', () => {
     const alerts = container.querySelectorAll('[role="alert"]');
     expect(alerts.length).toBeGreaterThan(0);
     expect(container.querySelector('[data-testid="org-editor-node"]')).not.toBeNull();
+  });
+
+  it('tambah child via tombol + memanggil onChange sekali dengan id unik', () => {
+    const onChange = vi.fn();
+    const { container } = render(<OrgChartEditor data={flatData} onChange={onChange} />);
+    const add = container.querySelector('[aria-label="Tambah bawahan CTO"]') as HTMLButtonElement;
+    expect(add).not.toBeNull();
+    fireEvent.click(add);
+    fireEvent.change(screen.getByLabelText('Nama'), { target: { value: 'QA Engineer' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Simpan' }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const payload = onChange.mock.calls[0][0] as { id: string; parentId: string | null; title: string }[];
+    const created = payload.find((n) => n.title === 'QA Engineer');
+    expect(created).toBeDefined();
+    expect(created?.parentId).toBe('cto');
+    expect(payload.map((n) => n.id)).toEqual(new Set(payload.map((n) => n.id)).size === payload.length ? payload.map((n) => n.id) : []);
+    expect(container.querySelector('[data-node-id="' + created?.id + '"]')).not.toBeNull();
+  });
+
+  it('tambah sibling via toolbar menempatkan parent yang benar', () => {
+    const onChange = vi.fn();
+    const { container } = render(<OrgChartEditor data={flatData} onChange={onChange} />);
+    fireEvent.click(container.querySelector('[data-node-id="eng"]') as HTMLElement);
+    fireEvent.click(screen.getByRole('button', { name: 'Tambah sibling' }));
+    fireEvent.change(screen.getByLabelText('Nama'), { target: { value: 'Sister Engineer' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Simpan' }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const payload = onChange.mock.calls[0][0] as { parentId: string | null; title: string }[];
+    expect(payload.find((n) => n.title === 'Sister Engineer')?.parentId).toBe('cto');
+  });
+
+  it('edit live + validasi nama kosong ditolak tanpa onChange', () => {
+    const onChange = vi.fn();
+    const { container } = render(<OrgChartEditor data={flatData} onChange={onChange} />);
+    fireEvent.click(container.querySelector('[data-node-id="cfo"]') as HTMLElement);
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    const nameInput = screen.getByLabelText('Nama');
+    fireEvent.change(nameInput, { target: { value: '   ' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Simpan' }));
+    expect(nameInput.getAttribute('aria-invalid')).toBe('true');
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.change(nameInput, { target: { value: 'Chief Financial Officer' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Simpan' }));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(container.textContent).toContain('Chief Financial Officer');
+  });
+
+  it('inspector menampilkan field panjang + path tanpa truncate', () => {
+    const long = 'Kepala Divisi Rekayasa Perangkat Lunak Senior Sekali';
+    const { container } = render(
+      <OrgChartEditor data={[{ id: 'r', parentId: null, title: 'Root Panjang Sekali' }, { id: 'c', parentId: 'r', title: long }]} />,
+    );
+    fireEvent.click(container.querySelector('[data-node-id="c"]') as HTMLElement);
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    expect(screen.getByDisplayValue(long)).toBeTruthy();
+    expect(String(document.querySelector('[data-testid="org-editor-inspector-meta"]')?.textContent)).toContain('Root Panjang Sekali / ' + long);
+  });
+
+  it('hapus daun via dialog memanggil onChange sekali', () => {
+    const onChange = vi.fn();
+    const { container } = render(<OrgChartEditor data={flatData} onChange={onChange} />);
+    fireEvent.click(container.querySelector('[data-node-id="eng"]') as HTMLElement);
+    fireEvent.click(screen.getByRole('button', { name: 'Hapus' }));
+    const buttons = screen.getAllByRole('button', { name: 'Hapus' });
+    fireEvent.click(buttons[buttons.length - 1]);
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const payload = onChange.mock.calls[0][0] as { id: string }[];
+    expect(payload.find((n) => n.id === 'eng')).toBeUndefined();
+  });
+
+  it('hapus parent dengan reparent memindahkan anak ke kakek', () => {
+    const onChange = vi.fn();
+    const { container } = render(<OrgChartEditor data={flatData} onChange={onChange} />);
+    fireEvent.click(container.querySelector('[data-node-id="cto"]') as HTMLElement);
+    fireEvent.click(screen.getByRole('button', { name: 'Hapus' }));
+    const buttons = screen.getAllByRole('button', { name: 'Hapus' });
+    fireEvent.click(buttons[buttons.length - 1]);
+    expect(onChange).toHaveBeenCalledTimes(1);
+    const payload = onChange.mock.calls[0][0] as { id: string; parentId: string | null }[];
+    expect(payload.find((n) => n.id === 'cto')).toBeUndefined();
+    expect(payload.find((n) => n.id === 'eng')?.parentId).toBe('ceo');
+  });
+
+  it('root tidak dapat dihapus', () => {
+    const { container } = render(<OrgChartEditor data={flatData} />);
+    fireEvent.click(container.querySelector('[data-node-id="ceo"]') as HTMLElement);
+    expect(screen.getByRole('button', { name: 'Hapus' })).toHaveProperty('disabled', true);
+    expect(screen.getByText('Root tidak dapat dihapus')).toBeTruthy();
   });
 
   it('node panjang terbaca penuh via title tooltip', () => {
