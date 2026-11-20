@@ -1,6 +1,6 @@
 # 003-02 — Node kaya, aksen departemen, expand/collapse, select
 
-Status: review
+Status: done
 PRD: `docs/prd/003-org-chart.md`
 FR: `FR-002`, `FR-003`, `FR-005`, `FR-007`
 Screens: `S-005.28`
