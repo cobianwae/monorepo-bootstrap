@@ -1,6 +1,6 @@
 # 003-04 — Pan/zoom kanvas, kontrol zoom, orientasi top-down & left-right
 
-Status: approved (gate 3)
+Status: review
 PRD: `docs/prd/003-org-chart.md`
 FR: `FR-006`, `FR-008`
 Screens: `S-005.28`
@@ -34,13 +34,13 @@ Goal: Kanvas dapat di-pan dan di-zoom dengan batas wajar, kontrol zoom [−][%][
 
 ## Tasks
 
-- [ ] Kanvas wrapper `overflow-hidden` + `transform: translate() scale()`; state zoom/pan internal uncontrolled (design D5)
-- [ ] Kontrol zoom mengambang [−][%][+][reset]; tombol persen `aria-live="polite"`
-- [ ] Zoom: tombol, Ctrl/Cmd+wheel (wheel polos aman), keyboard mode kanvas; `zoomRange` default 0.5–2 step 0.25
-- [ ] Pan: drag pointer + panah 40 px; `0` = reset ke 100% + posisi awal
-- [ ] Orientasi `left-right`: swap sumbu layout + mirror konektor
-- [ ] Test co-located: batas zoom & reset, wheel polos tidak dicegat, pan keyboard, layout + konektor LR
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
+- [x] Kanvas wrapper `overflow-hidden` + `transform: translate() scale()`; state zoom/pan internal uncontrolled (design D5)
+- [x] Kontrol zoom mengambang [−][%][+][reset]; tombol persen `aria-live="polite"`
+- [x] Zoom: tombol, Ctrl/Cmd+wheel (wheel polos aman), keyboard mode kanvas; `zoomRange` default 0.5–2 step 0.25
+- [x] Pan: drag pointer + panah 40 px; `0` = reset ke 100% + posisi awal
+- [x] Orientasi `left-right`: swap sumbu layout + mirror konektor
+- [x] Test co-located: batas zoom & reset, wheel polos tidak dicegat, pan keyboard, layout + konektor LR
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
 
 ## Dependencies
 

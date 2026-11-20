@@ -214,7 +214,9 @@ describe('OrgChart', () => {
 
   it('003-02 AC-01: expander hanya untuk node beranak dan berukuran minimal 32x32', () => {
     const { container } = render(<OrgChart data={flatData} />);
-    const buttons = Array.from(container.querySelectorAll('button'));
+    const buttons = Array.from(container.querySelectorAll('button')).filter((button) =>
+      /^(Collapse|Perluas) /.test(button.getAttribute('aria-label') ?? ''),
+    );
     // ceo + eng
     expect(buttons).toHaveLength(2);
     for (const button of buttons) {
@@ -346,7 +348,8 @@ describe('OrgChart', () => {
     expect(expander.className).toContain('h-8');
     expect(expander.className).toContain('w-8');
     expect(expander.className).toContain('focus-visible:ring-ring');
-    expect(container.querySelectorAll('button')).toHaveLength(2);
+    // 2 expander (ceo + eng) + 3 kontrol zoom
+    expect(container.querySelectorAll('button')).toHaveLength(5);
     fireEvent.click(expander);
     expect(screen.getByRole('button', { name: 'Perluas Engineering' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Perluas Engineering' }));
@@ -361,10 +364,123 @@ describe('OrgChart', () => {
     for (const button of Array.from(buttons)) {
       expect(button.className).toContain('motion-safe:transition-colors');
     }
-    const icons = container.querySelectorAll('button svg');
+    const icons = container.querySelectorAll('button[aria-label^="Collapse"] svg, button[aria-label^="Perluas"] svg');
     expect(icons.length).toBeGreaterThan(0);
     for (const icon of Array.from(icons)) {
       expect((icon as unknown as { className: { baseVal: string } }).className.baseVal ?? icon.getAttribute('class')).toContain('motion-safe:transition-transform');
     }
+  });
+
+  describe('003-04 pan/zoom/orientasi', () => {
+    function treeEl(container: HTMLElement): HTMLElement {
+      return container.querySelector('[role="tree"]') as HTMLElement;
+    }
+
+    it('003-04 AC-01: tombol zoom mengubah level dalam batas 0.5–2 step 0.25, reset kembali 100%', () => {
+      const { container } = render(<OrgChart data={flatData} />);
+      const level = () => screen.getByTestId('org-chart-zoom-level').textContent;
+      expect(level()).toBe('100%');
+      fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
+      expect(level()).toBe('125%');
+      fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }));
+      expect(level()).toBe('100%');
+      for (let i = 0; i < 8; i += 1) fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
+      expect(level()).toBe('200%');
+      fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
+      expect(level()).toBe('200%');
+      for (let i = 0; i < 8; i += 1) fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }));
+      expect(level()).toBe('50%');
+      fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }));
+      expect(level()).toBe('50%');
+      fireEvent.keyDown(screen.getByRole('region'), { key: 'ArrowRight' });
+      fireEvent.click(screen.getByRole('button', { name: 'Reset zoom' }));
+      expect(level()).toBe('100%');
+      expect(treeEl(container).style.transform).toBe('translate(0px, 0px) scale(1)');
+    });
+
+    it('003-04 AC-01: zoomRange kustom mengatur batas', () => {
+      render(<OrgChart data={flatData} zoomRange={{ min: 0.75, max: 1.5, step: 0.25 }} />);
+      const level = () => screen.getByTestId('org-chart-zoom-level').textContent;
+      for (let i = 0; i < 5; i += 1) fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
+      expect(level()).toBe('150%');
+      for (let i = 0; i < 5; i += 1) fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }));
+      expect(level()).toBe('75%');
+    });
+
+    it('003-04 AC-01: Ctrl/Cmd+wheel zoom, wheel polos tidak dicegat', () => {
+      render(<OrgChart data={flatData} />);
+      const canvas = screen.getByRole('region');
+      const level = () => screen.getByTestId('org-chart-zoom-level').textContent;
+      const plain = fireEvent.wheel(canvas, { deltaY: -100 });
+      expect(plain).toBe(true);
+      expect(level()).toBe('100%');
+      const zoomed = fireEvent.wheel(canvas, { ctrlKey: true, deltaY: -100 });
+      expect(zoomed).toBe(false);
+      expect(level()).toBe('125%');
+      fireEvent.wheel(canvas, { metaKey: true, deltaY: 100 });
+      expect(level()).toBe('100%');
+    });
+
+    it('003-04 AC-02: panah di kanvas menggeser konten 40px, +/−/0 zoom & reset', () => {
+      const { container } = render(<OrgChart data={flatData} />);
+      const canvas = screen.getByRole('region');
+      fireEvent.keyDown(canvas, { key: 'ArrowRight' });
+      expect(treeEl(container).style.transform).toBe('translate(40px, 0px) scale(1)');
+      fireEvent.keyDown(canvas, { key: 'ArrowDown' });
+      expect(treeEl(container).style.transform).toBe('translate(40px, 40px) scale(1)');
+      fireEvent.keyDown(canvas, { key: '+' });
+      expect(screen.getByTestId('org-chart-zoom-level').textContent).toBe('125%');
+      fireEvent.keyDown(canvas, { key: '-' });
+      expect(screen.getByTestId('org-chart-zoom-level').textContent).toBe('100%');
+      fireEvent.keyDown(canvas, { key: '0' });
+      expect(treeEl(container).style.transform).toBe('translate(0px, 0px) scale(1)');
+    });
+
+    it('003-04 AC-02: drag pointer menggeser konten', () => {
+      const { container } = render(<OrgChart data={flatData} />);
+      const canvas = screen.getByRole('region');
+      fireEvent.pointerDown(canvas, { button: 0, clientX: 10, clientY: 10, pointerId: 1 });
+      fireEvent.pointerMove(canvas, { clientX: 50, clientY: 30, pointerId: 1 });
+      expect(treeEl(container).style.transform).toBe('translate(40px, 20px) scale(1)');
+      fireEvent.pointerUp(canvas, { pointerId: 1 });
+    });
+
+    it('003-04 AC-03: kanvas region dan node adalah stop fokus terpisah; persen aria-live polite', () => {
+      const { container } = render(<OrgChart data={flatData} />);
+      const canvas = screen.getByRole('region', { name: 'Org chart canvas' });
+      expect(canvas.getAttribute('tabindex')).toBe('0');
+      expect(canvas.className).toContain('overflow-hidden');
+      expect(screen.getByRole('button', { name: 'Zoom in' })).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Zoom out' })).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Reset zoom' })).toBeTruthy();
+      const level = screen.getByTestId('org-chart-zoom-level');
+      expect(level.getAttribute('aria-live')).toBe('polite');
+      const activeNodes = screen.getAllByRole('treeitem').filter((el) => el.getAttribute('tabindex') === '0');
+      expect(activeNodes).toHaveLength(1);
+      fireEvent.keyDown(activeNodes[0], { key: 'ArrowDown' });
+      expect(treeEl(container).style.transform).toBe('translate(0px, 0px) scale(1)');
+    });
+
+    it('003-04 AC-04: left-right menukar sumbu dan mirror konektor tanpa merusak layout', () => {
+      const td = render(<OrgChart data={flatData} orientation="top-down" />);
+      const tdPositions = nodePositions(td.container);
+      const tdPaths = Array.from(td.container.querySelectorAll('[data-testid="org-chart-connector"]')).map((el) => el.getAttribute('d'));
+      td.unmount();
+      const lr = render(<OrgChart data={flatData} orientation="left-right" />);
+      const lrPositions = nodePositions(lr.container);
+      const lrPaths = Array.from(lr.container.querySelectorAll('[data-testid="org-chart-connector"]')).map((el) => el.getAttribute('d'));
+      expect(lrPositions.map((p) => p.id)).toEqual(tdPositions.map((p) => p.id));
+      for (let i = 0; i < tdPositions.length; i += 1) {
+        expect(lrPositions[i].left).toBe(tdPositions[i].top);
+        expect(lrPositions[i].top).toBe(tdPositions[i].left);
+      }
+      expect(lrPaths).toHaveLength(tdPaths.length);
+      for (const d of lrPaths) {
+        expect(d).toContain('H');
+        expect(d).toContain('V');
+      }
+      expect(lrPositions[0].id).toBe('ceo');
+      expect(lrPositions[0].left).toBe('0px');
+    });
   });
 });

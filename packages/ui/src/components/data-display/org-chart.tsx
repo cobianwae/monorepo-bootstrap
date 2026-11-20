@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Maximize, Minus, Plus } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../base/avatar';
 import { Badge } from '../base/badge';
@@ -341,6 +341,7 @@ export function OrgChart({
   expandedIds,
   onExpandedChange,
   selectedId,
+  zoomRange,
   renderNode,
   onSelect,
   ariaLabel = 'Org chart',
@@ -420,7 +421,100 @@ export function OrgChart({
     [normalized, positionById, orientation],
   );
 
+  const canvasRef = React.useRef<HTMLDivElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
+
+  // Pan/zoom uncontrolled (design D5, FR-006): zoom default 0.5–2 step 0.25.
+  const zoomMin = zoomRange?.min ?? 0.5;
+  const zoomMax = zoomRange?.max ?? 2;
+  const zoomStep = zoomRange?.step ?? 0.25;
+  const [zoomLevel, setZoomLevel] = React.useState(1);
+  const [pan, setPan] = React.useState({ x: 0, y: 0 });
+
+  const clampZoom = (value: number): number => {
+    const stepped = Math.round(value / zoomStep) * zoomStep;
+    const clamped = Math.min(zoomMax, Math.max(zoomMin, stepped));
+    return Number(clamped.toFixed(4));
+  };
+  const zoomIn = () => setZoomLevel((current) => clampZoom(current + zoomStep));
+  const zoomOut = () => setZoomLevel((current) => clampZoom(current - zoomStep));
+  const resetView = () => {
+    setZoomLevel(1);
+    setPan({ x: 0, y: 0 });
+  };
+
+  // Ctrl/Cmd+wheel zoom hanya di dalam kanvas; wheel polos tidak dicegat.
+  // Listener native non-passive agar preventDefault efektif di browser.
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const onWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      event.preventDefault();
+      const direction = event.deltaY < 0 ? 1 : -1;
+      setZoomLevel((current) => {
+        const stepped = Math.round((current + direction * zoomStep) / zoomStep) * zoomStep;
+        return Number(Math.min(zoomMax, Math.max(zoomMin, stepped)).toFixed(4));
+      });
+    };
+    canvas.addEventListener('wheel', onWheel, { passive: false });
+    return () => canvas.removeEventListener('wheel', onWheel);
+  }, [zoomMin, zoomMax, zoomStep]);
+
+  const dragRef = React.useRef<{ startX: number; startY: number; panX: number; panY: number } | null>(null);
+
+  const onCanvasPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+    if ((event.target as HTMLElement).closest('[data-zoom-controls]')) return;
+    dragRef.current = { startX: event.clientX, startY: event.clientY, panX: pan.x, panY: pan.y };
+    if (typeof event.currentTarget.setPointerCapture === 'function') {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
+  };
+  const onCanvasPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
+    if (!drag) return;
+    setPan({ x: drag.panX + (event.clientX - drag.startX), y: drag.panY + (event.clientY - drag.startY) });
+  };
+  const endDrag = () => {
+    dragRef.current = null;
+  };
+
+  const onCanvasKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return;
+    switch (event.key) {
+      case 'ArrowRight':
+        event.preventDefault();
+        setPan((current) => ({ ...current, x: current.x + 40 }));
+        break;
+      case 'ArrowLeft':
+        event.preventDefault();
+        setPan((current) => ({ ...current, x: current.x - 40 }));
+        break;
+      case 'ArrowDown':
+        event.preventDefault();
+        setPan((current) => ({ ...current, y: current.y + 40 }));
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        setPan((current) => ({ ...current, y: current.y - 40 }));
+        break;
+      case '+':
+      case '=':
+        event.preventDefault();
+        zoomIn();
+        break;
+      case '-':
+      case '_':
+        event.preventDefault();
+        zoomOut();
+        break;
+      case '0':
+        event.preventDefault();
+        resetView();
+        break;
+    }
+  };
 
   // Urutan DFS node visible — basis navigasi keyboard ↑↓/Home/End (pola tree-view).
   const dfsVisibleIds = React.useMemo(() => {
@@ -460,14 +554,17 @@ export function OrgChart({
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
+        event.stopPropagation();
         focusNode(focusableIds[Math.min(focusIdx + 1, focusableIds.length - 1)] ?? null);
         break;
       case 'ArrowUp':
         event.preventDefault();
+        event.stopPropagation();
         focusNode(focusIdx > 0 ? focusableIds[focusIdx - 1] : (focusableIds[0] ?? null));
         break;
       case 'ArrowRight':
         event.preventDefault();
+        event.stopPropagation();
         if (node.hasChildren && !expandedSet.has(node.id)) {
           toggleExpanded(node.id);
           setActiveId(node.id);
@@ -478,6 +575,7 @@ export function OrgChart({
         break;
       case 'ArrowLeft':
         event.preventDefault();
+        event.stopPropagation();
         if (node.hasChildren && expandedSet.has(node.id)) {
           toggleExpanded(node.id);
           setActiveId(node.id);
@@ -487,15 +585,18 @@ export function OrgChart({
         break;
       case 'Home':
         event.preventDefault();
+        event.stopPropagation();
         focusNode(focusableIds[0] ?? null);
         break;
       case 'End':
         event.preventDefault();
+        event.stopPropagation();
         focusNode(focusableIds[focusableIds.length - 1] ?? null);
         break;
       case 'Enter':
       case ' ':
         event.preventDefault();
+        event.stopPropagation();
         onSelect?.(node);
         break;
     }
@@ -511,11 +612,34 @@ export function OrgChart({
 
   const visibleNodes = normalized.nodes.filter((node) => visibleIds.has(node.id));
 
+  const zoomPercent = Math.round(zoomLevel * 100);
+
   return (
     <div
+      ref={canvasRef}
+      role="region"
+      aria-label={`${ariaLabel} canvas`}
+      tabIndex={0}
+      onKeyDown={onCanvasKeyDown}
+      onPointerDown={onCanvasPointerDown}
+      onPointerMove={onCanvasPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      className={cn(
+        'relative min-h-[320px] w-full touch-none overflow-hidden rounded-md border border-border bg-background md:min-h-[480px]',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        className,
+      )}
+    >
+    <div
       ref={containerRef}
-      className={cn('relative overflow-auto', className)}
-      style={{ width: layout.width, height: layout.height }}
+      className="absolute left-0 top-0"
+      style={{
+        width: layout.width,
+        height: layout.height,
+        transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoomLevel})`,
+        transformOrigin: '0 0',
+      }}
       role="tree"
       aria-label={ariaLabel}
     >
@@ -619,6 +743,42 @@ export function OrgChart({
           </div>
         );
       })}
+    </div>
+      <div
+        data-zoom-controls
+        className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-md border border-border bg-card p-1 shadow-sm"
+      >
+        <button
+          type="button"
+          aria-label="Zoom out"
+          onClick={zoomOut}
+          onPointerDown={(event) => event.stopPropagation()}
+          className="flex h-8 w-8 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <Minus className="h-4 w-4" aria-hidden="true" />
+        </button>
+        <span aria-live="polite" className="min-w-12 text-center text-sm text-foreground" data-testid="org-chart-zoom-level">
+          {zoomPercent}%
+        </span>
+        <button
+          type="button"
+          aria-label="Zoom in"
+          onClick={zoomIn}
+          onPointerDown={(event) => event.stopPropagation()}
+          className="flex h-8 w-8 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <Plus className="h-4 w-4" aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          aria-label="Reset zoom"
+          onClick={resetView}
+          onPointerDown={(event) => event.stopPropagation()}
+          className="flex h-8 w-8 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <Maximize className="h-4 w-4" aria-hidden="true" />
+        </button>
+      </div>
     </div>
   );
 }
