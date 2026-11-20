@@ -228,3 +228,138 @@ describe('FileManager shell', () => {
     vi.unstubAllGlobals();
   });
 });
+
+describe('FileManager context panel (002-03)', () => {
+  const panelItems: FileItem[] = [
+    { id: 'p1', folderId: 'q4', name: 'foto.png', type: 'image', size: 2048, updatedAt: '2026-11-01T00:00:00Z', dimensions: '800x600', previewUrl: 'https://example.com/foto.png' },
+    { id: 'p2', folderId: 'q4', name: 'dokumen.pdf', type: 'pdf', size: 4096, updatedAt: '2026-11-02T00:00:00Z', previewUrl: 'https://example.com/dokumen.pdf' },
+    { id: 'p3', folderId: 'q4', name: 'klip.mp4', type: 'video', size: 8192, updatedAt: '2026-11-03T00:00:00Z', duration: 125, previewUrl: 'https://example.com/klip.mp4' },
+    { id: 'p4', folderId: 'q4', name: 'suara.mp3', type: 'audio', size: 1024, updatedAt: '2026-11-04T00:00:00Z', duration: 61, previewUrl: 'https://example.com/suara.mp3' },
+    { id: 'p5', folderId: 'q4', name: 'arsip.zip', type: 'other', size: 512, updatedAt: '2026-11-05T00:00:00Z' },
+  ];
+
+  function stubURL() {
+    class MockURL extends URL {
+      static createObjectURL = vi.fn(() => 'blob:fake-url');
+      static revokeObjectURL = vi.fn();
+    }
+    vi.stubGlobal('URL', MockURL);
+  }
+
+  function openPreviewByEnter(name: string) {
+    const row = screen.getByText(name).closest('tr');
+    expect(row).not.toBeNull();
+    fireEvent.keyDown(row as Element, { key: 'Enter', code: 'Enter' });
+  }
+
+  it('adds uploaded files to the active folder content', async () => {
+    stubURL();
+    const uploadHandler = vi.fn(async (_file: File, { onProgress }: { onProgress: (n: number) => void }) => {
+      onProgress(100);
+    });
+    const { container } = render(
+      <FileManager folders={folders} items={panelItems} activeFolderId="q4" uploadHandler={uploadHandler} />
+    );
+    const dropzone = container.querySelector('[aria-label="File upload dropzone"]');
+    expect(dropzone).not.toBeNull();
+    const files = [
+      new File([new Uint8Array(10)], 'baru-1.txt', { type: 'text/plain' }),
+      new File([new Uint8Array(10)], 'baru-2.txt', { type: 'text/plain' }),
+      new File([new Uint8Array(10)], 'baru-3.txt', { type: 'text/plain' }),
+    ];
+    fireEvent.drop(dropzone as Element, { dataTransfer: { files } });
+    for (const name of ['baru-1.txt', 'baru-2.txt', 'baru-3.txt']) {
+      expect(await screen.findByText(name)).toBeDefined();
+    }
+    expect(uploadHandler.mock.calls.length).toBeGreaterThanOrEqual(3);
+    vi.unstubAllGlobals();
+  });
+
+  it('previews image via Enter and traps focus, Esc closes and returns focus', async () => {
+    stubURL();
+    render(<FileManager folders={folders} items={panelItems} activeFolderId="q4" />);
+    openPreviewByEnter('foto.png');
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog).toBeDefined();
+    expect(screen.getByAltText('foto.png')).toBeDefined();
+    expect(screen.getByText('800x600')).toBeDefined();
+    // Fokus terjebak di dalam dialog saat terbuka.
+    expect(dialog.contains(document.activeElement)).toBe(true);
+    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    vi.unstubAllGlobals();
+  });
+
+  it('previews video, audio, pdf (sandbox) and falls back for other', async () => {
+    stubURL();
+    const { unmount } = render(<FileManager folders={folders} items={panelItems} activeFolderId="q4" />);
+    openPreviewByEnter('klip.mp4');
+    expect((await screen.findByRole('dialog')).querySelector('video')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    openPreviewByEnter('suara.mp3');
+    expect((await screen.findByRole('dialog')).querySelector('audio')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+
+    openPreviewByEnter('dokumen.pdf');
+    const pdfFrame = (await screen.findByRole('dialog')).querySelector('iframe');
+    expect(pdfFrame).not.toBeNull();
+    expect(pdfFrame?.getAttribute('sandbox')).toBe('');
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+
+    openPreviewByEnter('arsip.zip');
+    expect(await screen.findByRole('dialog')).toBeDefined();
+    expect(screen.getByText(/Pratinjau tidak tersedia/)).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Unduh' })).toBeDefined();
+    unmount();
+    vi.unstubAllGlobals();
+  });
+
+  it('renders quota three levels with token colors and text messages', () => {
+    const { rerender } = render(
+      <FileManager folders={folders} items={panelItems} activeFolderId="q4" quota={{ total: 1000, used: 500 }} />
+    );
+    let bar = screen.getByRole('progressbar');
+    expect(bar.firstElementChild?.className).toContain('bg-primary');
+    expect(screen.getByText('Kapasitas masih cukup.')).toBeDefined();
+    expect(screen.getByText('Sisa')).toBeDefined();
+
+    rerender(<FileManager folders={folders} items={panelItems} activeFolderId="q4" quota={{ total: 1000, used: 850 }} />);
+    bar = screen.getByRole('progressbar');
+    expect(bar.firstElementChild?.className).toContain('bg-warning');
+    expect(screen.getByText(/Hampir penuh/)).toBeDefined();
+
+    rerender(<FileManager folders={folders} items={panelItems} activeFolderId="q4" quota={{ total: 1000, used: 1000 }} />);
+    bar = screen.getByRole('progressbar');
+    expect(bar.firstElementChild?.className).toContain('bg-destructive');
+    expect(screen.getByText(/Penyimpanan penuh/)).toBeDefined();
+
+    rerender(<FileManager folders={folders} items={panelItems} activeFolderId="q4" />);
+    expect(screen.queryByRole('progressbar')).toBeNull();
+    expect(screen.queryByLabelText('Kuota penyimpanan')).toBeNull();
+  });
+
+  it('shows quota loading skeleton and light error message', () => {
+    const { rerender } = render(
+      <FileManager folders={folders} items={panelItems} activeFolderId="q4" quota={{ total: 1000, used: 10 }} quotaLoading />
+    );
+    expect(screen.getByText('Memuat kuota…')).toBeDefined();
+    rerender(
+      <FileManager folders={folders} items={panelItems} activeFolderId="q4" quota={{ total: 1000, used: 10 }} quotaError="Kuota gagal dimuat." />
+    );
+    expect(screen.getByText('Kuota gagal dimuat.')).toBeDefined();
+    // Konten tetap tampil (error quota tidak memblokir).
+    expect(screen.getByText('foto.png')).toBeDefined();
+  });
+
+  it('shows selected item detail in the context panel', () => {
+    render(<FileManager folders={folders} items={panelItems} activeFolderId="q4" />);
+    expect(screen.getByText('Pilih item untuk melihat detailnya di sini.')).toBeDefined();
+    fireEvent.click(screen.getByText('foto.png'));
+    const panel = screen.getByLabelText('Detail item');
+    expect(panel.textContent).toContain('foto.png');
+    expect(panel.textContent).toContain('800x600');
+    expect(panel.textContent).toContain('2.0 KB');
+  });
+});
