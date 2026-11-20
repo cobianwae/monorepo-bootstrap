@@ -37,7 +37,7 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 |---|---|---|
 | `base` | Primitive visual dan kontrol dasar | button, badge, card, input, textarea, label, separator, skeleton, avatar, tabs, checkbox, switch, tooltip, progress, spinner, radio-group, slider, accordion, collapsible, kbd, toggle, aspect-ratio, scroll-area, palette-switcher, theme-provider |
 | `form` | Input dan validasi | form, select, combobox, tag-input, date-picker, input-otp, number-input, time-picker, filter-builder, stepper, segmented-control, file-input, file-upload |
-| `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart |
+| `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart, event-calendar (baru, PRD 004) |
 | `feedback` | Status dan respons sistem | dialog, alert, alert-dialog, toast, toaster, empty-state, use-toast |
 | `navigation` | Navigasi dan pencarian | dropdown-menu, breadcrumb, pagination, command-palette, context-menu, navigation-menu |
 | `overlay` | Lapisan di atas konten | sheet, popover, hover-card |
@@ -55,7 +55,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Activity Feed | Timeline aktivitas, loading, empty |
 | Auth | Form login/register, error, redirect |
 | Billing | Ringkasan biaya, invoice, state |
-| Calendar | Event, navigasi tanggal, timezone |
+| Calendar | Tampilan event bulan/minggu/hari + agenda, slot booking, navigasi periode (composed, kategori `data-display`); penyusun: event-calendar (baru), badge, popover, skeleton, empty-state, alert, button/segmented-control, dialog/sheet (milik konsumen via callback) |
 | Comments | Thread, optimistic update, empty |
 | Command Palette | Pencarian aksi, keyboard-first |
 | Dashboard | Ringkasan metrik, grid responsif |

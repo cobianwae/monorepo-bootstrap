@@ -1,0 +1,59 @@
+<!-- Flow calendar & scheduler — PRD 004, layar S-005.04 (.01–.04), modal M-006 -->
+<!-- Job utama: melihat event dalam konteks bulan/minggu/hari dan menemukan slot kosong; -->
+<!-- pendukung: booking slot kosong dan membuka detail event -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman calendar] --> B{Data event siap?}
+  B -- masih dimuat --> L[Tampilkan skeleton grid sesuai view aktif]
+  L --> B
+  B -- gagal dimuat --> ERR[Tampilkan pesan error + tombol coba lagi]
+  ERR --> R[User menekan coba lagi]
+  R --> A
+  B -- periode tanpa event --> EMP[Tampilkan empty state periode + CTA buat event]
+  EMP --> V[User ganti view atau periode]
+  V --> A
+  B -- siap --> C[Grid dirender sesuai view aktif: bulan, minggu, hari, atau agenda]
+  C --> D{User mengganti view?}
+  D -- ya --> SW[Tanggal konteks dipertahankan lintas view]
+  SW --> C
+  D -- tidak --> N{User navigasi periode?}
+  N -- sebelumnya / berikutnya / hari ini --> P[Periode bergeser; tanggal aktif konsisten dengan view]
+  P --> C
+  N -- tidak --> E[User menelusuri event multi-hari dan konflik jam]
+  E --> D
+```
+
+```mermaid
+flowchart TD
+  A[User melihat slot kosong di view minggu atau hari] --> B[User mengklik atau menekan Enter pada slot kosong]
+  B --> C[Komponen memanggil onSelectSlot dengan rentang awal-akhir]
+  C --> D{Aplikasi konsumen membuka form booking?}
+  D -- ya --> F[Form booking terisi tanggal dan jam dari slot]
+  F --> G[User mengisi detail dan menyimpan]
+  G --> H{Simpan berhasil?}
+  H -- ya --> I[Event baru muncul di grid; konfirmasi sukses]
+  H -- gagal --> J[Form menampilkan error; slot asal tetap disorot]
+  J --> G
+  D -- tidak, cuma melihat --> K[Tetap di grid; fokus kembali ke slot]
+  K --> A
+  I --> A
+```
+
+```mermaid
+flowchart TD
+  A[User fokus ke event di grid atau agenda] --> B[User membuka detail via klik, Enter, atau Space]
+  B --> C[Detail event tampil: popover di desktop, dialog di mobile]
+  C --> D{User memilih aksi?}
+  D -- tutup --> E[Fokus kembali ke event asal]
+  E --> A
+  D -- edit atau hapus --> F[Aplikasi konsumen menerima onSelectEvent dan membuka form miliknya]
+  F --> A
+  D -- pindah via drag, could --> G[User menyeret event ke slot lain]
+  G --> H[Komponen memanggil onEventDrop dengan id dan rentang baru]
+  H --> I{Operasi setara keyboard tersedia?}
+  I -- ya --> J[User memindah via menu pindah dengan dialog pilih slot]
+  J --> F
+  I -- tidak --> K[Tawarkan menu sebagai jalan alternatif]
+  K --> J
+```

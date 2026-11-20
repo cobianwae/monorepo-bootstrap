@@ -40,7 +40,11 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.01 | Activity Feed | `/patterns/activity-feed` | implemented |
 | S-005.02 | Auth | `/patterns/auth` | implemented |
 | S-005.03 | Billing | `/patterns/billing` | implemented |
-| S-005.04 | Calendar | `/patterns/calendar` | implemented |
+| S-005.04 | Calendar (shell — upgrade basis `event-calendar` reusable, PRD 004) | `/patterns/calendar` | in-design |
+| S-005.04.01 | Calendar — Month view | `/patterns/calendar` (view=month) | in-design |
+| S-005.04.02 | Calendar — Week view + all-day strip | `/patterns/calendar` (view=week) | in-design |
+| S-005.04.03 | Calendar — Day view + agenda pendamping | `/patterns/calendar` (view=day) | in-design |
+| S-005.04.04 | Calendar — Agenda view (could) | `/patterns/calendar` (view=agenda) | in-design |
 | S-005.05 | Comments | `/patterns/comments` | implemented |
 | S-005.06 | Command Palette | `/patterns/command-palette` | implemented |
 | S-005.07 | Dashboard | `/patterns/dashboard` | implemented |
@@ -100,6 +104,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | M-003 | Konfirmasi hapus & pilih folder tujuan move | S-005.27 | in-design |
 | M-004 | Konfirmasi hapus node org chart (reparent vs hapus subtree) | S-005.33 | in-design |
 | M-005 | Pilih atasan baru (dialog pindah + validasi siklus) | S-005.33 | in-design |
+| M-006 | Event detail (popover di desktop, dialog/sheet di mobile; edit/hapus milik konsumen via callback) | S-005.04 | in-design |
 
 ## Route Groups
 
