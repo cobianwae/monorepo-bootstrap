@@ -1,6 +1,6 @@
 # 010-02 — CRUD inspector: tambah/edit/hapus anti-truncate
 
-Status: review
+Status: done
 PRD: `docs/prd/010-org-chart-editor.md`
 Design: `docs/design/org-chart-editor.md`
 FR: `FR-002`, `FR-003`, `FR-005`, `FR-006`, `FR-007`
