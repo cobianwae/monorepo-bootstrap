@@ -19,6 +19,7 @@ import {
   CreditCard,
   Database,
   FileCheck2,
+  FolderOpen,
   GitFork,
   HeartPulse,
   Images,
@@ -45,6 +46,7 @@ import {
   TableProperties,
   Timer,
   Type,
+  Upload,
   Wand2,
 } from 'lucide-react';
 import {
@@ -142,12 +144,14 @@ export const NAV_SECTIONS: NavSection[] = [
           { title: 'Master-Detail Flow', href: '/patterns/master-detail', icon: ListTree },
           { title: 'Settings & Preferences', href: '/patterns/settings', icon: Settings },
           { title: 'Rich Text Editor', href: '/patterns/rich-text-editor', icon: PenLine },
+          { title: 'File Upload Queue', href: '/patterns/file-upload', icon: Upload },
         ],
       },
       {
         label: 'Data & Productivity',
         items: [
           { title: 'Data Table & Filtering', href: '/patterns/data-table', icon: TableProperties },
+          { title: 'File Manager', href: '/patterns/file-manager', icon: FolderOpen },
           { title: 'Calendar & Scheduling', href: '/patterns/calendar', icon: CalendarDays },
           { title: 'Kanban & Drag & Drop', href: '/patterns/kanban', icon: Columns3 },
           { title: 'Workspace Layout', href: '/patterns/workspace', icon: Layers },
