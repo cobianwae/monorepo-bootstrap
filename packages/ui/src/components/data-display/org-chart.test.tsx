@@ -235,4 +235,136 @@ describe('OrgChart', () => {
       expect(path.getAttribute('d')).toContain('V');
     }
   });
+
+  it('003-03 AC-01: kanvas role tree + treeitem membawa level/expanded/selected tanpa duplikat', () => {
+    const { container } = render(<OrgChart data={flatData} selectedId="eng" />);
+    const tree = screen.getByRole('tree', { name: 'Org chart' });
+    expect(tree).toBeTruthy();
+    // Single source of truth: tidak ada pohon tersembunyi terpisah
+    expect(container.querySelectorAll('[role="tree"]')).toHaveLength(1);
+    expect(container.querySelector('[role="group"]')).toBeNull();
+    const items = screen.getAllByRole('treeitem');
+    expect(items).toHaveLength(5);
+    const byId = Object.fromEntries(items.map((el) => [el.getAttribute('data-node-id'), el]));
+    expect(byId['ceo'].getAttribute('aria-level')).toBe('1');
+    expect(byId['eng'].getAttribute('aria-level')).toBe('2');
+    expect(byId['fe'].getAttribute('aria-level')).toBe('3');
+    expect(byId['ceo'].getAttribute('aria-expanded')).toBe('true');
+    expect(byId['fe'].getAttribute('aria-expanded')).toBeNull();
+    expect(byId['eng'].getAttribute('aria-selected')).toBe('true');
+    expect(byId['ceo'].getAttribute('aria-selected')).toBe('false');
+  });
+
+  it('003-03 AC-01: roving tabindex — satu treeitem tabbable, disabled -1', () => {
+    const data: OrgChartInput = [
+      { id: 'ceo', parentId: null, title: 'CEO' },
+      { id: 'eng', parentId: 'ceo', title: 'Engineering', disabled: true },
+      { id: 'ops', parentId: 'ceo', title: 'Operations' },
+    ];
+    const { container } = render(<OrgChart data={data} />);
+    const items = Array.from(container.querySelectorAll('[role="treeitem"]')) as HTMLElement[];
+    const tabbable = items.filter((el) => el.tabIndex === 0);
+    expect(tabbable).toHaveLength(1);
+    expect(tabbable[0].getAttribute('data-node-id')).toBe('ceo');
+    const eng = items.find((el) => el.getAttribute('data-node-id') === 'eng');
+    expect(eng?.tabIndex).toBe(-1);
+    expect(eng?.getAttribute('aria-disabled')).toBe('true');
+    expect(eng?.className).toContain('focus-visible:ring-ring');
+  });
+
+  it('003-03 AC-02: navigasi panah DFS, Home/End, → expand/masuk anak, ← collapse/ke parent', () => {
+    const { container } = render(<OrgChart data={flatData} />);
+    const node = (id: string) => container.querySelector(`[data-node-id="${id}"]`) as HTMLElement;
+    node('ceo').focus();
+    expect(document.activeElement).toBe(node('ceo'));
+    fireEvent.keyDown(node('ceo'), { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(node('eng'));
+    fireEvent.keyDown(node('eng'), { key: 'ArrowDown' });
+    // Urutan DFS: ceo → eng → fe → be → ops
+    expect(document.activeElement).toBe(node('fe'));
+    fireEvent.keyDown(node('fe'), { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(node('be'));
+    fireEvent.keyDown(node('be'), { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(node('ops'));
+    fireEvent.keyDown(node('ops'), { key: 'ArrowUp' });
+    expect(document.activeElement).toBe(node('be'));
+    fireEvent.keyDown(node('be'), { key: 'Home' });
+    expect(document.activeElement).toBe(node('ceo'));
+    fireEvent.keyDown(node('ceo'), { key: 'End' });
+    expect(document.activeElement).toBe(node('ops'));
+    // ← pada daun kembali ke parent
+    fireEvent.keyDown(node('ops'), { key: 'ArrowLeft' });
+    expect(document.activeElement).toBe(node('ceo'));
+  });
+
+  it('003-03 AC-02: ← collapse parent, → expand ulang via keyboard', () => {
+    const { container } = render(<OrgChart data={flatData} />);
+    const node = (id: string) => container.querySelector(`[data-node-id="${id}"]`) as HTMLElement;
+    node('eng').focus();
+    fireEvent.keyDown(node('eng'), { key: 'ArrowLeft' });
+    expect(container.querySelector('[data-node-id="fe"]')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Perluas Engineering' })).toBeTruthy();
+    fireEvent.keyDown(node('eng'), { key: 'ArrowRight' });
+    expect(container.querySelector('[data-node-id="fe"]')).toBeTruthy();
+    // → pada parent terbuka masuk ke anak pertama
+    fireEvent.keyDown(node('eng'), { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(node('fe'));
+  });
+
+  it('003-03 AC-02: Enter dan Space memanggil onSelect tanpa toggle', () => {
+    const onSelect = vi.fn();
+    const { container } = render(<OrgChart data={flatData} onSelect={onSelect} />);
+    const eng = container.querySelector('[data-node-id="eng"]') as HTMLElement;
+    eng.focus();
+    fireEvent.keyDown(eng, { key: 'Enter' });
+    expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({ id: 'eng' }));
+    fireEvent.keyDown(eng, { key: ' ' });
+    expect(onSelect).toHaveBeenCalledTimes(2);
+    // Expand state tidak berubah oleh Enter/Space
+    expect(container.querySelectorAll('[data-testid="org-chart-node"]')).toHaveLength(5);
+    expect(screen.getByRole('button', { name: 'Collapse Engineering' })).toBeTruthy();
+  });
+
+  it('003-03 AC-02/03: keyboard melewati node disabled', () => {
+    const data: OrgChartInput = [
+      { id: 'ceo', parentId: null, title: 'CEO' },
+      { id: 'eng', parentId: 'ceo', title: 'Engineering', disabled: true },
+      { id: 'ops', parentId: 'ceo', title: 'Operations' },
+    ];
+    const { container } = render(<OrgChart data={data} />);
+    const node = (id: string) => container.querySelector(`[data-node-id="${id}"]`) as HTMLElement;
+    node('ceo').focus();
+    fireEvent.keyDown(node('ceo'), { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(node('ops'));
+    fireEvent.keyDown(node('ops'), { key: 'ArrowUp' });
+    expect(document.activeElement).toBe(node('ceo'));
+  });
+
+  it('003-03 AC-03: expander keyboard dapat difokus, label dinamis, focus ring token', () => {
+    const { container } = render(<OrgChart data={flatData} />);
+    const expander = screen.getByRole('button', { name: 'Collapse Engineering' });
+    expect(expander.className).toContain('h-8');
+    expect(expander.className).toContain('w-8');
+    expect(expander.className).toContain('focus-visible:ring-ring');
+    expect(container.querySelectorAll('button')).toHaveLength(2);
+    fireEvent.click(expander);
+    expect(screen.getByRole('button', { name: 'Perluas Engineering' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Perluas Engineering' }));
+    expect(screen.getByRole('button', { name: 'Collapse Engineering' })).toBeTruthy();
+  });
+
+  it('003-03 AC-04: transisi hanya berlaku dengan motion-safe (reduced-motion dimatikan)', () => {
+    const { container } = render(<OrgChart data={flatData} />);
+    const node = container.querySelector('[data-testid="org-chart-node"]') as HTMLElement;
+    expect(node.className).toContain('motion-safe:transition-colors');
+    const buttons = container.querySelectorAll('button');
+    for (const button of Array.from(buttons)) {
+      expect(button.className).toContain('motion-safe:transition-colors');
+    }
+    const icons = container.querySelectorAll('button svg');
+    expect(icons.length).toBeGreaterThan(0);
+    for (const icon of Array.from(icons)) {
+      expect((icon as unknown as { className: { baseVal: string } }).className.baseVal ?? icon.getAttribute('class')).toContain('motion-safe:transition-transform');
+    }
+  });
 });

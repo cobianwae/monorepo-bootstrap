@@ -31,3 +31,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-20 — Story 003-01 fondasi OrgChart (normalisasi flat/nested + validasi + tidy-tree + konektor elbow token) selesai (`done`, ter-merge ke `dev`) — `003-01`
 - 2026-11-20 — Story 003-02 node kaya OrgChart (avatar/badge/strip aksen token, renderNode, expand/collapse uncontrolled & controlled, onSelect/selectedId) + audit kontras strip aksen selesai, status review — `003-02`
 - 2026-11-20 — Story 003-02 node kaya OrgChart (avatar/badge/strip aksen token, renderNode, expand/collapse uncontrolled & controlled, onSelect/selectedId) selesai (`done`, ter-merge ke `dev`) — `003-02`
+- 2026-11-20 — Story 003-03 a11y penuh OrgChart (role tree/treeitem + aria-level/expanded/selected, roving tabindex + navigasi keyboard DFS/Home/End/Enter-Space, focus ring primary offset 2px + skip disabled, transisi motion-safe) selesai, status review — `003-03`

@@ -1,6 +1,6 @@
 # 003-03 — A11y penuh: role tree, navigasi keyboard node, dua mode fokus
 
-Status: approved (gate 3)
+Status: review
 PRD: `docs/prd/003-org-chart.md`
 FR: `FR-010` (penguat `FR-005`, `FR-003`)
 Screens: `S-005.28`
@@ -34,13 +34,13 @@ Goal: Diagram dapat dibaca screen reader sebagai pohon (`role="tree"`/`treeitem`
 
 ## Tasks
 
-- [ ] Roving tabindex + peta tombol node (`↑↓`, `→←`, Home/End, Enter/Space) mengikuti pola `dnd/tree-view`
-- [ ] ARIA: `role="tree"` + `aria-label` kanvas, `treeitem`/`group`, `aria-level`/`aria-expanded`/`aria-selected`
-- [ ] Expander keyboard: `aria-label` dinamis, target ≥ 32×32, rotasi ikon saat terbuka
-- [ ] Focus ring kontras light & dark (`ring` token `primary`, offset 2px); skip node `disabled`
-- [ ] `prefers-reduced-motion`: matikan transisi transform + expander
-- [ ] Test co-located: navigasi panah DFS, expand/collapse + Enter/Space select, atribut ARIA, disabled skip, reduced motion
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
+- [x] Roving tabindex + peta tombol node (`↑↓`, `→←`, Home/End, Enter/Space) mengikuti pola `dnd/tree-view`
+- [x] ARIA: `role="tree"` + `aria-label` kanvas, `treeitem`/`group`, `aria-level`/`aria-expanded`/`aria-selected`
+- [x] Expander keyboard: `aria-label` dinamis, target ≥ 32×32, rotasi ikon saat terbuka
+- [x] Focus ring kontras light & dark (`ring` token `primary`, offset 2px); skip node `disabled`
+- [x] `prefers-reduced-motion`: matikan transisi transform + expander
+- [x] Test co-located: navigasi panah DFS, expand/collapse + Enter/Space select, atribut ARIA, disabled skip, reduced motion
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
 
 ## Dependencies
 
