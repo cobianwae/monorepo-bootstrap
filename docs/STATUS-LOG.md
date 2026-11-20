@@ -17,3 +17,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-20 — Approve PRD 002–006 (gate 1) dan spec RM-02/03/10; roadmap disinkronkan, S-005.27–S-005.32 terdaftar planned — review PRD 002–006
 - 2026-11-20 — Skill fullstack aktif: `shared-types`, `backend-nestjs`, `prisma-schema`, `api-testing`, `monorepo-ci` + routing fullstack di `decision-framework` dan plan `docs/skill-plan-fullstack.md` — `chore/skill-planning`
 - 2026-11-20 — Skill fullstack ditambah section Decision Points (keputusan scope ditentukan PRD/design) dan Edge Cases Umum (kandidat AC) di 5 skill + aturan stop-and-ask di routing `decision-framework` — `chore/skill-arch-readiness`
+- 2026-11-20 — Approve story 002-01–002-04 file manager (gate 3): shell navigasi, konten seleksi, preview/quota/upload, states/kelola/a11y — `002-01`, `002-02`, `002-03`, `002-04`
