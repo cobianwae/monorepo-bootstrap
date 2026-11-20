@@ -1,6 +1,6 @@
 # 003-01 — Fondasi OrgChart: normalisasi data, layout tidy-tree, render diagram + konektor
 
-Status: approved (gate 3)
+Status: review
 PRD: `docs/prd/003-org-chart.md`
 FR: `FR-001`, `FR-004`
 Screens: `S-005.28`
@@ -34,13 +34,13 @@ Goal: Komponen inti `OrgChart` di `packages/ui` menerima data flat/nested, menor
 
 ## Tasks
 
-- [ ] Buat `packages/ui/src/components/data-display/org-chart.tsx` + tipe publik inti (`OrgNodeFlat`, `OrgNodeNested`, `OrgChartInput`, `OrgNodeNormalized`, `OrgChartAccent`, `OrgChartProps`) sesuai design §2
-- [ ] Normalisasi + validasi memoized: flat ↔ nested, id duplikat, parent hilang, siklus (DFS dari root), root ≠ 1 → deskriptor error terstruktur (design D2)
-- [ ] Algoritma tidy-tree sederhana (post-order lebar subtree) + konstanta layout 200×72 / gap 32 / level 56
-- [ ] Render hanya node expanded + layer SVG konektor elbow per parent (stroke token `border`, design §3)
-- [ ] Barrel export di `packages/ui/src/index.ts`
-- [ ] Test co-located: flat = nested, tiap jenis data invalid, determinisme layout, path konektor per parent
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
+- [x] Buat `packages/ui/src/components/data-display/org-chart.tsx` + tipe publik inti (`OrgNodeFlat`, `OrgNodeNested`, `OrgChartInput`, `OrgNodeNormalized`, `OrgChartAccent`, `OrgChartProps`) sesuai design §2
+- [x] Normalisasi + validasi memoized: flat ↔ nested, id duplikat, parent hilang, siklus (DFS dari root), root ≠ 1 → deskriptor error terstruktur (design D2)
+- [x] Algoritma tidy-tree sederhana (post-order lebar subtree) + konstanta layout 200×72 / gap 32 / level 56
+- [x] Render hanya node expanded + layer SVG konektor elbow per parent (stroke token `border`, design §3)
+- [x] Barrel export di `packages/ui/src/index.ts`
+- [x] Test co-located: flat = nested, tiap jenis data invalid, determinisme layout, path konektor per parent
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
 
 ## Dependencies
 
