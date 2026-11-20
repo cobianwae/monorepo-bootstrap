@@ -82,6 +82,8 @@ export interface OrgChartEditorProps {
   onSelect?: (node: OrgNodeNormalized) => void;
   renderNodeExtra?: (node: OrgNodeNormalized) => React.ReactNode;
   ariaLabel?: string;
+  emptyActionLabel?: string;
+  onEmptyAction?: () => void;
   className?: string;
 }
 
@@ -759,6 +761,8 @@ export function OrgChartEditor({
   onSelect,
   renderNodeExtra,
   ariaLabel = 'Org chart editor',
+  emptyActionLabel,
+  onEmptyAction,
   className,
 }: OrgChartEditorProps) {
   const [internalFlat, setInternalFlat] = React.useState<OrgNodeFlat[]>(() =>
@@ -781,6 +785,7 @@ export function OrgChartEditor({
   );
   const [dropAlert, setDropAlert] = React.useState<string | null>(null);
   const [announcement, setAnnouncement] = React.useState('');
+  const [errorCopied, setErrorCopied] = React.useState(false);
   const [past, setPast] = React.useState<{ flat: OrgNodeFlat[]; label: string }[]>([]);
   const [future, setFuture] = React.useState<{ flat: OrgNodeFlat[]; label: string }[]>([]);
   const returnFocusIdRef = React.useRef<string | null>(null);
@@ -1164,12 +1169,27 @@ export function OrgChartEditor({
   }
 
   if (normalized.error !== null) {
+    const detail = normalized.error.nodeId
+      ? `${normalized.error.message} (node: ${normalized.error.nodeId})`
+      : normalized.error.message;
     return (
       <div role="alert" className={cn('rounded-md border border-border bg-card p-4 text-sm text-foreground', className)}>
         <p>{normalized.error.message}</p>
         {normalized.error.nodeId ? (
           <p className="mt-1 text-muted-foreground">Node terkait: &quot;{normalized.error.nodeId}&quot;</p>
         ) : null}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="mt-2"
+          onClick={() => {
+            void navigator.clipboard?.writeText(detail).catch(() => undefined);
+            setErrorCopied(true);
+          }}
+        >
+          {errorCopied ? 'Detail disalin' : 'Salin detail error'}
+        </Button>
       </div>
     );
   }
@@ -1181,6 +1201,8 @@ export function OrgChartEditor({
           role="status"
           title="Belum ada data organisasi"
           description="Sediakan data flat (id/parentId) atau nested (children) dengan tepat satu root."
+          actionLabel={emptyActionLabel}
+          onAction={onEmptyAction}
         />
       </div>
     );

@@ -522,3 +522,42 @@ describe('OrgChartEditor undo/redo', () => {
     expect(cto?.title).toBe('CTO 4');
   }, 30000);
 });
+
+describe('OrgChartEditor state matrix 010-04', () => {
+  it('loading: skeleton aria-busy, tanpa kanvas', () => {
+    render(<OrgChartEditor data={flatData} loading />);
+    expect(screen.getByLabelText('Org chart editor loading').getAttribute('aria-busy')).toBe('true');
+    expect(screen.getAllByTestId('org-editor-skeleton-box')).toHaveLength(8);
+    expect(screen.queryByRole('application')).toBeNull();
+  });
+
+  it('empty: role=status + CTA memanggil onEmptyAction', () => {
+    const onEmptyAction = vi.fn();
+    render(<OrgChartEditor data={[]} emptyActionLabel="Buat root pertama" onEmptyAction={onEmptyAction} />);
+    expect(screen.getByRole('status')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Buat root pertama' }));
+    expect(onEmptyAction).toHaveBeenCalledTimes(1);
+  });
+
+  it('error invalid: role=alert + id + tombol salin detail', () => {
+    const cycle: OrgChartInput = [
+      { id: 'ceo', parentId: null, title: 'CEO' },
+      { id: 'a', parentId: 'b', title: 'A' },
+      { id: 'b', parentId: 'a', title: 'B' },
+    ];
+    render(<OrgChartEditor data={cycle} />);
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toMatch(/siklus|cycle/i);
+    expect(alert.textContent).toMatch(/Node terkait/);
+    const copy = screen.getByRole('button', { name: 'Salin detail error' });
+    fireEvent.click(copy);
+    expect(screen.getByRole('button', { name: 'Detail disalin' })).toBeTruthy();
+  });
+
+  it('highlightedIds: node cocok mendapat data-highlighted', () => {
+    const { container } = render(<OrgChartEditor data={flatData} highlightedIds={['eng']} />);
+    const highlighted = container.querySelector('[data-highlighted="true"]');
+    expect(highlighted?.getAttribute('data-node-id')).toBe('eng');
+    expect(container.querySelectorAll('[data-highlighted="true"]')).toHaveLength(1);
+  });
+});
