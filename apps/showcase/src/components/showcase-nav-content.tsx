@@ -154,6 +154,7 @@ export const NAV_SECTIONS: NavSection[] = [
           { title: 'Data Table & Filtering', href: '/patterns/data-table', icon: TableProperties },
           { title: 'File Manager', href: '/patterns/file-manager', icon: FolderOpen },
           { title: 'Org Chart', href: '/patterns/org-chart', icon: Network },
+          { title: 'Org Chart Editor', href: '/patterns/org-chart-editor', icon: Network },
           { title: 'Calendar & Scheduling', href: '/patterns/calendar', icon: CalendarDays },
           { title: 'Kanban & Drag & Drop', href: '/patterns/kanban', icon: Columns3 },
           { title: 'Workspace Layout', href: '/patterns/workspace', icon: Layers },

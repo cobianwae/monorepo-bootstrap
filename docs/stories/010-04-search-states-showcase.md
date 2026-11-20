@@ -1,6 +1,6 @@
 # 010-04 — Search + states + showcase + a11y penuh
 
-Status: todo
+Status: review
 PRD: `docs/prd/010-org-chart-editor.md`
 Design: `docs/design/org-chart-editor.md`
 FR: `FR-010`, `FR-012`, `FR-013`, `FR-014`, `FR-016`
@@ -35,11 +35,11 @@ Goal: Showcase `/patterns/org-chart-editor` end-to-end (browse → tambah → pi
 
 ## Tasks
 
-- [ ] Showcase controlled page: state di page (`data` + `onChange`), toolbar (tambah/undo/redo/orientasi/fit), pencarian + live region, pemicu state, papan keyboard, catatan a11y
-- [ ] Pohon alternatif `role="tree"` (reuse 003) sebagai tab kedua / visually-hidden + tombol aksi per baris
-- [ ] Audit: keyboard penuh, SR (tree + live region), kontras light/dark (teks + edge + ring + minimap), `prefers-reduced-motion`
-- [ ] Test: highlight + auto-expand, live region, state matrix 4 kondisi, pohon alternatif ada + fokusable
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test` → `pnpm -C apps/showcase build`
+- [x] Showcase controlled page: state di page (`data` + `onChange`), toolbar (tambah/undo/redo/orientasi/fit), pencarian + live region, pemicu state, papan keyboard, catatan a11y
+- [x] Pohon alternatif `role="tree"` (reuse 003) sebagai tab kedua / visually-hidden + tombol aksi per baris
+- [x] Audit: keyboard penuh, SR (tree + live region), kontras light/dark (teks + edge + ring + minimap), `prefers-reduced-motion`
+- [x] Test: highlight + auto-expand, live region, state matrix 4 kondisi, pohon alternatif ada + fokusable
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test` → `pnpm -C apps/showcase build`
 
 ## Dependencies
 
