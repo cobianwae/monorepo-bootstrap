@@ -6,7 +6,7 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 ## Posisi Saat Ini
 
-Struktur OpenCode terpasang (config root, docs-as-state, agents, commands, workflow skills); baseline `typecheck`, `lint`, dan `test` hijau.
+Struktur OpenCode terpasang (config root, docs-as-state, agents, commands, workflow skills); baseline `typecheck`, `lint`, dan `test` hijau. Skill set fullstack aktif (`shared-types`, `backend-nestjs`, `prisma-schema`, `api-testing`, `monorepo-ci`) dengan routing di `decision-framework`.
 CR-001–CR-007 selesai (`done`, ter-merge ke `dev`); kepatuhan `STATUS-LOG` dikunci via CR-007 (backfill + aturan append + `scripts/check-status-log.mjs`).
 Story 001-01 dan 001-02 (upload queue) selesai (`done`, ter-merge ke `dev`).
 PRD 002–006 (`approved`, gate 1) dan spec RM-02/03/10 (`approved`, story 007-01, 008-01/008-02, 009-01) selesai review dan disetujui user; CR-008 (`draft`) mengajukan perapian dokumen PRD 001.
