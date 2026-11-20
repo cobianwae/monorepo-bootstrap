@@ -1,6 +1,6 @@
 # 002-04 — State matrix penuh + rename/kelola + audit keyboard
 
-Status: approved (gate 3)
+Status: done
 PRD: `docs/prd/002-file-manager.md`
 FR: `FR-009`, `FR-011`, `FR-013`
 Screens: `S-005.27`, `S-005.27.01`, `S-005.27.02`, `M-002`, `M-003`
@@ -35,14 +35,14 @@ Goal: Lengkapi state matrix semua zona, dialog kelola (rename/folder baru + konf
 
 ## Tasks
 
-- [ ] Audit dan lengkapi state matrix §6 di semua zona + scenario showcase (kontrol per zona) + test tiap state
-- [ ] `M-002` rename/folder baru: dialog + validasi kosong/duplikat + pesan inline + update tree + list/grid
-- [ ] `M-003` konfirmasi hapus + pilih folder tujuan move; wiring ke `onDelete`/`onMove`; batal tanpa efek
-- [ ] Polish keyboard/SR: treeview panah + Enter, breadcrumb nav, tabel `aria-sort`, grid posisi item, bulk `aria-live`, menu Shift+F10, preview focus trap + Esc + fokus kembali, tab order, `prefers-reduced-motion`
-- [ ] Test co-located: state per zona, validasi rename/duplikat, konfirmasi hapus/move + batal, tab order + focus trap + live region
-- [ ] Showcase final: semua state §6 teramati + catatan a11y + light/dark; handler mock tanpa mengubah kode pattern (FR-010)
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test` (+ `pnpm -C apps/showcase build` karena menyentuh route)
-- [ ] Tick tasks story, update `docs/BACKLOG.md` dan `docs/STATUS.md` sesuai definisi selesai
+- [x] Audit dan lengkapi state matrix §6 di semua zona + scenario showcase (kontrol per zona) + test tiap state
+- [x] `M-002` rename/folder baru: dialog + validasi kosong/duplikat + pesan inline + update tree + list/grid
+- [x] `M-003` konfirmasi hapus + pilih folder tujuan move; wiring ke `onDelete`/`onMove`; batal tanpa efek
+- [x] Polish keyboard/SR: treeview panah + Enter, breadcrumb nav, tabel `aria-sort`, grid posisi item, bulk `aria-live`, menu Shift+F10, preview focus trap + Esc + fokus kembali, tab order, `prefers-reduced-motion`
+- [x] Test co-located: state per zona, validasi rename/duplikat, konfirmasi hapus/move + batal, tab order + focus trap + live region
+- [x] Showcase final: semua state §6 teramati + catatan a11y + light/dark; handler mock tanpa mengubah kode pattern (FR-010)
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test` (+ `pnpm -C apps/showcase build` karena menyentuh route)
+- [x] Tick tasks story, update `docs/BACKLOG.md` dan `docs/STATUS.md` sesuai definisi selesai
 
 ## Dependencies
 

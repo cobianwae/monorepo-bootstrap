@@ -29,7 +29,15 @@ import { Checkbox } from '../base/checkbox';
 import { Input } from '../base/input';
 import { Progress } from '../base/progress';
 import { Skeleton } from '../base/skeleton';
-import { Dialog, DialogContent, DialogTitle } from '../feedback/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../feedback/dialog';
+import { Label } from '../base/label';
 import { Sheet, SheetContent, SheetTitle } from '../overlay/sheet';
 import {
   Breadcrumb,
@@ -242,6 +250,19 @@ export function FileManager({
   const [previewItem, setPreviewItem] = React.useState<FileItem | null>(null);
   const [previewFailed, setPreviewFailed] = React.useState(false);
   const previewTriggerRef = React.useRef<HTMLElement | null>(null);
+  // Dialog kelola M-002 (rename / folder baru) dan M-003 (hapus / pindah).
+  const [renameTarget, setRenameTarget] = React.useState<FileItem | null>(null);
+  const [renameValue, setRenameValue] = React.useState('');
+  const [renameError, setRenameError] = React.useState<string | null>(null);
+  const [newFolderParent, setNewFolderParent] = React.useState<{ parentId: string | null } | null>(null);
+  const [newFolderValue, setNewFolderValue] = React.useState('');
+  const [newFolderError, setNewFolderError] = React.useState<string | null>(null);
+  const [confirmAction, setConfirmAction] = React.useState<{
+    kind: 'delete' | 'move';
+    items: FileItem[];
+  } | null>(null);
+  const [moveTargetId, setMoveTargetId] = React.useState('');
+  const manageTriggerRef = React.useRef<HTMLElement | null>(null);
   const isDesktop = useIsDesktop();
   const lastClickedIndex = React.useRef<number | null>(null);
 
@@ -348,6 +369,102 @@ export function FileManager({
     // karena dibuka programatik, kembalikan fokus secara manual (AC-02).
     previewTriggerRef.current?.focus?.();
     previewTriggerRef.current = null;
+  };
+
+  // --- Dialog kelola (M-002 / M-003) -------------------------------------
+  // Pattern murni memanggil handler konsumen; tidak memutasi data sendiri
+  // (design §3). Fokus dialog dikembalikan ke pemicu saat ditutup.
+
+  const captureManageTrigger = () => {
+    manageTriggerRef.current = document.activeElement as HTMLElement | null;
+  };
+
+  const closeManage = () => {
+    setRenameTarget(null);
+    setNewFolderParent(null);
+    setConfirmAction(null);
+    setMoveTargetId('');
+    // Tunda ke frame berikutnya: cleanup focus Radix (FocusScope) berjalan
+    // saat unmount dan akan menimpa fokus sinkron ke body.
+    const trigger = manageTriggerRef.current;
+    manageTriggerRef.current = null;
+    requestAnimationFrame(() => trigger?.focus?.());
+  };
+
+  const openRename = (item: FileItem) => {
+    captureManageTrigger();
+    setRenameTarget(item);
+    setRenameValue(item.name);
+    setRenameError(null);
+  };
+
+  const openCreateFolder = (parentId: string | null) => {
+    captureManageTrigger();
+    setNewFolderParent({ parentId });
+    setNewFolderValue('');
+    setNewFolderError(null);
+  };
+
+  const openConfirm = (kind: 'delete' | 'move', targetItems: FileItem[]) => {
+    captureManageTrigger();
+    setMoveTargetId('');
+    setConfirmAction({ kind, items: targetItems });
+  };
+
+  const submitRename = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!renameTarget) return;
+    const next = renameValue.trim();
+    if (!next) {
+      setRenameError('Nama tidak boleh kosong.');
+      return;
+    }
+    const duplicate = allItems.some(
+      (item) =>
+        item.folderId === renameTarget.folderId &&
+        item.id !== renameTarget.id &&
+        item.name.toLowerCase() === next.toLowerCase()
+    );
+    if (duplicate) {
+      setRenameError('Nama sudah dipakai file lain di folder ini.');
+      return;
+    }
+    onRename?.(renameTarget, next);
+    closeManage();
+  };
+
+  const submitCreateFolder = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!newFolderParent) return;
+    const next = newFolderValue.trim();
+    if (!next) {
+      setNewFolderError('Nama tidak boleh kosong.');
+      return;
+    }
+    const duplicate = folders.some(
+      (folder) =>
+        folder.parentId === newFolderParent.parentId &&
+        folder.name.toLowerCase() === next.toLowerCase()
+    );
+    if (duplicate) {
+      setNewFolderError('Nama sudah dipakai folder lain di folder ini.');
+      return;
+    }
+    // Kontrak publik memakai string; '' menandakan folder root (parentId null).
+    onCreateFolder?.(newFolderParent.parentId ?? '', next);
+    closeManage();
+  };
+
+  const submitConfirm = () => {
+    if (!confirmAction) return;
+    if (confirmAction.kind === 'delete') {
+      onDelete?.(confirmAction.items);
+    } else {
+      if (!moveTargetId) return;
+      onMove?.(confirmAction.items, moveTargetId);
+    }
+    setSelection([]);
+    closeManage();
   };
 
   const handleUploadDone = (doneItems: UploadQueueItem[]) => {
@@ -516,14 +633,14 @@ export function FileManager({
       id: 'move',
       label: 'Pindah',
       icon: FolderInput,
-      onClick: () => onMove?.(selectedItems, activeFolderId),
+      onClick: () => openConfirm('move', selectedItems),
     },
     {
       id: 'delete',
       label: 'Hapus',
       icon: Trash2,
       variant: 'destructive' as const,
-      onClick: () => onDelete?.(selectedItems),
+      onClick: () => openConfirm('delete', selectedItems),
     },
   ];
 
@@ -537,15 +654,15 @@ export function FileManager({
         <Download className="mr-2 h-4 w-4" aria-hidden="true" />
         Unduh
       </ContextMenuItem>
-      <ContextMenuItem onSelect={() => onRename?.(item, item.name)}>
+      <ContextMenuItem onSelect={() => openRename(item)}>
         <Pencil className="mr-2 h-4 w-4" aria-hidden="true" />
         Ganti nama
       </ContextMenuItem>
-      <ContextMenuItem onSelect={() => onMove?.([item], activeFolderId)}>
+      <ContextMenuItem onSelect={() => openConfirm('move', [item])}>
         <FolderInput className="mr-2 h-4 w-4" aria-hidden="true" />
         Pindah
       </ContextMenuItem>
-      <ContextMenuItem variant="destructive" onSelect={() => onDelete?.([item])}>
+      <ContextMenuItem variant="destructive" onSelect={() => openConfirm('delete', [item])}>
         <Trash2 className="mr-2 h-4 w-4" aria-hidden="true" />
         Hapus
       </ContextMenuItem>
@@ -579,7 +696,7 @@ export function FileManager({
   ) : folders.length === 0 ? (
     <div className="space-y-3 p-4">
       <p className="text-sm text-muted-foreground">Belum ada folder.</p>
-      <Button size="sm" variant="outline">
+      <Button size="sm" variant="outline" onClick={() => openCreateFolder(null)}>
         <FolderPlus className="h-4 w-4" />
         Folder baru
       </Button>
@@ -680,7 +797,7 @@ export function FileManager({
           // sini membuka panel tersebut di mobile/tablet.
           onAction={() => setContextOpen(true)}
           secondaryActionLabel="Folder baru"
-          onSecondaryAction={() => onCreateFolder?.(activeFolderId, 'Folder baru')}
+          onSecondaryAction={() => openCreateFolder(activeFolderId || null)}
         />
       ) : currentView === 'list' ? (
         <div className="rounded-md border border-border">
@@ -1000,7 +1117,7 @@ export function FileManager({
                       <button
                         type="button"
                         onClick={() => handleSelect(folder.id)}
-                        className="transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                        className="transition-colors motion-reduce:transition-none hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
                       >
                         {folder.name}
                       </button>
@@ -1020,7 +1137,12 @@ export function FileManager({
             <Upload className="h-4 w-4" />
             Upload
           </Button>
-          <Button size="sm" variant="outline" className="hidden sm:inline-flex">
+          <Button
+            size="sm"
+            variant="outline"
+            className="hidden sm:inline-flex"
+            onClick={() => openCreateFolder(activeFolderId || null)}
+          >
             <FolderPlus className="h-4 w-4" />
             Folder baru
           </Button>
@@ -1099,6 +1221,132 @@ export function FileManager({
           </DialogContent>
         </Dialog>
       )}
+
+      {/* M-002: rename / folder baru + validasi nama (FR-013) */}
+      <Dialog
+        open={renameTarget !== null || newFolderParent !== null}
+        onOpenChange={(open) => {
+          if (!open) closeManage();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{renameTarget ? 'Ganti nama' : 'Folder baru'}</DialogTitle>
+            <DialogDescription>
+              {renameTarget
+                ? `Nama baru untuk ${renameTarget.name}. Nama harus unik di folder ini.`
+                : 'Buat folder baru di folder aktif. Nama harus unik di folder ini.'}
+            </DialogDescription>
+          </DialogHeader>
+          <form
+            className="space-y-3"
+            onSubmit={renameTarget ? submitRename : submitCreateFolder}
+            noValidate
+          >
+            <div className="space-y-1.5">
+              <Label htmlFor="file-manager-name-input">Nama</Label>
+              <Input
+                id="file-manager-name-input"
+                value={renameTarget ? renameValue : newFolderValue}
+                onChange={(event) => {
+                  if (renameTarget) {
+                    setRenameValue(event.target.value);
+                    setRenameError(null);
+                  } else {
+                    setNewFolderValue(event.target.value);
+                    setNewFolderError(null);
+                  }
+                }}
+                aria-invalid={Boolean(renameTarget ? renameError : newFolderError)}
+                aria-describedby={
+                  renameTarget ? (renameError ? 'file-manager-name-error' : undefined) : newFolderError ? 'file-manager-name-error' : undefined
+                }
+              />
+              {(renameTarget ? renameError : newFolderError) && (
+                <p id="file-manager-name-error" role="alert" className="text-sm text-destructive">
+                  {renameTarget ? renameError : newFolderError}
+                </p>
+              )}
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={closeManage}>
+                Batal
+              </Button>
+              <Button type="submit">{renameTarget ? 'Simpan' : 'Buat folder'}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* M-003: konfirmasi hapus / pilih folder tujuan move (FR-004/FR-005) */}
+      <Dialog
+        open={confirmAction !== null}
+        onOpenChange={(open) => {
+          if (!open) closeManage();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {confirmAction?.kind === 'delete'
+                ? `Hapus ${confirmAction.items.length} item?`
+                : `Pindah ${confirmAction?.items.length ?? 0} item ke folder…`}
+            </DialogTitle>
+            <DialogDescription>
+              {confirmAction?.kind === 'delete'
+                ? 'Item yang dihapus tidak dapat dikembalikan. Tindakan ini meminta konfirmasi sebelum handler dipanggil.'
+                : 'Pilih folder tujuan. Item akan dipindahkan setelah Anda mengonfirmasi.'}
+            </DialogDescription>
+          </DialogHeader>
+          {confirmAction && (
+            <ul className="max-h-40 space-y-1 overflow-y-auto rounded-md border border-border p-2 text-sm">
+              {confirmAction.items.map((item) => (
+                <li key={item.id} className="truncate">
+                  {item.name}
+                </li>
+              ))}
+            </ul>
+          )}
+          {confirmAction?.kind === 'move' && (
+            <div className="space-y-1.5" role="radiogroup" aria-label="Folder tujuan">
+              {folders
+                .filter((folder) => folder.id !== confirmAction.items[0]?.folderId)
+                .map((folder) => {
+                  const depth = ancestorIds(folders, folder.id).length;
+                  return (
+                    <label
+                      key={folder.id}
+                      className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted"
+                      style={{ paddingLeft: `${depth * 16 + 8}px` }}
+                    >
+                      <input
+                        type="radio"
+                        name="file-manager-move-target"
+                        value={folder.id}
+                        checked={moveTargetId === folder.id}
+                        onChange={() => setMoveTargetId(folder.id)}
+                      />
+                      <span>{folder.name}</span>
+                    </label>
+                  );
+                })}
+            </div>
+          )}
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={closeManage}>
+              Batal
+            </Button>
+            <Button
+              type="button"
+              variant={confirmAction?.kind === 'delete' ? 'destructive' : 'default'}
+              disabled={confirmAction?.kind === 'move' && !moveTargetId}
+              onClick={submitConfirm}
+            >
+              {confirmAction?.kind === 'delete' ? 'Hapus' : 'Pindah'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

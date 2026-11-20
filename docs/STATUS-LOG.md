@@ -24,3 +24,5 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-20 — Story 002-02 FileManager zona konten list/grid + seleksi massal + context menu selesai (`done`, ter-merge ke `dev`) — `002-02`
 - 2026-11-20 — Story 002-03 panel konteks S-005.27.02 (upload compose + quota 3 level + detail item) + preview M-001 sheet/dialog + showcase selesai, status review — `002-03`
 - 2026-11-20 — Story 002-03 panel konteks + preview M-001 + quota selesai (`done`, ter-merge ke `dev`) — `002-03`
+- 2026-11-20 — Story 002-04 dialog kelola M-002/M-003 + audit state matrix + keyboard/SR + showcase final selesai, status review — `002-04`
+- 2026-11-20 — Story 002-04 dialog kelola M-002/M-003 + audit state matrix + keyboard/SR + showcase final selesai (`done`, ter-merge ke `dev`) — `002-04`

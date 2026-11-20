@@ -153,7 +153,12 @@ describe('FileManager shell', () => {
     fireEvent.click(screen.getByRole('button', { name: /unduh/i }));
     expect(onDownload).toHaveBeenCalledTimes(1);
     expect(onDownload.mock.calls[0][0].map((i: FileItem) => i.id)).toEqual(['f1', 'f2']);
-    fireEvent.click(screen.getByRole('button', { name: /hapus/i }));
+    // Hapus via bulk bar membuka konfirmasi M-003, bukan langsung memanggil handler.
+    fireEvent.click(screen.getByRole('button', { name: /^hapus$/i }));
+    expect(onDelete).not.toHaveBeenCalled();
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.textContent).toContain('a.pdf');
+    fireEvent.click(within(dialog).getByRole('button', { name: /^hapus$/i }));
     expect(onDelete).toHaveBeenCalledTimes(1);
     expect(onDelete.mock.calls[0][0]).toHaveLength(2);
   });
@@ -361,5 +366,207 @@ describe('FileManager context panel (002-03)', () => {
     expect(panel.textContent).toContain('foto.png');
     expect(panel.textContent).toContain('800x600');
     expect(panel.textContent).toContain('2.0 KB');
+  });
+});
+
+describe('FileManager manage dialogs + state/a11y audit (002-04)', () => {
+  function openRename(name: string) {
+    fireEvent.contextMenu(screen.getByText(name));
+    fireEvent.click(screen.getByRole('menuitem', { name: /ganti nama/i }));
+    return screen.getByRole('dialog');
+  }
+
+  it('M-002 rename: rejects empty and duplicate names inline, then calls onRename', () => {
+    const onRename = vi.fn();
+    render(
+      <FileManager folders={folders} items={contentItems} activeFolderId="q4" onRename={onRename} />
+    );
+    const dialog = openRename('a.pdf');
+    const input = within(dialog).getByLabelText('Nama');
+    expect((input as HTMLInputElement).value).toBe('a.pdf');
+
+    fireEvent.change(input, { target: { value: '   ' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Simpan' }));
+    expect(screen.getByText('Nama tidak boleh kosong.')).toBeDefined();
+    expect(onRename).not.toHaveBeenCalled();
+
+    fireEvent.change(input, { target: { value: 'b.jpg' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Simpan' }));
+    expect(screen.getByText('Nama sudah dipakai file lain di folder ini.')).toBeDefined();
+    expect(onRename).not.toHaveBeenCalled();
+
+    fireEvent.change(input, { target: { value: 'baru.pdf' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Simpan' }));
+    expect(onRename).toHaveBeenCalledTimes(1);
+    expect(onRename.mock.calls[0][0].id).toBe('f1');
+    expect(onRename.mock.calls[0][1]).toBe('baru.pdf');
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('M-002 create folder: rejects empty and duplicate, then calls onCreateFolder', () => {
+    const onCreateFolder = vi.fn();
+    render(
+      <FileManager folders={folders} items={contentItems} activeFolderId="2026" onCreateFolder={onCreateFolder} />
+    );
+    // Tombol pertama = toolbar (EmptyState konten juga punya tombol se-nama).
+    fireEvent.click(screen.getAllByRole('button', { name: 'Folder baru' })[0]);
+    const dialog = screen.getByRole('dialog');
+    const input = within(dialog).getByLabelText('Nama');
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Buat folder' }));
+    expect(screen.getByText('Nama tidak boleh kosong.')).toBeDefined();
+
+    fireEvent.change(input, { target: { value: 'Q4' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Buat folder' }));
+    expect(screen.getByText('Nama sudah dipakai folder lain di folder ini.')).toBeDefined();
+    expect(onCreateFolder).not.toHaveBeenCalled();
+
+    fireEvent.change(input, { target: { value: 'Q5' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Buat folder' }));
+    expect(onCreateFolder).toHaveBeenCalledTimes(1);
+    expect(onCreateFolder).toHaveBeenCalledWith('2026', 'Q5');
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('M-002: sidebar-empty Folder baru CTA opens the create dialog', () => {
+    render(<FileManager folders={[]} items={[]} activeFolderId="" />);
+    const ctas = screen.getAllByRole('button', { name: 'Folder baru' });
+    expect(ctas.length).toBeGreaterThanOrEqual(1);
+    fireEvent.click(ctas[0]);
+    expect(screen.getByRole('dialog')).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'Folder baru' })).toBeDefined();
+  });
+
+  it('M-003 delete: cancel has no effect, confirm deletes and clears selection', () => {
+    const onDelete = vi.fn();
+    const onSelectionChange = vi.fn();
+    render(
+      <FileManager
+        folders={folders}
+        items={contentItems}
+        activeFolderId="q4"
+        selectedIds={['f1', 'f2']}
+        onDelete={onDelete}
+        onSelectionChange={onSelectionChange}
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: /^hapus$/i }));
+    let dialog = screen.getByRole('dialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Batal' }));
+    expect(onDelete).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: /^hapus$/i }));
+    dialog = screen.getByRole('dialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: /^hapus$/i }));
+    expect(onDelete).toHaveBeenCalledTimes(1);
+    expect(onDelete.mock.calls[0][0].map((i: FileItem) => i.id)).toEqual(['f1', 'f2']);
+    expect(onSelectionChange).toHaveBeenCalledWith([]);
+  });
+
+  it('M-003 move: choose target folder (source excluded), confirm calls onMove', () => {
+    const onMove = vi.fn();
+    render(
+      <FileManager folders={folders} items={contentItems} activeFolderId="q4" onMove={onMove} />
+    );
+    fireEvent.contextMenu(screen.getByText('a.pdf'));
+    fireEvent.click(screen.getByRole('menuitem', { name: /^pindah$/i }));
+    const dialog = screen.getByRole('dialog');
+    // Folder sumber (Q4) bukan pilihan tujuan.
+    expect(within(dialog).queryByLabelText('Q4')).toBeNull();
+    const confirmButton = within(dialog).getByRole('button', { name: /^pindah$/i });
+    expect((confirmButton as HTMLButtonElement).disabled).toBe(true);
+
+    fireEvent.click(within(dialog).getByLabelText('Arsip'));
+    fireEvent.click(confirmButton);
+    expect(onMove).toHaveBeenCalledTimes(1);
+    expect(onMove.mock.calls[0][0].map((i: FileItem) => i.id)).toEqual(['f1']);
+    expect(onMove.mock.calls[0][1]).toBe('arsip');
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('M-003 move: cancel closes without calling onMove', () => {
+    const onMove = vi.fn();
+    render(
+      <FileManager folders={folders} items={contentItems} activeFolderId="q4" onMove={onMove} />
+    );
+    fireEvent.contextMenu(screen.getByText('a.pdf'));
+    fireEvent.click(screen.getByRole('menuitem', { name: /^pindah$/i }));
+    const dialog = screen.getByRole('dialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Batal' }));
+    expect(onMove).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('AC-01: content error clears selection; quota error keeps content visible', () => {
+    const onSelectionChange = vi.fn();
+    const { unmount: unmountFirst } = render(
+      <FileManager
+        folders={folders}
+        items={contentItems}
+        activeFolderId="q4"
+        selectedIds={['f1']}
+        error="Gagal memuat konten"
+        onSelectionChange={onSelectionChange}
+      />
+    );
+    expect(onSelectionChange).toHaveBeenCalledWith([]);
+    unmountFirst();
+
+    const { unmount } = render(
+      <FileManager
+        folders={folders}
+        items={contentItems}
+        activeFolderId="q4"
+        quota={{ total: 1000, used: 10 }}
+        quotaError="Kuota gagal dimuat."
+      />
+    );
+    expect(screen.getByText('Kuota gagal dimuat.')).toBeDefined();
+    expect(screen.getByText('a.pdf')).toBeDefined();
+    unmount();
+  });
+
+  it('AC-04: sorted column exposes aria-sort; Shift+Arrow extends selection', () => {
+    const { container } = render(
+      <FileManager folders={folders} items={contentItems} activeFolderId="q4" />
+    );
+    fireEvent.click(screen.getByRole('button', { name: /sort by name/i }));
+    expect(screen.getByRole('columnheader', { name: /nama/i }).getAttribute('aria-sort')).toBe(
+      'ascending'
+    );
+
+    const row = screen.getByText('a.pdf').closest('tr');
+    expect(row).not.toBeNull();
+    (row as HTMLElement).focus();
+    fireEvent.keyDown(row as Element, { key: 'ArrowDown', shiftKey: true });
+    expect(screen.getAllByText('1 item dipilih').length).toBeGreaterThanOrEqual(1);
+    expect(container.querySelector('[aria-live="polite"]')?.textContent).toContain('1 item dipilih');
+  });
+
+  it('AC-04: M-002 traps focus and Esc returns focus to the trigger', async () => {
+    render(<FileManager folders={folders} items={contentItems} activeFolderId="q4" />);
+    const trigger = screen.getByRole('button', { name: 'Folder baru' });
+    (trigger as HTMLElement).focus();
+    fireEvent.click(trigger);
+    const dialog = await screen.findByRole('dialog');
+    expect(dialog.contains(document.activeElement)).toBe(true);
+    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    await vi.waitFor(() => expect(document.activeElement).toBe(trigger));
+  });
+
+  it('AC-04: tab order goes toolbar/breadcrumb, sidebar, content, context panel', () => {
+    const { container } = render(
+      <FileManager folders={folders} items={contentItems} activeFolderId="q4" />
+    );
+    const breadcrumb = screen.getByLabelText('Breadcrumb');
+    const sidebar = screen.getByLabelText('Sidebar folder');
+    const content = screen.getByLabelText('Konten folder');
+    const panel = screen.getByLabelText('Panel konteks');
+    expect(breadcrumb.compareDocumentPosition(sidebar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(sidebar.compareDocumentPosition(content) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(content.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(container.querySelector('main')).not.toBeNull();
   });
 });
