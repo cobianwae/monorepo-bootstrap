@@ -1,6 +1,6 @@
 # 002-02 — Konten list/grid + seleksi massal + context menu
 
-Status: review
+Status: done
 PRD: `docs/prd/002-file-manager.md`
 FR: `FR-003`, `FR-004`, `FR-005`, `FR-012`
 Screens: `S-005.27`, `S-005.27.01`
