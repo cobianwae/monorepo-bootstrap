@@ -1,6 +1,6 @@
 # 002-04 — State matrix penuh + rename/kelola + audit keyboard
 
-Status: review
+Status: done
 PRD: `docs/prd/002-file-manager.md`
 FR: `FR-009`, `FR-011`, `FR-013`
 Screens: `S-005.27`, `S-005.27.01`, `S-005.27.02`, `M-002`, `M-003`
