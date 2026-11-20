@@ -61,6 +61,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Data Table | Sort, filter, pagination, bulk action |
 | Dynamic Form | Schema-driven, validasi |
 | File Upload | Upload queue: validasi batch per file, progres per item, cancel/retry, thumbnail; penyusun: file-upload (baru), file-input, progress, button, badge, alert |
+| File Manager | Hierarki folder + aksi file + quota + preview (composed, kategori `data-display`); penyusun: tree-view, data-table, breadcrumb, context-menu, bulk-action-bar, file-upload, dialog/sheet, progress, skeleton, empty-state |
 | Global Search | Query, result grouping, empty |
 | Infinite Scroll | Pagination berbasis viewport |
 | Kanban | Kolom, drag, optimistic move |

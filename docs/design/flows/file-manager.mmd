@@ -1,0 +1,48 @@
+<!-- Flow file manager — PRD 002 (RM-04 + RM-05), layar S-005.27 -->
+<!-- Job utama: browse folder + aksi massal; pendukung: preview dan upload -->
+
+```mermaid
+flowchart TD
+  A[User membuka File Manager] --> B{Konten folder berhasil dimuat?}
+  B -- gagal --> ERR[Tampilkan error state zona + tombol Coba lagi]
+  ERR --> A
+  B -- ya --> C{Folder berisi item?}
+  C -- kosong --> E[Tampilkan empty state + CTA Upload / Folder baru]
+  E --> F[User upload atau buat folder]
+  F --> A
+  C -- ada isi --> G[User navigasi via tree sidebar atau breadcrumb]
+  G --> H[Folder aktif berubah; tree highlight dan breadcrumb sinkron]
+  H --> I{User memilih beberapa item?}
+  I -- tidak --> J[User memakai context menu per item: preview, download, rename, move, delete, detail]
+  J --> K[Aksi diteruskan ke handler konsumen]
+  I -- ya, 2+ item --> L[Bulk action bar muncul]
+  L --> M[User memilih aksi massal: download, move, delete]
+  M --> N{Konfirmasi / folder tujuan bila perlu?}
+  N -- batal --> L
+  N -- lanjut --> O[Aksi diterapkan ke semua item terpilih]
+  O --> P[Konten dan tree diperbarui; seleksi dibersihkan]
+```
+
+```mermaid
+flowchart TD
+  A[User meminta preview file] --> B{Format didukung? image, PDF, video, audio}
+  B -- tidak --> C[Tampilkan fallback generik + metadata + tombol unduh]
+  B -- ya --> D[Tampilkan preview sesuai tipe + metadata: nama, tipe, ukuran, tanggal, dimensi/durasi]
+  D --> E{User menutup preview?}
+  E -- ya --> F[Kembali ke folder aktif; fokus kembali ke item pemicu]
+  E -- tidak --> G[User mengunduh atau melihat detail lanjutan]
+```
+
+```mermaid
+flowchart TD
+  A[User mengunggah file ke folder aktif] --> B[Queue file-upload tampil di panel konteks]
+  B --> C{Upload tiap file berhasil?}
+  C -- gagal --> D[Item queue error + aksi Ulang; folder tidak berubah]
+  D --> E{User mengulang?}
+  E -- ya --> B
+  E -- tidak --> F[Item tetap gagal; file lain tidak terpengaruh]
+  C -- sukses --> G[Item baru muncul di list/grid folder aktif]
+  G --> H{Quota mendekati atau penuh?}
+  H -- ya --> I[Indikator quota warning/destructive + pesan]
+  H -- tidak --> J[Indikator quota normal diperbarui]
+```

@@ -63,7 +63,9 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.24 | Stepper | `/patterns/stepper` | implemented |
 | S-005.25 | Virtualized List | `/patterns/virtualized-list` | implemented |
 | S-005.26 | Workspace | `/patterns/workspace` | implemented |
-| S-005.27 | File Manager | `/patterns/file-manager` | planned |
+| S-005.27 | File Manager | `/patterns/file-manager` | in-design |
+| S-005.27.01 | File Manager — konten list/grid | `/patterns/file-manager` (panel konten) | in-design |
+| S-005.27.02 | File Manager — panel konteks | `/patterns/file-manager` (panel upload/quota/detail) | in-design |
 | S-005.28 | Org Chart | `/patterns/org-chart` | planned |
 | S-005.29 | Flow Editor | `/patterns/flow-editor` | planned |
 | S-005.30 | Transfer List | `/patterns/transfer-list` | planned |
@@ -87,6 +89,14 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-027 | Clinic Registration | `/clinic/registration` | implemented |
 | S-030 | Landing | `/landing` | implemented |
 | S-031 | Scratch (internal) | `/scratch` | implemented |
+
+## Modal Registry
+
+| ID | Modal | Dipakai di | Status |
+|---|---|---|---|
+| M-001 | File Preview (sheet di desktop, dialog full-screen di mobile) | S-005.27 | in-design |
+| M-002 | Rename / Folder baru (dialog + validasi nama) | S-005.27 | in-design |
+| M-003 | Konfirmasi hapus & pilih folder tujuan move | S-005.27 | in-design |
 
 ## Route Groups
 
