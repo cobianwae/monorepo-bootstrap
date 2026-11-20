@@ -1,6 +1,6 @@
 # 002-01 — Shell tiga zona + navigasi tree-breadcrumb
 
-Status: approved (gate 3)
+Status: done (gate 3)
 PRD: `docs/prd/002-file-manager.md`
 FR: `FR-001`, `FR-002`, `FR-010`
 Screens: `S-005.27`
@@ -43,15 +43,15 @@ Goal: Pattern `FileManager` di `packages/ui` kategori `data-display` dengan shel
 
 ## Tasks
 
-- [ ] Scaffold `packages/ui/src/components/data-display/file-manager.tsx` + tipe `FileFolder`, `FileItem`, `FileManagerProps` sesuai §3 design (props di-destructure di parameter, named export, `'use client'`)
-- [ ] Compose `tree-view` existing untuk zona A + `breadcrumb` existing untuk toolbar; sinkron dua arah via `activeFolderId` / `onActiveFolderChange`
-- [ ] Shell tiga zona + toolbar (breadcrumb, search placeholder, tombol Upload/Folder baru placeholder) + breakpoint desktop/tablet/mobile sesuai §2.2
-- [ ] Panel konteks placeholder (slot upload/quota/detail diisi story 002-03) dan konten placeholder (diisi story 002-02)
-- [ ] State sidebar loading/empty/error sesuai §6 + `aria-busy` / `role="alert"`
-- [ ] Test co-located `file-manager.test.tsx`: render tiga zona, klik tree → breadcrumb berubah, klik breadcrumb → tree highlight + handler dipanggil, kontrak tidak fetch
-- [ ] Export lewat `packages/ui/src/index.ts`
-- [ ] Showcase `S-005.27` `/patterns/file-manager`: tiga zona dengan data tiruan bertingkat + kontrol demo folder aktif/loading/error sidebar + catatan a11y
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
+- [x] Scaffold `packages/ui/src/components/data-display/file-manager.tsx` + tipe `FileFolder`, `FileItem`, `FileManagerProps` sesuai §3 design (props di-destructure di parameter, named export, `'use client'`)
+- [x] Compose `tree-view` existing untuk zona A + `breadcrumb` existing untuk toolbar; sinkron dua arah via `activeFolderId` / `onActiveFolderChange`
+- [x] Shell tiga zona + toolbar (breadcrumb, search placeholder, tombol Upload/Folder baru placeholder) + breakpoint desktop/tablet/mobile sesuai §2.2
+- [x] Panel konteks placeholder (slot upload/quota/detail diisi story 002-03) dan konten placeholder (diisi story 002-02)
+- [x] State sidebar loading/empty/error sesuai §6 + `aria-busy` / `role="alert"`
+- [x] Test co-located `file-manager.test.tsx`: render tiga zona, klik tree → breadcrumb berubah, klik breadcrumb → tree highlight + handler dipanggil, kontrak tidak fetch
+- [x] Export lewat `packages/ui/src/index.ts`
+- [x] Showcase `S-005.27` `/patterns/file-manager`: tiga zona dengan data tiruan bertingkat + kontrol demo folder aktif/loading/error sidebar + catatan a11y
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
 
 ## Dependencies
 
