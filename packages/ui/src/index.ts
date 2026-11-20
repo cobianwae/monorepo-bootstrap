@@ -43,6 +43,7 @@ export * from './components/form/input-otp';
 export * from './components/base/slider';
 export * from './components/form/number-input';
 export * from './components/form/time-picker';
+export * from './components/data-display/file-manager';
 export * from './components/data-display/data-table';
 export * from './components/form/filter-builder';
 export * from './components/data-display/bulk-action-bar';
