@@ -13,6 +13,7 @@ const PATTERNS = [
   { slug: 'stepper', label: 'Stepper' },
   { slug: 'dynamic-form', label: 'Dynamic Form' },
   { slug: 'file-upload', label: 'File Upload' },
+  { slug: 'file-manager', label: 'File Manager' },
   { slug: 'rich-text-editor', label: 'Rich Text Editor' },
   { slug: 'infinite-scroll', label: 'Infinite Scroll' },
   { slug: 'virtualized-list', label: 'Virtualized List' },

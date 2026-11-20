@@ -39,6 +39,10 @@ import {
   MessagesSquare,
   PenLine,
   Rows3,
+  FolderOpen,
+  Upload,
+  Wand2,
+  ListTree,
 } from 'lucide-react';
 import {
   Card,
@@ -216,6 +220,22 @@ export default function OverviewPage() {
       tag: 'PATTERN',
     },
     {
+      title: 'File Manager',
+      description: 'Folder tree + breadcrumb, list/grid content, bulk actions, upload quota, and media preview.',
+      href: '/patterns/file-manager',
+      icon: FolderOpen,
+      badge: 'Composed',
+      tag: 'PATTERN',
+    },
+    {
+      title: 'File Upload Queue',
+      description: 'Upload queue with drag & drop, per-file progress, retry, and completion states.',
+      href: '/patterns/file-upload',
+      icon: Upload,
+      badge: 'Queue',
+      tag: 'PATTERN',
+    },
+    {
       title: 'Master Data CRUD',
       description: 'Enterprise reference data management: category filters, drawer forms, audit logs, and status controls.',
       href: '/patterns/master-data',
@@ -229,6 +249,22 @@ export default function OverviewPage() {
       href: '/patterns/workspace',
       icon: Layers,
       badge: 'Layout',
+      tag: 'PATTERN',
+    },
+    {
+      title: 'Dynamic Form',
+      description: 'Schema-driven form rendering with conditional fields and field-level validation.',
+      href: '/patterns/dynamic-form',
+      icon: Wand2,
+      badge: 'Schema',
+      tag: 'PATTERN',
+    },
+    {
+      title: 'Master-Detail Flow',
+      description: 'Master list with synced detail panel and a responsive stacked layout.',
+      href: '/patterns/master-detail',
+      icon: ListTree,
+      badge: 'Master-Detail',
       tag: 'PATTERN',
     },
     {
