@@ -27,7 +27,9 @@ import { cn } from '../../lib/utils';
 import { Button } from '../base/button';
 import { Checkbox } from '../base/checkbox';
 import { Input } from '../base/input';
+import { Progress } from '../base/progress';
 import { Skeleton } from '../base/skeleton';
+import { Dialog, DialogContent, DialogTitle } from '../feedback/dialog';
 import { Sheet, SheetContent, SheetTitle } from '../overlay/sheet';
 import {
   Breadcrumb,
@@ -54,7 +56,7 @@ import { BulkActionBar } from './bulk-action-bar';
 import { DataTableHeader, useDataTable } from './data-table';
 import { Table, TableBody, TableCell, TableRow } from './table';
 import { TreeView, type TreeNode } from '../dnd/tree-view';
-import type { UploadHandler } from '../form/file-upload';
+import { FileUpload, type UploadHandler, type UploadQueueItem } from '../form/file-upload';
 
 export interface FileFolder {
   id: string;
@@ -98,6 +100,10 @@ export interface FileManagerProps {
   onRename?: (item: FileItem, nextName: string) => void;
   onCreateFolder?: (parentId: string, name: string) => void;
   uploadHandler?: UploadHandler;
+  /** Tampilkan skeleton pada indikator quota (state panel §6). */
+  quotaLoading?: boolean;
+  /** Pesan ringan bila quota gagal dimuat; tidak memblokir konten. */
+  quotaError?: string | null;
   onRetry?: () => void;
   contentSlot?: React.ReactNode;
   contextSlot?: React.ReactNode;
@@ -141,6 +147,47 @@ function formatDate(iso: string): string {
   return Number.isNaN(date.getTime()) ? iso : date.toLocaleDateString('id-ID');
 }
 
+function formatDuration(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const rest = Math.round(seconds % 60);
+  return `${minutes}:${String(rest).padStart(2, '0')}`;
+}
+
+function inferItemType(file: File): FileItemType {
+  if (file.type.startsWith('image/')) return 'image';
+  if (file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')) return 'pdf';
+  if (file.type.startsWith('video/')) return 'video';
+  if (file.type.startsWith('audio/')) return 'audio';
+  return 'other';
+}
+
+function toFileItem(queueItem: UploadQueueItem, folderId: string): FileItem {
+  const { file, previewUrl } = queueItem;
+  return {
+    id: `uploaded-${file.name}-${file.size}-${file.lastModified}`,
+    folderId,
+    name: file.name,
+    type: inferItemType(file),
+    size: file.size,
+    updatedAt: new Date().toISOString(),
+    previewUrl,
+  };
+}
+
+/** Breakpoint `lg` (1024px) — preview sheet di desktop, dialog di bawahnya. */
+function useIsDesktop(): boolean {
+  const [isDesktop, setIsDesktop] = React.useState(false);
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const query = window.matchMedia('(min-width: 1024px)');
+    setIsDesktop(query.matches);
+    const listener = (event: MediaQueryListEvent) => setIsDesktop(event.matches);
+    query.addEventListener('change', listener);
+    return () => query.removeEventListener('change', listener);
+  }, []);
+  return isDesktop;
+}
+
 const TYPE_ICONS: Record<FileItemType, React.ElementType> = {
   image: ImageIcon,
   pdf: FileText,
@@ -163,6 +210,9 @@ export function FileManager({
   activeFolderId,
   selectedIds,
   view,
+  quota,
+  quotaLoading = false,
+  quotaError = null,
   loading = false,
   error = null,
   onActiveFolderChange,
@@ -174,6 +224,7 @@ export function FileManager({
   onDelete,
   onRename,
   onCreateFolder,
+  uploadHandler,
   onRetry,
   contentSlot,
   contextSlot,
@@ -187,6 +238,11 @@ export function FileManager({
   const [internalView, setInternalView] = React.useState<FileManagerView>('list');
   const [internalSelected, setInternalSelected] = React.useState<string[]>(selectedIds ?? []);
   const [filterType, setFilterType] = React.useState<'all' | FileItemType>('all');
+  const [uploadedItems, setUploadedItems] = React.useState<FileItem[]>([]);
+  const [previewItem, setPreviewItem] = React.useState<FileItem | null>(null);
+  const [previewFailed, setPreviewFailed] = React.useState(false);
+  const previewTriggerRef = React.useRef<HTMLElement | null>(null);
+  const isDesktop = useIsDesktop();
   const lastClickedIndex = React.useRef<number | null>(null);
 
   const currentView = view ?? internalView;
@@ -203,6 +259,18 @@ export function FileManager({
   };
 
   const activeFolder = folders.find((f) => f.id === activeFolderId);
+  const activeFolderIdRef = React.useRef(activeFolderId);
+  React.useEffect(() => {
+    activeFolderIdRef.current = activeFolderId;
+  }, [activeFolderId]);
+
+  // File yang selesai diunggah masuk ke folder aktif (FR-006) tanpa
+  // meminta konsumen mengubah prop `items`; item dari konsumen tetap
+  // menjadi sumber kebenaran bila id-nya bentrok.
+  const allItems = React.useMemo(
+    () => [...items, ...uploadedItems.filter((u) => !items.some((i) => i.id === u.id))],
+    [items, uploadedItems]
+  );
   const path = React.useMemo(() => {
     const byId = new Map(folders.map((f) => [f.id, f]));
     const chain: FileFolder[] = [];
@@ -234,18 +302,18 @@ export function FileManager({
   };
 
   const treeNodes = React.useMemo(() => buildTree(folders), [folders]);
-  const activeItems = items.filter((item) => item.folderId === activeFolderId);
+  const activeItems = allItems.filter((item) => item.folderId === activeFolderId);
   const visibleItems = React.useMemo(
     () => (filterType === 'all' ? activeItems : activeItems.filter((i) => i.type === filterType)),
     // activeItems is derived each render; depend on its inputs instead.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [items, activeFolderId, filterType]
+    [allItems, activeFolderId, filterType]
   );
 
   const selectedItems = React.useMemo(
     () => visibleItems.filter((i) => currentSelected.includes(i.id)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [items, activeFolderId, filterType, currentSelected]
+    [allItems, activeFolderId, filterType, currentSelected]
   );
 
   const toggleItem = (item: FileItem, mode: 'single' | 'additive' | 'range', index: number) => {
@@ -267,6 +335,34 @@ export function FileManager({
     lastClickedIndex.current = index;
   };
 
+  const openPreview = (item: FileItem, trigger?: HTMLElement | null) => {
+    previewTriggerRef.current = trigger ?? (document.activeElement as HTMLElement | null);
+    setPreviewFailed(false);
+    setPreviewItem(item);
+    onPreview?.(item);
+  };
+
+  const closePreview = () => {
+    setPreviewItem(null);
+    // Radix mengembalikan fokus ke pemicu hanya bila memakai Trigger;
+    // karena dibuka programatik, kembalikan fokus secara manual (AC-02).
+    previewTriggerRef.current?.focus?.();
+    previewTriggerRef.current = null;
+  };
+
+  const handleUploadDone = (doneItems: UploadQueueItem[]) => {
+    const folderId = activeFolderIdRef.current;
+    const fresh = doneItems
+      .filter((queueItem) => queueItem.status === 'done')
+      .map((queueItem) => toFileItem(queueItem, folderId));
+    if (fresh.length > 0) {
+      setUploadedItems((prev) => [
+        ...prev,
+        ...fresh.filter((f) => !prev.some((p) => p.id === f.id)),
+      ]);
+    }
+  };
+
   const handleItemClick = (event: React.MouseEvent, item: FileItem, index: number) => {
     if ((event.target as HTMLElement).closest('button, a, input, [role="checkbox"], [role="menuitem"]')) {
       return;
@@ -280,7 +376,17 @@ export function FileManager({
     }
   };
 
-  const handleItemKeyDown = (event: React.KeyboardEvent, _item: FileItem, index: number) => {
+  const handleItemKeyDown = (event: React.KeyboardEvent, item: FileItem, index: number) => {
+    // Enter pada baris/item membuka preview (AC-02); abaikan bila fokus
+    // sedang pada kontrol di dalam baris (checkbox/dll).
+    if (event.key === 'Enter') {
+      if ((event.target as HTMLElement).closest('button, a, input, [role="checkbox"], [role="menuitem"]')) {
+        return;
+      }
+      event.preventDefault();
+      openPreview(item, event.currentTarget as HTMLElement);
+      return;
+    }
     // Buka context menu via keyboard: tombol Menu / Shift+F10 memicu event
     // contextmenu di browser; dispatch manual agar Radix membukanya.
     if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) {
@@ -377,6 +483,28 @@ export function FileManager({
     [table, visibleItems, columns]
   );
 
+  // Quota tiga level (FR-008): normal → primary, ≥80% → warning, penuh → destructive.
+  const quotaPercent = quota && quota.total > 0 ? Math.min(100, (quota.used / quota.total) * 100) : 0;
+  const quotaLevel = !quota
+    ? 'hidden'
+    : quota.used >= quota.total
+      ? 'full'
+      : quotaPercent >= 80
+        ? 'warning'
+        : 'normal';
+  const quotaIndicatorClass =
+    quotaLevel === 'warning' ? 'bg-warning' : quotaLevel === 'full' ? 'bg-destructive' : 'bg-primary';
+  const quotaMessageClass =
+    quotaLevel === 'warning' ? 'text-warning-text' : quotaLevel === 'full' ? 'text-destructive' : 'text-muted-foreground';
+  const quotaMessage =
+    quotaLevel === 'warning'
+      ? 'Hampir penuh — pertimbangkan menghapus file yang tidak lagi diperlukan.'
+      : quotaLevel === 'full'
+        ? 'Penyimpanan penuh — hapus file untuk dapat mengunggah lagi.'
+        : 'Kapasitas masih cukup.';
+
+  const detailItem = selectedItems[0] ?? null;
+
   const bulkActions = [
     {
       id: 'download',
@@ -401,7 +529,7 @@ export function FileManager({
 
   const renderContextMenu = (item: FileItem) => (
     <ContextMenuContent aria-label={`Aksi ${item.name}`}>
-      <ContextMenuItem onSelect={() => onPreview?.(item)}>
+      <ContextMenuItem onSelect={() => openPreview(item)}>
         <Eye className="mr-2 h-4 w-4" aria-hidden="true" />
         Buka / Pratinjau
       </ContextMenuItem>
@@ -548,8 +676,9 @@ export function FileManager({
           title="Folder kosong"
           description="Folder ini belum berisi file. Unggah file pertama atau buat folder baru untuk mulai."
           actionLabel="Upload"
-          // Upload compose diisi pada 002-03 (panel konteks); di sini CTA
-          // disediakan agar empty state lengkap dan terjangkau keyboard.
+          // Upload compose tersedia di panel konteks (S-005.27.02); CTA di
+          // sini membuka panel tersebut di mobile/tablet.
+          onAction={() => setContextOpen(true)}
           secondaryActionLabel="Folder baru"
           onSecondaryAction={() => onCreateFolder?.(activeFolderId, 'Folder baru')}
         />
@@ -643,6 +772,207 @@ export function FileManager({
     </div>
   );
 
+  const contextPanel = (
+    <div className="space-y-5 overflow-y-auto p-4">
+      <section aria-label="Upload" className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Upload</h3>
+        {uploadHandler ? (
+          <FileUpload
+            variant="compact"
+            uploadHandler={uploadHandler}
+            onAllDone={handleUploadDone}
+            helperText={`Unggah ke folder ${activeFolder?.name ?? activeFolderId}.`}
+          />
+        ) : (
+          <p className="text-sm text-muted-foreground">Upload tidak tersedia pada pattern ini.</p>
+        )}
+      </section>
+
+      {quotaLevel !== 'hidden' && (
+        <section aria-label="Kuota penyimpanan" className="space-y-2">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Kuota penyimpanan</h3>
+          {quotaLoading ? (
+            <div aria-busy="true" className="space-y-2">
+              <Skeleton className="h-2 w-full" />
+              <span className="sr-only">Memuat kuota…</span>
+            </div>
+          ) : quotaError ? (
+            <p role="status" className="text-sm text-destructive">{quotaError}</p>
+          ) : quota ? (
+            <>
+              <dl className="grid grid-cols-3 gap-2 text-sm">
+                <div>
+                  <dt className="text-xs text-muted-foreground">Total</dt>
+                  <dd className="font-medium">{formatSize(quota.total)}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-muted-foreground">Terpakai</dt>
+                  <dd className="font-medium">{formatSize(quota.used)}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-muted-foreground">Sisa</dt>
+                  <dd className="font-medium">{formatSize(Math.max(0, quota.total - quota.used))}</dd>
+                </div>
+              </dl>
+              <Progress
+                value={quotaPercent}
+                indicatorClassName={quotaIndicatorClass}
+                aria-label={`Kuota penyimpanan ${Math.round(quotaPercent)} persen terpakai`}
+              />
+              <p className={cn('text-sm', quotaMessageClass)}>{quotaMessage}</p>
+            </>
+          ) : null}
+        </section>
+      )}
+
+      <section aria-label="Detail item" className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Detail item</h3>
+        {detailItem ? (
+          <dl className="space-y-1.5 text-sm">
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted-foreground">Nama</dt>
+              <dd className="text-right font-medium">{detailItem.name}</dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted-foreground">Tipe</dt>
+              <dd>{TYPE_LABELS[detailItem.type]}</dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted-foreground">Ukuran</dt>
+              <dd>{formatSize(detailItem.size)}</dd>
+            </div>
+            <div className="flex justify-between gap-3">
+              <dt className="text-muted-foreground">Tanggal</dt>
+              <dd>{formatDate(detailItem.updatedAt)}</dd>
+            </div>
+            {detailItem.dimensions && (
+              <div className="flex justify-between gap-3">
+                <dt className="text-muted-foreground">Dimensi</dt>
+                <dd>{detailItem.dimensions}</dd>
+              </div>
+            )}
+            {detailItem.duration !== undefined && (
+              <div className="flex justify-between gap-3">
+                <dt className="text-muted-foreground">Durasi</dt>
+                <dd>{formatDuration(detailItem.duration)}</dd>
+              </div>
+            )}
+          </dl>
+        ) : (
+          <p className="text-sm text-muted-foreground">Pilih item untuk melihat detailnya di sini.</p>
+        )}
+      </section>
+    </div>
+  );
+
+  const previewMedia = (() => {
+    if (!previewItem) return null;
+    const src = previewItem.previewUrl;
+    const fallback = (
+      <div className="flex flex-col items-center justify-center gap-3 rounded-lg bg-muted p-8 text-center">
+        <FileIcon className="h-10 w-10 text-muted-foreground" aria-hidden="true" />
+        <p className="text-sm text-muted-foreground">
+          Pratinjau tidak tersedia untuk tipe file ini. Unduh untuk melihat isinya.
+        </p>
+      </div>
+    );
+    if (previewFailed || !src) return fallback;
+    switch (previewItem.type) {
+      case 'image':
+        return (
+          <img
+            src={src}
+            alt={previewItem.name}
+            className="max-h-[50vh] w-full rounded-lg object-contain"
+            onError={() => setPreviewFailed(true)}
+          />
+        );
+      case 'video':
+        return (
+          <video
+            src={src}
+            controls
+            title={previewItem.name}
+            className="max-h-[50vh] w-full rounded-lg"
+            onError={() => setPreviewFailed(true)}
+          />
+        );
+      case 'audio':
+        return (
+          <audio
+            src={src}
+            controls
+            title={previewItem.name}
+            className="w-full"
+            onError={() => setPreviewFailed(true)}
+          />
+        );
+      case 'pdf':
+        // sandbox tanpa script: dokumen tidak dapat menjalankan JavaScript (D5).
+        return (
+          <iframe
+            src={src}
+            title={previewItem.name}
+            sandbox=""
+            className="h-[50vh] w-full rounded-lg border border-border"
+          />
+        );
+      default:
+        return fallback;
+    }
+  })();
+
+  const previewBody = previewItem ? (
+    <div className="space-y-4">
+      {previewMedia}
+      <dl className="space-y-1.5 text-sm">
+        <div className="flex justify-between gap-3">
+          <dt className="text-muted-foreground">Nama</dt>
+          <dd className="text-right font-medium">{previewItem.name}</dd>
+        </div>
+        <div className="flex justify-between gap-3">
+          <dt className="text-muted-foreground">Tipe</dt>
+          <dd>{TYPE_LABELS[previewItem.type]}</dd>
+        </div>
+        <div className="flex justify-between gap-3">
+          <dt className="text-muted-foreground">Ukuran</dt>
+          <dd>{formatSize(previewItem.size)}</dd>
+        </div>
+        <div className="flex justify-between gap-3">
+          <dt className="text-muted-foreground">Tanggal</dt>
+          <dd>{formatDate(previewItem.updatedAt)}</dd>
+        </div>
+        {previewItem.dimensions && (
+          <div className="flex justify-between gap-3">
+            <dt className="text-muted-foreground">Dimensi</dt>
+            <dd>{previewItem.dimensions}</dd>
+          </div>
+        )}
+        {previewItem.duration !== undefined && (
+          <div className="flex justify-between gap-3">
+            <dt className="text-muted-foreground">Durasi</dt>
+            <dd>{formatDuration(previewItem.duration)}</dd>
+          </div>
+        )}
+      </dl>
+      <div className="flex flex-wrap gap-2">
+        {previewItem.previewUrl ? (
+          <Button asChild size="sm">
+            <a href={previewItem.previewUrl} download={previewItem.name}>
+              <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+              Unduh
+            </a>
+          </Button>
+        ) : (
+          <Button size="sm" onClick={() => onDownload?.([previewItem])}>
+            <Download className="mr-2 h-4 w-4" aria-hidden="true" />
+            Unduh
+          </Button>
+        )}
+      </div>
+    </div>
+  ) : null;
+
   return (
     <div className={cn('flex flex-col overflow-hidden rounded-xl border border-border bg-card', className)}>
       {/* Toolbar */}
@@ -686,7 +1016,7 @@ export function FileManager({
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input placeholder="Cari di folder ini" aria-label="Cari di folder ini" className="h-8 w-44 pl-8" />
           </div>
-          <Button size="sm" variant="outline" className="hidden sm:inline-flex">
+          <Button size="sm" variant="outline" className="hidden sm:inline-flex" onClick={() => setContextOpen(true)}>
             <Upload className="h-4 w-4" />
             Upload
           </Button>
@@ -717,11 +1047,7 @@ export function FileManager({
         </main>
 
         <aside aria-label="Panel konteks" className="hidden w-80 shrink-0 border-l border-border bg-muted/20 lg:block">
-          {contextSlot ?? (
-            <p className="p-4 text-sm text-muted-foreground">
-              Panel konteks (upload, quota, detail) diisi pada story 002-03.
-            </p>
-          )}
+          {contextSlot ?? contextPanel}
         </aside>
       </div>
 
@@ -743,13 +1069,36 @@ export function FileManager({
           <div className="border-b border-border px-4 py-3">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Panel konteks</span>
           </div>
-          {contextSlot ?? (
-            <p className="p-4 text-sm text-muted-foreground">
-              Panel konteks (upload, quota, detail) diisi pada story 002-03.
-            </p>
-          )}
+          {contextSlot ?? contextPanel}
         </SheetContent>
       </Sheet>
+
+      {/* Preview M-001: sheet di desktop, dialog full-screen di mobile (D2) */}
+      {isDesktop ? (
+        <Sheet
+          open={previewItem !== null}
+          onOpenChange={(open) => {
+            if (!open) closePreview();
+          }}
+        >
+          <SheetContent side="right" className="overflow-y-auto sm:max-w-md">
+            <SheetTitle>{previewItem?.name ?? 'Pratinjau'}</SheetTitle>
+            {previewBody}
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <Dialog
+          open={previewItem !== null}
+          onOpenChange={(open) => {
+            if (!open) closePreview();
+          }}
+        >
+          <DialogContent className="max-h-[100dvh] w-full max-w-none overflow-y-auto rounded-none sm:rounded-none">
+            <DialogTitle>{previewItem?.name ?? 'Pratinjau'}</DialogTitle>
+            {previewBody}
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

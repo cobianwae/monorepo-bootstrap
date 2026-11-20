@@ -1,6 +1,6 @@
 # 002-03 — Preview media + quota + upload compose
 
-Status: approved (gate 3)
+Status: review
 PRD: `docs/prd/002-file-manager.md`
 FR: `FR-006`, `FR-007`, `FR-008`
 Screens: `S-005.27`, `S-005.27.02`, `M-001`
@@ -37,13 +37,13 @@ Goal: Panel konteks `S-005.27.02` (upload queue + quota + detail item) dan previ
 
 ## Tasks
 
-- [ ] Panel konteks `S-005.27.02`: compose `file-upload` (teruskan `uploadHandler`) + quota basis `progress` + detail item terpilih
-- [ ] Preview `M-001`: sheet desktop / dialog full-screen mobile; elemen native + `sandbox` PDF + fallback generik + tombol unduh; focus trap + Esc + fokus kembali
-- [ ] Quota 3 level (`normal`/`warning`/`full`) via token `primary`/`warning`/`destructive` + pesan teks
-- [ ] State panel sesuai §6 (upload mengikuti PRD 001; quota skeleton/error ringan; preview skeleton/fallback)
-- [ ] Test co-located: upload selesai → item baru di folder aktif; 4 tipe preview + fallback; quota warna + pesan; preview focus trap
-- [ ] Showcase: kontrol demo quota normal/warning/penuh, pembuka preview per tipe media, panel upload + detail
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
+- [x] Panel konteks `S-005.27.02`: compose `file-upload` (teruskan `uploadHandler`) + quota basis `progress` + detail item terpilih
+- [x] Preview `M-001`: sheet desktop / dialog full-screen mobile; elemen native + `sandbox` PDF + fallback generik + tombol unduh; focus trap + Esc + fokus kembali
+- [x] Quota 3 level (`normal`/`warning`/`full`) via token `primary`/`warning`/`destructive` + pesan teks
+- [x] State panel sesuai §6 (upload mengikuti PRD 001; quota skeleton/error ringan; preview skeleton/fallback)
+- [x] Test co-located: upload selesai → item baru di folder aktif; 4 tipe preview + fallback; quota warna + pesan; preview focus trap
+- [x] Showcase: kontrol demo quota normal/warning/penuh, pembuka preview per tipe media, panel upload + detail
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
 
 ## Dependencies
 

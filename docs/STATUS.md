@@ -12,11 +12,12 @@ Story 001-01 dan 001-02 (upload queue) selesai (`done`, ter-merge ke `dev`).
 PRD 002–006 (`approved`, gate 1) dan spec RM-02/03/10 (`approved`, story 007-01, 008-01/008-02, 009-01) selesai review dan disetujui user; CR-008 (`draft`) mengajukan perapian dokumen PRD 001.
 Story 002-01 (`done`, ter-merge ke `dev`) — pattern `FileManager` shell tiga zona + navigasi tree-breadcrumb di `packages/ui` data-display + showcase `/patterns/file-manager` (S-005.27).
 Story 002-02 (`done`, ter-merge ke `dev`) — zona konten list/grid + seleksi massal + context menu di `file-manager.tsx` + showcase S-005.27.01.
+Story 002-03 (`review`, branch `002-03-preview-quota-upload`) — panel konteks S-005.27.02 (upload compose + quota 3 level + detail item) + preview M-001 (sheet/dialog) di `file-manager.tsx` + showcase S-005.27.02; tambah prop opsional `quotaLoading`/`quotaError` dan `indicatorClassName` pada `Progress`.
 
 ## Next
 
 1. Eksekusi CR-008 (perapian FR PRD 001 + rujukan `CR-006`) — butuh `approved` user.
-2. Mulai gate 2 PRD 002 (file manager) atau eksekusi story lightweight (007-01/008-01/008-02/009-01) — pilih target satu sesi sesuai BACKLOG.
+2. Eksekusi story 002-04 (state matrix penuh + rename/kelola + audit keyboard) atau story lightweight (007-01/008-01/008-02/009-01) — pilih target satu sesi sesuai BACKLOG.
 3. PRD 001 masih `approved` — tetapkan `shipped` bila sudah sesuai keputusan user, lalu arsipkan dari `BACKLOG.md`.
 4. Lengkapi `docs/design/object-model.md` (tambah kategori `canvas` + entri komponen baru) dan `sitemap.md` (S-005.27–S-005.32 sudah terdaftar `planned`).
 
