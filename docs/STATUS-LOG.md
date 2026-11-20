@@ -27,3 +27,5 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-20 — Story 002-04 dialog kelola M-002/M-003 + audit state matrix + keyboard/SR + showcase final selesai, status review — `002-04`
 - 2026-11-20 — Story 002-04 dialog kelola M-002/M-003 + audit state matrix + keyboard/SR + showcase final selesai (`done`, ter-merge ke `dev`) — `002-04`
 - 2026-11-20 — Approve spec desain PRD 003 org chart (gate 2): komponen `OrgChart` data-display standalone tanpa dependency, tidy-tree + konektor token, contract flat/nested + validasi, state matrix + a11y dua mode fokus; artefak `docs/design/org-chart.md`, `docs/design/wireframes/org-chart.md`, `docs/design/flows/org-chart.mmd` — design PRD 003
+- 2026-11-20 — Story 003-01 fondasi OrgChart (normalisasi flat/nested + validasi + tidy-tree + konektor elbow token) selesai, status review — `003-01`
+- 2026-11-20 — Story 003-01 fondasi OrgChart (normalisasi flat/nested + validasi + tidy-tree + konektor elbow token) selesai (`done`, ter-merge ke `dev`) — `003-01`
