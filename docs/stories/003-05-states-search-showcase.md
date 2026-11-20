@@ -1,6 +1,6 @@
 # 003-05 — State matrix, highlight pencarian, scenario showcase final
 
-Status: review
+Status: done
 PRD: `docs/prd/003-org-chart.md`
 FR: `FR-011`, `FR-009`, `FR-012` (penguat `FR-001`, `FR-007`, `FR-008`)
 Screens: `S-005.28`
