@@ -48,7 +48,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | ID | Judul | Status | File |
 |---|---|---|---|
 | 002-01 | Shell tiga zona + navigasi tree-breadcrumb | done | `docs/stories/002-01-shell-navigation.md` |
-| 002-02 | Konten list/grid + seleksi massal + context menu | approved | `docs/stories/002-02-content-selection.md` |
+| 002-02 | Konten list/grid + seleksi massal + context menu | review | `docs/stories/002-02-content-selection.md` |
 | 002-03 | Preview media + quota + upload compose | approved | `docs/stories/002-03-preview-quota-upload.md` |
 | 002-04 | State matrix penuh + rename/kelola + audit keyboard | approved | `docs/stories/002-04-states-manage-a11y.md` |
 

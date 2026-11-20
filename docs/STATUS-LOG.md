@@ -20,3 +20,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-20 — Approve story 002-01–002-04 file manager (gate 3): shell navigasi, konten seleksi, preview/quota/upload, states/kelola/a11y — `002-01`, `002-02`, `002-03`, `002-04`
 - 2026-11-20 — Story 002-01 FileManager shell tiga zona + navigasi tree-breadcrumb + showcase S-005.27 selesai, status review — `002-01`
 - 2026-11-20 — Story 002-01 FileManager shell tiga zona + navigasi tree-breadcrumb selesai (`done`, ter-merge ke `dev`) — `002-01`
+- 2026-11-20 — Story 002-02 FileManager zona konten list/grid + seleksi massal + context menu + sortir/filter + showcase S-005.27.01 selesai, status review — `002-02`
