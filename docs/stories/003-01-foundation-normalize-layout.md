@@ -1,6 +1,6 @@
 # 003-01 — Fondasi OrgChart: normalisasi data, layout tidy-tree, render diagram + konektor
 
-Status: review
+Status: done
 PRD: `docs/prd/003-org-chart.md`
 FR: `FR-001`, `FR-004`
 Screens: `S-005.28`
