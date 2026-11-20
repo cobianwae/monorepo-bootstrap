@@ -1,6 +1,6 @@
 # 003-03 — A11y penuh: role tree, navigasi keyboard node, dua mode fokus
 
-Status: review
+Status: done
 PRD: `docs/prd/003-org-chart.md`
 FR: `FR-010` (penguat `FR-005`, `FR-003`)
 Screens: `S-005.28`
