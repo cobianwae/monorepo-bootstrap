@@ -76,7 +76,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.29.02 | Flow Editor — inspector properti (panel kanan/sheet) | `/patterns/flow-editor` (panel kanan) | implemented |
 | S-005.30 | Transfer List | `/patterns/transfer-list` | implemented |
 | S-005.31 | Cascader & Tree Select | `/patterns/cascader-tree-select` | implemented |
-| S-005.32 | Mention & Emoji | `/patterns/mention-emoji` | planned |
+| S-005.32 | Mention & Emoji | `/patterns/mention-emoji` | implemented |
 | S-005.33 | Org Chart Editor (legacy, diganti 011) | `/patterns/org-chart-editor` | deprecated |
 | S-005.34 | Org Chart Studio (PRD 011) | `/patterns/org-chart-studio` | implemented |
 | S-005.34.01 | Org Chart Studio — panel detail (inspector + tab pohon SR) | `/patterns/org-chart-studio` (panel kanan) | implemented |
