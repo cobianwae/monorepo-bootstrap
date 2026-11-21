@@ -72,7 +72,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 011-04 | Studio cari + keyboard + pohon SR + motion/sentuh | done | `docs/stories/011-04-cari-keyboard-pohon-sr.md` |
 | 011-05 | Studio states + showcase + audit kontras + legacy deprecated | done | `docs/stories/011-05-states-showcase-audit-legacy.md` |
 | 005-01 | Flow editor fondasi canvas + node custom DS | done | `docs/stories/005-01-canvas-node-foundation.md` |
-| 005-02 | Flow editor palette drag + tambah keyboard + snap | approved | `docs/stories/005-02-palette-drop-snap.md` |
+| 005-02 | Flow editor palette drag + tambah keyboard + snap | done | `docs/stories/005-02-palette-drop-snap.md` |
 | 005-03 | Flow editor edge sambung + validasi + label | approved | `docs/stories/005-03-edge-validasi-label.md` |
 | 005-04 | Flow editor seleksi + inspector on-demand + hapus | approved | `docs/stories/005-04-seleksi-inspector-hapus.md` |
 | 005-05 | Flow editor undo/redo + toolbar pola | approved | `docs/stories/005-05-undo-redo-toolbar.md` |

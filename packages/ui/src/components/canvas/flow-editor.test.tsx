@@ -1,13 +1,18 @@
 import * as React from 'react';
-import { render, renderHook, screen, within } from '@testing-library/react';import { afterEach, describe, expect, it, vi } from 'vitest';
+import { render, renderHook, screen, within, fireEvent } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { useReactFlow } from '@xyflow/react';
 import { Toaster } from '../feedback/toaster';
 import { TooltipProvider } from '../base/tooltip';
-import { FlowEditor, type FlowEdge, type FlowNode, useFlowHistory } from './flow-editor';
+import { FlowEditor, type FlowEdge, type FlowNode, type FlowPaletteItem, useFlowHistory } from './flow-editor';
+
+const mockStf = vi.hoisted(() => vi.fn((pos: { x: number; y: number }) => pos));
+const mockGetViewport = vi.hoisted(() => vi.fn(() => ({ x: 0, y: 0, zoom: 1 })));
 
 vi.mock('@xyflow/react', async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>;
   return {
-    ...actual,
+    ...(actual as Record<string, unknown>),
     // ReactFlow test-friendly: render nodes via nodeTypes dan edges sebagai div,
     // tanpa memerlukan DOM kanvas xyflow asli di jsdom.
     ReactFlow: function MockReactFlow(props: Record<string, unknown>) {
@@ -53,6 +58,31 @@ vi.mock('@xyflow/react', async (importOriginal) => {
     Background: () => null,
     Handle: () => <span data-testid="flow-handle-mock" />,
     ReactFlowProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    screenToFlowPosition: mockStf,
+    useReactFlow: () => ({
+      screenToFlowPosition: mockStf,
+      getViewport: mockGetViewport,
+    }),
+  };
+});
+
+vi.mock('@dnd-kit/core', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...(actual as Record<string, unknown>),
+    DndContext: ({ children, onDragEnd }: { children: React.ReactNode; onDragEnd?: (event: unknown) => void }) => {
+      if (onDragEnd) {
+        // Expose ke tes melalui window agar tidak perlu impor anggota buatan dari module.
+        ;(window as unknown as Record<string, unknown>).__flowLastDragEnd = onDragEnd;
+      }
+      return <div data-testid="dnd-mock-context">{children}</div>;
+    },
+    PointerSensor: actual.PointerSensor,
+    useSensor: () => ({}),
+    useSensors: () => [],
+    useDraggable: () => ({ attributes: {}, listeners: {}, setNodeRef: () => {}, isDragging: false }),
+    useDroppable: () => ({ attributes: {}, listeners: {}, setNodeRef: () => {}, isOver: false }),
+    closestCenter: actual.closestCenter,
   };
 });
 
@@ -88,7 +118,20 @@ function renderEditor(props: React.ComponentProps<typeof FlowEditor> = {}) {
 
 afterEach(() => {
   vi.restoreAllMocks();
+  ;(window as unknown as Record<string, unknown>).__flowLastDragEnd = null;
 });
+
+const dragEndEvent = (over: { id: string } | undefined) =>
+  ({
+    active: {
+      data: { current: { item: { type: 'action', title: 'Kirim email' } } },
+      rect: { current: { translated: { left: 100, top: 100 } } },
+    },
+    activatorEvent: { clientX: 100, clientY: 100 },
+    over,
+  } as unknown);
+
+const getDragEnd = () => (window as unknown as Record<string, unknown>).__flowLastDragEnd as (event: unknown) => void;
 
 describe('FlowEditor fondasi (005-01)', () => {
   it('AC-02: render 2 node DS deterministik 220×88 dengan kontrak a11y D4', () => {
@@ -181,5 +224,95 @@ describe('FlowEditor fondasi (005-01)', () => {
     expect(typeof result.current.redo).toBe('function');
     expect(result.current.canUndo).toBe(false);
     expect(result.current.canRedo).toBe(false);
+  });
+});
+
+describe('FlowEditor palette + keyboard + snap (005-02)', () => {
+  const paletteItems: FlowPaletteItem[] = [
+    { type: 'action', title: 'Kirim email', description: 'Tugas otomatisasi email' },
+    { type: 'pending', title: 'Tunda', description: 'Jeda eksekusi sejumlah waktu' },
+  ];
+
+  const renderWithPalette = (overrides: React.ComponentProps<typeof FlowEditor> = {}) =>
+    renderEditor({ paletteItems, onAddFromPalette: vi.fn(), ...overrides });
+
+  it('AC-03: render palette, search filter, dan live region "N jenis"', () => {
+    renderWithPalette();
+    expect(screen.getByTestId('flow-palette')).not.toBeNull();
+    expect(screen.getByTestId('flow-palette-live').textContent).toBe('2 jenis');
+    const search = screen.getByTestId('flow-palette-search');
+    fireEvent.change(search, { target: { value: 'email' } });
+    expect(screen.getByTestId('flow-palette-live').textContent).toBe('1 jenis');
+    expect(screen.getByTestId('flow-palette-item-action')).not.toBeNull();
+    expect(screen.queryByTestId('flow-palette-item-pending')).toBeNull();
+  });
+
+  it('AC-02: tombol [+] klik tambah di tengah viewport + node baru difokuskan (selected)', () => {
+    const onAddFromPalette = vi.fn();
+    renderEditor({ paletteItems, onAddFromPalette });
+    const add = screen.getByTestId('flow-palette-add-action');
+    fireEvent.click(add);
+    expect(onAddFromPalette).toHaveBeenCalledWith(
+      { type: 'action', title: 'Kirim email', description: 'Tugas otomatisasi email' },
+      { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+    );
+  });
+
+  it('AC-02: tombol [+] Enter memicu tambah', () => {
+    const onAddFromPalette = vi.fn();
+    renderEditor({ paletteItems, onAddFromPalette });
+    const add = screen.getByTestId('flow-palette-add-action');
+    fireEvent.keyDown(add, { key: 'Enter' });
+    expect(onAddFromPalette).toHaveBeenCalledTimes(1);
+  });
+
+  it('AC-01: drop di dalam canvas panggil onAddFromPalette dengan posisi screenToFlowPosition', () => {
+    const onAddFromPalette = vi.fn();
+    renderEditor({ paletteItems: [{ type: 'action', title: 'Kirim email' }], onAddFromPalette });
+    getDragEnd()(dragEndEvent({ id: 'canvas' }));
+    expect(onAddFromPalette).toHaveBeenCalledTimes(1);
+    const [item, pos] = onAddFromPalette.mock.calls[0];
+    expect(item.type).toBe('action');
+    expect(pos).toEqual({ x: 100, y: 100 });
+  });
+
+  it('AC-01: drop di luar canvas batal, onAddFromPalette tidak dipanggil', () => {
+    const onAddFromPalette = vi.fn();
+    renderEditor({ paletteItems: [{ type: 'action', title: 'Kirim email' }], onAddFromPalette });
+    getDragEnd()(dragEndEvent(undefined));
+    expect(onAddFromPalette).not.toHaveBeenCalled();
+  });
+
+  it('AC-04: snap aktif → posisi jatuh ke kelipatan grid; mati → presisi piksel', () => {
+    mockStf.mockReturnValue({ x: 103, y: 57 });
+    mockGetViewport.mockReturnValue({ x: 0, y: 0, zoom: 1 });
+
+    const onSnap = vi.fn();
+    renderEditor({ paletteItems: [{ type: 'action', title: 'Kirim email' }], onAddFromPalette: onSnap, snapToGrid: true, gridSize: 16 });
+    getDragEnd()(dragEndEvent({ id: 'canvas' }));
+    expect(onSnap).toHaveBeenLastCalledWith(
+      expect.objectContaining({ type: 'action' }),
+      { x: 96, y: 64 },
+    );
+
+    const onNoSnap = vi.fn();
+    renderEditor({ paletteItems: [{ type: 'action', title: 'Kirim email' }], onAddFromPalette: onNoSnap, snapToGrid: false, gridSize: 16 });
+    getDragEnd()(dragEndEvent({ id: 'canvas' }));
+    expect(onNoSnap).toHaveBeenLastCalledWith(
+      expect.objectContaining({ type: 'action' }),
+      { x: 103, y: 57 },
+    );
+
+    mockStf.mockReturnValue({ x: 100, y: 100 });
+    mockGetViewport.mockReturnValue({ x: 0, y: 0, zoom: 1 });
+  });
+
+  it('AC-02: tambah via [+] tidak membuka sheet penuh (node baru selected, internal add)', () => {
+    const { container } = renderEditor({ paletteItems });
+    const add = screen.getByTestId('flow-palette-add-action');
+    fireEvent.click(add);
+    const newNode = container.querySelector('[data-testid^="flow-node-node-"]');
+    expect(newNode).not.toBeNull();
+    expect(newNode?.getAttribute('aria-selected')).toBe('true');
   });
 });

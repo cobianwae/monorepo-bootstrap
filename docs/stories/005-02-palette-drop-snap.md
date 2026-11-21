@@ -1,6 +1,6 @@
 # 005-02 — Palette drag + tambah keyboard + snap grid
 
-Status: approved
+Status: done
 PRD: `docs/prd/005-flow-editor.md`
 Design: `docs/design/flow-editor.md`
 FR: `FR-004`, `FR-009`, `FR-011`
@@ -35,11 +35,11 @@ Goal: Node baru lahir dari palette via drag maupun keyboard, di posisi benar (dr
 
 ## Tasks
 
-- [ ] `FlowPalette` (`S-005.29.01`): search, item drag `@dnd-kit/*`, tombol [+]
-- [ ] Drop: `screenToFlowPosition` + snap + `onAddFromPalette` + fokus ke node baru
-- [ ] Grid `BackgroundVariant.Dots` token + props `snapToGrid`/`gridSize`
-- [ ] Test: drop posisi + batal-luar-canvas + keyboard tambah + fokus + search + snap on/off
-- [ ] Showcase: palette tampil di draf route (final di 005-06)
+- [x] `FlowPalette` (`S-005.29.01`): search, item drag `@dnd-kit/*`, tombol [+]
+- [x] Drop: `screenToFlowPosition` + snap + `onAddFromPalette` + fokus ke node baru
+- [x] Grid `BackgroundVariant.Dots` token + props `snapToGrid`/`gridSize`
+- [x] Test: drop posisi + batal-luar-canvas + keyboard tambah + fokus + search + snap on/off
+- [x] Showcase: palette tampil di draf route (final di 005-06)
 
 ## Dependencies
 
