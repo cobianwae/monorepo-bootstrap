@@ -44,8 +44,6 @@ import {
   DialogTitle,
 } from '../feedback/dialog';
 
-export { htmlToMarkdown, markdownToHtml } from './rich-text-editor-serializer';
-
 export type RichTextMode = 'editable' | 'readonly' | 'disabled';
 
 function stripHtmlToLength(html: string): number {

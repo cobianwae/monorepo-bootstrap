@@ -62,7 +62,6 @@ import {
   type OrgNodeNormalized,
 } from '../data-display/org-chart';
 
-export { getAncestors };
 export type { OrgChartInput, OrgChartOrientation, OrgNodeNormalized };
 
 export type OrgChartEditorAccent = 'primary' | 'success' | 'warning' | 'info' | 'destructive';
