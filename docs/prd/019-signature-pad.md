@@ -26,7 +26,7 @@ Bukti/konsekuensi:
 | Pad tanda tangan standar | Coret→undo→ekspor tanpa komponen custom | Scenario + test hijau |
 | Goresan halus semua input | Pointer + sentuh dengan smoothing | Teramati di scenario desktop + mobile |
 | Tetap bisa keyboard | Kontrol + fallback terlabel | Lolos audit WCAG 2.1 AA |
-| Tanpa dependency baru | Canvas 2D API saja | Dependency tercatat di constraints |
+| Pad standar | signature_pad + wrapper DS controlled | Dependency tercatat di constraints |
 
 ## Non-goals
 
@@ -85,8 +85,9 @@ Skenario utama:
 
 ## Constraints & Dependencies
 
-- Dependency package: **tanpa dependency baru** — Canvas 2D API + Pointer Events
-  browser.
+- Dependency package: **`signature_pad`** — standar industri pad tanda tangan
+  (smoothing, pointer/touch, ekspor PNG/SVG); dibungkus komponen DS controlled
+  + a11y (label, undo/hapus keyboard, fallback).
 - Teknis: komponen di `packages/ui` kategori `form`; peka DPI (devicePixelRatio)
   agar goresan tajam.
 - Batasan lingkungan: token-first (OKLCH), WCAG 2.1 AA, light/dark parity, test
@@ -96,7 +97,7 @@ Skenario utama:
 
 | # | Pertanyaan | Status |
 |---|---|---|
-| 1 | Format ekspor default: PNG vs SVG? | open — usulan: PNG (raster goresan) + SVG sebagai opsi |
+| 1 | Format ekspor default: PNG vs SVG? | answered — PNG default + SVG opsi (keduanya didukung signature_pad) |
 | 2 | Fallback ketik-nama: wajib di v1 (FR-006) atau `could`? | open — usulan: `could` bila pad + tombol sudah lolos audit |
 | 3 | Ukuran kanvas default (responsif penuh vs rasio tetap)? | open — usulan: rasio 3:1 responsif |
 
@@ -106,3 +107,4 @@ Skenario utama:
 |---|---|
 | 2026-11-21 | Draft awal dari roadmap RM-18 |
 | 2026-11-21 | **Approved (gate 1)** — OQ dibawa ke gate 2 sebagai risiko/desain |
+| 2026-11-21 | **Revisi dependency (gate 1)**: signature_pad + wrapper DS controlled; OQ#1 answered (PNG default + SVG opsi) |

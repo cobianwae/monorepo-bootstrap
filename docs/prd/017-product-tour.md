@@ -26,7 +26,7 @@ Bukti/konsekuensi:
 | Komponen tur reusable | Alur 5 langkah tanpa komponen custom | Scenario + test hijau |
 | Robust terhadap layout | Target hilang ditangani anggun | Error state tercover test |
 | Aksesibilitas tur | Keyboard + SR + reduced-motion | Lolos audit WCAG 2.1 AA |
-| Tanpa dependency baru | Di atas `popover` + pola existing | Dependency tercatat di constraints |
+| Tur pro | driver.js + wrapper DS | Dependency tercatat di constraints |
 
 ## Non-goals
 
@@ -85,8 +85,9 @@ Skenario utama:
 
 ## Constraints & Dependencies
 
-- Dependency package: **tanpa dependency baru** — di atas Radix `popover`
-  existing + util posisi existing; tanpa library tur pihak ketiga.
+- Dependency package: **`driver.js`** — standar agnostik tur/coach marks
+  (spotlight, popover, keyboard, API ringan); dibungkus wrapper DS
+  (token-first, microcopy Bahasa Indonesia, reduced-motion).
 - Teknis: komponen di `packages/ui` kategori `overlay`; storage persistence
   milik konsumen (hanya callback).
 - Batasan lingkungan: token-first (OKLCH), WCAG 2.1 AA, light/dark parity, test
@@ -96,7 +97,7 @@ Skenario utama:
 
 | # | Pertanyaan | Status |
 |---|---|---|
-| 1 | Penargetan: ref React saja, atau dukung selector string juga? | open — usulan: keduanya, ref prioritas |
+| 1 | Penargetan: ref React saja, atau dukung selector string juga? | answered — keduanya; ref prioritas, selector via driver.js |
 | 2 | Konfirmasi saat Lewati — selalu, atau hanya bila progres > 1 langkah? | open |
 | 3 | Apakah mode "coach mark tunggal" (satu sorotan tanpa alur) masuk v1? | open — usulan: ya sebagai `could` bila murah |
 
@@ -106,3 +107,4 @@ Skenario utama:
 |---|---|
 | 2026-11-21 | Draft awal dari roadmap RM-16 |
 | 2026-11-21 | **Approved (gate 1)** — OQ dibawa ke gate 2 sebagai risiko/desain |
+| 2026-11-21 | **Revisi dependency (gate 1)**: driver.js + wrapper DS; OQ#1 answered (ref + selector) |

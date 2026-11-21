@@ -26,7 +26,7 @@ Bukti/konsekuensi:
 | Matriks role × resource standar | Grid 5×8 tanpa komponen custom | Scenario + test hijau |
 | Aksi massal konsisten | Toggle baris/kolom + indeterminate benar | Semua tercover test + scenario |
 | Grid accessible | Header terasosiasi + keyboard | Lolos audit WCAG 2.1 AA |
-| Tanpa dependency baru | Compose pola tabel + checkbox existing | Dependency tercatat di constraints |
+| Tanpa dependency (disengaja) | Tidak ada standar industri; compose existing | Praktik umum, tercatat di constraints |
 
 ## Non-goals
 
@@ -85,8 +85,9 @@ Skenario utama:
 
 ## Constraints & Dependencies
 
-- Dependency package: **tanpa dependency baru** — compose `checkbox` + pola
-  tabel existing.
+- Dependency package: **tanpa dependency (disengaja)** — tidak ada library
+  standar industri untuk matriks otorisasi; compose `checkbox` + pola tabel
+  existing adalah praktik umum.
 - Teknis: komponen di `packages/ui` kategori `data-display`; API controlled
   sederhana (`value: Record<role, Record<resource, boolean>>` atau setara —
   final di gate 2).
@@ -107,3 +108,4 @@ Skenario utama:
 |---|---|
 | 2026-11-21 | Draft awal dari roadmap RM-17 |
 | 2026-11-21 | **Approved (gate 1)** — OQ dibawa ke gate 2 sebagai risiko/desain |
+| 2026-11-21 | **Revisi dependency (gate 1)**: tetap tanpa dependency (disengaja — tidak ada standar industri) |

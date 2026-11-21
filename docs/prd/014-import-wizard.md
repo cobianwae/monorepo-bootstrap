@@ -26,7 +26,7 @@ Bukti/konsekuensi:
 | Impor CSV ujung-ke-ujung standar | Alur 4 langkah selesai tanpa komponen custom | Scenario + test hijau |
 | Error data mudah diperbaiki | Error per sel/baris teramati + bisa kembali ke mapping | Semua tercover test + scenario |
 | Aksesibilitas wizard | Stepper + focus management antar langkah | Lolos audit WCAG 2.1 AA |
-| Tanpa dependency baru | Parsing CSV milik sendiri | Dependency tercatat di constraints |
+| Parsing standar | papaparse + validasi/UI sendiri | Dependency tercatat di constraints |
 
 ## Non-goals
 
@@ -88,8 +88,9 @@ Skenario utama:
 
 ## Constraints & Dependencies
 
-- Dependency package: **tanpa dependency baru** — parsing CSV (delimiter, quote,
-  encoding umum) milik sendiri sebagai util co-located.
+- Dependency package: **`papaparse`** — standar industri parsing CSV
+  (delimiter/quote/encoding, worker + streaming untuk file besar); validasi
+  dan UI wizard milik sendiri.
 - Teknis: pola di `apps/showcase` + komponen bantu di `packages/ui` kategori
   `form`/`data-display` sesuai kebutuhan gate 2; hasil akhir via `onComplete`.
 - Batasan lingkungan: token-first (OKLCH), WCAG 2.1 AA, light/dark parity, test
@@ -101,7 +102,7 @@ Skenario utama:
 |---|---|---|
 | 1 | Batas ukuran file/baris default di v1? | open — usulan: 5 MB / 10.000 baris dengan peringatan |
 | 2 | Opsi baris gagal: lewati vs gagalkan seluruh impor — default mana? | open — usulan: lewati dengan ringkasan |
-| 3 | Delimiter selain koma (titik-koma/tab) — auto-detect di v1? | open — usulan: ya, auto-detect + override manual |
+| 3 | Delimiter selain koma (titik-koma/tab) — auto-detect di v1? | answered — ya, auto-detect + override manual (bawaan papaparse) |
 
 ## Changelog
 
@@ -109,3 +110,4 @@ Skenario utama:
 |---|---|
 | 2026-11-21 | Draft awal dari roadmap RM-13 |
 | 2026-11-21 | **Approved (gate 1)** — OQ dibawa ke gate 2 sebagai risiko/desain |
+| 2026-11-21 | **Revisi dependency (gate 1)**: papaparse untuk parsing CSV; OQ#3 answered (auto-detect + override) |

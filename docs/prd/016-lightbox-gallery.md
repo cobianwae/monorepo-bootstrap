@@ -25,7 +25,7 @@ Bukti/konsekuensi:
 | Lightbox galeri standar | Navigasi multi-item tanpa komponen custom | Scenario + test hijau |
 | Navigasi semua input | Keyboard, pointer, dan swipe dasar | Semua tercover test + scenario |
 | Dialog accessible | Trap fokus + pengumuman posisi | Lolos audit WCAG 2.1 AA |
-| Tanpa dependency baru | Di atas `dialog` + pola existing | Dependency tercatat di constraints |
+| Lightbox pro | yet-another-react-lightbox + wrapper DS | Dependency tercatat di constraints |
 
 ## Non-goals
 
@@ -83,8 +83,9 @@ Skenario utama:
 
 ## Constraints & Dependencies
 
-- Dependency package: **tanpa dependency baru** — di atas Radix `dialog`
-  existing + pola media existing.
+- Dependency package: **`yet-another-react-lightbox`** — standar modern lightbox
+  React (navigasi, zoom, thumbnail, swipe, plugin); dibungkus wrapper DS
+  (token-first, label Bahasa Indonesia, trap fokus + live region terverifikasi).
 - Teknis: komponen di `packages/ui` kategori `overlay` (atau `data-display`
   bila diputuskan gate 2); API terkontrol `openIndex`/`onOpenChange`.
 - Batasan lingkungan: token-first (OKLCH), WCAG 2.1 AA, light/dark parity, test
@@ -94,7 +95,7 @@ Skenario utama:
 
 | # | Pertanyaan | Status |
 |---|---|---|
-| 1 | Kategori folder: `overlay` vs `data-display`? | open — usulan: `overlay` (basis dialog) |
+| 1 | Kategori folder: `overlay` vs `data-display`? | answered — `overlay` (basis dialog/lightbox) |
 | 2 | Preload strategi: berapa item ke depan? | open — usulan: 1 ke depan + 1 ke belakang |
 | 3 | Apakah unduh/share per item masuk v1? | open — usulan: slot aksi opsional milik konsumen |
 
@@ -104,3 +105,4 @@ Skenario utama:
 |---|---|
 | 2026-11-21 | Draft awal dari roadmap RM-15 |
 | 2026-11-21 | **Approved (gate 1)** — OQ dibawa ke gate 2 sebagai risiko/desain |
+| 2026-11-21 | **Revisi dependency (gate 1)**: yet-another-react-lightbox + wrapper DS; OQ#1 answered (kategori overlay) |

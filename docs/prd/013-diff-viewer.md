@@ -26,7 +26,7 @@ Bukti/konsekuensi:
 | Diff viewer reusable untuk review/audit | Screen konsumen memakai komponen langsung | ≥ 1 screen konsumen |
 | Dua mode tampil tercakup | Unified + split teramati di showcase | Semua tercover test + scenario |
 | Aksesibilitas diff | Navigasi hunk via keyboard + label SR | Lolos audit WCAG 2.1 AA |
-| Tanpa dependency baru | Parsing + render milik sendiri | Dependency tercatat di constraints |
+| Parsing standar | `diff` (jsdiff) + render token-first sendiri | Dependency tercatat di constraints |
 
 ## Non-goals
 
@@ -83,8 +83,9 @@ Skenario utama:
 
 ## Constraints & Dependencies
 
-- Dependency package: **tanpa dependency baru** — parsing unified-diff dan render
-  milik sendiri; syntax highlighting penuh ditunda.
+- Dependency package: **`diff` (jsdiff)** — standar industri parsing unified-diff;
+  render unified/split milik sendiri agar token-first dan kontras terkontrol.
+  Syntax highlighting penuh tetap ditunda (FR-003).
 - Teknis: komponen di `packages/ui` kategori `data-display`; input berupa struktur
   hunk ternormalisasi (parser disediakan sebagai util co-located).
 - Batasan lingkungan: token-first (OKLCH), WCAG 2.1 AA, light/dark parity, test
@@ -94,7 +95,7 @@ Skenario utama:
 
 | # | Pertanyaan | Status |
 |---|---|---|
-| 1 | Format input: struktur hunk JSON milik DS vs string unified-diff mentah (parser bawaan)? | open — usulan: terima keduanya, normalisasi di util |
+| 1 | Format input: struktur hunk JSON vs string unified-diff mentah? | answered — terima keduanya; string di-parse via `diff`, normalisasi di util co-located |
 | 2 | Apakah syntax highlighting ringan (regex kata kunci, tanpa dep) masuk v1? | open |
 | 3 | Batas baris render default sebelum "muat lebih banyak"? | open — usulan: 500 baris |
 
@@ -104,3 +105,4 @@ Skenario utama:
 |---|---|
 | 2026-11-21 | Draft awal dari roadmap RM-12 |
 | 2026-11-21 | **Approved (gate 1)** — OQ dibawa ke gate 2 sebagai risiko/desain |
+| 2026-11-21 | **Revisi dependency (gate 1)**: `diff` (jsdiff) untuk parsing, render token-first sendiri; OQ#1 answered |

@@ -25,7 +25,7 @@ Bukti/konsekuensi:
 | Crop avatar/cover standar | Alur upload→crop→simpan tanpa komponen custom | Scenario + test hijau |
 | Interaksi presisi | Drag/resize/zoom menghasilkan output sesuai area | Dimensi output terverifikasi test |
 | Aksesibilitas crop | Operasi setara via keyboard | Lolos audit WCAG 2.1 AA |
-| Tanpa dependency baru | Canvas API browser saja | Dependency tercatat di constraints |
+| Cropper pro | react-easy-crop + wrapper token DS | Dependency tercatat di constraints |
 
 ## Non-goals
 
@@ -82,8 +82,9 @@ Skenario utama:
 
 ## Constraints & Dependencies
 
-- Dependency package: **tanpa dependency baru** — Canvas 2D API + `createImageBitmap`
-  browser; tanpa library crop pihak ketiga.
+- Dependency package: **`react-easy-crop`** — cropper React paling umum
+  (drag/zoom/rotate, aspek terkunci, keyboard-ready); dibungkus wrapper
+  token-first DS dengan microcopy Bahasa Indonesia.
 - Teknis: komponen di `packages/ui` kategori `form`; util decode/resize co-located.
 - Batasan lingkungan: token-first (OKLCH), WCAG 2.1 AA, light/dark parity, test
   Vitest + Testing Library co-located (mock canvas bila perlu), alur gate AGENTS.md.
@@ -102,3 +103,4 @@ Skenario utama:
 |---|---|
 | 2026-11-21 | Draft awal dari roadmap RM-14 |
 | 2026-11-21 | **Approved (gate 1)** — OQ dibawa ke gate 2 sebagai risiko/desain |
+| 2026-11-21 | **Revisi dependency (gate 1)**: react-easy-crop + wrapper token DS |

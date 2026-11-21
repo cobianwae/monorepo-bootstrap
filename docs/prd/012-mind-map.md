@@ -26,7 +26,7 @@ Bukti/konsekuensi:
 | Mind map reusable untuk ideation | Screen konsumen memakai komponen langsung | ≥ 1 screen konsumen |
 | Struktur radial terbaca | Root + 3 level cabang teramati di showcase | Semua tercover test + scenario |
 | Aksesibilitas setara tree | Navigasi keyboard + ARIA | Lolos audit WCAG 2.1 AA |
-| Tanpa dependency baru | Reuse pola kanvas existing | Dependency tercatat di OQ#1 |
+| Satu dependency canvas | Reuse `@xyflow/react` yang sudah ada | Tanpa dependency di luar existing |
 
 ## Non-goals
 
@@ -85,9 +85,10 @@ Skenario utama:
 
 ## Constraints & Dependencies
 
-- Dependency package: **tanpa dependency baru** (diusulkan) — layout radial
-  deterministik + SVG connectors reuse pola `OrgChart`; bukan di atas xyflow agar
-  tetap ringan. Keputusan final di OQ#1 (gate 1).
+- Dependency package: **`@xyflow/react` (reuse)** — sudah disetujui di PRD 005 dan
+  dipakai `OrgChartStudio`; mind map reuse satu dependency canvas (node/edge,
+  pan/zoom, minimap) dengan layout radial milik sendiri. Tanpa dependency baru
+  di luar yang sudah ada.
 - Teknis: komponen di `packages/ui` kategori `canvas`; data `id`/`parentId`
   konsisten dengan pola org chart.
 - Batasan lingkungan: token-first (OKLCH), WCAG 2.1 AA, light/dark parity, test
@@ -97,7 +98,7 @@ Skenario utama:
 
 | # | Pertanyaan | Status |
 |---|---|---|
-| 1 | Implementasi: standalone reuse pola Studio (diusulkan, tanpa dependency) vs di atas `@xyflow/react`? | open |
+| 1 | Implementasi: standalone vs di atas `@xyflow/react`? | answered — reuse `@xyflow/react` (satu dependency canvas; layout radial milik sendiri) |
 | 2 | Layout default: dua sisi (kiri-kanan) vs radial penuh? | open — usulan: dua sisi seimbang sebagai default |
 | 3 | Apakah FR-010 (drag-reparent) masuk v1 atau iterasi berikut? | open |
 
@@ -107,3 +108,4 @@ Skenario utama:
 |---|---|
 | 2026-11-21 | Draft awal dari roadmap RM-07 |
 | 2026-11-21 | **Approved (gate 1)** — OQ dibawa ke gate 2 sebagai risiko/desain |
+| 2026-11-21 | **Revisi dependency (gate 1)**: reuse `@xyflow/react` (sudah ada di PRD 005); OQ#1 answered |
