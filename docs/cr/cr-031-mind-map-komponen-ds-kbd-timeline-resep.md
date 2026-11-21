@@ -62,9 +62,9 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] C1: ganti `<kbd>` buatan dengan `Kbd`, pecah per tombol; pertahankan `dl/dt/dd` dan catatan kaki.
-- [ ] C2: ganti `<ol>` langkah dengan `Timeline`; pastikan `ol > li` = 6 dan urutan langkah terbaca benar.
-- [ ] C3: restyle bingkai + header bar resep; logika salin/fallback/live region tidak berubah.
+- [x] C1: ganti `<kbd>` buatan dengan `Kbd`, pecah per tombol; pertahankan `dl/dt/dd` dan catatan kaki.
+- [x] C2: ganti `<ol>` langkah dengan `Timeline`; pastikan `ol > li` = 6 dan urutan langkah terbaca benar.
+- [x] C3: restyle bingkai + header bar resep; logika salin/fallback/live region tidak berubah.
 - [ ] Perbarui test bila perlu (lihat Cek test).
 - [ ] Verifikasi: test showcase mind-map (`page.test.tsx` + `mind-map-recipe.test.tsx`), eslint, tsc showcase, `pnpm -C apps/showcase build`, cek visual light/dark.
 
@@ -99,9 +99,9 @@ Branch: `cr-031-mind-map-komponen-ds-kbd-timeline-resep` (bertumpuk dari `cr-030
 Commit: `refactor: pakai Kbd, Timeline, dan restyle resep mind map [CR-031]`
 
 - [x] CR disetujui user (instruksi user: "approve smua", sesi /improve-ui).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan (mind-map test 9/9, `build:types` hijau, `pnpm lint` workspace bersih; build showcase ditunda).
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
 - [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.

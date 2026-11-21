@@ -37,23 +37,28 @@ export function MindMapRecipe() {
             Salin contoh ini untuk menghubungkan data dan pencarian di aplikasi konsumen.
           </p>
         </div>
-        <Button type="button" variant="outline" size="sm" className="min-h-11" onClick={copyRecipe}>
-          {copied === 'Resep disalin' ? (
-            <Check className="h-4 w-4" aria-hidden="true" />
-          ) : (
-            <Copy className="h-4 w-4" aria-hidden="true" />
-          )}
-          Salin resep
-        </Button>
       </div>
       <div>
-        <pre
-          tabIndex={0}
-          aria-label="Contoh kode integrasi MindMap"
-          className="overflow-x-auto rounded-lg border border-border bg-muted/40 p-4 font-mono text-xs leading-relaxed text-foreground"
-        >
-          <code>{RECIPE}</code>
-        </pre>
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+          <div className="flex items-center justify-between gap-2 border-b border-border bg-muted/40 px-4 py-2 text-xs">
+            <span className="font-mono text-muted-foreground">tsx</span>
+            <Button type="button" variant="outline" size="sm" className="min-h-11" onClick={copyRecipe}>
+              {copied === 'Resep disalin' ? (
+                <Check className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Copy className="h-4 w-4" aria-hidden="true" />
+              )}
+              Salin resep
+            </Button>
+          </div>
+          <pre
+            tabIndex={0}
+            aria-label="Contoh kode integrasi MindMap"
+            className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-foreground"
+          >
+            <code>{RECIPE}</code>
+          </pre>
+        </div>
         <p role="status" className={copied ? 'mt-2 text-sm text-muted-foreground' : 'sr-only'}>
           {copied}
         </p>

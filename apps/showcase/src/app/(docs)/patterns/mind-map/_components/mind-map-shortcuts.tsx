@@ -1,13 +1,17 @@
+import * as React from 'react';
 import { Keyboard } from 'lucide-react';
+import { Kbd } from '@ds/ui';
 
-const SHORTCUTS: Array<{ keys: string; action: string }> = [
-  { keys: 'Enter / F2', action: 'Ubah nama ide' },
-  { keys: 'Space', action: 'Lipat atau buka cabang' },
-  { keys: 'Delete', action: 'Hapus cabang (dengan konfirmasi)' },
-  { keys: 'Ctrl/⌘ + Z', action: 'Urungkan perubahan' },
-  { keys: '← ↑ ↓ →', action: 'Telusuri ide: saudara, induk, atau anak' },
-  { keys: 'Home / End', action: 'Ke awal atau akhir daftar' },
-  { keys: '+ − 0 F', action: 'Kanvas: zoom in, zoom out, reset 100%, fit view' },
+type ShortcutJoiner = '/' | '+' | ' ';
+
+const SHORTCUTS: Array<{ keys: string[]; joiner: ShortcutJoiner; action: string }> = [
+  { keys: ['Enter', 'F2'], joiner: '/', action: 'Ubah nama ide' },
+  { keys: ['Space'], joiner: ' ', action: 'Lipat atau buka cabang' },
+  { keys: ['Delete'], joiner: ' ', action: 'Hapus cabang (dengan konfirmasi)' },
+  { keys: ['Ctrl/⌘', 'Z'], joiner: '+', action: 'Urungkan perubahan' },
+  { keys: ['←', '↑', '↓', '→'], joiner: ' ', action: 'Telusuri ide: saudara, induk, atau anak' },
+  { keys: ['Home', 'End'], joiner: '/', action: 'Ke awal atau akhir daftar' },
+  { keys: ['+', '−', '0', 'F'], joiner: ' ', action: 'Kanvas: zoom in, zoom out, reset 100%, fit view' },
 ];
 
 export function MindMapShortcuts() {
@@ -24,11 +28,18 @@ export function MindMapShortcuts() {
       </div>
       <dl className="grid gap-2 sm:grid-cols-2">
         {SHORTCUTS.map((row) => (
-          <div key={row.keys} className="rounded-md border border-border bg-card p-3">
-            <dt>
-              <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground">
-                {row.keys}
-              </kbd>
+          <div key={row.keys.join(' ')} className="rounded-md border border-border bg-card p-3">
+            <dt className="flex flex-wrap items-center gap-1">
+              {row.keys.map((key, index) => (
+                <React.Fragment key={key}>
+                  {index > 0 && (
+                    <span aria-hidden="true" className="px-0.5 text-xs text-muted-foreground">
+                      {row.joiner === ' ' ? '' : row.joiner}
+                    </span>
+                  )}
+                  <Kbd size="sm" variant="outline">{key}</Kbd>
+                </React.Fragment>
+              ))}
             </dt>
             <dd className="mt-1 text-sm text-muted-foreground">{row.action}</dd>
           </div>

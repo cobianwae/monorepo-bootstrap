@@ -12,6 +12,7 @@ import {
   Label,
   MindMap,
   PageHeader,
+  Timeline,
   getAncestors,
   type MindNodeFlat,
 } from '@ds/ui';
@@ -166,18 +167,13 @@ export default function MindMapPatternPage() {
             Ikuti enam langkah ini untuk mengembangkan ide pusat menjadi rencana yang terstruktur.
           </p>
         </div>
-        <ol className="space-y-3">
-          {STEPS.map((step, index) => (
-            <li key={step.title} className="flex items-start gap-3 text-sm">
-              <span aria-hidden="true" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-foreground">
-                {index + 1}
-              </span>
-              <p className="pt-0.5 text-muted-foreground">
-                <span className="font-medium text-foreground">{step.title}:</span> {step.detail}
-              </p>
-            </li>
-          ))}
-        </ol>
+        <Timeline
+          items={STEPS.map((step, index) => ({
+            id: `step-${index}`,
+            title: step.title,
+            description: step.detail,
+          }))}
+        />
       </section>
 
       <MindMapShortcuts />
