@@ -20,10 +20,10 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Ubah status S-005.22 menjadi `in-design` di `sitemap.md`
-- [ ] Tambah entri M-009 dan M-010 di Modal Registry `sitemap.md`
-- [ ] Perbarui § Design Refs di PRD 006
-- [ ] Verifikasi `pnpm typecheck`, `pnpm lint`, `pnpm test` pass (docs-only, smoke)
+- [x] Ubah status S-005.22 menjadi `in-design` di `sitemap.md` (sudah di `dev` via 264e536)
+- [x] Tambah entri M-009 dan M-010 di Modal Registry `sitemap.md` (sudah di `dev` via 264e536)
+- [x] Perbarui § Design Refs di PRD 006
+- [x] Verifikasi `pnpm typecheck`, `pnpm lint`, `pnpm test` pass (docs-only, smoke) — lihat catatan verifikasi
 
 ## Keputusan
 
@@ -47,9 +47,14 @@ Branch: `cr-011-sitemap-rich-text-editor`
 Commit: `docs: rapikan sitemap dan rujukan RTE 006 [CR-011]`
 
 - [x] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+
+Catatan verifikasi 2026-11-21: `pnpm test` hijau (48 file, 486 test); `pnpm typecheck`/`lint`
+gagal hanya oleh unused import pre-existing di
+`packages/ui/src/components/canvas/flow-editor.test.tsx` (milik 005-02, sama seperti
+catatan CR-008) — known issue, di luar scope CR-011.
