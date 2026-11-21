@@ -2,7 +2,8 @@
 
 // FlowEditor — fondasi canvas + node custom DS (story 005-01, PRD 005, design flow-editor).
 // Wrapper di atas @xyflow/react 13.0.2 (sudah terdaftar; bukan dependency baru).
-// Default CSS xyflow TIDAK diimpor — semua permukaan dipetakan ke token (design D1/D11).
+// CSS default xyflow DIIMPOR di styles.css (@import) lalu semua permukaan dipetakan ke token
+// lewat variabel --xy-* dan selector .react-flow__* (design D1/D11; CR-021 #7).
 // Kontrak deklaratif penuh (design D3): nodes/edges controlled + onNodesChange/onEdgesChange/
 // onConnect/onSelectionChange; uncontrolled via defaultNodes/defaultEdges untuk demo.
 // State matrix: loading (skeleton + aria-busy), empty (role="status" + CTA), error (role="alert" + retry).
@@ -870,6 +871,7 @@ function FlowCanvasHost({
 
   return (
     <DndContext
+      id="flow-editor-dnd"
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}

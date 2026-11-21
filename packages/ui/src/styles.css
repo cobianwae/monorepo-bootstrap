@@ -110,8 +110,6 @@
     --xy-minimap-node-background-color: var(--muted-foreground);
     --xy-controls-button-background-color: var(--card);
     --xy-controls-button-background-color-hover: var(--accent);
-    --xy-edge-stroke-default: var(--muted-foreground);
-    --xy-edge-stroke-selected-default: var(--primary);
     background-color: var(--background);
   }
   .react-flow__viewport {
@@ -153,14 +151,9 @@
     background-color: var(--primary);
     border-color: var(--primary);
   }
-  .react-flow__edge {
-    stroke: var(--muted-foreground);
-    stroke-width: 1.5px;
-  }
-  .react-flow__edge.selected {
-    stroke: var(--primary);
-    stroke-width: 2px;
-  }
+  /* Warna edge dikendalikan variabel `--xy-edge-*` di `.react-flow` (atas). Selector
+   * `.react-flow__edge` lama salah target: stroke ada di `.react-flow__edge-path`, dan
+   * CSS xyflow (tidak di-layer) menang atas blok @layer ini. (CR-021 #7) */
   .react-flow__controls {
     background-color: var(--card);
     border-color: var(--border);
@@ -177,4 +170,18 @@
     fill: var(--primary);
     stroke: var(--primary);
   }
+}
+/* Label edge xyflow default 10px (tidak di-layer, sehingga harus di luar @layer agar menang). */
+.react-flow .react-flow__edge-text {
+  font-size: 0.75rem;
+}
+
+/* Variabel edge xyflow harus di luar @layer: CSS xyflow (@import di atas) tidak di-layer dan
+ * menang atas blok @layer components, sehingga override edge dipasang di sini. (CR-021 #7) */
+.react-flow {
+  --xy-edge-stroke-default: var(--muted-foreground);
+  --xy-edge-stroke-width: 1.5px;
+  --xy-edge-stroke-selected-default: var(--primary);
+  --xy-edge-label-background-color: var(--card);
+  --xy-edge-label-color: var(--foreground);
 }

@@ -41,13 +41,13 @@ minimum ±500px sehingga screenshot 390px terpotong; perlu emulasi device metric
 - [x] #2 Handle: hit-area transparan 48px + dot 12px; judul/status tidak tertimpa.
 - [x] #3 Toolbar di dalam kanvas, tombol ikon ber-label/tooltip, target ≥44px.
 - [x] #4 `fitView` awal + saat ganti demo; kanvas lebar penuh; ≥5/5 node terlihat di 1440 px.
-- [ ] #5 Controls dirapikan, tidak menutup node.
-- [ ] #6 `text-micro` tidak dibuang `cn()`; “Siap” 10px.
-- [ ] #7 Pemetaan edge/handle/label light+dark; kontras ≥3:1; selaraskan komentar vs `@import`.
-- [ ] #8 Inspector: footer tidak meluap, copy/ID/meta, `Tutup`.
-- [ ] #9 Hydration mismatch hilang (console bersih).
-- [ ] #10 Keputusan gate visual (lihat Keputusan).
-- [ ] Verifikasi: `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`, screenshot light+dark.
+- [x] #5 Controls dirapikan, tidak menutup node.
+- [x] #6 `text-micro` tidak dibuang `cn()`; “Siap” 10px.
+- [x] #7 Pemetaan edge/handle/label light+dark; kontras ≥3:1; selaraskan komentar vs `@import`.
+- [x] #8 Inspector: footer tidak meluap, copy/ID/meta, `Tutup`.
+- [x] #9 Hydration mismatch hilang (console bersih).
+- [x] #10 Keputusan gate visual (lihat Keputusan).
+- [x] Verifikasi: `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`, screenshot light+dark.
 
 ## Keputusan
 
@@ -72,9 +72,9 @@ Branch: `cr-021-flow-editor-visual`
 Commit: `fix: perbaiki layout visual flow editor [CR-021]`
 
 - [x] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick.
 - [ ] `docs/STATUS.md` diperbarui bila relevan.
 - [ ] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.
