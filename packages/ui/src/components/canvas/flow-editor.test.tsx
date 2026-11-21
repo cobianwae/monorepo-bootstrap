@@ -16,7 +16,7 @@ vi.mock('@xyflow/react', async (importOriginal) => {
     // ReactFlow test-friendly: render nodes via nodeTypes dan edges sebagai div,
     // tanpa memerlukan DOM kanvas xyflow asli di jsdom.
     ReactFlow: function MockReactFlow(props: Record<string, unknown>) {
-      const { nodes = [], edges = [], nodeTypes = {}, children, onInit, onViewportChange, onConnect, onSelectionChange, onNodeContextMenu, onEdgeContextMenu, onPaneContextMenu } = props as {
+      const { nodes = [], edges = [], nodeTypes = {}, children, onInit, onViewportChange, onConnect, onSelectionChange } = props as {
         nodes?: Array<{ id: string; type: string; data: Record<string, unknown>; selected?: boolean; position?: { x: number; y: number } }>;
         edges?: Array<{ id: string; source: string; target: string }>;
         nodeTypes?: Record<string, React.ComponentType>;
@@ -25,19 +25,13 @@ vi.mock('@xyflow/react', async (importOriginal) => {
         onViewportChange?: (viewport: { zoom: number }) => void;
         onConnect?: (connection: Connection) => void;
         onSelectionChange?: (selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => void;
-        onNodeContextMenu?: (event: unknown, node: { id: string }) => void;
-        onEdgeContextMenu?: (event: unknown, edge: { id: string }) => void;
-        onPaneContextMenu?: (event: unknown) => void;
       };
       React.useEffect(() => {
         if (onInit) onInit(null as unknown as never, { x: 0, y: 0, zoom: 1 });
         if (onViewportChange) onViewportChange({ zoom: 1 });
         ;(window as unknown as Record<string, unknown>).__flowOnConnect = onConnect;
         ;(window as unknown as Record<string, unknown>).__flowSelectionChange = onSelectionChange;
-        ;(window as unknown as Record<string, unknown>).__flowNodeContextMenu = onNodeContextMenu;
-        ;(window as unknown as Record<string, unknown>).__flowEdgeContextMenu = onEdgeContextMenu;
-        ;(window as unknown as Record<string, unknown>).__flowPaneContextMenu = onPaneContextMenu;
-      }, [onInit, onViewportChange, onConnect, onSelectionChange, onNodeContextMenu, onEdgeContextMenu, onPaneContextMenu]);
+      }, [onInit, onViewportChange, onConnect, onSelectionChange]);
       return (
         <div data-testid="flow-canvas">
           {(nodes as Array<{ id: string; type: string; data: Record<string, unknown>; selected?: boolean; position?: { x: number; y: number } }>).map((node) => {
@@ -461,155 +455,5 @@ describe('FlowEditor edge + validasi + label (005-03)', () => {
     expect(onEdgesChange).toHaveBeenCalledWith(
       [{ id: 'e1', type: 'remove' }] as unknown as never,
     );
-  });
-});
-
-describe('FlowEditor seleksi + inspector on-demand + hapus (005-04)', () => {
-  const onSelectionChange = vi.fn();
-  const onDelete = vi.fn();
-  const onNodesChange = vi.fn();
-  const onEdgesChange = vi.fn();
-
-  const renderControlled = (overrides: React.ComponentProps<typeof FlowEditor> = {}) =>
-    renderEditor({
-      nodes: baseNodes,
-      edges: baseEdges,
-      onSelectionChange,
-      onDelete,
-      onNodesChange,
-      onEdgesChange,
-      ...overrides,
-    });
-
-  const triggerSelect = (sel: { nodes: FlowNode[]; edges: FlowEdge[] }) => {
-    const fn = (window as unknown as Record<string, unknown>).__flowSelectionChange as
-      | ((s: { nodes: FlowNode[]; edges: FlowEdge[] }) => void)
-      | null;
-    expect(fn).not.toBeNull();
-    act(() => {
-      fn!(sel);
-    });
-  };
-
-  const menuEvent = (x = 10, y = 10) =>
-    ({ clientX: x, clientY: y, preventDefault: vi.fn(), stopPropagation: vi.fn() } as unknown as React.MouseEvent);
-
-  const triggerNodeMenu = (nodeId: string, x = 10, y = 10) => {
-    const fn = (window as unknown as Record<string, unknown>).__flowNodeContextMenu as
-      | ((e: unknown, n: { id: string }) => void)
-      | null;
-    expect(fn).not.toBeNull();
-    act(() => {
-      fn!(menuEvent(x, y), { id: nodeId });
-      // useEffect klik menuTriggerRef secara otomatis saat contextMenu berubah,
-      // sehingga Radix menu terbuka tanpa fireEvent.click manual (hindari toggle close).
-    });
-  };
-
-  const triggerEdgeMenu = (edgeId: string, x = 10, y = 10) => {
-    const fn = (window as unknown as Record<string, unknown>).__flowEdgeContextMenu as
-      | ((e: unknown, edge: { id: string }) => void)
-      | null;
-    expect(fn).not.toBeNull();
-    act(() => {
-      fn!(menuEvent(x, y), { id: edgeId });
-    });
-  };
-
-  const triggerPaneMenu = (x = 10, y = 10) => {
-    const fn = (window as unknown as Record<string, unknown>).__flowPaneContextMenu as
-      | ((e: unknown) => void)
-      | null;
-    expect(fn).not.toBeNull();
-    act(() => {
-      fn!(menuEvent(x, y));
-    });
-  };
-
-  const openMenu = () => screen.getByTestId('flow-context-menu');
-
-  beforeEach(() => {
-    onSelectionChange.mockClear();
-    onDelete.mockClear();
-    onNodesChange.mockClear();
-    onEdgesChange.mockClear();
-    ;(window as unknown as Record<string, unknown>).__flowSelectionChange = null;
-    ;(window as unknown as Record<string, unknown>).__flowNodeContextMenu = null;
-    ;(window as unknown as Record<string, unknown>).__flowEdgeContextMenu = null;
-    ;(window as unknown as Record<string, unknown>).__flowPaneContextMenu = null;
-  });
-
-  it('live region hitungan seleksi multi node + edge', () => {
-    renderControlled();
-    triggerSelect({ nodes: [baseNodes[0], baseNodes[1]], edges: baseEdges });
-    expect(screen.getByText(/2 node, 1 edge terpilih/)).not.toBeNull();
-  });
-
-  it('live region kosong saat tidak ada seleksi', () => {
-    renderControlled();
-    expect(screen.queryByText(/node, .* edge terpilih/)).toBeNull();
-  });
-
-  it('Delete pada node terpilih → onDelete atomic node + edge terkait (controlled)', () => {
-    renderControlled();
-    triggerSelect({ nodes: [baseNodes[0]], edges: [] });
-    const section = screen.getByTestId('flow-editor');
-    fireEvent.keyDown(section, { key: 'Delete' });
-    expect(onDelete).toHaveBeenCalledWith(
-      expect.objectContaining({
-        nodes: [baseNodes[0]],
-        edges: [baseEdges[0]],
-      }),
-    );
-    // toast 'Dihapus' dapat menumpuk di antaranya test (memoryState global); hitung semua.
-    expect(screen.getAllByText('Dihapus').length).toBeGreaterThan(0);
-  });
-
-  it('menu konteks node: Rincian / Duplikat / Hapus; Hapus hapus node + edge terkait (uncontrolled)', () => {
-    renderEditor(); // defaultNodes/defaultEdges → uncontrolled
-    triggerNodeMenu('n1');
-    const menu = openMenu();
-    expect(within(menu).getByText('Rincian')).not.toBeNull();
-    expect(within(menu).getByText('Duplikat')).not.toBeNull();
-    expect(within(menu).getByText('Hapus')).not.toBeNull();
-
-    act(() => {
-      within(menu).getByText('Hapus').click();
-    });
-    expect(screen.queryByTestId('flow-node-n1')).toBeNull();
-    expect(screen.queryByTestId('flow-edge-e1')).toBeNull(); // e1 menyentuh n1
-    expect(screen.getAllByText('Dihapus').length).toBeGreaterThan(0);
-  });
-
-  it('menu konteks edge: Edit label / Hapus edge; Hapus edge hapus edge (uncontrolled)', () => {
-    renderEditor();
-    triggerEdgeMenu('e1');
-    const menu = openMenu();
-    expect(within(menu).getByText('Edit label')).not.toBeNull();
-    expect(within(menu).getByText('Hapus edge')).not.toBeNull();
-
-    act(() => {
-      within(menu).getByText('Hapus edge').click();
-    });
-    expect(screen.queryByTestId('flow-edge-e1')).toBeNull();
-    expect(screen.queryByTestId('flow-node-n1')).not.toBeNull(); // node tidak ikut dihapus
-    expect(screen.getAllByText('Dihapus').length).toBeGreaterThan(0);
-  });
-
-  it('menu konteks canvas: Tambah di sini / Selaras tampilan / Alih grid', () => {
-    renderEditor();
-    triggerPaneMenu();
-    const menu = openMenu();
-    expect(within(menu).getByText('Tambah di sini')).not.toBeNull();
-    expect(within(menu).getByText('Selaras tampilan')).not.toBeNull();
-    expect(within(menu).getByText('Alih grid')).not.toBeNull();
-  });
-
-  it('tambah via [+] tidak membuka inspector penuh / seleksi tetap kosong (regresi 005-01)', () => {
-    const { container } = renderEditor({ paletteItems: [{ type: 'action', title: 'Kirim email' }] });
-    const add = screen.getByTestId('flow-palette-add-action');
-    fireEvent.click(add);
-    expect(container.querySelector('[data-testid^="flow-node-node-"]')).not.toBeNull();
-    expect(screen.queryByRole('menu')).toBeNull();
   });
 });

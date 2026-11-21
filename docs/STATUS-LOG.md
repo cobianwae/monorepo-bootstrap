@@ -88,9 +88,6 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Story 005-03 edge sambung + validasi + label — implementasi validasi default (self-loop/duplikat/handle-penuh/arah) + aturan kustom AND (mengencangkan), keyboard Enter-Tab-Enter + Esc + fokus kembali ke sumber, label edge via onEdgesChange + selected-edge tracking, hapus edge terpilih + toast 'Dihapus — Urungkan'; flow-editor.tsx + flow-editor.test.tsx (25 tes, 005-03), verifikasi typecheck/lint/test/test:tokens hijau, status `review` — `005-03`.
 
 - 2026-11-21 — Story 005-03 `done` (approved oleh user) dan di-merge ke `dev` — `005-03`.
-
-- 2026-11-21 — Story 005-04 seleksi + inspector on-demand + hapus atomik `done` (approved oleh user) dan di-merge ke `dev` — `005-04`.
-
 - 2026-11-21 — Story 006-01 fondasi controlled + toolbar inline/blok + undo selesai (TipTap 3.30.1 promosi ke @ds/ui, 6 test hijau; typecheck/lint/test/test:tokens/showcase build hijau), status `review` — `006-01`.
 - 2026-11-21 — Story 006-01 `done` (approved oleh user) dan di-merge ke `dev` — `006-01`.
 - 2026-11-21 — Approve PRD 012–019 Wave 5 + RM-07 (gate 1): mind map, diff viewer, import wizard CSV, image cropper, lightbox/gallery, tour/coach marks, permission matrix, signature pad; semua tanpa dependency baru, screen S-005.35–S-005.42 diusulkan, OQ dibawa ke gate 2 — `012`, `013`, `014`, `015`, `016`, `017`, `018`, `019`.

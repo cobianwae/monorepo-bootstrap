@@ -82,7 +82,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 005-01 | Flow editor fondasi canvas + node custom DS | done | `docs/stories/005-01-canvas-node-foundation.md` |
 | 005-02 | Flow editor palette drag + tambah keyboard + snap | done | `docs/stories/005-02-palette-drop-snap.md` |
 | 005-03 | Flow editor edge sambung + validasi + label | done | `docs/stories/005-03-edge-validasi-label.md` |
-| 005-04 | Flow editor seleksi + inspector on-demand + hapus | done | `docs/stories/005-04-seleksi-inspector-hapus.md` |
+| 005-04 | Flow editor seleksi + inspector on-demand + hapus | approved | `docs/stories/005-04-seleksi-inspector-hapus.md` |
 | 005-05 | Flow editor undo/redo + toolbar pola | approved | `docs/stories/005-05-undo-redo-toolbar.md` |
 | 005-06 | Flow editor minimap + showcase + audit | approved | `docs/stories/005-06-minimap-showcase-audit.md` |
 | 006-01 | RTE fondasi controlled + toolbar inline/blok + undo | done | `docs/stories/006-01-fondasi-toolbar-controlled.md` |
@@ -104,6 +104,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-010 | Org Chart Studio gate-2 follow-up (tutup OQ + perapian approved) | done | `docs/cr/cr-010-org-chart-studio-gate2-followup.md` |
 | CR-011 | Sitemap & rujukan docs Rich Text Editor (PRD 006) | done | `docs/cr/cr-011-sitemap-rich-text-editor.md` |
 | CR-014 | Org Chart Studio layak-pakai (tambah terlihat + garis + tombol jelas) | done | `docs/cr/cr-014-studio-layak-pakai.md` |
+| CR-015 | Verifikasi baseline dev (known issue flow-editor.test.tsx) + bersihkan entri stale | draft | `docs/cr/cr-015-baseline-flow-editor-test.md` |
 
 ## Catatan
 
