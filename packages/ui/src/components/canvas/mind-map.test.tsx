@@ -435,7 +435,7 @@ describe('MindMap fondasi (012-01)', () => {
     expect(Math.abs(kolomKanan.length - kolomKiri.length) * 6).toBeLessThanOrEqual(6);
   });
 
-  it('AC-03: edge bezier 1px token border + satu edge per pasangan parent-child', () => {
+  it('AC-03: edge bezier 1.5px + satu edge per pasangan parent-child + garis putus primary ke node cocok', () => {
     const normalized = normalizeMindInput(flatData);
     const visible = new Set([
       'q1',
@@ -453,8 +453,19 @@ describe('MindMap fondasi (012-01)', () => {
     expect(edges).toHaveLength(8);
     for (const edge of edges) {
       expect(edge.type).toBe('default'); // bezier (K4)
-      expect(edge.style).toEqual({ strokeWidth: 1, stroke: 'var(--border)' });
+      expect(edge.style).toEqual({ strokeWidth: 1.5, stroke: 'var(--border)' });
     }
+    // Paritas studio 011-04: edge menuju node cocok memakai garis putus primary.
+    const highlighted = toMindFlowEdges(normalized, positions, visible, ['wawancara']);
+    expect(highlighted.find((edge) => edge.target === 'wawancara')?.style).toEqual({
+      strokeWidth: 1.5,
+      stroke: 'var(--primary)',
+      strokeDasharray: '5 4',
+    });
+    expect(highlighted.find((edge) => edge.target === 'kompetitor')?.style).toEqual({
+      strokeWidth: 1.5,
+      stroke: 'var(--border)',
+    });
     // Root memancar dua sisi: anak kanan via out-r, anak kiri via out-l.
     const rootEdges = edges.filter((edge) => edge.source === 'q1');
     expect(rootEdges.find((edge) => edge.target === 'riset')?.sourceHandle).toBe('out-r');

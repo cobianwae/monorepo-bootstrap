@@ -42,28 +42,31 @@ data.highlighted && 'border-dashed border-primary' // tanpa ring ganda, plus Bad
 
 ## Tasks (jalur small-fix)
 
-- [ ] Audit + perkuat konektor edge (temuan 1).
-- [ ] Bedakan highlight pencarian vs node baru (temuan 2).
-- [ ] Samakan bahasa error invalid vs eksternal (temuan 3).
-- [ ] Perbaiki skeleton meniru layout dua sisi (temuan 4).
-- [ ] Audit minimap light/dark (temuan 5).
-- [ ] Verifikasi + `pnpm test:tokens` bila warna disentuh.
+- [x] Audit + perkuat konektor edge (temuan 1) — normal `1.5px border`, edge ke node cocok `1.5px primary dashed` (paritas studio 011-04); `toMindFlowEdges` terima `highlightedIds` opsional.
+- [x] Bedakan highlight pencarian vs node baru (temuan 2) — highlight `ring-2 ring-primary border-dashed border-primary` + badge `Cocok` (CR-022); baru `ring-2 ring-primary` solid.
+- [x] Samakan bahasa error invalid vs eksternal (temuan 3) — invalid kini `border-destructive` (sebelum `border-border`), dua-duanya `role="alert"`.
+- [x] Perbaiki skeleton meniru layout dua sisi (temuan 4) — 1 pill root `h-16 w-[200px]` sentral + kolom kiri 3 / kanan 2 pill cabang (total 6, test tidak berubah).
+- [x] Audit minimap light/dark (temuan 5) — `maskColor` transparent → `color-mix(in oklch, var(--background) 70%, transparent)` (paritas editor/studio).
+- [x] Verifikasi + `pnpm test:tokens`.
 
 ## Keputusan
 
 | # | Keputusan | Alasan |
 |---|---|---|
-| 1 | — | Menunggu diskusi user. |
+| 1 | CR disetujui user ("approve aja dulu"). | Persetujuan dicatat; implementasi mengikuti scope CR ini. |
+| 2 | Edge normal 1.5px `border` (bukan `muted-foreground`), highlight primary dashed. | Selaras studio (`studio.tsx:563-565`); 1.5px cukup tanpa noise 49 edge `muted`. Highlight paritas 011-04. |
+| 3 | Ring highlight dipertahankan (studio parity), pembeda = dash `border-primary` + badge. | Studio highlight juga ring+dash+chip; melepas ring menyimpang dari DS. |
+| 4 | Branch dari `cr-022` (stacked) atas instruksi user. | Perubahan CR-023 menumpuk di atas commit CR-022 yang belum di-merge. |
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA.
-- [ ] Perilaku Radix/a11y tidak rusak.
-- [ ] API `cva` dan export tetap konsisten.
-- [ ] State loading, empty, dan error relevan tersedia.
-- [ ] Showcase/docs diperbarui bila perlu.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA.
+- [x] Perilaku Radix/a11y tidak rusak.
+- [x] API `cva` dan export tetap konsisten.
+- [x] State loading, empty, dan error relevan tersedia.
+- [x] Showcase/docs diperbarui bila perlu.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
 
 - Cek light/dark: edge, ring, error, skeleton, minimap di kedua mode + `pnpm test:tokens`.
 - Cek state: loading, empty, invalid, error eksternal, highlighted, isNew, collapsed.
@@ -74,10 +77,18 @@ data.highlighted && 'border-dashed border-primary' // tanpa ring ganda, plus Bad
 Branch: `cr-023-mind-map-warna-state`
 Commit: `fix: perjelas warna dan state mind map [CR-023]`
 
-- [ ] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
+- [x] CR disetujui user.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
 - [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
 - [ ] `docs/STATUS.md` diperbarui bila relevan.
 - [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+
+### Hasil implementasi
+
+- `pnpm typecheck`: tidak ada error baru (hanya 12 baseline FlowEditor).
+- `pnpm lint`: hijau.
+- MindMap + integrasi: **48/48 lulus** (termasuk assert edge baru).
+- Showcase page: **3/3 lulus**; `pnpm test:tokens` **8/8**; build showcase hijau.
+- Menunggu user menetapkan `done`, lalu update BACKLOG/STATUS/STATUS-LOG + push/merge.

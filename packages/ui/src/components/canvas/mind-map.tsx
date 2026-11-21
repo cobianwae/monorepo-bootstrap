@@ -513,14 +513,19 @@ export function toMindFlowEdges(
   normalized: MindNormalizedResult,
   positions: MindPosition[],
   visibleIds: Set<string>,
+  highlightedIds: string[] = [],
 ): MindFlowEdge[] {
   const sideById = new Map(positions.map((position) => [position.id, position.side]));
+  const highlightedSet = new Set(highlightedIds);
   const edges: MindFlowEdge[] = [];
   for (const node of normalized.nodes) {
     if (!visibleIds.has(node.id)) continue;
     for (const childId of node.childIds) {
       if (!visibleIds.has(childId)) continue;
       const childSide = sideById.get(childId) ?? 'right';
+      // Paritas studio 011-04: edge menuju node cocok memakai garis putus
+      // primary; edge normal 1.5px border (CR-023: keterbacaan di atas background).
+      const isMatch = highlightedSet.has(childId);
       edges.push({
         id: `${node.id}>${childId}`,
         source: node.id,
@@ -529,7 +534,9 @@ export function toMindFlowEdges(
         sourceHandle: node.depth === 0 ? (childSide === 'right' ? 'out-r' : 'out-l') : 'out',
         targetHandle: 'in',
         type: 'default', // bezier — konektor halus radial (wireframe §2, K4)
-        style: { strokeWidth: 1, stroke: 'var(--border)' },
+        style: isMatch
+          ? { strokeWidth: 1.5, stroke: 'var(--primary)', strokeDasharray: '5 4' }
+          : { strokeWidth: 1.5, stroke: 'var(--border)' },
       });
     }
   }
@@ -722,7 +729,7 @@ function MindNode({ data }: { data: MindNodeData }) {
             mindPillVariants({ level: isRoot ? 'root' : 'branch' }),
             'group/mind-node focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
             isNew && 'ring-2 ring-primary',
-            data.highlighted && 'ring-2 ring-primary border-dashed',
+            data.highlighted && 'ring-2 ring-primary border-dashed border-primary',
             node.disabled && 'pointer-events-none opacity-60',
           )}
         >
@@ -1232,7 +1239,7 @@ function MindCanvas({
               zoomable
               aria-label="Minimap"
               className={cn('!border-border !bg-card', mobileMinimap ? 'block' : 'hidden md:block')}
-              maskColor="transparent"
+              maskColor="color-mix(in oklch, var(--background) 70%, transparent)"
               maskStrokeColor="var(--primary)"
               maskStrokeWidth={2}
               nodeColor="var(--primary)"
@@ -1703,8 +1710,8 @@ export function MindMap({
     [normalized, positions, expandedSet, toggleExpanded, editingId, newNodeId, handlers, activeId, highlightedIds, navigateNode, focusNodeId],
   );
   const flowEdges = React.useMemo(
-    () => toMindFlowEdges(normalized, positions, visibleIds),
-    [normalized, positions, visibleIds],
+    () => toMindFlowEdges(normalized, positions, visibleIds, highlightedIds),
+    [normalized, positions, visibleIds, highlightedIds],
   );
 
   // Fokus pill target (setelah commit/Esc/hapus kembali ke node/parent).
@@ -1723,13 +1730,28 @@ export function MindMap({
     return (
       <div aria-busy="true" aria-label="Memuat peta ide" className={cn('rounded-md border border-border p-6', className)}>
         <p role="status" className="sr-only">Memuat peta ide…</p>
-        <div aria-hidden="true" className="grid min-h-80 grid-cols-2 items-center gap-6">
-          {Array.from({ length: 6 }, (_, index) => (
-            <div key={index} className="flex items-center">
-              <span className="h-px w-8 bg-border" />
-              <Skeleton data-testid="mind-map-skeleton" className="h-12 w-40 rounded-full motion-reduce:animate-none" />
+        <div aria-hidden="true" className="flex min-h-80 flex-col items-center justify-center gap-6">
+          <div className="flex items-center">
+            <Skeleton data-testid="mind-map-skeleton" className="h-16 w-[200px] rounded-full motion-reduce:animate-none" />
+          </div>
+          <div className="grid w-full grid-cols-2 gap-6">
+            <div className="flex flex-col items-end gap-6">
+              {Array.from({ length: 3 }, (_, index) => (
+                <div key={`kiri-${index}`} className="flex items-center">
+                  <Skeleton data-testid="mind-map-skeleton" className="h-12 w-40 rounded-full motion-reduce:animate-none" />
+                  <span className="h-px w-8 bg-border" />
+                </div>
+              ))}
             </div>
-          ))}
+            <div className="flex flex-col items-start gap-6">
+              {Array.from({ length: 2 }, (_, index) => (
+                <div key={`kanan-${index}`} className="flex items-center">
+                  <span className="h-px w-8 bg-border" />
+                  <Skeleton data-testid="mind-map-skeleton" className="h-12 w-40 rounded-full motion-reduce:animate-none" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -1739,7 +1761,7 @@ export function MindMap({
     const { message, nodeId } = normalized.error;
     const detail = nodeId ? `${message} (node: ${nodeId})` : message;
     return (
-      <div role="alert" className={cn('rounded-md border border-border bg-card p-4 text-sm text-foreground', className)}>
+      <div role="alert" className={cn('rounded-md border border-destructive bg-card p-4 text-sm text-foreground', className)}>
         <p>{message}</p>
         {nodeId ? <p className="mt-1 text-muted-foreground">Node terkait: {nodeId}</p> : null}
         <Button
