@@ -58,11 +58,12 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] B1: ganti section demo dengan `Card` + `CardHeader` + `CardContent`; hilangkan bingkai bersarang.
-- [ ] B2: pindahkan `data-theme="pulse"`, class `dark`/`light`, dan `colorScheme` ke panggung yang hanya membungkus `MindMap`.
-- [ ] B3: gabungkan baris "Aksi" ke baris "Tampilan"; hapus grup "Aksi demo" atau pindahkan tombolnya tanpa kehilangan nama aksesibel tombol "Muat contoh 50 node".
-- [ ] Perbarui test `page.test.tsx` (lihat Cek test).
-- [ ] Verifikasi: test showcase mind-map, eslint, tsc showcase, `pnpm -C apps/showcase build`, cek visual light/dark (termasuk tema global dark + toggle "Mode gelap").
+- [x] B1: ganti section demo dengan `Card` + `CardHeader` + `CardContent`; hilangkan bingkai bersarang. Judul tetap `h2` (bukan `CardTitle`, karena `CardTitle` merender `h3`); deskripsi memakai `CardDescription`.
+- [x] B2: pindahkan `data-theme="pulse"`, class `dark`/`light`, dan `colorScheme` ke wrapper yang hanya membungkus `MindMap`.
+- [x] B3: gabungkan baris "Aksi" ke baris "Tampilan & beban"; grup "Aksi demo" dihapus, tombol "Muat contoh 50 node" tetap dengan `aria-label` yang sama.
+- [x] Perbarui test `page.test.tsx`: tidak perlu diubah. Tidak ada asersi yang menyebut grup "Aksi demo".
+- [x] Verifikasi: test mind-map 9/9, `build:types` showcase hijau, `pnpm lint` workspace tanpa error. Screenshot desktop terang/gelap dan mobile 390px ditinjau (panel dua baris membungkus rapi, kanvas gelap saat "Mode gelap" aktif, tanpa overflow). `pnpm -C apps/showcase build` belum dijalankan (dev server :4000 memakai `.next`).
+- Catatan `data-theme` ganda: di browser ada dua elemen `data-theme`. Yang pertama `<html>` dari `ThemeProvider` (`packages/ui/src/components/base/theme-provider.tsx:69`); yang kedua wrapper panggung kanvas. Test memakai `container`, jadi tetap menunjuk wrapper.
 
 ## Keputusan
 
@@ -92,9 +93,9 @@ Branch: `cr-030-mind-map-panggung-demo-card` (bertumpuk dari `cr-029-mind-map-hi
 Commit: `refactor: panggung demo mind map dalam Card [CR-030]`
 
 - [x] CR disetujui user (instruksi user: "approve smua", sesi /improve-ui).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat (`cr-030-mind-map-panggung-demo-card`).
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan (lihat Tasks di atas).
+- [x] CR di-tick. Status tetap `approved` sampai user menetapkan `done`.
+- [ ] `docs/STATUS.md` diperbarui bila relevan (ditunda ke akhir rantai).
+- [x] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.

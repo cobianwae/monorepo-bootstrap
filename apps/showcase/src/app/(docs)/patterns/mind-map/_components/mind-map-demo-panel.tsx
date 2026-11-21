@@ -57,25 +57,8 @@ export function MindDemoPanel({
         </div>
       </div>
 
-      <div role="group" aria-label="Aksi demo" className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-start">
-        <span className="pt-2 text-xs font-medium text-muted-foreground sm:w-24 sm:shrink-0">Aksi</span>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="min-h-11"
-            aria-label="Muat contoh 50 node"
-            onClick={onLoadLarge}
-          >
-            <Boxes className="h-4 w-4" aria-hidden="true" />
-            Muat 50 node
-          </Button>
-        </div>
-      </div>
-
       <div role="group" aria-label="Tampilan demo" className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-start">
-        <span className="pt-2 text-xs font-medium text-muted-foreground sm:w-24 sm:shrink-0">Tampilan</span>
+        <span className="pt-2 text-xs font-medium text-muted-foreground sm:w-24 sm:shrink-0">Tampilan &amp; beban</span>
         <div className="flex flex-wrap gap-2">
           <Button
             type="button"
@@ -98,6 +81,17 @@ export function MindDemoPanel({
           >
             <MapIcon className="h-4 w-4" aria-hidden="true" />
             Peta mini
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="min-h-11"
+            aria-label="Muat contoh 50 node"
+            onClick={onLoadLarge}
+          >
+            <Boxes className="h-4 w-4" aria-hidden="true" />
+            Muat 50 node
           </Button>
         </div>
       </div>

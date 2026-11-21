@@ -2,7 +2,19 @@
 
 import * as React from 'react';
 import { ListOrdered, Network, Search } from 'lucide-react';
-import { Badge, Input, Label, MindMap, PageHeader, getAncestors, type MindNodeFlat } from '@ds/ui';
+import {
+  Badge,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  Input,
+  Label,
+  MindMap,
+  PageHeader,
+  getAncestors,
+  type MindNodeFlat,
+} from '@ds/ui';
 import { MindDemoPanel } from './_components/mind-map-demo-panel';
 import { MindMapRecipe } from './_components/mind-map-recipe';
 import { MindMapShortcuts } from './_components/mind-map-shortcuts';
@@ -98,45 +110,50 @@ export default function MindMapPatternPage() {
         }
       />
 
-      <section
-        aria-labelledby="mind-demo"
-        data-theme="pulse"
-        className={`${dark ? 'dark' : 'light'} space-y-3 rounded-lg border border-border bg-background p-4 text-foreground`}
-        style={{ colorScheme: dark ? 'dark' : 'light' }}
-      >
-        <div className="space-y-1">
-          <h2 id="mind-demo" className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-            <Network aria-hidden="true" className="h-6 w-6 text-highlight" />
-            <span>Demo interaktif</span>
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Pilih status data atau tampilan di panel, lalu coba langsung di kanvas.
-          </p>
-        </div>
-        <MindDemoPanel
-          demoState={demoState}
-          onSelectState={selectState}
-          onLoadLarge={() => load(LARGE, 'Berisi')}
-          dark={dark}
-          onDarkChange={setDark}
-          minimap={minimap}
-          onMinimapChange={setMinimap}
-        />
-        <MindMap
-          data={data}
-          onChange={setData}
-          expandedIds={expanded}
-          onExpandedChange={setExpanded}
-          highlightedIds={matches.map((node) => node.id)}
-          loading={demoState === 'Loading'}
-          error={
-            demoState === 'Error eksternal'
-              ? 'Perubahan belum tersimpan. Peta tetap tersedia; coba simpan lagi melalui aplikasi konsumen.'
-              : null
-          }
-          minimap={minimap}
-          searchSlot={searchSlot}
-        />
+      <section aria-labelledby="mind-demo">
+        <Card>
+          <CardHeader className="space-y-1 pb-4">
+            <h2 id="mind-demo" className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+              <Network aria-hidden="true" className="h-6 w-6 text-highlight" />
+              <span>Demo interaktif</span>
+            </h2>
+            <CardDescription>
+              Pilih status data atau tampilan di panel, lalu coba langsung di kanvas.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <MindDemoPanel
+              demoState={demoState}
+              onSelectState={selectState}
+              onLoadLarge={() => load(LARGE, 'Berisi')}
+              dark={dark}
+              onDarkChange={setDark}
+              minimap={minimap}
+              onMinimapChange={setMinimap}
+            />
+            <div
+              data-theme="pulse"
+              className={`${dark ? 'dark' : 'light'} text-foreground`}
+              style={{ colorScheme: dark ? 'dark' : 'light' }}
+            >
+              <MindMap
+                data={data}
+                onChange={setData}
+                expandedIds={expanded}
+                onExpandedChange={setExpanded}
+                highlightedIds={matches.map((node) => node.id)}
+                loading={demoState === 'Loading'}
+                error={
+                  demoState === 'Error eksternal'
+                    ? 'Perubahan belum tersimpan. Peta tetap tersedia; coba simpan lagi melalui aplikasi konsumen.'
+                    : null
+                }
+                minimap={minimap}
+                searchSlot={searchSlot}
+              />
+            </div>
+          </CardContent>
+        </Card>
       </section>
 
       <section aria-labelledby="mind-steps" className="space-y-3">
