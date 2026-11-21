@@ -117,5 +117,5 @@ Goal: Komponen `FileUpload` di `packages/ui` dengan antrean upload per file — 
 ## Notes
 
 - Risiko: scope inti besar — mitigasi dengan memisahkan fitur should/could ke `001-02` (aksi kolektif, sortable, auto-retry, varian compact).
-- Keputusan: mengikuti design D1–D6; komponen baru `FileUpload` compose `FileInput` tanpa mengubah API publiknya (OQ #1); warna status via token semantik (D6, mengacu CR-06).
+- Keputusan: mengikuti design D1–D6; komponen baru `FileUpload` compose `FileInput` tanpa mengubah API publiknya (OQ #1); warna status via token semantik (D6, mengacu CR-006).
 - Kontrak showcase: mock handler di S-005.10 harus menghormati `AbortSignal` supaya demo Batal realistis.

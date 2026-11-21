@@ -15,7 +15,7 @@ Tanggal: 2026-11-20
 | D3 | Default `maxConcurrent = 3`. File yang melewati `maxFiles` **ditolak langsung** dengan alasan per file, bukan diantrikan. | FR-012; perilaku tolak konsisten dengan validasi existing `FileInput`. (menjawab OQ#3) |
 | D4 | Reorder queue masuk v1 sebagai prop opsional `sortable` (default `false`), memakai `@dnd-kit` + keyboard sensor yang sudah ada. Dipotong bila story membengkak — keputusan final di gate 3. | FR-011 `should`; OQ#4. |
 | D5 | Thumbnail memakai object URL native, direvoke saat item dihapus/komponen unmount. Non-image mendapat ikon generik per tipe. | FR-009; tanpa dependency baru. |
-| D6 | Semua state status (badge, ikon, teks %) hidup di token semantik (`success`, `destructive`, `primary`, `muted-foreground`); tidak ada hex/palette literal. | Token-first; CR-06. |
+| D6 | Semua state status (badge, ikon, teks %) hidup di token semantik (`success`, `destructive`, `primary`, `muted-foreground`); tidak ada hex/palette literal. | Token-first; CR-006. |
 
 ## 2. Anatomy
 

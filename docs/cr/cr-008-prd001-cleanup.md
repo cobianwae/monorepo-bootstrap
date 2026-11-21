@@ -1,6 +1,6 @@
 # CR-008 — Perapian dokumen PRD 001 & design upload-queue
 
-Status: approved
+Status: done
 Sumber: review
 Refness: `docs/prd/001-upload-queue.md:81-82`, `docs/design/upload-queue.md:18`
 
@@ -19,10 +19,10 @@ Refness: `docs/prd/001-upload-queue.md:81-82`, `docs/design/upload-queue.md:18`
 
 ## Tasks (jalur small-fix)
 
-- [ ] Renumber FR di PRD 001 (urutan monoton).
-- [ ] Perbaiki rujukan `CR-06` → `CR-006` di design upload-queue.
-- [ ] Perbarui rujukan FR di story 001-01/001-02 dan design bila terdampak.
-- [ ] Verifikasi `node scripts/check-status-log.mjs` hijau dan `pnpm verify` (atau setidaknya typecheck/lint/test) hijau.
+- [x] Pindahkan FR-015 ke akhir tabel PRD 001 (urutan monoton FR-001–FR-015, tanpa renumber — keputusan user).
+- [x] Perbaiki rujukan `CR-06` → `CR-006` di design upload-queue.
+- [x] Perbarui rujukan FR di story 001-01/001-02 dan design bila terdampak.
+- [x] Verifikasi `node scripts/check-status-log.mjs` hijau dan `pnpm verify` (atau setidaknya typecheck/lint/test) hijau.
 
 ## Keputusan
 
@@ -46,10 +46,10 @@ Refness: `docs/prd/001-upload-queue.md:81-82`, `docs/design/upload-queue.md:18`
 Branch: `cr-008-prd001-cleanup`
 Commit: `docs: perapian dokumen PRD 001 dan design upload-queue [CR-008]`
 
-- [ ] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR disetujui user.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.

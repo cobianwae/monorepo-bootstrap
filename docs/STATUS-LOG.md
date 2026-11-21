@@ -80,3 +80,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 2026-11-21 — Story 011-05 `done` (approved oleh user) dan di-merge ke `dev` — `011-05`.
 2026-11-21 — Story 005-02 palette drag + tombol [+] Enter/Space + snap grid selesai verifikasi (drop posisi lewat screenToFlowPosition + snap ke grid gridSize 16 / presisi piksel, search + live region "N jenis", fokus pindah ke node baru tanpa auto-buka sheet, batal di luar canvas; 17 test flow-editor hijau, typecheck/lint/showcase build hijau), status review — `005-02`.
 2026-11-21 — Story 005-02 `done` (approved oleh user) dan di-merge ke `dev` — `005-02`.
+2026-11-21 — CR-008 `done` (approved oleh user): FR-015 PRD 001 dipindah ke akhir tabel (monoton FR-001–FR-015, tanpa renumber), rujukan `CR-06` → `CR-006` di design upload-queue + story 001-01; catatan: typecheck/lint baseline `dev` merah pre-existing di flow-editor.test.tsx (di luar scope) — `CR-008`.
