@@ -1,6 +1,6 @@
 # 006-04 — Gambar M-010 + serializer markdown + slot mention
 
-Status: review
+Status: done
 PRD: `docs/prd/006-rich-text-editor.md`
 Design: `docs/design/rich-text-editor.md`
 FR: `FR-009`, `FR-015`, `FR-013`
