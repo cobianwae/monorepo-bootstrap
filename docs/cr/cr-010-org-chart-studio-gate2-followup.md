@@ -37,6 +37,7 @@
 | 2 | OQ#2 = drag + dialog M-007 keduanya | Approved user; tidak ada aksi pointer-only |
 | 3 | OQ#3 = paralel-deprecated → hapus saat 011 shipped | Approved user; hindari breaking langsung |
 | 4 | CR-009 diselesaikan-dulu, 010 diarsipkan saat 011 shipped | Keputusan user; cegah kerja terbuang / konflik merge |
+| 4r | Reversal 2026-11-21: CR-009 DIHENTIKAN (batal diselesaikan), mulai dari awal via 011 | User; branch `cr-009-org-chart-editor-layak` + kerja kodenya ditinggalkan |
 | 5 | Blur-valid = simpan seperti Enter | Dikonfirmasi user |
 
 ## Design System Checks

@@ -1,6 +1,6 @@
 # CR-009 — OrgChartEditor layak total (fondasi + visual + a11y + showcase)
 
-**Status:** approved
+**Status:** dihentikan (2026-11-21, diganti PRD 011 — mulai dari awal via Org Chart Studio)
 **Sumber:** audit ui-ux-auditor + keluhan user "PRD 10 hasilnya sampah"
 **Ref:** `docs/prd/010-org-chart-editor.md`, `docs/design/org-chart-editor.md`, `docs/stories/010-01-canvas-foundation.md`, `docs/stories/010-02-crud-inspector.md`, `docs/stories/010-03-reparent-undo.md`, `docs/stories/010-04-search-states-showcase.md`, `packages/ui/src/components/canvas/org-chart-editor.tsx`, `apps/showcase/src/app/(docs)/patterns/org-chart-editor/page.tsx`
 
