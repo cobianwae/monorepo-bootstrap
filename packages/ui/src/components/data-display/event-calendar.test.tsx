@@ -137,3 +137,161 @@ describe('EventCalendar', () => {
     expect(addMonths(new Date(), 1).getMonth()).not.toBe((onDateChange.mock.calls[0][0] as Date).getMonth());
   });
 });
+
+describe('EventCalendar time grid', () => {
+  const fullDayEvent: CalendarEvent = {
+    id: 'retreat',
+    title: 'Team Retreat',
+    start: new Date(2026, 10, 22, 0, 0),
+    end: new Date(2026, 10, 23, 0, 0),
+    category: 'info',
+  };
+
+  function workingCells(container: HTMLElement): HTMLElement[] {
+    return Array.from(container.querySelectorAll<HTMLElement>('[data-working="true"]'));
+  }
+
+  it('AC-01: week grid memposisikan blok dari menit dan mengarsir luar jam kerja', () => {
+    const offsetEvent: CalendarEvent = {
+      id: 'sync',
+      title: 'Quick Sync',
+      start: new Date(2026, 10, 21, 9, 15),
+      end: new Date(2026, 10, 21, 9, 45),
+      category: 'success',
+    };
+    const { container } = render(
+      <EventCalendar events={[...EVENTS, offsetEvent]} defaultDate={CONTEXT_DATE} defaultView="week" />
+    );
+
+    const keynote = container.querySelector<HTMLElement>('[data-event-id="keynote"]');
+    expect(keynote).not.toBeNull();
+    expect(keynote?.style.top).toBe('0px');
+    expect(keynote?.style.height).toBe('60px');
+    expect(keynote?.closest('[data-slot-minute]')?.getAttribute('data-slot-minute')).toBe('540');
+    expect(keynote?.closest('[data-date]')?.getAttribute('data-date')).toBe('2026-11-21');
+
+    const workshop = container.querySelector<HTMLElement>('[data-event-id="workshop"]');
+    expect(workshop?.closest('[data-slot-minute]')?.getAttribute('data-slot-minute')).toBe('600');
+    expect(workshop?.style.height).toBe('60px');
+
+    const offset = container.querySelector<HTMLElement>('[data-event-id="sync"]');
+    expect(offset?.style.top).toBe('15px');
+    expect(offset?.style.height).toBe('30px');
+
+    expect(container.querySelectorAll('[data-hour-label]').length).toBe(24);
+    expect(screen.getAllByRole('gridcell').length).toBe(48 * 7);
+
+    const defaultWorking = workingCells(container);
+    expect(defaultWorking.length).toBe(20 * 7);
+
+    const outside = container.querySelector<HTMLElement>('[data-date="2026-11-16"][data-slot-minute="0"]');
+    expect(outside?.getAttribute('data-working')).toBe('false');
+    expect(outside?.className).toContain('bg-muted');
+    expect(container.querySelector('[data-working="false"]')).not.toBeNull();
+  });
+
+  it('AC-02: workingHours + slotIntervalMinutes mengubah grid (09–17/30 dan default 08–18/30)', () => {
+    const { container, unmount } = render(
+      <EventCalendar
+        events={EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="week"
+        workingHours={{ start: '09:00', end: '17:00' }}
+        slotIntervalMinutes={30}
+      />
+    );
+
+    expect(workingCells(container).length).toBe(16 * 7);
+    expect(container.querySelector('[data-hour-label="09:00"]')).not.toBeNull();
+    expect(container.querySelector('[data-hour-label="16:00"]')).not.toBeNull();
+    expect(
+      container.querySelector('[data-date="2026-11-16"][data-slot-minute="540"]')?.getAttribute('data-working')
+    ).toBe('true');
+    expect(
+      container.querySelector('[data-date="2026-11-16"][data-slot-minute="480"]')?.getAttribute('data-working')
+    ).toBe('false');
+    unmount();
+
+    const hourly = render(
+      <EventCalendar
+        events={EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="week"
+        slotIntervalMinutes={60}
+      />
+    );
+    expect(workingCells(hourly.container).length).toBe(10 * 7);
+    expect(screen.getAllByRole('gridcell').length).toBe(24 * 7);
+  });
+
+  it('AC-03: klik dan keyboard pada slot memanggil onSelectSlot sekali dengan rentang interval', () => {
+    const onSelectSlot = vi.fn();
+    render(
+      <EventCalendar
+        events={EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="week"
+        onSelectSlot={onSelectSlot}
+      />
+    );
+
+    const slot = screen.getByRole('gridcell', { name: 'Monday 09:00–09:30' });
+    fireEvent.click(slot);
+
+    expect(onSelectSlot).toHaveBeenCalledTimes(1);
+    const payload = onSelectSlot.mock.calls[0][0] as { start: Date; end: Date; allDay: boolean };
+    expect(payload.start.getFullYear()).toBe(2026);
+    expect(payload.start.getMonth()).toBe(10);
+    expect(payload.start.getDate()).toBe(16);
+    expect(payload.start.getHours()).toBe(9);
+    expect(payload.start.getMinutes()).toBe(0);
+    expect(payload.end.getHours()).toBe(9);
+    expect(payload.end.getMinutes()).toBe(30);
+    expect(payload.allDay).toBe(false);
+
+    fireEvent.keyDown(slot, { key: 'Enter' });
+    fireEvent.keyDown(slot, { key: ' ' });
+    expect(onSelectSlot).toHaveBeenCalledTimes(3);
+  });
+
+  it('AC-03: day view merender satu kolom slot fokusable', () => {
+    const { container } = render(
+      <EventCalendar events={EVENTS} defaultDate={CONTEXT_DATE} defaultView="day" />
+    );
+
+    expect(screen.getAllByRole('gridcell').length).toBe(48);
+    expect(container.querySelectorAll('[data-date="2026-11-21"]').length).toBe(48);
+
+    const slot = screen.getByRole('gridcell', { name: 'Saturday 09:00–09:30' });
+    expect(slot.getAttribute('tabindex')).toBe('-1');
+    expect(screen.getByRole('gridcell', { name: 'Saturday 08:00–08:30' }).getAttribute('tabindex')).toBe('0');
+  });
+
+  it('AC-04: all-day dan event 24 jam tampil di strip terpisah, tidak di grid jam', () => {
+    const onSelectEvent = vi.fn();
+    const { container } = render(
+      <EventCalendar
+        events={[...EVENTS, fullDayEvent]}
+        defaultDate={CONTEXT_DATE}
+        defaultView="week"
+        onSelectEvent={onSelectEvent}
+      />
+    );
+
+    const friday = container.querySelector<HTMLElement>('[data-allday-date="2026-11-20"]');
+    expect(friday).not.toBeNull();
+    expect(within(friday as HTMLElement).getByText('Company Offsite')).toBeDefined();
+
+    const sunday = container.querySelector<HTMLElement>('[data-allday-date="2026-11-22"]');
+    expect(within(sunday as HTMLElement).getByText('Team Retreat')).toBeDefined();
+
+    expect(container.querySelector('[data-time-grid] [data-event-id="off"]')).toBeNull();
+    expect(container.querySelector('[data-time-grid] [data-event-id="retreat"]')).toBeNull();
+    expect(container.querySelector('[data-event-id="keynote"]')).not.toBeNull();
+
+    const chip = screen.getByRole('button', { name: 'Company Offsite, all day' });
+    fireEvent.click(chip);
+    expect(onSelectEvent).toHaveBeenCalledTimes(1);
+    expect((onSelectEvent.mock.calls[0][0] as CalendarEvent).id).toBe('off');
+  });
+});
