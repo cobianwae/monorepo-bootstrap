@@ -1,0 +1,87 @@
+<!-- Flow mind map — PRD 012, layar S-005.35 + M-011 hapus -->
+<!-- Job utama: tambah cabang 1-klik inline-edit; pendukung: lipat/buka, hapus/undo, cari/keyboard, pan/zoom -->
+<!-- Layout decided: dua sisi seimbang (root sentral); FR-010 drag-reparent could ditunda v1 (selaras PRD revisi 2026-11-21) -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman mind map] --> B{Data ide siap?}
+  B -- masih dimuat --> L[Tampilkan skeleton node + teks SR]
+  L --> B
+  B -- gagal fetch atau data tidak valid --> ERR[Tampilkan error: penyebab + id pelanggar pertama + salin detail]
+  ERR --> E2[User memperbaiki data atau memuat contoh atau coba lagi]
+  E2 --> A
+  B -- tanpa data --> EMP[Tampilkan empty state + CTA buat root]
+  EMP --> E3[User membuat root; node root langsung inline-edit]
+  E3 --> A
+  B -- siap --> C[Diagram dirender: root sentral + cabang dua sisi + toolbar + minimap]
+  C --> D{User melipat atau membuka cabang?}
+  D -- ya --> E[Subtree + edge ikut muncul atau hilang; layout dua sisi dihitung ulang]
+  E --> D
+  D -- tidak --> F[User memilih node; aksi tambah atau edit atau hapus tersedia]
+  F --> D
+```
+
+```mermaid
+flowchart TD
+  A[User hover atau fokus node] --> B{Gagang tambah terlihat?}
+  B -- kanan atau luar --> C[User klik gagang tambah: tambah anak]
+  B -- sejajar --> D[User klik gagang samping: tambah saudara]
+  C --> E[Node baru muncul tersorot; mode inline-edit aktif]
+  D --> E
+  E --> F{User mengetik label?}
+  F -- Enter atau blur valid --> G[Simpan: onChange sekali + dorong undo + toast Urungkan + fokus ke node baru]
+  F -- Esc --> H[Batal: node baru dibuang; fokus kembali ke parent]
+  F -- blur kosong --> I[Tolak simpan: pesan label wajib + tetap edit]
+  I --> F
+  G --> J[Panel detail TIDAK ada; edit lanjut via inline-edit]
+  H --> A
+  J --> A
+```
+
+```mermaid
+flowchart TD
+  A[User menghapus atau mengurungkan] --> B{Jenis operasi?}
+  B -- hapus via Delete atau menu --> C{Node root?}
+  C -- ya --> D[Tolak: root diproteksi + penjelasan]
+  C -- tidak --> E{Node punya anak?}
+  E -- ya --> F[M-011: sebut N turunan; pilih hapus subtree penuh]
+  E -- tidak --> G[Hapus langsung tanpa dialog]
+  F -- batal --> A
+  F -- konfirmasi --> H[Hapus; onChange sekali + dorong undo + toast]
+  G --> H
+  D --> A
+  H --> L[Undo atau redo tersedia: toolbar + Ctrl+Z/Y + live region]
+  L --> A
+```
+
+```mermaid
+flowchart TD
+  A[User mengetik label di pencarian] --> B{Ada node yang cocok?}
+  B -- tidak --> C[Umumkan tidak ada hasil via live region; diagram tetap]
+  C --> A
+  B -- ya --> D[Sorot non-warna-saja: ring + badge Cocok; buka path ancestor otomatis]
+  D --> E[Umumkan jumlah cocok via live region]
+  E --> F{User memilih hasil?}
+  F -- ya --> G[Fokus ke node; inline-edit opsional via Enter]
+  G --> A
+  F -- tidak --> H[User menghapus query; sorotan hilang]
+  H --> A
+```
+
+```mermaid
+flowchart TD
+  A[User fokus ke kanvas] --> B{Ingin melihat lebih luas atau dekat?}
+  B -- lebih dekat --> C[Perbesar via tombol atau Ctrl+scroll atau keyboard]
+  B -- lebih luas --> D[Perkecil dengan cara yang sama]
+  B -- reset --> E[Reset 100 persen; fit view opsional seluruh peta]
+  C --> F{Batas tercapai?}
+  D --> F
+  F -- ya --> G[Hentikan di batas; umumkan level via live region]
+  F -- belum --> H[Skalakan kanvas + minimap; konektor tetap rapi]
+  A --> I[Geser via drag atau panah atau klik minimap]
+  I --> J[Viewport mengikuti; scroll halaman aman]
+  E --> I
+  G --> I
+  H --> I
+  J --> A
+```

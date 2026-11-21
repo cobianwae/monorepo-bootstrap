@@ -94,6 +94,9 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 008-01 | Cascader alamat/kategori + showcase | approved | `docs/stories/008-01-cascader.md` |
 | 008-02 | Tree select compose tree-view + showcase | approved | `docs/stories/008-02-tree-select.md` |
 | 009-01 | Mention + emoji picker untuk chat + showcase | approved | `docs/stories/009-01-mention-emoji.md` |
+| 012-01 | Mind map fondasi dua sisi + pill + pan/zoom | approved | `docs/stories/012-01-fondasi-dua-sisi-pill-panzoom.md` |
+| 012-02 | Mind map tambah inline + hapus M-011 + undo/redo | approved | `docs/stories/012-02-tambah-hapus-undo.md` |
+| 012-03 | Mind map keyboard + cari + states + showcase audit | approved | `docs/stories/012-03-keyboard-cari-showcase-audit.md` |
 
 ## Change Requests
 

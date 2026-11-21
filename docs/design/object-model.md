@@ -44,7 +44,7 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 | `layout` | Kerangka halaman | app-shell, page-header, page-shell, page-skeleton, container, section, prose, demo-section, resizable, skip-link |
 | `marketing` | Blok presentasi | hero, hero-band, feature-grid, faq, logo-cloud, carousel, cta-band, statement-card, art-background, grid-pattern, dot-pattern, glow-orb, stats-band, section-number, pricing, testimonial, gradient-text |
 | `dnd` | Drag and drop | sortable-list, tree-view, kanban |
-| `canvas` | Kanvas interaktif (xyflow, token-mapped) | org-chart-editor (legacy PRD 010, diganti 011), org-chart-studio (baru, PRD 011), flow-editor (baru, PRD 005) |
+| `canvas` | Kanvas interaktif (xyflow, token-mapped) | org-chart-editor (legacy PRD 010, diganti 011), org-chart-studio (baru, PRD 011), flow-editor (baru, PRD 005), mind-map (baru, PRD 012) |
 
 ## 4. Pattern Inventory
 
@@ -76,6 +76,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Org Chart | Diagram hierarki organisasi read-only (legacy PRD 003, diganti 011 — lihat Org Chart Studio) |
 | Org Chart Editor | Editor hierarki organisasi v1 (legacy PRD 010, diganti 011 — lihat Org Chart Studio) |
 | Org Chart Studio | Editor + visualisasi hierarki satu komponen: kartu lega inline-edit via gagang `+`, drag reparent + dialog setara, undo/redo 50, search + auto-expand, pohon SR internal, state matrix 6 demo (composed, kategori `canvas` xyflow token-mapped); penyusun: org-chart-studio (baru), sheet, context-menu, tooltip, form, input, badge, avatar, skeleton, empty-state, alert, button, toast |
+| Mind Map | Peta ide radial ringan turunan org chart studio: root sentral + cabang dua sisi seimbang, tambah inline 1-klik, lipat cabang + hitungan tersembunyi (composed, kategori `canvas` xyflow token-mapped); penyusun: mind-map (baru), button, tooltip, skeleton, empty-state, alert, badge |
 | Product Tour | Highlight, step, dismiss |
 | Results | Sukses/gagal, next action |
 | Rich Text Editor | Toolbar format + konten Prose + link popover + counter (composed, kategori `form`); penyusun: rich-text-editor (baru), button, tooltip, popover, dialog, input, badge, skeleton, empty-state, alert, kbd |

@@ -80,6 +80,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.33 | Org Chart Editor (legacy, diganti 011) | `/patterns/org-chart-editor` | deprecated |
 | S-005.34 | Org Chart Studio (PRD 011) | `/patterns/org-chart-studio` | implemented |
 | S-005.34.01 | Org Chart Studio — panel detail (inspector + tab pohon SR) | `/patterns/org-chart-studio` (panel kanan) | implemented |
+| S-005.35 | Mind Map (PRD 012) | `/patterns/mind-map` | in-design |
 | S-006 | Guidelines | `/guidelines` | implemented |
 | S-007 | Contribution | `/contribution` | implemented |
 | S-008 | What's New | `/whats-new` | implemented |
@@ -113,6 +114,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | M-008 | Konfirmasi hapus Org Chart Studio (hitungan turunan + pilihan reparent/hapus subtree + proteksi root) | S-005.34 | implemented |
 | M-009 | Link editor (popover di desktop, dialog/sheet di mobile; sisip/edit/hapus + validasi URL) | S-005.22 | in-design |
 | M-010 | Sisip gambar via URL + alt text wajib (dialog; tanpa alt ditolak dengan pesan) | S-005.22 | in-design |
+| M-011 | Konfirmasi hapus mind map (hitungan turunan + proteksi root) | S-005.35 | in-design |
 
 ## Route Groups
 

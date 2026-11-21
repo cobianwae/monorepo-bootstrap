@@ -99,8 +99,8 @@ Skenario utama:
 | # | Pertanyaan | Status |
 |---|---|---|
 | 1 | Implementasi: standalone vs di atas `@xyflow/react`? | answered — reuse `@xyflow/react` (satu dependency canvas; layout radial milik sendiri) |
-| 2 | Layout default: dua sisi (kiri-kanan) vs radial penuh? | open — usulan: dua sisi seimbang sebagai default |
-| 3 | Apakah FR-010 (drag-reparent) masuk v1 atau iterasi berikut? | open |
+| 2 | Layout default: dua sisi (kiri-kanan) vs radial penuh? | answered — dua sisi seimbang sebagai default (root sentral, anak dibagi kanan-kiri proporsional) |
+| 3 | Apakah FR-010 (drag-reparent) masuk v1 atau iterasi berikut? | answered — ditunda iterasi berikut (v1 tanpa drag; hapus via M-011 + undo cukup) |
 
 ## Changelog
 
@@ -109,3 +109,4 @@ Skenario utama:
 | 2026-11-21 | Draft awal dari roadmap RM-07 |
 | 2026-11-21 | **Approved (gate 1)** — OQ dibawa ke gate 2 sebagai risiko/desain |
 | 2026-11-21 | **Revisi dependency (gate 1)**: reuse `@xyflow/react` (sudah ada di PRD 005); OQ#1 answered |
+| 2026-11-21 | **Revisi OQ#2/OQ#3**: kunci dua sisi seimbang default + FR-010 ditunda iterasi berikut (belum dikerjakan, edit langsung PRD) |
