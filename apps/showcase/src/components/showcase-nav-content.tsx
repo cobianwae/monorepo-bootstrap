@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
 import {
   Activity,
+  ArrowLeftRight,
+  AtSign,
   BellRing,
   BookOpen,
   Bot,
@@ -19,7 +21,9 @@ import {
   CreditCard,
   Database,
   FileCheck2,
+  FileUp,
   FolderOpen,
+  FolderTree,
   GitFork,
   HeartPulse,
   Images,
@@ -28,6 +32,7 @@ import {
   LayoutDashboard,
   Layers,
   ListTree,
+  LockKeyhole,
   MessagesSquare,
   MonitorSmartphone,
   MousePointerClick,
@@ -49,6 +54,7 @@ import {
   Type,
   Upload,
   Wand2,
+  Workflow,
 } from 'lucide-react';
 import {
   Badge,
@@ -142,6 +148,10 @@ export const NAV_SECTIONS: NavSection[] = [
         items: [
           { title: 'Stepper / Wizard Flow', href: '/patterns/stepper', icon: GitFork },
           { title: 'Dynamic Form', href: '/patterns/dynamic-form', icon: Wand2 },
+          { title: 'Import Wizard', href: '/patterns/import-wizard', icon: FileUp },
+          { title: 'Cascader & Tree Select', href: '/patterns/cascader-tree-select', icon: FolderTree },
+          { title: 'Transfer List', href: '/patterns/transfer-list', icon: ArrowLeftRight },
+          { title: 'Mention & Emoji', href: '/patterns/mention-emoji', icon: AtSign },
           { title: 'Master Data CRUD', href: '/patterns/master-data', icon: Database },
           { title: 'Master-Detail Flow', href: '/patterns/master-detail', icon: ListTree },
           { title: 'Settings & Preferences', href: '/patterns/settings', icon: Settings },
@@ -160,6 +170,7 @@ export const NAV_SECTIONS: NavSection[] = [
           { title: 'Mind Map', href: '/patterns/mind-map', icon: Network },
           { title: 'Calendar & Scheduling', href: '/patterns/calendar', icon: CalendarDays },
           { title: 'Kanban & Drag & Drop', href: '/patterns/kanban', icon: Columns3 },
+          { title: 'Flow Editor', href: '/patterns/flow-editor', icon: Workflow },
           { title: 'Workspace Layout', href: '/patterns/workspace', icon: Layers },
           { title: 'Billing & Invoices', href: '/patterns/billing', icon: CreditCard },
           { title: 'Media Gallery & Lightbox', href: '/patterns/media-gallery', icon: Images },
@@ -190,6 +201,7 @@ export const NAV_SECTIONS: NavSection[] = [
           { title: 'Auth & Security', href: '/patterns/auth', icon: KeyRound },
           { title: 'Onboarding & First Visit', href: '/patterns/onboarding', icon: Compass },
           { title: 'Product Tour & Coach Marks', href: '/patterns/product-tour', icon: Rocket },
+          { title: 'Permission Matrix', href: '/patterns/permission-matrix', icon: LockKeyhole },
         ],
       },
       {
