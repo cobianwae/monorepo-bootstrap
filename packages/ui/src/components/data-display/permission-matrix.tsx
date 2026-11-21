@@ -1,10 +1,15 @@
 'use client';
 
+import * as React from 'react';
 import { cva } from 'class-variance-authority';
 import { Lock } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Checkbox } from '../base/checkbox';
 import { Badge } from '../base/badge';
+import { Button } from '../base/button';
+import { Skeleton } from '../base/skeleton';
+import { Alert, AlertDescription, AlertTitle } from '../feedback/alert';
+import { EmptyState } from '../feedback/empty-state';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../base/tooltip';
 import type {
   PermissionDiff,
@@ -14,7 +19,7 @@ import type {
   RoleId,
 } from './permission-matrix-types';
 
-export const permissionMatrixVariants = cva('w-full border-collapse text-sm', {
+export const permissionMatrixVariants = cva('w-full min-w-max border-collapse text-sm', {
   variants: {
     density: {
       default: '[&_td]:p-2 [&_th]:p-2',
@@ -25,13 +30,13 @@ export const permissionMatrixVariants = cva('w-full border-collapse text-sm', {
 });
 
 export const permissionCellVariants = cva(
-  'inline-flex items-center justify-center rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+  'inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:transition-none',
   {
     variants: {
       cell: {
         on: 'text-primary',
         off: 'text-muted-foreground',
-        locked: 'cursor-not-allowed text-muted-foreground opacity-70',
+        locked: 'cursor-not-allowed text-muted-foreground',
       },
     },
     defaultVariants: { cell: 'off' },
@@ -40,11 +45,7 @@ export const permissionCellVariants = cva(
 
 export const permissionHeaderVariants = cva('font-medium text-foreground', {
   variants: {
-    headerState: {
-      checked: '',
-      unchecked: '',
-      mixed: '',
-    },
+    headerState: { checked: '', unchecked: '', mixed: '' },
   },
   defaultVariants: { headerState: 'unchecked' },
 });
@@ -52,6 +53,8 @@ export const permissionHeaderVariants = cva('font-medium text-foreground', {
 export type PermissionMatrixComponentProps = PermissionMatrixProps;
 
 type HeaderState = 'checked' | 'unchecked' | 'mixed';
+type FocusTarget = { kind: 'all' } | { kind: 'column'; role: RoleId } |
+  { kind: 'row'; resource: ResourceId } | { kind: 'cell'; role: RoleId; resource: ResourceId };
 
 function getLocked(
   locked: PermissionMatrixProps['locked'],
@@ -64,8 +67,24 @@ function getLocked(
 function stateOf(values: boolean[]): HeaderState {
   const on = values.filter(Boolean).length;
   if (on === 0) return 'unchecked';
-  if (on === values.length) return 'checked';
-  return 'mixed';
+  return on === values.length ? 'checked' : 'mixed';
+}
+
+function diffValues(from: PermissionValue, to: PermissionValue, roles: RoleId[], resources: ResourceId[]): PermissionDiff[] {
+  const diff: PermissionDiff[] = [];
+  for (const role of roles) for (const resource of resources) {
+    const previous = from[role]?.[resource] ?? false;
+    const next = to[role]?.[resource] ?? false;
+    if (previous !== next) diff.push({ role, resource, from: previous, to: next });
+  }
+  return diff;
+}
+
+function cloneValue(value: PermissionValue, roles: RoleId[], resources: ResourceId[]): PermissionValue {
+  return Object.fromEntries(roles.map((role) => [
+    role,
+    Object.fromEntries(resources.map((resource) => [resource, value[role]?.[resource] ?? false])),
+  ]));
 }
 
 export function PermissionMatrix({
@@ -77,75 +96,107 @@ export function PermissionMatrix({
   renderCell,
   density = 'default',
   className,
+  initialValue,
+  onSave,
+  onCancel,
+  onLoadExample,
+  loading = false,
+  error = null,
+  emptyActionLabel = 'Muat contoh 5×8',
+  onEmptyAction,
 }: PermissionMatrixComponentProps) {
-  const isOn = (role: RoleId, resource: ResourceId): boolean =>
-    value[role]?.[resource] ?? false;
+  const roleIds = roles.map(({ id }) => id);
+  const resourceIds = resources.map(({ id }) => id);
+  const [snapshot, setSnapshot] = React.useState<PermissionValue | null>(null);
+  if (snapshot === null && !loading && !error && roles.length && resources.length) {
+    setSnapshot(cloneValue(value, roleIds, resourceIds));
+  }
+  const baseline = initialValue ?? snapshot ?? value;
+  const changes = diffValues(baseline, value, roleIds, resourceIds);
+  const [listOpen, setListOpen] = React.useState(false);
+  const [announcement, setAnnouncement] = React.useState('');
+  const [focusTarget, setFocusTarget] = React.useState<FocusTarget>({ kind: 'all' });
+  const gridRef = React.useRef<HTMLDivElement>(null);
+  const alertRef = React.useRef<HTMLDivElement>(null);
+  const mountedRef = React.useRef(false);
 
-  const emit = (next: PermissionValue, diff: PermissionDiff[]): void => {
-    if (diff.length === 0) return;
-    onValueChange?.(next, diff);
+  const duplicateId = (items: Array<{ id: string }>): string | null => {
+    const seen = new Set<string>();
+    for (const item of items) {
+      if (seen.has(item.id)) return item.id;
+      seen.add(item.id);
+    }
+    return null;
   };
+  const invalidId = duplicateId(roles) ?? duplicateId(resources);
+  React.useEffect(() => {
+    if (!loading && (error || invalidId)) alertRef.current?.focus();
+  }, [error, invalidId, loading]);
 
+  React.useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
+    const element = Array.from(gridRef.current?.querySelectorAll<HTMLElement>('[data-target]') ?? [])
+      .find((item) => item.dataset.target === JSON.stringify(focusTarget));
+    element?.focus({ preventScroll: true });
+    element?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }, [focusTarget]);
+
+  const isOn = (role: RoleId, resource: ResourceId): boolean => value[role]?.[resource] ?? false;
+  const labelOf = (role: RoleId, resource: ResourceId): string => {
+    const roleLabel = roles.find((item) => item.id === role)?.label ?? role;
+    const resourceLabel = resources.find((item) => item.id === resource)?.label ?? resource;
+    return `${roleLabel} × ${resourceLabel}`;
+  };
+  const emit = (next: PermissionValue, diff: PermissionDiff[]): void => {
+    if (!diff.length) return;
+    onValueChange?.(next, diff);
+    const dirty = diffValues(baseline, next, roleIds, resourceIds).length;
+    const dirtySuffix = dirty > 0 ? `; ${dirty} perubahan belum disimpan` : '; tidak ada perubahan';
+    if (diff.length === 1) {
+      setAnnouncement(`${labelOf(diff[0].role, diff[0].resource)} ${diff[0].to ? 'menyala' : 'mati'}${dirtySuffix}`);
+      return;
+    }
+    const on = diff.filter((item) => item.to).length;
+    const off = diff.length - on;
+    const action = on > 0 && off === 0 ? `${on} dipilih` : off > 0 && on === 0 ? `${off} dimatikan` : `${on} dipilih, ${off} dimatikan`;
+    setAnnouncement(`${action}${dirtySuffix}`);
+  };
   const toggleCell = (role: RoleId, resource: ResourceId): void => {
-    if (getLocked(locked, role, resource)) return;
+    const reason = getLocked(locked, role, resource);
+    if (reason) {
+      setAnnouncement(`Tidak diubah. Terkunci: ${reason}`);
+      return;
+    }
     const from = isOn(role, resource);
-    const next: PermissionValue = {
-      ...value,
-      [role]: { ...value[role], [resource]: !from },
-    };
+    const next = { ...value, [role]: { ...value[role], [resource]: !from } };
     emit(next, [{ role, resource, from, to: !from }]);
   };
-
-  const toggleRow = (resource: ResourceId): void => {
-    const targets = roles.filter((r) => !getLocked(locked, r.id, resource));
-    if (targets.length === 0) return;
-    const allOn = targets.every((r) => isOn(r.id, resource));
-    const to = !allOn;
-    const next: PermissionValue = { ...value };
+  const togglePairs = (pairs: Array<{ role: RoleId; resource: ResourceId }>): void => {
+    const unlocked = pairs.filter(({ role, resource }) => !getLocked(locked, role, resource));
+    if (!unlocked.length) {
+      setAnnouncement('Tidak diubah. Semua sel dikunci kebijakan.');
+      return;
+    }
+    const to = !unlocked.every(({ role, resource }) => isOn(role, resource));
+    const next = cloneValue(value, roleIds, resourceIds);
     const diff: PermissionDiff[] = [];
-    for (const r of targets) {
-      const from = isOn(r.id, resource);
+    for (const pair of unlocked) {
+      const from = isOn(pair.role, pair.resource);
       if (from === to) continue;
-      next[r.id] = { ...next[r.id], [resource]: to };
-      diff.push({ role: r.id, resource, from, to });
+      next[pair.role][pair.resource] = to;
+      diff.push({ ...pair, from, to });
     }
     emit(next, diff);
   };
-
-  const toggleColumn = (role: RoleId): void => {
-    const targets = resources.filter((res) => !getLocked(locked, role, res.id));
-    if (targets.length === 0) return;
-    const allOn = targets.every((res) => isOn(role, res.id));
-    const to = !allOn;
-    const next: PermissionValue = { ...value, [role]: { ...value[role] } };
-    const diff: PermissionDiff[] = [];
-    for (const res of targets) {
-      const from = isOn(role, res.id);
-      if (from === to) continue;
-      next[role] = { ...next[role], [res.id]: to };
-      diff.push({ role, resource: res.id, from, to });
-    }
-    emit(next, diff);
-  };
-
-  const toggleAll = (): void => {
-    const pairs: Array<{ role: RoleId; resource: ResourceId }> = [];
-    for (const r of roles)
-      for (const res of resources)
-        if (!getLocked(locked, r.id, res.id)) pairs.push({ role: r.id, resource: res.id });
-    if (pairs.length === 0) return;
-    const allOn = pairs.every((p) => isOn(p.role, p.resource));
-    const to = !allOn;
-    const next: PermissionValue = { ...value };
-    const diff: PermissionDiff[] = [];
-    for (const p of pairs) {
-      const from = isOn(p.role, p.resource);
-      if (from === to) continue;
-      next[p.role] = { ...next[p.role], [p.resource]: to };
-      diff.push({ role: p.role, resource: p.resource, from: from, to });
-    }
-    emit(next, diff);
-  };
+  const toggleRow = (resource: ResourceId): void =>
+    togglePairs(roleIds.map((role) => ({ role, resource })));
+  const toggleColumn = (role: RoleId): void =>
+    togglePairs(resourceIds.map((resource) => ({ role, resource })));
+  const toggleAll = (): void =>
+    togglePairs(roleIds.flatMap((role) => resourceIds.map((resource) => ({ role, resource }))));
 
   const columnState = (role: RoleId): { state: HeaderState; unlocked: number; lockedCount: number } => {
     const unlockedVals: boolean[] = [];
@@ -154,174 +205,249 @@ export function PermissionMatrix({
       if (getLocked(locked, role, res.id)) lockedCount += 1;
       else unlockedVals.push(isOn(role, res.id));
     }
-    return {
-      state: unlockedVals.length === 0 ? 'unchecked' : stateOf(unlockedVals),
-      unlocked: unlockedVals.length,
-      lockedCount,
-    };
+    return { state: unlockedVals.length ? stateOf(unlockedVals) : 'unchecked', unlocked: unlockedVals.length, lockedCount };
   };
-
   const rowState = (resource: ResourceId): { state: HeaderState; unlocked: number; lockedCount: number } => {
     const unlockedVals: boolean[] = [];
     let lockedCount = 0;
-    for (const r of roles) {
-      if (getLocked(locked, r.id, resource)) lockedCount += 1;
-      else unlockedVals.push(isOn(r.id, resource));
+    for (const role of roles) {
+      if (getLocked(locked, role.id, resource)) lockedCount += 1;
+      else unlockedVals.push(isOn(role.id, resource));
     }
-    return {
-      state: unlockedVals.length === 0 ? 'unchecked' : stateOf(unlockedVals),
-      unlocked: unlockedVals.length,
-      lockedCount,
-    };
+    return { state: unlockedVals.length ? stateOf(unlockedVals) : 'unchecked', unlocked: unlockedVals.length, lockedCount };
+  };
+  const allPairs = roleIds.flatMap((role) => resourceIds.map((resource) => ({ role, resource })));
+  const unlockedPairs = allPairs.filter(({ role, resource }) => !getLocked(locked, role, resource));
+  const allState = unlockedPairs.length
+    ? stateOf(unlockedPairs.map(({ role, resource }) => isOn(role, resource)))
+    : 'unchecked';
+  const headerLabel = (base: string, state: HeaderState, lockedCount: number): string =>
+    `${base}${state === 'mixed' ? ', sebagian dipilih' : ''}${lockedCount ? `, ${lockedCount} terkunci` : ''}`;
+  const isTarget = (target: FocusTarget): boolean => {
+    if (focusTarget.kind !== target.kind) return false;
+    if (target.kind === 'all') return true;
+    if (target.kind === 'column' && focusTarget.kind === 'column') return target.role === focusTarget.role;
+    if (target.kind === 'row' && focusTarget.kind === 'row') return target.resource === focusTarget.resource;
+    return target.kind === 'cell' && focusTarget.kind === 'cell' &&
+      target.role === focusTarget.role && target.resource === focusTarget.resource;
+  };
+  const itemProps = (target: FocusTarget) => ({
+    'data-target': JSON.stringify(target),
+    className: "relative after:absolute after:-inset-3.5 after:content-[''] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+    tabIndex: isTarget(target) ? 0 : -1,
+    onFocus: () => setFocusTarget(target),
+    onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        if (target.kind === 'all') toggleAll();
+        else if (target.kind === 'column') toggleColumn(target.role);
+        else if (target.kind === 'row') toggleRow(target.resource);
+        else toggleCell(target.role, target.resource);
+        return;
+      }
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      const items: FocusTarget[] = [
+        { kind: 'all' },
+        ...roleIds.map((role): FocusTarget => ({ kind: 'column', role })),
+        ...resourceIds.flatMap((resource) => [
+          { kind: 'row', resource } as FocusTarget,
+          ...roleIds.map((role): FocusTarget => ({ kind: 'cell', role, resource })),
+        ]),
+      ];
+      const indexOf = (candidate: FocusTarget): number => items.findIndex((item) =>
+        item.kind === candidate.kind &&
+        (item.kind === 'all' || (item.kind === 'column' && candidate.kind === 'column' && item.role === candidate.role) ||
+          (item.kind === 'row' && candidate.kind === 'row' && item.resource === candidate.resource) ||
+          (item.kind === 'cell' && candidate.kind === 'cell' && item.role === candidate.role && item.resource === candidate.resource)));
+      let nextIndex = indexOf(target);
+      // Baris header (all + kolom): 0..roles.length. Baris resource i:
+      // header di 1 + R + i * (R + 1), sel-sel setelahnya.
+      const rowIndex = target.kind === 'cell' || target.kind === 'row'
+        ? resourceIds.indexOf(target.resource)
+        : -1;
+      const rowStart = rowIndex < 0 ? 0 : 1 + roles.length + rowIndex * (roles.length + 1);
+      const rowEnd = rowIndex < 0 ? roles.length : Math.min(items.length - 1, rowStart + roles.length);
+      if (event.ctrlKey && event.key === 'Home') nextIndex = 0;
+      else if (event.ctrlKey && event.key === 'End') nextIndex = items.length - 1;
+      else if (event.key === 'Home') nextIndex = rowStart;
+      else if (event.key === 'End') nextIndex = rowEnd;
+      else if (event.key === 'ArrowRight') nextIndex = Math.min(rowEnd, nextIndex + 1);
+      else if (event.key === 'ArrowLeft') nextIndex = Math.max(rowStart, nextIndex - 1);
+      else if (event.key === 'ArrowDown' && rowIndex < resources.length - 1) nextIndex += roles.length + 1;
+      else if (event.key === 'ArrowUp' && rowIndex >= 0) nextIndex -= roles.length + 1;
+      setFocusTarget(items[nextIndex]);
+    },
+  });
+  const handleReset = (): void => {
+    const next = cloneValue(baseline, roleIds, resourceIds);
+    const diff = diffValues(value, next, roleIds, resourceIds);
+    if (!diff.length) return;
+    emit(next, diff);
+    setListOpen(false);
+    setAnnouncement('Perubahan dibatalkan');
+    setFocusTarget({ kind: 'all' });
   };
 
-  const allUnlockedVals: boolean[] = [];
-  let lockedTotal = 0;
-  for (const r of roles)
-    for (const res of resources) {
-      if (getLocked(locked, r.id, res.id)) lockedTotal += 1;
-      else allUnlockedVals.push(isOn(r.id, res.id));
-    }
-  const allState: HeaderState =
-    allUnlockedVals.length === 0 ? 'unchecked' : stateOf(allUnlockedVals);
-  const totalCells = roles.length * resources.length;
+  if (loading) {
+    return (
+      <div role="grid" aria-label="Memuat izin" aria-busy="true" className={cn('space-y-2 rounded-md border border-border p-3', className)}>
+        <span className="sr-only">Memuat izin…</span>
+        {Array.from({ length: 5 }, (_, row) => (
+          <div key={row} className="flex gap-2">
+            {Array.from({ length: 8 }, (_, col) => <Skeleton key={col} className="h-9 flex-1 motion-reduce:animate-none" />)}
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <Alert ref={alertRef} tabIndex={-1} role="alert" variant="destructive" className={className}>
+        <AlertTitle>Data izin tidak valid</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
+        <Button className="mt-3" size="sm" onClick={onLoadExample}>Muat contoh</Button>
+      </Alert>
+    );
+  }
+  if (invalidId) {
+    return (
+      <Alert ref={alertRef} tabIndex={-1} role="alert" variant="destructive" className={className}>
+        <AlertTitle>Data izin tidak valid</AlertTitle>
+        <AlertDescription>ID role atau resource duplikat: {invalidId}</AlertDescription>
+        <Button className="mt-3" size="sm" onClick={onLoadExample}>Muat contoh</Button>
+      </Alert>
+    );
+  }
+  if (!roles.length || !resources.length) {
+    return (
+      <EmptyState
+        role="status"
+        className={className}
+        title="Belum ada role atau resource"
+        description="Tambahkan data atau muat contoh matriks untuk memulai."
+        actionLabel={emptyActionLabel}
+        onAction={onEmptyAction ?? onLoadExample}
+      />
+    );
+  }
 
-  const headerAriaLabel = (
-    base: string,
-    state: HeaderState,
-    lockedCount: number
-  ): string =>
-    `${base}${state === 'mixed' ? ', sebagian dipilih' : ''}${lockedCount > 0 ? `, ${lockedCount} terkunci` : ''}`;
+  const dirtyBanner = changes.length > 0 && (
+    <section role="status" aria-label="Perubahan belum disimpan" className="order-first rounded-md border border-warning bg-warning/10 p-3 text-foreground motion-reduce:transition-none">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center">
+        <Badge variant="warning">{changes.length}</Badge>
+        <span>{changes.length} perubahan belum disimpan</span>
+        <Button variant="ghost" size="sm" aria-expanded={listOpen} onClick={() => setListOpen((open) => !open)}>
+          {listOpen ? 'Tutup daftar' : 'Lihat daftar'}
+        </Button>
+        <div className="flex flex-wrap gap-2 md:ml-auto">
+          <Button variant="ghost" onClick={handleReset}>Reset</Button>
+          {onCancel && <Button variant="ghost" onClick={() => { onCancel(); setFocusTarget({ kind: 'all' }); }}>Batal</Button>}
+          <Button variant="highlight" disabled={!onSave} onClick={() => { onSave?.(); setFocusTarget({ kind: 'all' }); }}>Simpan</Button>
+        </div>
+      </div>
+      {listOpen && (
+        <ul className="mt-3 space-y-2 border-t border-warning/40 pt-3">
+          {changes.map((change) => (
+            <li key={JSON.stringify([change.role, change.resource])} className="flex flex-wrap items-center gap-2">
+              <span>{labelOf(change.role, change.resource)}: {change.from ? 'menyala' : 'mati'} → {change.to ? 'menyala' : 'mati'}</span>
+              <Button size="sm" variant="outline" onClick={() => {
+                const next = cloneValue(value, roleIds, resourceIds);
+                next[change.role][change.resource] = baseline[change.role]?.[change.resource] ?? false;
+                emit(next, diffValues(value, next, roleIds, resourceIds));
+                setAnnouncement(`${labelOf(change.role, change.resource)} dibatalkan`);
+                setFocusTarget({ kind: 'all' });
+              }}>Reset baris ini</Button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
 
   return (
     <TooltipProvider>
-      <div className={cn('w-full overflow-x-auto rounded-md border border-border bg-card', className)}>
-        <table role="grid" aria-label="Matriks izin role dan resource" className={cn(permissionMatrixVariants({ density }))}>
-          <thead>
-            <tr role="row">
-              <th role="columnheader" scope="col" className="sticky left-0 top-0 z-10 bg-muted/40 p-2 text-left">
-                <span className="inline-flex items-center gap-2">
-                  <Checkbox
-                    checked={allState === 'checked' ? true : allState === 'mixed' ? 'indeterminate' : false}
-                    onCheckedChange={toggleAll}
-                    disabled={allUnlockedVals.length === 0}
-                    aria-label={headerAriaLabel('Pilih semua izin', allState, lockedTotal)}
-                  />
-                  <span className="sr-only">{allState === 'mixed' ? 'sebagian' : allState}</span>
-                  <span className="text-xs font-medium text-muted-foreground">semua</span>
-                </span>
-              </th>
-              {roles.map((role) => {
-                const { state, unlocked, lockedCount } = columnState(role.id);
-                return (
-                  <th
-                    key={role.id}
-                    role="columnheader"
-                    scope="col"
-                    className="sticky top-0 z-10 bg-muted/40 p-2 text-center"
-                  >
-                    <span className="inline-flex items-center justify-center gap-2">
-                      <Checkbox
-                        checked={state === 'checked' ? true : state === 'mixed' ? 'indeterminate' : false}
-                        onCheckedChange={() => toggleColumn(role.id)}
-                        disabled={unlocked === 0}
-                        aria-label={headerAriaLabel(`Toggle kolom ${role.label}`, state, lockedCount)}
-                      />
-                      <span className={cn(permissionHeaderVariants({ headerState: state }))}>
-                        {role.label}
+      <div className="flex flex-col gap-3">
+        <div ref={gridRef} className={cn('max-h-96 w-full overflow-auto rounded-md border border-border bg-card', className)}>
+          {unlockedPairs.length === 0 && (
+            <p className="border-b border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+              Semua sel dikunci kebijakan.
+            </p>
+          )}
+          <table role="grid" aria-label="Matriks izin role dan resource" className={cn(permissionMatrixVariants({ density }))}>
+            <thead>
+              <tr role="row">
+                <th role="columnheader" scope="col" className="sticky left-0 top-0 z-20 bg-muted/40 p-2 text-left">
+                  <span className="inline-flex min-h-11 items-center gap-2">
+                    <Checkbox {...itemProps({ kind: 'all' })} checked={allState === 'checked' ? true : allState === 'mixed' ? 'indeterminate' : false} onCheckedChange={toggleAll} aria-disabled={!unlockedPairs.length} aria-label={headerLabel('Pilih semua izin', allState, allPairs.length - unlockedPairs.length)} />
+                    <span className="text-xs font-medium text-muted-foreground">semua</span>
+                    {allState === 'mixed' && <span aria-hidden="true" className="text-xs text-primary">◐</span>}
+                  </span>
+                </th>
+                {roles.map((role) => {
+                  const { state, unlocked, lockedCount } = columnState(role.id);
+                  const target: FocusTarget = { kind: 'column', role: role.id };
+                  return (
+                    <th key={role.id} role="columnheader" scope="col" className="sticky top-0 z-10 bg-muted/40 p-2 text-center">
+                      <span className="inline-flex min-h-11 items-center justify-center gap-2">
+                        <Checkbox {...itemProps(target)} checked={state === 'checked' ? true : state === 'mixed' ? 'indeterminate' : false} onCheckedChange={() => toggleColumn(role.id)} aria-disabled={!unlocked} aria-label={headerLabel(`Toggle kolom ${role.label}`, state, lockedCount)} />
+                        <span className={cn(permissionHeaderVariants({ headerState: state }))}>{role.label}</span>
+                        {state === 'mixed' && <span aria-hidden="true" className="text-xs text-primary">◐</span>}
+                        {state === 'mixed' && <span className="sr-only">sebagian</span>}
                       </span>
-                      {state === 'mixed' && (
-                        <span aria-hidden="true" className="text-xs text-primary">
-                          ◐
-                        </span>
-                      )}
-                      {state === 'mixed' && <span className="sr-only">sebagian</span>}
-                    </span>
-                  </th>
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {resources.map((resource) => {
+                const { state, unlocked, lockedCount } = rowState(resource.id);
+                const rowTarget: FocusTarget = { kind: 'row', resource: resource.id };
+                return (
+                  <tr key={resource.id} role="row">
+                    <th role="rowheader" scope="row" className="sticky left-0 z-10 bg-muted/40 p-2 text-left">
+                      <span className="inline-flex min-h-11 items-center gap-2">
+                        <Checkbox {...itemProps(rowTarget)} checked={state === 'checked' ? true : state === 'mixed' ? 'indeterminate' : false} onCheckedChange={() => toggleRow(resource.id)} aria-disabled={!unlocked} aria-label={headerLabel(`Toggle semua izin ${resource.label}`, state, lockedCount)} />
+                        <span className={cn(permissionHeaderVariants({ headerState: state }))}>{resource.label}</span>
+                        {state === 'mixed' && <span aria-hidden="true" className="text-xs text-primary">◐</span>}
+                        {state === 'mixed' && <span className="sr-only">sebagian</span>}
+                      </span>
+                    </th>
+                    {roles.map((role) => {
+                      const checked = isOn(role.id, resource.id);
+                      const reason = getLocked(locked, role.id, resource.id);
+                      const target: FocusTarget = { kind: 'cell', role: role.id, resource: resource.id };
+                      const label = `${role.label} × ${resource.label}, ${reason ? `terkunci: ${reason}` : checked ? 'menyala' : 'mati'}`;
+                       const cellProps = itemProps(target);
+                      const checkbox = renderCell
+                        ? <button type="button" {...cellProps} onClick={() => toggleCell(role.id, resource.id)} role="checkbox" aria-checked={checked} aria-label={label} aria-disabled={reason !== null}>{renderCell({ role: role.id, resource: resource.id, checked, lockedReason: reason })}</button>
+                        : <Checkbox {...cellProps} checked={checked} onCheckedChange={() => toggleCell(role.id, resource.id)} aria-label={label} aria-disabled={reason !== null} />;
+                      return (
+                        <td key={role.id} role="gridcell" className="p-0 text-center">
+                          {reason ? (
+                            <Tooltip>
+                              <span className={cn(permissionCellVariants({ cell: 'locked' }), 'p-2')}><TooltipTrigger asChild>{checkbox}</TooltipTrigger><Lock aria-hidden="true" className="ml-1 size-3.5 text-muted-foreground" /></span>
+                              <TooltipContent className="motion-reduce:animate-none"><p>{reason}</p></TooltipContent>
+                            </Tooltip>
+                          ) : <span className={cn(permissionCellVariants({ cell: checked ? 'on' : 'off' }), 'p-2')}>{checkbox}</span>}
+                        </td>
+                      );
+                    })}
+                  </tr>
                 );
               })}
-            </tr>
-          </thead>
-          <tbody>
-            {resources.map((resource) => {
-              const { state, unlocked, lockedCount } = rowState(resource.id);
-              return (
-                <tr key={resource.id} role="row">
-                  <th role="rowheader" scope="row" className="sticky left-0 z-10 bg-muted/40 p-2 text-left">
-                    <span className="inline-flex items-center gap-2">
-                      <Checkbox
-                        checked={state === 'checked' ? true : state === 'mixed' ? 'indeterminate' : false}
-                        onCheckedChange={() => toggleRow(resource.id)}
-                        disabled={unlocked === 0}
-                        aria-label={headerAriaLabel(`Toggle semua izin ${resource.label}`, state, lockedCount)}
-                      />
-                      <span className={cn(permissionHeaderVariants({ headerState: state }))}>
-                        {resource.label}
-                      </span>
-                      {state === 'mixed' && (
-                        <span aria-hidden="true" className="text-xs text-primary">
-                          ◐
-                        </span>
-                      )}
-                      {state === 'mixed' && <span className="sr-only">sebagian</span>}
-                    </span>
-                  </th>
-                  {roles.map((role) => {
-                    const checked = isOn(role.id, resource.id);
-                    const reason = getLocked(locked, role.id, resource.id);
-                    const cellState = reason ? 'locked' : checked ? 'on' : 'off';
-                    const label = `${role.label} × ${resource.label}, ${reason ? `terkunci: ${reason}` : checked ? 'menyala' : 'mati'}`;
-                    const box = (
-                      <span className={cn(permissionCellVariants({ cell: cellState }), 'p-2')}>
-                        {renderCell ? (
-                          renderCell({ role: role.id, resource: resource.id, checked, lockedReason: reason })
-                        ) : (
-                          <Checkbox
-                            checked={checked}
-                            onCheckedChange={() => toggleCell(role.id, resource.id)}
-                            disabled={reason !== null}
-                            aria-label={label}
-                            aria-disabled={reason !== null}
-                          />
-                        )}
-                        {reason && (
-                          <Lock aria-hidden="true" className="ml-1 size-3.5 text-muted-foreground" />
-                        )}
-                      </span>
-                    );
-                    return (
-                      <td key={role.id} role="gridcell" className="p-0 text-center">
-                        {reason ? (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <span className="inline-block">{box}</span>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>{reason}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        ) : (
-                          box
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-        <div className="flex flex-wrap items-center gap-2 border-t border-border px-3 py-2 text-xs text-muted-foreground">
-          <span>
-            {totalCells} sel · {lockedTotal} terkunci
-          </span>
-          <Badge variant="muted" size="sm">
-            ◐ = sebagian
-          </Badge>
-          <Badge variant="muted" size="sm">
-            <Lock aria-hidden="true" className="size-3" /> = terkunci kebijakan
-          </Badge>
+            </tbody>
+          </table>
+          <div className="flex flex-wrap items-center gap-2 border-t border-border px-3 py-2 text-xs text-muted-foreground">
+            <span>{allPairs.length} sel · {allPairs.length - unlockedPairs.length} terkunci</span>
+            <Badge variant="muted" size="sm">◐ = sebagian</Badge>
+            <Badge variant="muted" size="sm"><Lock aria-hidden="true" className="size-3" /> = terkunci kebijakan</Badge>
+          </div>
         </div>
+        {dirtyBanner}
+        <div className="sr-only" aria-live="polite">{announcement}</div>
+        <p className="sr-only">Navigasi grid: gunakan panah, Home, End, Ctrl+Home, atau Ctrl+End. Space memilih sel; Enter atau Space memilih header.</p>
       </div>
     </TooltipProvider>
   );

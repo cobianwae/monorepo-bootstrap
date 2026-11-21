@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import * as React from 'react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { PermissionMatrix } from './permission-matrix';
 import type { PermissionValue } from './permission-matrix-types';
 
@@ -107,6 +108,7 @@ describe('PermissionMatrix', () => {
     fireEvent.click(cell);
     fireEvent.keyDown(cell, { key: ' ' });
     expect(onValueChange).not.toHaveBeenCalled();
+    expect(screen.getByText(/Tidak diubah. Terkunci:/).textContent).toContain('Viewer tidak boleh Hapus');
   });
 
   it('excludes locked cells from denominator and skips them in bulk toggle', () => {
@@ -129,5 +131,160 @@ describe('PermissionMatrix', () => {
     expect(diff).toHaveLength(7);
     expect(next.editor.hapus).toBe(false);
     expect(diff.every((d) => d.resource !== 'hapus')).toBe(true);
+  });
+
+  it('supports roving keyboard navigation and toggles focused cells with Space', () => {
+    const onValueChange = vi.fn();
+    render(<PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} onValueChange={onValueChange} />);
+    const first = screen.getByLabelText('Pilih semua izin');
+    expect(first.getAttribute('tabindex')).toBe('0');
+    fireEvent.keyDown(first, { key: 'ArrowRight' });
+    const admin = screen.getByLabelText(/toggle kolom admin/i);
+    expect(document.activeElement).toBe(admin);
+    fireEvent.keyDown(admin, { key: 'ArrowDown' });
+    const cell = screen.getByLabelText('Admin × Publikasi, mati');
+    expect(document.activeElement).toBe(cell);
+    fireEvent.keyDown(cell, { key: ' ' });
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    expect(fireEvent.keyDown(cell, { key: 'Tab' })).toBe(true);
+    expect(fireEvent.keyDown(cell, { key: 'Tab', shiftKey: true })).toBe(true);
+  });
+
+  it('shows dirty changes, resets a changed cell to baseline, and calls save', () => {
+    const onValueChange = vi.fn();
+    const onSave = vi.fn();
+    const initialValue = makeValue(false);
+    const current = makeValue(false);
+    current.admin.publikasi = true;
+    render(<PermissionMatrix roles={roles} resources={resources} value={current} initialValue={initialValue} onValueChange={onValueChange} onSave={onSave} />);
+    expect(screen.getByText('1 perubahan belum disimpan')).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: 'Lihat daftar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reset baris ini' }));
+    expect(onValueChange).toHaveBeenCalledWith(initialValue, [{ role: 'admin', resource: 'publikasi', from: true, to: false }]);
+    fireEvent.click(screen.getByRole('button', { name: 'Simpan' }));
+    expect(onSave).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders loading, empty, duplicate-id error, and all-locked states', () => {
+    const { rerender } = render(<PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} loading />);
+    expect(screen.getByText('Memuat izin…')).toBeDefined();
+    expect(screen.getByText('Memuat izin…').parentElement?.getAttribute('aria-busy')).toBe('true');
+
+    rerender(<PermissionMatrix roles={[]} resources={resources} value={{}} />);
+    expect(screen.getByRole('status')).toBeDefined();
+
+    rerender(<PermissionMatrix roles={[roles[0], roles[0]]} resources={resources} value={makeValue(false)} />);
+    expect(screen.getByRole('alert').textContent).toContain('ID role atau resource duplikat');
+    expect(document.activeElement).toBe(screen.getByRole('alert'));
+
+    rerender(<PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} locked={() => 'Terkunci kebijakan'} />);
+    expect(screen.getByText('Semua sel dikunci kebijakan.')).toBeDefined();
+  });
+
+  it('keeps locked cells reachable, announces refusal, and preserves row/column boundaries', () => {
+    const onValueChange = vi.fn();
+    render(<PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} onValueChange={onValueChange} locked={() => 'Kebijakan organisasi'} />);
+    const first = screen.getByLabelText(/pilih semua izin/i);
+    act(() => first.focus());
+    fireEvent.keyDown(first, { key: 'ArrowDown' });
+    const row = screen.getByLabelText(/toggle semua izin publikasi/i);
+    expect(document.activeElement).toBe(row);
+    fireEvent.keyDown(row, { key: 'ArrowRight' });
+    const cell = screen.getByLabelText(/Admin × Publikasi, terkunci/);
+    expect(document.activeElement).toBe(cell);
+    fireEvent.keyDown(cell, { key: ' ' });
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(screen.getByText('Tidak diubah. Terkunci: Kebijakan organisasi')).toBeDefined();
+    fireEvent.keyDown(cell, { key: 'End' });
+    const lastInRow = screen.getByLabelText(/Owner × Publikasi, terkunci/);
+    expect(document.activeElement).toBe(lastInRow);
+    fireEvent.keyDown(lastInRow, { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(lastInRow);
+    fireEvent.keyDown(lastInRow, { key: 'Home' });
+    expect(document.activeElement).toBe(row);
+    fireEvent.keyDown(row, { key: 'Home', ctrlKey: true });
+    expect(document.activeElement).toBe(first);
+    fireEvent.keyDown(first, { key: 'End', ctrlKey: true });
+    const last = screen.getByLabelText(/Owner × Laporan, terkunci/);
+    expect(document.activeElement).toBe(last);
+    fireEvent.keyDown(last, { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(last);
+    expect(within(screen.getByRole('grid')).getAllByRole('checkbox').filter((item) => item.tabIndex === 0)).toHaveLength(1);
+  });
+
+  it('tracks three controlled changes, resets one/all, returns focus, and clears the banner on save', () => {
+    const initialValue = makeValue(false);
+    const onSave = vi.fn();
+    function Consumer() {
+      const [value, setValue] = React.useState(initialValue);
+      const [baseline, setBaseline] = React.useState(initialValue);
+      return <PermissionMatrix roles={roles} resources={resources} value={value} initialValue={baseline} onValueChange={setValue} onSave={() => { onSave(value); setBaseline(value); }} />;
+    }
+    render(<Consumer />);
+    for (const label of ['Admin × Publikasi', 'Editor × Artikel', 'Viewer × Media']) {
+      fireEvent.click(screen.getByLabelText(`${label}, mati`));
+    }
+    const banner = screen.getByRole('status');
+    expect(within(banner).getByText('3')).toBeDefined();
+    expect(screen.getByRole('grid').compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Lihat daftar' }));
+    expect(screen.getAllByRole('listitem')).toHaveLength(3);
+    fireEvent.click(screen.getAllByRole('button', { name: 'Reset baris ini' })[0]);
+    expect(screen.getAllByRole('listitem')).toHaveLength(2);
+    expect(document.activeElement).toBe(screen.getByLabelText(/pilih semua izin/i));
+    fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+    expect(screen.queryByRole('status')).toBeNull();
+    expect(screen.getByText('Perubahan dibatalkan')).toBeDefined();
+    expect(document.activeElement).toBe(screen.getByLabelText(/pilih semua izin/i));
+    fireEvent.click(screen.getByLabelText('Editor × Artikel, mati'));
+    fireEvent.click(screen.getByRole('button', { name: 'Simpan' }));
+    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(onSave.mock.calls[0][0].editor.artikel).toBe(true);
+    expect(screen.queryByRole('status')).toBeNull();
+    expect(document.activeElement).toBe(screen.getByLabelText(/pilih semua izin/i));
+  });
+
+  it('captures the ready baseline by default and emits exactly one batch per keyboard header action', () => {
+    const onValueChange = vi.fn();
+    const { rerender } = render(<PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} onValueChange={onValueChange} />);
+    const header = screen.getByLabelText(/toggle kolom admin/i);
+    fireEvent.keyDown(header, { key: 'Enter' });
+    expect(onValueChange).toHaveBeenCalledTimes(1);
+    const [next, diff] = onValueChange.mock.calls[0];
+    expect(diff).toHaveLength(8);
+    expect(screen.getByText(/8 dipilih/)).toBeDefined();
+    rerender(<PermissionMatrix roles={roles} resources={resources} value={next} onValueChange={onValueChange} />);
+    expect(screen.getByText('8 perubahan belum disimpan')).toBeDefined();
+  });
+
+  it('exposes loading placeholders and functional empty/error recovery actions', () => {
+    const onLoadExample = vi.fn();
+    const { rerender } = render(<PermissionMatrix roles={roles} resources={resources} value={{}} loading />);
+    const grid = screen.getByRole('grid');
+    expect(grid.querySelectorAll('.animate-pulse')).toHaveLength(40);
+    expect(grid.querySelectorAll('.motion-reduce\\:animate-none')).toHaveLength(40);
+    expect(within(grid).queryAllByRole('checkbox')).toHaveLength(0);
+    rerender(<PermissionMatrix roles={[]} resources={[]} value={{}} onLoadExample={onLoadExample} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Muat contoh 5×8' }));
+    expect(onLoadExample).toHaveBeenCalledTimes(1);
+    rerender(<PermissionMatrix roles={roles} resources={resources} value={{}} error="Sumber data tidak tersedia" onLoadExample={onLoadExample} />);
+    expect(document.activeElement).toBe(screen.getByRole('alert'));
+    expect(screen.getByRole('alert').textContent).toContain('Sumber data tidak tersedia');
+    fireEvent.click(screen.getByRole('button', { name: 'Muat contoh' }));
+    expect(onLoadExample).toHaveBeenCalledTimes(2);
+  });
+
+  it('retains all 20 columns with sticky headers and scrolls keyboard focus into view', () => {
+    const manyRoles = Array.from({ length: 20 }, (_, index) => ({ id: `role-${index}`, label: `Role ${index}` }));
+    const { container } = render(<PermissionMatrix roles={manyRoles} resources={resources} value={{}} density="compact" />);
+    expect(screen.getAllByRole('gridcell')).toHaveLength(160);
+    expect(screen.getAllByRole('columnheader').every((header) => header.classList.contains('sticky') && header.classList.contains('top-0'))).toBe(true);
+    expect(screen.getAllByRole('rowheader').every((header) => header.classList.contains('sticky') && header.classList.contains('left-0'))).toBe(true);
+    expect(container.querySelector('.overflow-auto')).not.toBeNull();
+    const last = screen.getByLabelText('Role 19 × Laporan, mati');
+    const scrollIntoView = vi.spyOn(last, 'scrollIntoView');
+    fireEvent.keyDown(screen.getByLabelText(/pilih semua izin/i), { key: 'End', ctrlKey: true });
+    expect(document.activeElement).toBe(last);
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' });
   });
 });
