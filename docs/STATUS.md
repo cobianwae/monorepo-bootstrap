@@ -25,7 +25,7 @@ CR-020 `done` atas approval user (2026-11-22), implementasi `9000a26` di `arah-s
 4. Mind Map: CR-020 `done` atas approval user; walkthrough Chrome sudah lulus, pembaca layar bersuara native tetap tindak lanjut.
 5. CR-020 `done`: sinkronisasi dev `aa6e0d8` (CR-021) terverifikasi; lint/build/test hijau (706 UI, 68 showcase, 8 token), typecheck hanya 12 error baseline FlowEditor. Push branch dan merge/push `dev` diizinkan user.
 6. CR-022–028 `done` atas approval user (2026-11-22), lengkap dalam branch stacked CR-028; push ketujuh branch dan merge/push `dev` diizinkan. Verifikasi kode final: lint/build/test workspace hijau (707 UI, 74 showcase, 8 token), typecheck hanya 12 baseline FlowEditor. Chrome light/dark selaras 320/390/768/1440px tanpa overflow; Tab mengikuti visual. Isu tema campuran/SR native tetap tindak lanjut.
-7. Mind Map: CR-033 (token scope tema bersarang) lalu CR-029–032 (hierarki, panggung demo, komponen DS, "Kapan dipakai") `done` atas approval user (2026-11-22), sudah di-fast-forward ke `dev` (`eeb7a6b`), belum di-push. `pnpm test` penuh hijau; `next build` showcase belum dijalankan (dev server :4000 memakai `.next`).
+7. Mind Map: CR-033 (token scope tema bersarang) lalu CR-029–032 (hierarki, panggung demo, komponen DS, "Kapan dipakai") `done` atas approval user (2026-11-22), sudah di-fast-forward ke `dev` (`eeb7a6b`), belum di-push. `pnpm test` penuh hijau; `pnpm -C apps/showcase build` hijau (dev server :4000 dihentikan untuk build).
 
 ## Known Issues
 
