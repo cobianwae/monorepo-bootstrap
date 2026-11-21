@@ -129,6 +129,17 @@
     border-color: var(--primary);
     box-shadow: 0 0 0 2px var(--primary);
   }
+  /* Node custom (action/pending) menggambar kartunya sendiri di FlowNode; wrapper
+   * xyflow hanya pemosisi (CR-021 #1) sehingga chrome-nya dinetralkan agar tidak
+   * tampil sebagai border ganda. Selector 2-kelas mengalahkan `.selected` di atas. */
+  .react-flow__node.react-flow__node-action,
+  .react-flow__node.react-flow__node-pending {
+    border: 0;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+    color: inherit;
+  }
   .react-flow__handle {
     border-color: var(--border);
     background-color: var(--background);

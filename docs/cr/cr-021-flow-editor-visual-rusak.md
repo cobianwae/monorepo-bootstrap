@@ -37,10 +37,10 @@ minimum ±500px sehingga screenshot 390px terpotong; perlu emulasi device metric
 
 ## Tasks (jalur small-fix)
 
-- [ ] #1 Node di-posisi-kan xyflow; wrapper terukur 220×88; minimap menampilkan node.
-- [ ] #2 Handle: hit-area transparan 48px + dot 12px; judul/status tidak tertimpa.
-- [ ] #3 Toolbar di dalam kanvas, tombol ikon ber-label/tooltip, target ≥44px.
-- [ ] #4 `fitView` awal + saat ganti demo; kanvas lebar penuh; ≥5/5 node terlihat di 1440 px.
+- [x] #1 Node di-posisi-kan xyflow; wrapper terukur 220×88; minimap menampilkan node.
+- [x] #2 Handle: hit-area transparan 48px + dot 12px; judul/status tidak tertimpa.
+- [x] #3 Toolbar di dalam kanvas, tombol ikon ber-label/tooltip, target ≥44px.
+- [x] #4 `fitView` awal + saat ganti demo; kanvas lebar penuh; ≥5/5 node terlihat di 1440 px.
 - [ ] #5 Controls dirapikan, tidak menutup node.
 - [ ] #6 `text-micro` tidak dibuang `cn()`; “Siap” 10px.
 - [ ] #7 Pemetaan edge/handle/label light+dark; kontras ≥3:1; selaraskan komentar vs `@import`.
