@@ -22,6 +22,7 @@ Story 012-03 `done` atas approval user di worktree `arah-cr`, branch `012-03-key
 2. Antrean implementasi satu per sesi: 013-01, 015-03.
 3. Sinkron sitemap: S-005.30/S-005.31 `planned` → `implemented` (007-01/008-01/02 live); S-005.41 `in-design` (018).
 4. Mind Map: 012-03 `done` atas approval user; walkthrough browser/SR tetap tindak lanjut catatan review (smoke build sudah hijau).
+5. Review canvas 012 vs 011: CR-020 `approved` oleh user — pemusatan node baru/edit/fokus belum diturunkan dari Studio; siap implementasi, kode belum diubah.
 
 ## Known Issues
 
