@@ -1,6 +1,6 @@
 # 014-01 — Util parsing, mapping, validasi + template
 
-Status: approved
+Status: done
 PRD: `docs/prd/014-import-wizard.md` (approved, gate 1)
 Design: `docs/design/import-wizard.md` (approved, gate 2) + `docs/design/flows/import-wizard.mmd` + `docs/design/wireframes/import-wizard.md`
 FR: `FR-001`, `FR-002`, `FR-006`, `FR-007`, `FR-010`
@@ -41,10 +41,10 @@ Goal: Logika murni impor berdiri tanpa UI: parse CSV via papaparse, auto-suggest
 
 ## Tasks
 
-- [ ] Tambah dependency `papaparse` + `@types/papaparse` (approved user 2026-11-21, D2) ke `apps/showcase` (scope showcase dulu, bukan `packages/ui`)
-- [ ] Buat util showcase `_lib` berdampingan route: `parseCsv` (wrapper Papa + delimiter auto/manual + batas), `suggestMapping` + kamus sinonim (§3 langkah 3), `validateRows` (urutan wajib→tipe→pola→unik→custom), `toTemplateCsv` (§3 langkah 7)
-- [ ] Tulis unit test co-located: parse valid/xlsx/besar/kosong, suggest skor + wajib hilang, validasi tiap aturan + pesan ID, template header + contoh
-- [ ] Docs: catat batas default, kamus sinonim, dan pesan error di story; siapkan contoh `anggota-valid/invalid` untuk 014-02
+- [x] Tambah dependency `papaparse` + `@types/papaparse` (approved user 2026-11-21, D2) ke `apps/showcase` (scope showcase dulu, bukan `packages/ui`)
+- [x] Buat util showcase `_lib` berdampingan route: `parseCsv` (wrapper Papa + delimiter auto/manual + batas), `suggestMapping` + kamus sinonim (§3 langkah 3), `validateRows` (urutan wajib→tipe→pola→unik→custom), `toTemplateCsv` (§3 langkah 7)
+- [x] Tulis unit test co-located: parse valid/xlsx/besar/kosong, suggest skor + wajib hilang, validasi tiap aturan + pesan ID, template header + contoh
+- [x] Docs: catat batas default, kamus sinonim, dan pesan error di story; siapkan contoh `anggota-valid/invalid` untuk 014-02
 
 ## Dependencies
 
@@ -55,3 +55,28 @@ Goal: Logika murni impor berdiri tanpa UI: parse CSV via papaparse, auto-suggest
 
 - Risiko: worker papaparse di test jsdom — mitigasi pakai parse string sinkron di test, worker hanya di browser
 - Keputusan: D1 composed (tanpa `form/import-wizard.tsx`); D2 papaparse; OQ#1 warning-bukan-blokir; OQ#3 auto + override
+
+### Konvensi untuk 014-02
+
+Batas default (D2): `DEFAULT_MAX_BYTES = 5_000_000` (≈ 5 MB), `DEFAULT_MAX_ROWS = 10_000`. Kelebihan = warning + tetap lanjut (bukan blokir); XLSX / non-CSV ditolak "v1 CSV saja".
+
+Kamus sinonim (ternormalisasi, skor 90): `nama|namalengkap → name`; `sulam|emailaddress → email`; `tgllahir|tgallahir|tanggallahir|birthdate|dob → dob`; `telepon|phone|telp|nomortelepon|nomorhp|handphone → phone`; `memberid|idanggota|idmember → memberId`. Skor persis 100, sinonim 90, substring ≥70, selainnya `null` (Abaikan).
+
+Pesan error kanonik: `"Wajib diisi"`; `"Bukan angka"`; `"Email tidak valid"`; `"Tanggal tidak valid (YYYY-MM-DD)"`; `"Format tidak sesuai"`; `"Ganda di file (baris X & Y)"` (semua baris ganda); custom dari `field.validate?`.
+
+Contoh untuk 014-02 (`anggota-valid.csv`):
+
+```csv
+Nama Lengkap,Email,Tgl Lahir,Telepon
+Rina Sari,rina@contoh.id,1990-05-20,081234567890
+Budi Setiawan,budi@mail.co.id,1985-11-02,081298765432
+```
+
+`anggota-invalid.csv` (pelanggaran per baris, validasi 014-01):
+
+```csv
+Nama Lengkap,Email,Tgl Lahir,Telepon
+,,32/13,abc
+Dua Nama,dup@x.com,1991-01-01,081111111111
+Tiga Nama,dup@x.com,1992-02-02,081222222222
+```
