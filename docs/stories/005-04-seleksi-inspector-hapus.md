@@ -1,6 +1,6 @@
 # 005-04 — Seleksi + inspector on-demand + hapus atomik
 
-Status: approved
+Status: review
 PRD: `docs/prd/005-flow-editor.md`
 Design: `docs/design/flow-editor.md`
 FR: `FR-005`, `FR-006`
@@ -41,12 +41,12 @@ Goal: Seleksi tunggal/multi terobservasi, inspector sheet hanya on-demand, hapus
 
 ## Tasks
 
-- [ ] `onSelectionChange` wiring + live region hitungan
-- [ ] Sheet komposisi showcase (`overlay/sheet` + `form/*`): isi minimal + mode multi + validasi judul
-- [ ] Hapus atomik node+edge + toast (tanpa dialog)
-- [ ] Menu konteks per node/edge/canvas (label Indonesia)
-- [ ] Test: tunggal/multi + on-demand (tambah tidak buka) + validasi + hapus atomik + undo-restore (mock)
-- [ ] Showcase: inspector tampil di draf route (final di 005-06)
+- [x] `onSelectionChange` wiring + live region hitungan
+- [x] Sheet komposisi showcase (`overlay/sheet` + `form/*`): isi minimal + mode multi + validasi judul
+- [x] Hapus atomik node+edge + toast (tanpa dialog)
+- [x] Menu konteks per node/edge/canvas (label Indonesia)
+- [x] Test: tunggal/multi + on-demand (tambah tidak buka) + validasi + hapus atomik + undo-restore (mock)
+- [x] Showcase: inspector tampil di draf route (final di 005-06)
 
 ## Dependencies
 

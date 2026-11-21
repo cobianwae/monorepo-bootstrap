@@ -45,6 +45,13 @@ import {
 } from '@dnd-kit/core';
 import { Plus } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from '../navigation/context-menu';
 import { Badge } from '../base/badge';
 import { EmptyState } from '../feedback/empty-state';
 import { Skeleton } from '../base/skeleton';
@@ -87,6 +94,7 @@ export interface FlowEditorProps {
   onEdgesChange?: OnEdgesChange<FlowEdge>;
   onConnect?: OnConnect;
   onSelectionChange?: (selection: FlowSelection) => void; // wajib untuk inspector
+  onDelete?: (selection: FlowSelection) => void; // hapus atomik node+edge (story 005-04)
   defaultNodes?: FlowNode[]; // uncontrolled demo
   defaultEdges?: FlowEdge[]; // uncontrolled demo
   nodeTypes?: Record<string, ComponentType<{ data: FlowNodeData; selected?: boolean }>>; // kontrak a11y D4
@@ -538,6 +546,9 @@ interface FlowCanvasHostProps {
   ) => boolean;
   nodeTypes: unknown;
   onAddFromPalette: (item: FlowPaletteItem, position: { x: number; y: number }) => void;
+  onNodeContextMenu?: (event: React.MouseEvent, node: FlowNode) => void;
+  onEdgeContextMenu?: (event: React.MouseEvent, edge: FlowEdge) => void;
+  onPaneContextMenu?: (event: React.MouseEvent) => void;
   snapToGrid: boolean;
   gridSize: number;
   minimap: boolean;
@@ -604,6 +615,9 @@ function FlowCanvasHost({
   fitView,
   ariaLabel,
   paletteItems,
+  onNodeContextMenu,
+  onEdgeContextMenu,
+  onPaneContextMenu,
 }: FlowCanvasHostProps) {
   const apiRef = React.useRef<FlowCanvasApi | null>(null);
   const sensors = useSensors(
@@ -699,6 +713,18 @@ function FlowCanvasHost({
               onNodeClick={(_event, _node) => {
                 // seleksi diatur melalui onSelectionChange xyflow; tidak ada state internal tambahan
               }}
+              onNodeContextMenu={(event, node) => {
+                event.preventDefault();
+                void onNodeContextMenu?.(event as unknown as React.MouseEvent, node as FlowNode);
+              }}
+              onEdgeContextMenu={(event, edge) => {
+                event.preventDefault();
+                void onEdgeContextMenu?.(event as unknown as React.MouseEvent, edge as FlowEdge);
+              }}
+              onPaneContextMenu={(event) => {
+                event.preventDefault();
+                void onPaneContextMenu?.(event as unknown as React.MouseEvent);
+              }}
             >
               <Background variant={('dots' as unknown as BackgroundVariant)} gap={gridSize * 4} />
               {minimap ? (
@@ -760,6 +786,7 @@ export function FlowEditor(props: FlowEditorProps) {
     historyLimit = 50,
     ariaLabel = 'Editor alur',
     className,
+    onDelete,
   } = props;
 
   const isControlled = nodesProp !== undefined && edgesProp !== undefined;
@@ -771,6 +798,29 @@ export function FlowEditor(props: FlowEditorProps) {
   const [selectedEdgeId, setSelectedEdgeId] = React.useState<string | null>(null);
   const [connectionSuccess, setConnectionSuccess] = React.useState<string | null>(null);
   const [connectionAlert, setConnectionAlert] = React.useState<string | null>(null);
+  const [selection, setSelection] = React.useState<FlowSelection>({ nodes: [], edges: [] });
+  const [contextMenu, setContextMenu] = React.useState<{
+    kind: 'node' | 'edge' | 'canvas';
+    id: string | null;
+    x: number;
+    y: number;
+  } | null>(null);
+  const menuTriggerRef = React.useRef<HTMLButtonElement>(null);
+
+  // Buka menu konteks saat contextMenu berubah. Dispatch contextmenu (right-click) agar
+  // Radix ContextMenuTrigger membuka Content (Radix menanggapi contextmenu, bukan click).
+  React.useEffect(() => {
+    if (!contextMenu || !menuTriggerRef.current) return;
+    const trigger = menuTriggerRef.current;
+    trigger.dispatchEvent(
+      new MouseEvent('contextmenu', {
+        bubbles: true,
+        cancelable: true,
+        clientX: contextMenu.x,
+        clientY: contextMenu.y,
+      }),
+    );
+  }, [contextMenu]);
 
   const nodes = isControlled ? nodesProp : internalNodes;
   const edges = isControlled ? edgesProp : internalEdges;
@@ -923,9 +973,10 @@ React.useEffect(() => {
 }, [connectionAlert]);
 
   const handleSelectionChange = React.useCallback(
-    (selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => {
-      setSelectedEdgeId(selection.edges[0]?.id ?? null);
-      void onSelectionChange?.({ nodes: selection.nodes, edges: selection.edges });
+    (next: { nodes: FlowNode[]; edges: FlowEdge[] }) => {
+      setSelection(next);
+      setSelectedEdgeId(next.edges[0]?.id ?? null);
+      void onSelectionChange?.({ nodes: next.nodes, edges: next.edges });
     },
     [onSelectionChange],
   );
@@ -941,6 +992,94 @@ React.useEffect(() => {
     }
     setSelectedEdgeId(null);
   }, [selectedEdgeId, isControlled, onEdgesChange, nodes, edges, _history]);
+
+  // Hapus atomik node terpilih + semua edge yang menyentuhnya dalam satu commit + toast (AC-04).
+  // `sel` boleh di-override (mis. dari menu konteks) agar tidak bergantung closure `selection` yang stale.
+  const handleDeleteSelected = React.useCallback((sel?: { nodes: FlowNode[]; edges: FlowEdge[] }) => {
+    const { nodes: selNodes, edges: selEdges } = sel ?? selection;
+    if (selNodes.length === 0 && selEdges.length === 0) return;
+    const nodeIds = new Set(selNodes.map((n) => n.id));
+    const edgesToRemove = new Set<FlowEdge>();
+    selEdges.forEach((e) => edgesToRemove.add(e));
+    edges.forEach((e) => {
+      if (nodeIds.has(e.source) || nodeIds.has(e.target)) edgesToRemove.add(e);
+    });
+    const edgeList = [...edgesToRemove];
+
+    if (isControlled) {
+      void onDelete?.({ nodes: selNodes, edges: edgeList });
+    } else {
+      setInternalNodes((prev) => prev.filter((n) => !nodeIds.has(n.id)));
+      setInternalEdges((prev) => prev.filter((e) => !edgeList.includes(e)));
+      _history.push(nodes, edges);
+    }
+    setSelection({ nodes: [], edges: [] });
+    setSelectedEdgeId(null);
+    void toast({ title: 'Dihapus', description: `${selNodes.length} node, ${edgeList.length} edge dihapus — Urungkan`, duration: 4000 });
+  }, [selection, edges, isControlled, onDelete, nodes, _history]);
+
+  const openContextMenu = React.useCallback(
+    (kind: 'node' | 'edge' | 'canvas', id: string | null, x: number, y: number) => {
+      setContextMenu({ kind, id, x, y });
+    },
+    [],
+  );
+  const closeContextMenu = React.useCallback(() => setContextMenu(null), []);
+
+  const handleNodeContextMenu = React.useCallback(
+    (event: React.MouseEvent, node: FlowNode) => {
+      openContextMenu('node', node.id, event.clientX, event.clientY);
+    },
+    [openContextMenu],
+  );
+  const handleEdgeContextMenu = React.useCallback(
+    (event: React.MouseEvent, edge: FlowEdge) => {
+      openContextMenu('edge', edge.id, event.clientX, event.clientY);
+    },
+    [openContextMenu],
+  );
+  const handlePaneContextMenu = React.useCallback(
+    (event: React.MouseEvent) => {
+      const kind =
+        selection.nodes.length === 1
+          ? 'node'
+          : selection.edges.length === 1
+            ? 'edge'
+            : 'canvas';
+      const id =
+        kind === 'node'
+          ? selection.nodes[0].id
+          : kind === 'edge'
+            ? selectedEdgeId
+            : null;
+      openContextMenu(kind, id, event.clientX, event.clientY);
+    },
+    [selection, selectedEdgeId, openContextMenu],
+  );
+
+  const handleDeleteMenuNode = React.useCallback(() => {
+    const { id: nodeId } = contextMenu ?? {};
+    if (!nodeId) return;
+    const node = nodes.find((n) => n.id === nodeId);
+    if (!node) return;
+    handleDeleteSelected({ nodes: [node], edges: [] });
+    setSelection({ nodes: [], edges: [] });
+  }, [contextMenu, nodes, handleDeleteSelected]);
+
+  const handleDeleteMenuEdge = React.useCallback(() => {
+    const { id: edgeId } = contextMenu ?? {};
+    if (!edgeId) return;
+    if (isControlled) {
+      void onEdgesChange?.([{ id: edgeId, type: 'remove' }] as unknown as EdgeChangeset<FlowEdge>);
+      _history.push(nodes, edges);
+    } else {
+      setInternalEdges((prev) => prev.filter((e) => e.id !== edgeId));
+      _history.push(nodes, edges);
+    }
+    setSelectedEdgeId(null);
+    closeContextMenu();
+    void toast({ title: 'Dihapus', description: 'Edge dihapus — Urungkan', duration: 3000 });
+  }, [contextMenu, isControlled, onEdgesChange, nodes, edges, _history, closeContextMenu]);
 
   const handleRefs = React.useRef<Map<string, { source: HTMLElement; target: HTMLElement }>>(new Map());
   const registerHandleRefs = React.useCallback(
@@ -983,13 +1122,21 @@ React.useEffect(() => {
 
   const handleEditorKeyDown = React.useCallback(
     (event: React.KeyboardEvent) => {
-      if ((event.key === 'Delete' || event.key === 'Backspace') && selectedEdgeId) {
-        event.preventDefault();
-        removeSelectedEdge();
-        void toast({ title: 'Dihapus', description: 'Edge dihapus — Urungkan', duration: 3000 });
+      if (event.key === 'Delete' || event.key === 'Backspace') {
+        if (selectedEdgeId) {
+          event.preventDefault();
+          removeSelectedEdge();
+          void toast({ title: 'Dihapus', description: 'Edge dihapus — Urungkan', duration: 3000 });
+          return;
+        }
+        if (selection.nodes.length > 0) {
+          event.preventDefault();
+          handleDeleteSelected();
+          return;
+        }
       }
     },
-    [selectedEdgeId, removeSelectedEdge],
+    [selectedEdgeId, removeSelectedEdge, selection.nodes.length, handleDeleteSelected],
   );
 
   const handleAddFromPalette = React.useCallback(
@@ -1098,6 +1245,9 @@ React.useEffect(() => {
           fitView={() => {}}
           ariaLabel={ariaLabel}
           paletteItems={paletteItems ?? []}
+          onNodeContextMenu={handleNodeContextMenu}
+          onEdgeContextMenu={handleEdgeContextMenu}
+          onPaneContextMenu={handlePaneContextMenu}
           />
         </FlowConnectContext.Provider>
       )}
@@ -1136,6 +1286,91 @@ React.useEffect(() => {
           ))}
         </ul>
       </div>
+
+      {/* Live region hitungan seleksi (AC-02) */}
+      {(selection.nodes.length > 0 || selection.edges.length > 0) && (
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          {selection.nodes.length} node, {selection.edges.length} edge terpilih
+        </div>
+      )}
+
+      {/* Menu konteks node/edge/canvas (story 005-04) */}
+      {contextMenu && (
+        <div style={{ position: 'absolute', left: contextMenu.x, top: contextMenu.y, zIndex: 60 }}>
+          <ContextMenu>
+            <ContextMenuTrigger asChild>
+              <button
+                ref={menuTriggerRef}
+                data-testid="flow-context-trigger"
+                type="button"
+                style={{
+                  position: 'absolute',
+                  opacity: 0,
+                  border: 'none',
+                  background: 'none',
+                  padding: 0,
+                  margin: 0,
+                  width: 0,
+                  height: 0,
+                }}
+              />
+            </ContextMenuTrigger>
+            <ContextMenuContent data-testid="flow-context-menu">
+              {contextMenu.kind === 'node' ? (
+                <>
+                  <ContextMenuItem onClick={closeContextMenu} data-testid="flow-menu-node-rincian">
+                    Rincian
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={closeContextMenu} data-testid="flow-menu-node-duplik">
+                    Duplikat
+                  </ContextMenuItem>
+                  <ContextMenuSeparator />
+                  <ContextMenuItem
+                    onClick={handleDeleteMenuNode}
+                    variant="destructive"
+                    data-testid="flow-menu-node-hapus"
+                  >
+                    Hapus
+                  </ContextMenuItem>
+                </>
+              ) : contextMenu.kind === 'edge' ? (
+                <>
+                  <ContextMenuItem onClick={closeContextMenu} data-testid="flow-menu-edge-edit">
+                    Edit label
+                  </ContextMenuItem>
+                  <ContextMenuSeparator />
+                  <ContextMenuItem
+                    onClick={handleDeleteMenuEdge}
+                    variant="destructive"
+                    data-testid="flow-menu-edge-hapus"
+                  >
+                    Hapus edge
+                  </ContextMenuItem>
+                </>
+              ) : (
+                <>
+                  <ContextMenuItem onClick={closeContextMenu} data-testid="flow-menu-canvas-tambah">
+                    Tambah di sini
+                  </ContextMenuItem>
+                  <ContextMenuItem
+                    onClick={closeContextMenu}
+                    data-testid="flow-menu-canvas-selaraskan"
+                  >
+                    Selaras tampilan
+                  </ContextMenuItem>
+                  <ContextMenuSeparator />
+                  <ContextMenuItem
+                    onClick={closeContextMenu}
+                    data-testid="flow-menu-canvas-grid"
+                  >
+                    Alih grid
+                  </ContextMenuItem>
+                </>
+              )}
+            </ContextMenuContent>
+          </ContextMenu>
+        </div>
+      )}
     </section>
   );
 }

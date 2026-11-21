@@ -22,6 +22,8 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  Input,
+  Label,
   toast,
   type FlowEdge,
   type FlowNode,
@@ -60,6 +62,48 @@ export default function FlowEditorPage() {
   const [demo, setDemo] = React.useState<'data' | 'loading' | 'empty' | 'error'>('data');
   const [snapToGrid, setSnapToGrid] = React.useState(false);
   const gridSize = 16;
+  const [draftTitle, setDraftTitle] = React.useState('');
+  const [titleError, setTitleError] = React.useState(false);
+
+  const validateTitle = (value: string) => {
+    const ok = value.trim().length > 0;
+    setTitleError(!ok);
+    return ok;
+  };
+
+  const handleDelete = React.useCallback((selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => {
+    const nodeIds = new Set(selection.nodes.map((n) => n.id));
+    const edgeIds = new Set(selection.edges.map((e) => e.id));
+    setNodes((prev) => prev.filter((n) => !nodeIds.has(n.id)));
+    setEdges((prev) =>
+      prev.filter((e) => !edgeIds.has(e.id) && !nodeIds.has(e.source) && !nodeIds.has(e.target)),
+    );
+    setSelected(null);
+    setDraftTitle('');
+    setTitleError(false);
+    void toast({ title: 'Dihapus', description: `${selection.nodes.length} node, ${selection.edges.length} edge dihapus — Urungkan`, duration: 4000 });
+  }, []);
+
+  const handleSaveTitle = React.useCallback(() => {
+    if (!validateTitle(draftTitle)) return;
+    if (selected?.nodes.length === 1) {
+      const node = selected.nodes[0];
+      setNodes((prev) =>
+        prev.map((n) => (n.id === node.id ? { ...n, data: { ...n.data, label: draftTitle } } : n)),
+      );
+    }
+    setTitleError(false);
+  }, [draftTitle, selected]);
+
+  const onBlurTitle = React.useCallback((value: string) => {
+    validateTitle(value);
+  }, []);
+
+  const handleCancel = React.useCallback(() => {
+    setSelected(null);
+    setDraftTitle('');
+    setTitleError(false);
+  }, []);
 
   const handleNodesChange = React.useCallback((changes: NodeChangeParam) => {
     setNodes((prev) => {
@@ -100,6 +144,9 @@ export default function FlowEditorPage() {
 
   const handleSelectionChange = React.useCallback((selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => {
     setSelected(selection);
+    if (selection.nodes.length === 1) setDraftTitle(selection.nodes[0].data.label);
+    else setDraftTitle('');
+    setTitleError(false);
   }, []);
 
   const demoNodes = demo === 'data' ? nodes : [];
@@ -175,6 +222,7 @@ export default function FlowEditorPage() {
                 onEdgesChange={handleEdgesChange}
                 onConnect={handleConnect}
                 onSelectionChange={handleSelectionChange}
+                onDelete={handleDelete}
                 paletteItems={paletteItems}
                 loading={isLoading}
                 error={isError ? 'Gagal memuat flow dari server.' : null}
@@ -191,10 +239,7 @@ export default function FlowEditorPage() {
             {selected && (
               <CardFooter className="flex flex-col gap-2 pt-2 border-t">
                 <CardTitle className="text-sm">Inspector (onSelectionChange)</CardTitle>
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <div>Node terpilih: {selected.nodes.map((n) => n.data.label).join(', ') || '—'}</div>
-                  <div>Edge terpilih: {selected.edges.length}</div>
-                </div>
+                <InspectorSummary selection={selected} />
               </CardFooter>
             )}
           </Card>
@@ -204,27 +249,190 @@ export default function FlowEditorPage() {
       {/* Inspector sheet on-demand (story 005-04): hanya buka saat seleksi eksplisit. */}
       <Sheet open={!!selected}>
         <SheetContent side="right" className="w-80">
-          <SheetHeader>
-            <SheetTitle>{selected?.nodes[0]?.data.label ?? 'Inspector'}</SheetTitle>
-            <SheetDescription>Ubah properti node secara live (konsumen menyediakan form).</SheetDescription>
-          </SheetHeader>
-          <Separator />
-          <CardContent className="space-y-2">
-            <div className="text-xs font-medium">ID</div>
-            <input
-              readOnly
-              value={selected?.nodes[0]?.id ?? ''}
-              className="w-full border border-input bg-background px-2 py-1 text-xs rounded"
+          {selected ? (
+            <InspectorPanel
+              selection={selected}
+              draftTitle={draftTitle}
+              titleError={titleError}
+              onChangeTitle={setDraftTitle}
+              onBlurTitle={onBlurTitle}
+              onSaveTitle={handleSaveTitle}
+              onDelete={handleDelete}
+              onCancel={handleCancel}
             />
-            <div className="text-xs font-medium">Judul</div>
-            <input
-              readOnly
-              value={selected?.nodes[0]?.data.label ?? ''}
-              className="w-full border border-input bg-background px-2 py-1 text-xs rounded"
-            />
-          </CardContent>
+          ) : null}
         </SheetContent>
       </Sheet>
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// InspectorPanel — komposisi inspector on-demand (story 005-04)
+// ---------------------------------------------------------------------------
+
+type InspectorPanelProps = {
+  selection: { nodes: FlowNode[]; edges: FlowEdge[] };
+  draftTitle: string;
+  titleError: boolean;
+  onChangeTitle: (value: string) => void;
+  onBlurTitle: (value: string) => void;
+  onSaveTitle: () => void;
+  onDelete: (selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => void;
+  onCancel: () => void;
+};
+
+function InspectorSummary({ selection }: { selection: { nodes: FlowNode[]; edges: FlowEdge[] } }) {
+  const total = selection.nodes.length + selection.edges.length;
+  return (
+    <div className="text-xs text-muted-foreground space-y-1">
+      <div>
+        {selection.nodes.length > 0 || selection.edges.length > 0
+          ? `${total} terpilih (${selection.nodes.length} node, ${selection.edges.length} edge)`
+          : '—'}
+      </div>
+      {selection.nodes.length > 0 && (
+        <div className="truncate" title={selection.nodes.map((n) => n.data.label).join(', ')}>
+          Node: {selection.nodes.map((n) => n.data.label).join(', ')}
+        </div>
+      )}
+      {selection.edges.length > 0 && (
+        <div className="truncate" title={selection.edges.map((e) => `${e.source}→${e.target}`).join(', ')}>
+          Edge: {selection.edges.map((e) => `${e.source}→${e.target}`).join(', ')}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InspectorPanel({
+  selection,
+  draftTitle,
+  titleError,
+  onChangeTitle,
+  onBlurTitle,
+  onSaveTitle,
+  onDelete,
+  onCancel,
+}: InspectorPanelProps) {
+  const isMulti = selection.nodes.length > 1 || selection.edges.length > 0;
+  const isSingleNode = selection.nodes.length === 1 && selection.edges.length === 0;
+  const node = selection.nodes[0];
+  const edge = selection.edges[0];
+  const edgeCount = node
+    ? selection.edges.filter((e) => e.source === node.id || e.target === node.id).length
+    : 0;
+
+  const sheetTitle = isMulti
+    ? `${selection.nodes.length + selection.edges.length} terpilih (${selection.nodes.length} node, ${selection.edges.length} edge)`
+    : isSingleNode
+      ? (node?.data.label ?? 'Node')
+      : edge
+        ? `Edge ${edge.source}→${edge.target}`
+        : 'Inspector';
+
+  return (
+    <>
+      <SheetHeader>
+        <SheetTitle className="text-sm">{sheetTitle}</SheetTitle>
+        <SheetDescription>
+          {isMulti
+            ? 'Gunakan [Hapus semua] untuk menghapus atomik, atau [Batalkan seleksi].'
+            : isSingleNode
+              ? 'Ubah judul node. Judul tidak boleh kosong.'
+              : 'Properti edge (baca saja).'}
+        </SheetDescription>
+      </SheetHeader>
+      <Separator />
+      <CardContent className="space-y-3">
+        {isMulti ? (
+          <>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => {
+                onDelete(selection);
+                onCancel();
+              }}
+            >
+              Hapus semua
+            </Button>
+            <Button variant="outline" size="sm" onClick={onCancel}>
+              Batalkan seleksi
+            </Button>
+          </>
+        ) : isSingleNode ? (
+          <>
+            <div className="space-y-1">
+              <div className="text-xs font-medium">ID</div>
+              <Input readOnly value={node?.id ?? ''} className="text-xs" />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs font-medium">Judul</Label>
+              <Input
+                value={draftTitle}
+                onChange={(e) => onChangeTitle(e.target.value)}
+                onBlur={() => onBlurTitle(draftTitle)}
+                className={`text-xs border ${titleError ? 'border-destructive' : ''}`}
+                aria-invalid={titleError}
+              />
+              {titleError && <p className="text-xs text-destructive">Judul tidak boleh kosong.</p>}
+            </div>
+            <div className="space-y-1">
+              <div className="text-xs font-medium">Posisi</div>
+              <Input
+                readOnly
+                value={`(${Math.round(node?.position.x ?? 0)}, ${Math.round(node?.position.y ?? 0)})`}
+                className="text-xs"
+              />
+            </div>
+            <div className="space-y-1">
+              <div className="text-xs font-medium">Koneksi</div>
+              <Input readOnly value={String(edgeCount)} className="text-xs" />
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                onClick={onSaveTitle}
+                disabled={titleError || draftTitle.trim().length === 0}
+              >
+                Simpan
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  onDelete({
+                    nodes: [node],
+                    edges: selection.edges.filter((e) => e.source === node.id || e.target === node.id),
+                  });
+                  onCancel();
+                }}
+              >
+                Hapus node
+              </Button>
+              <Button variant="outline" size="sm" onClick={onCancel}>
+                Batal
+              </Button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="space-y-1">
+              <div className="text-xs font-medium">ID</div>
+              <Input readOnly value={edge?.id ?? ''} className="text-xs" />
+            </div>
+            <div className="space-y-1">
+              <div className="text-xs font-medium">Sumber → Target</div>
+              <Input readOnly value={`${edge?.source ?? '—'} → ${edge?.target ?? '—'}`} className="text-xs" />
+            </div>
+            <div className="space-y-1">
+              <div className="text-xs font-medium">Label</div>
+              <Input readOnly value={edge?.label ?? ''} className="text-xs" />
+            </div>
+          </>
+        )}
+      </CardContent>
+    </>
   );
 }
