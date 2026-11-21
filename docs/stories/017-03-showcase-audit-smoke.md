@@ -1,6 +1,6 @@
 # 017-03 — Showcase + audit + smoke
 
-Status: approved
+Status: review
 PRD: `docs/prd/017-product-tour.md` (approved, gate 1)
 Design: `docs/design/wireframes/product-tour.md` (approved, gate 2, §1, §5–§7) + `docs/design/flows/product-tour.mmd` (diagram 4) + sitemap `S-005.20`
 FR: `FR-007`, `FR-008`, `FR-009`
@@ -41,11 +41,11 @@ Goal: Scenario showcase final membuktikan tur 5 langkah ujung-ke-ujung di light 
 
 ## Tasks
 
-- [ ] Buat route `/patterns/product-tour` final: `PageHeader` + card dashboard contoh (bar aksi + metrik + tabel mini) + lapisan tur + popover + dialog K2 + `ol` 6 langkah + panel demo (wireframe §1) + responsif <md (§5: popover bottom-sheet, footer stacked)
-- [ ] Wiring komponen 017-01/017-02: scenario 5 langkah + toggle sembunyi langkah 3 + varian kosong/semua-hilang/loading + resep callback 15 baris tersalin + `data-testid` (`tour-start`, `tour-popover`, `tour-next`, `tour-back`, `tour-skip`, `tour-progress`, `tour-confirm`)
-- [ ] Audit: keyboard penuh, SR live, fokus ring `primary` 2px offset 2, `prefers-reduced-motion`, sentuh ≥44px; `test:tokens` light & dark + tabel audit
-- [ ] Smoke `pnpm -C apps/showcase build`; tanpa token/dependency baru
-- [ ] Update `sitemap.md` S-005.20 → `implemented` + catat `STATUS-LOG.md` setelah merge per AGENTS.md
+- [x] Buat route `/patterns/product-tour` final: `PageHeader` + card dashboard contoh (bar aksi + metrik + tabel mini) + lapisan tur + popover + dialog K2 + `ol` 6 langkah + panel demo (wireframe §1) + responsif <md (§5: popover bottom-sheet, footer stacked)
+- [x] Wiring komponen 017-01/017-02: scenario 5 langkah + toggle sembunyi langkah 3 + varian kosong/semua-hilang/loading + resep callback 15 baris tersalin + `data-testid` (`tour-start`, `tour-popover`, `tour-next`, `tour-back`, `tour-skip`, `tour-progress`, `tour-confirm`)
+- [x] Audit: keyboard penuh, SR live, fokus ring `primary` 2px offset 2, `prefers-reduced-motion`, sentuh ≥44px; `test:tokens` light & dark + tabel audit
+- [x] Smoke `pnpm -C apps/showcase build`; tanpa token/dependency baru
+- [x] Update `sitemap.md` S-005.20 → `implemented` + catat `STATUS-LOG.md` setelah merge per AGENTS.md
 
 ## Dependencies
 
@@ -56,3 +56,15 @@ Goal: Scenario showcase final membuktikan tur 5 langkah ujung-ke-ujung di light 
 
 - Risiko: contoh dashboard terlalu mirip produksi — mitigasi label jelas "contoh" + bukan data nyata; flaky scroll di CI — mitigasi mock + toleransi viewport
 - Keputusan: K1–K6 tampil di demo (badge driver.js, info lewati, dialog K2, coach tunggal diuji via 1 langkah opsional); sitemap `implemented` hanya setelah story ini merge
+
+## Hasil audit kontras (tema pulse, validator `@ds/tokens`)
+
+| Elemen | Pasangan | Light | Dark | Ambang | Status |
+|---|---|---|---|---|---|
+| Judul/isi popover + card | foreground / card | 17,72 | 16,39 | ≥ 4,5 | lolos |
+| Teks muted + progress | muted-foreground / background | 7,47 | 7,51 | ≥ 4,5 | lolos |
+| Tombol primer + Selesai | primary-foreground / primary | 8,97 | 5,65 | ≥ 4,5 | lolos |
+| Ring spotlight + ring fokus | primary / card | 8,97 | 5,29 | ≥ 3,0 | lolos |
+| Bar progress vs trek | primary / muted | 8,16 | 4,37 | ≥ 3,0 | lolos |
+
+Overlay `background/80` mengikuti tema; lubang spotlight tanpa redup + ring `primary` solid sehingga target tetap terbaca dua tema.
