@@ -1,6 +1,6 @@
 # 006-01 — Fondasi controlled + toolbar inline/blok + undo
 
-Status: review
+Status: done
 PRD: `docs/prd/006-rich-text-editor.md`
 Design: `docs/design/rich-text-editor.md`
 FR: `FR-001`, `FR-002`, `FR-005`, `FR-010`, `FR-006`

@@ -89,3 +89,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 
 - 2026-11-21 — Story 005-03 `done` (approved oleh user) dan di-merge ke `dev` — `005-03`.
 - 2026-11-21 — Story 006-01 fondasi controlled + toolbar inline/blok + undo selesai (TipTap 3.30.1 promosi ke @ds/ui, 6 test hijau; typecheck/lint/test/test:tokens/showcase build hijau), status `review` — `006-01`.
+- 2026-11-21 — Story 006-01 `done` (approved oleh user) dan di-merge ke `dev` — `006-01`.
