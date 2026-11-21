@@ -10,8 +10,13 @@ Review membandingkan MindMap 012 dengan **OrgChartStudio 011**, bukan
 OrgChartEditor legacy. Bukti berbasis kode dan tes DOM; keluhan user belum
 direproduksi di browser nyata dalam sesi ini. Tidak ada perubahan kode.
 
+**Amendment 2026-11-21 (persetujuan user: "Amend CR-020"):** investigasi
+lanjutan menemukan akar keluhan "canvas tidak jalan" — temuan 0 (blocker) di
+bawah. Direproduksi di jsdom dengan ReactFlow asli (tanpa mock), bukan browser.
+
 | # | Severity | Lensa | Lokasi | Deskripsi | Rekomendasi |
 |---|---|---|---|---|---|
+| 0 | blocker | UX/UI / implementation drift | `packages/ui/src/components/canvas/mind-map.tsx:1195`, `packages/ui/src/components/canvas/mind-map.tsx:1197`, `packages/ui/src/components/canvas/mind-map.tsx:487`, pembanding `packages/ui/src/components/canvas/org-chart-studio.tsx:1116` | Di `@xyflow/react` 13.0.2 wrapper node mendapat `pointer-events: all` hanya bila node selectable, draggable, atau punya handler klik/hover; selain itu `none`. MindMap memakai `nodesDraggable={false}` + `elementsSelectable={false}` tanpa handler, sehingga semua `.react-flow__node` ber-`pointer-events: none` dan anak-anaknya mewarisi. Akibatnya tombol `+` (hover/focus), expander, klik, dan double-click pill tidak menerima pointer di browser; hanya pan/zoom kanvas yang jalan. 011 aman karena `elementsSelectable` true. Probe: render MindMap asli → `style.pointerEvents` node `['none','none']`; Studio → `['all','all']`. Tes 43/43 lolos karena memakai `fireEvent` (mengabaikan `pointer-events`) dan `useReactFlow` dimock. | Pulihkan pointer pada node: pilih yang paling sederhana — set `pointerEvents: 'all'` per node di builder node (`:487`), atau `elementsSelectable` true bila tidak bentrok dengan roving-tabindex/`nodesFocusable={false}`. Tambah tes regresi permanen yang merender ReactFlow asli dan meng-assert `pointer-events` node bukan `none`. Ini harus dikerjakan sebelum temuan 1–3 diverifikasi di browser. |
 | 1 | major | UX/UI / implementation drift | `packages/ui/src/components/canvas/mind-map.tsx:1455`, `packages/ui/src/components/canvas/mind-map.tsx:1672`, `packages/ui/src/components/canvas/mind-map.tsx:1805` | Tambah mengaktifkan `editingId`, tetapi canvas tidak menerima target pemusatan dan efek fokus hanya memanggil DOM `.focus()`. Tidak ada pemindahan viewport ke node baru/edit/fokus, berbeda dari 011 yang meneruskan `centerNodeId={editingId ?? focusNodeId}` dan memanggil `setCenter`. Node di luar area terlihat berisiko membuat aksi terasa tidak berjalan (FR-002/005/009). | Turunkan pola pemusatan 011/CR-014 ke MindMap dengan ukuran root/cabang yang benar; jaga zoom dan reduced-motion. Pastikan input baru dan target fokus terlihat, bukan sekadar aktif di DOM. |
 | 2 | major | UX/UI / implementation drift | `packages/ui/src/components/canvas/mind-map.tsx:1211`, `apps/showcase/src/app/(docs)/patterns/mind-map/page.tsx:111` | Minimap selalu `hidden md:block`; toggle demo hanya mount/unmount, tidak dapat menampilkan minimap di mobile. Bertentangan dengan wireframe §6: sembunyi dengan toggle, bukan hilang permanen. | Sediakan jalur toggle internal yang benar-benar dapat menampilkan minimap pada viewport kecil, tanpa perubahan API publik yang tidak disetujui. |
 | 3 | major | Implementation drift / test | `packages/ui/src/components/canvas/mind-map.test.tsx:33`, `packages/ui/src/components/canvas/mind-map.test.tsx:142`, `apps/showcase/src/app/(docs)/patterns/mind-map/page.test.tsx:54` | `useReactFlow` dimock (viewport tetap 0,0,1); tes reset menerima translasi nol dan tes 50 node hanya menghitung elemen DOM. Tidak menguji apakah node/input terlihat, viewport bergerak, atau konektor terhubung di browser. | Pertahankan unit test; tambahkan kasus viewport nontrivial dan walkthrough browser Q1/50 node untuk fit/reset, tambah/edit, pan/zoom, konektor, mobile, light/dark. Jangan mengklaim smoke build sebagai validasi interaksi. |
@@ -44,6 +49,7 @@ direproduksi di browser nyata dalam sesi ini. Tidak ada perubahan kode.
 
 ## Tasks (jalur small-fix)
 
+- [ ] Pulihkan `pointer-events` node MindMap (temuan 0) dan tambah tes regresi dengan ReactFlow asli (assert style node ≠ `none`; hover/klik `+` dan expander tidak diblokir). Kerjakan lebih dulu.
 - [ ] Teruskan target edit/fokus ke canvas dan pusatkan node setelah layout final; pertahankan zoom serta reduced-motion.
 - [ ] Pastikan minimap bisa ditampilkan melalui toggle di mobile.
 - [ ] Tambah tes regresi viewport nontrivial, bukan hanya callback mock.
@@ -59,6 +65,7 @@ direproduksi di browser nyata dalam sesi ini. Tidak ada perubahan kode.
 | 1 | CR disetujui user pada 2026-11-21 ("approve"). | Persetujuan dicatat; implementasi mengikuti scope CR ini. |
 | 2 | Review tidak mengubah kode atau status artefak 011/012. | Scope permintaan adalah review dan draft CR. |
 | 3 | Tidak membuka perbaikan reset atau resize otomatis sebagai bug terkonfirmasi. | Reset sama dengan pembanding 011; resize belum diverifikasi di browser. |
+| 4 | Temuan 0 (pointer-events node `none`) ditambahkan ke CR-020 lewat amendment atas persetujuan user, bukan CR terpisah. | Satu cluster koheren (keluhan canvas 012 tidak jalan); blocker dikerjakan lebih dulu. |
 
 ## Design System Checks
 
@@ -74,6 +81,7 @@ direproduksi di browser nyata dalam sesi ini. Tidak ada perubahan kode.
 
 - `pnpm --filter @ds/ui exec vitest run src/components/canvas/mind-map.test.tsx --maxWorkers=2 --testTimeout=30000`: **43/43 lulus**; warning `act(...)` saat penutupan dialog.
 - `pnpm --filter @ds/showcase exec vitest run 'src/app/(docs)/patterns/mind-map/page.test.tsx' --maxWorkers=2 --testTimeout=30000`: **3/3 lulus**.
+- Probe sekali pakai (jsdom, ReactFlow asli, file sudah dihapus): `.react-flow__node` `style.pointerEvents` MindMap `none`, OrgChartStudio `all`. Source xyflow 13.0.2: `pointerEvents = (selectable || draggable || onClick || onMouseEnter || onMouseMove || onMouseLeave) ? 'all' : 'none'`.
 - Browser/SR nyata, full suite, dan build tidak dijalankan pada review ini.
 - Graphify dicoba, tetapi hasil tidak memuat MindMap/OrgChartStudio yang relevan; fallback pembacaan kode targeted.
 
