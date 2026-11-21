@@ -1,6 +1,6 @@
 # 005-06 — Minimap + showcase end-to-end + audit
 
-Status: approved
+Status: review
 PRD: `docs/prd/005-flow-editor.md`
 Design: `docs/design/flow-editor.md`
 FR: `FR-008`, `FR-010`, `FR-014`, `FR-016`
@@ -40,13 +40,13 @@ Goal: Scenario showcase utuh (palette → edge → inspector → undo → minima
 
 ## Tasks
 
-- [ ] Minimap token-mapped + toggle + responsif < md
-- [ ] Route `/patterns/flow-editor`: dataset workflow + `ol` ID + panel demo + kotak resep 15 baris
-- [ ] Status could `FlowStatus` + badge teks + daftar SR `ul` + tombol per baris
-- [ ] Audit kontras light & dark (tabel) + `pnpm test:tokens` + smoke build
-- [ ] Verifikasi FR-001–016 tercakup penuh lintas 005-01–06; catat gap bila ada
-- [ ] `<Toaster>` (`feedback/toaster`) dirender di route — host tunggal semua toast 005-03/04/05
-- [ ] Update docs (sitemap `implemented`/`documented` bila layak) + STATUS-LOG
+- [x] Minimap token-mapped + toggle + responsif < md
+- [x] Route `/patterns/flow-editor`: dataset workflow + `ol` ID + panel demo + kotak resep 15 baris
+- [x] Status could `FlowStatus` + badge teks + daftar SR `ul` + tombol per baris
+- [x] Audit kontras light & dark (tabel) + `pnpm test:tokens` + smoke build
+- [x] Verifikasi FR-001–016 tercakup penuh lintas 005-01–06; catat gap bila ada
+- [x] `<Toaster>` (`feedback/toaster`) dirender di route — host tunggal semua toast 005-03/04/05
+- [x] Update docs (sitemap `implemented`/`documented` bila layak) + STATUS-LOG
 
 ## Dependencies
 
@@ -57,3 +57,21 @@ Goal: Scenario showcase utuh (palette → edge → inspector → undo → minima
 
 - Risiko: scope audit membesar — mitigasi: tabel audit hanya pasangan token yang dipakai (teks + grafis)
 - Keputusan: minimap boleh dipotong terakhir bila scope meledak (OQ#2) — AC-01 turun ke could, AC-02–04 tetap must
+
+## Audit Kontras (light/dark, tema Pulse)
+
+Tabel hanya pasangan token yang dipakai implementasi 005-06. Persyaratan WCAG 2.1 AA: teks ≥ 4.5:1, elemen grafik ≥ 3:1. Sumber: `packages/tokens/src/contrast.ts` (`auditThemeTokenPairs('pulse')`, diverifikasi ulang `pnpm test:tokens` untuk semua 8 tema).
+
+| Pasangan token (Pulse) | Light | Dark | Status |
+|---|---|---|---|
+| Primary Foreground on Primary (tombol/minimap node) | 8.97:1 | 5.65:1 | Lolos teks |
+| Destructive Foreground on Destructive (status Gagal) | 4.83:1 | 6.96:1 | Lolos teks |
+| Success Foreground on Success (status Sukses) | 5.48:1 | 10.01:1 | Lolos teks |
+| Warning Foreground on Warning (status Peringatan) | 5.56:1 | 10.61:1 | Lolos teks |
+| Muted Foreground on Background (teks samar) | 7.47:1 | 7.51:1 | Lolos teks |
+| Success dot pada card (grafis) | 5.48:1 | 9.37:1 | Lolos grafik |
+| Warning dot pada card (grafis) | 3.19:1 | 10.79:1 | Lolos grafik |
+| Destructive dot pada card (grafis) | 4.83:1 | 6.51:1 | Lolos grafik |
+| Primary dot pada card (grafis) | 8.97:1 | 5.29:1 | Lolos grafik |
+
+Semua pasangan ≥ ambang WCAG AA di light dan dark. Tidak ada token baru ditambahkan.

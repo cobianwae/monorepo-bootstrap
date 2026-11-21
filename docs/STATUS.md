@@ -36,6 +36,7 @@ Story 005-01 (`done`, ter-merge ke `dev`) — Flow editor fondasi canvas + node 
 7. Story 005-03 edge sambung + validasi + label — implementasi selesai, verifikasi typecheck/lint/test/test:tokens hijau, status `done`, di-merge ke `dev` — `005-03`.
 8. Story 005-04 seleksi + inspector on-demand + hapus — implementasi selesai, verifikasi typecheck/lint/test/test:tokens/showcase build hijau, status `done`, di-merge ke `dev` — `005-04`.
 9. Story 005-05 undo/redo + toolbar pola — implementasi selesai, verifikasi typecheck/lint/test flow-editor hijau (showcase build terhalang baseline @tiptap, out of scope), status `done` — `005-05`.
+9a. Story 005-06 minimap + showcase + audit — implementasi selesai, verifikasi lint/test/test:tokens/showcase build hijau (baseline typecheck merah pre-existing di luar scope), status `review`, branch `005-06-minimap-showcase-audit` — `005-06`.
 10. Story 006-01 fondasi controlled + toolbar inline/blok + undo selesai, status `done`, di-merge ke `dev` — `006-01`.
 11. Story 006-02 link M-009 + shortcut + keyboard selesai, status `done`, di-merge ke `dev` — `006-02`.
 12. Story 006-03 mode + counter + state matrix — implementasi selesai, verifikasi hijau, status `done`, di-merge ke `dev` — `006-03`.

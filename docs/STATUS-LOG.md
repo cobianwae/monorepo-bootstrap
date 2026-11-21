@@ -12,6 +12,8 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Story 004-01 fondasi EventCalendar + month view + navigasi selesai (9 test hijau; kegagalan typecheck/test/build hanya baseline `@xyflow/react` lama) — `004-01`.
 - 2026-11-21 — Story 004-01 `done` (approved oleh user) dan di-merge ke `dev` — `004-01`.
 
+- 2026-11-21 — Story 005-06 Minimap + showcase end-to-end + audit selesai implementasi: minimap toggle token-mapped responsif <md, SkipLink ke kanvas, daftar SR node/edge + tombol Fokus/Hapus per baris, status node dot + label Indonesia; showcase `/patterns/flow-editor` dataset 5 node/4 edge, `ol` 6 langkah Bahasa Indonesia, [Muat contoh]/[Atur ulang demo], meta node·edge, inspector sheet bottom <md, Toaster host tunggal (root layout), 11 data-testid; typecheck (baseline pre-existing merah di flow-editor.test.tsx out of scope), lint, test flow-editor 46/46, test:tokens, showcase build hijau — status `review` — `005-06`.
+
 - 2026-11-19 — Adopsi struktur OpenCode: config root, docs-as-state, agents, commands, workflow skills — `chore/opencode-workflow`.
 - 2026-11-19 — Validasi baseline: graphify MCP connected, `pnpm typecheck`, `pnpm lint`, dan `pnpm test` hijau — `chore/opencode-workflow`.
 - 2026-11-19 — CR-001 keyboard access clickable table row selesai — `CR-001`.

@@ -185,9 +185,9 @@ describe('FlowEditor fondasi (005-01)', () => {
 
   it('AC-01: daftar SR node + edge', () => {
     renderEditor();
-    expect(screen.getByTestId('flow-sr-edge-e1').textContent).toContain('Edge dari n1 ke n2');
-    expect(screen.getByTestId('flow-sr-node-n1').textContent).toContain('Kirim email');
-    expect(screen.getByTestId('flow-sr-node-n2').textContent).toContain('Tunggu 1 hari');
+    expect(screen.getByTestId('flow-sr-edge-e1').textContent).toContain('n1 → n2, label: —');
+    expect(screen.getByTestId('flow-sr-node-n1').textContent).toContain('Kirim email, 1 koneksi');
+    expect(screen.getByTestId('flow-sr-node-n2').textContent).toContain('Tunggu 1 hari, 1 koneksi');
   });
 
   it('AC-04: state matrix — empty (role=status)', () => {
@@ -765,5 +765,80 @@ describe('FlowEditor undo/redo + toolbar (005-05)', () => {
 
     fireEvent.click(screen.getByTestId('flow-toolbar-redo'));
     expect(countNodes()).toBe(3);
+  });
+});
+
+describe('FlowEditor minimap + daftar SR (005-06)', () => {
+  it('AC-01: minimap default true, wrapper tabIndex=-1, dan skip-link ke kanvas', () => {
+    renderEditor();
+    const wrap = screen.getByTestId('flow-minimap-wrap');
+    expect(wrap.getAttribute('tabindex')).toBe('-1');
+    const skip = screen.getByText('Lewati ke kanvas');
+    expect(skip.getAttribute('href')).toBe('#flow-canvas');
+    expect(screen.getByTestId('flow-toggle-minimap').getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('AC-01: toggle minimap menyembunyikan/munculkan peta kecil', () => {
+    renderEditor();
+    const toggle = screen.getByTestId('flow-toggle-minimap');
+    fireEvent.click(toggle);
+    expect(screen.queryByTestId('flow-minimap-wrap')).toBeNull();
+    expect(toggle.getAttribute('aria-pressed')).toBe('false');
+    fireEvent.click(toggle);
+    expect(screen.getByTestId('flow-minimap-wrap')).not.toBeNull();
+    expect(toggle.getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('AC-01: prop minimap=false tidak merender minimap', () => {
+    renderEditor({ minimap: false });
+    expect(screen.queryByTestId('flow-minimap-wrap')).toBeNull();
+  });
+
+  it('AC-03: status node memakai dot + teks label (bukan warna-saja)', () => {
+    renderEditor();
+    expect(screen.getByTestId('flow-node-status-n2').textContent).toContain('Peringatan');
+  });
+
+  it('AC-03: daftar SR menampilkan jumlah koneksi + label edge', () => {
+    renderEditor();
+    expect(screen.getByTestId('flow-sr-node-n1').textContent).toContain('1 koneksi');
+    expect(screen.getByTestId('flow-sr-edge-e1').textContent).toContain('n1 → n2');
+  });
+
+  it('AC-03: toggle daftar SR membuka/menutup daftar terlihat', () => {
+    renderEditor();
+    const toggle = screen.getByTestId('flow-sr-toggle');
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    fireEvent.click(toggle);
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(screen.getByRole('region', { name: 'Daftar node dan edge' }).className).not.toContain('sr-only');
+  });
+
+  it('AC-03: tombol [Fokus] pada baris node memanggil onSelectionChange', () => {
+    const onSelectionChange = vi.fn();
+    renderEditor({ onSelectionChange });
+    fireEvent.click(screen.getByTestId('flow-sr-focus-node-n1'));
+    expect(onSelectionChange).toHaveBeenCalledTimes(1);
+    expect(onSelectionChange.mock.calls[0][0].nodes[0].id).toBe('n1');
+  });
+
+  it('AC-03: tombol [Hapus] pada baris node menghapus node + edge terkait', () => {
+    const onDelete = vi.fn();
+    renderEditor({ nodes: baseNodes, edges: baseEdges, onNodesChange: vi.fn(), onEdgesChange: vi.fn(), onDelete });
+    fireEvent.click(screen.getByTestId('flow-sr-hapus-node-n1'));
+    expect(onDelete).toHaveBeenCalledTimes(1);
+    const payload = onDelete.mock.calls[0][0];
+    expect(payload.nodes[0].id).toBe('n1');
+    expect(payload.edges.map((e: FlowEdge) => e.id)).toEqual(['e1']);
+  });
+
+  it('AC-03: tombol [Hapus] pada baris edge menghapus edge tersebut', () => {
+    const onDelete = vi.fn();
+    renderEditor({ nodes: baseNodes, edges: baseEdges, onNodesChange: vi.fn(), onEdgesChange: vi.fn(), onDelete });
+    fireEvent.click(screen.getByTestId('flow-sr-hapus-edge-e1'));
+    expect(onDelete).toHaveBeenCalledTimes(1);
+    const payload = onDelete.mock.calls[0][0];
+    expect(payload.nodes).toEqual([]);
+    expect(payload.edges.map((e: FlowEdge) => e.id)).toEqual(['e1']);
   });
 });

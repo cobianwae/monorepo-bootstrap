@@ -1,11 +1,10 @@
 'use client';
 
-// Flow Editor showcase draf — S-005.29 (story 005-01, final diserahkan ke 005-06).
-// Resep konsumen: state kendali di luar komponen (controlled), FlowEditor hanya
-// presentasi + komposisi tanpa persistensi internal (PRD FR-012).
+// Flow Editor showcase — S-005.29 (final diserahkan ke 005-06).
+// State kendali di luar komponen (controlled), FlowEditor hanya presentasi (PRD FR-012).
+// `<Toaster>` tidak ditampilkan di sini: host tunggal sudah ada di root layout (AC-05).
 
 import * as React from 'react';
-import { Plus } from 'lucide-react';
 import {
   Button,
   Card,
@@ -22,8 +21,13 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetTrigger,
+  SheetClose,
   Input,
   Label,
+  Switch,
+  useTheme,
+  PaletteSwitcher,
   toast,
   type FlowEdge,
   type FlowNode,
@@ -56,14 +60,27 @@ const initialEdges: FlowEdge[] = [
 ];
 
 export default function FlowEditorPage() {
+  const { resolvedTheme } = useTheme();
   const [nodes, setNodes] = React.useState<FlowNode[]>(initialNodes);
   const [edges, setEdges] = React.useState<FlowEdge[]>(initialEdges);
   const [selected, setSelected] = React.useState<{ nodes: FlowNode[]; edges: FlowEdge[] } | null>(null);
   const [demo, setDemo] = React.useState<'data' | 'loading' | 'empty' | 'error'>('data');
   const [snapToGrid, setSnapToGrid] = React.useState(false);
+  const [minimapEnabled, setMinimapEnabled] = React.useState(true);
   const gridSize = 16;
   const [draftTitle, setDraftTitle] = React.useState('');
   const [titleError, setTitleError] = React.useState(false);
+
+  // Deteksi layar kecil secara inline (pola existing di monorepo; matchMedia di-mock di test).
+  const [isMobile, setIsMobile] = React.useState(false);
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(max-width: 767px)');
+    setIsMobile(mq.matches);
+    const onChange = () => setIsMobile(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
 
   const validateTitle = (value: string) => {
     const ok = value.trim().length > 0;
@@ -149,6 +166,26 @@ export default function FlowEditorPage() {
     setTitleError(false);
   }, []);
 
+  const handleResetDemo = React.useCallback(() => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+    setDemo('data');
+    setSnapToGrid(false);
+    setMinimapEnabled(true);
+    setSelected(null);
+    setDraftTitle('');
+    setTitleError(false);
+  }, []);
+
+  const handleInvalidEdgeDemo = React.useCallback(() => {
+    // Simulasi penolakan koneksi tak valid (self-loop) → toast role="alert" (AC-02 panel invalid-edge).
+    void toast({
+      title: 'Koneksi ditolak',
+      description: 'Tidak dapat menyambung node ke dirinya sendiri (self-loop).',
+      duration: 4000,
+    });
+  }, []);
+
   const demoNodes = demo === 'data' ? nodes : [];
   const demoEdges = demo === 'data' ? edges : [];
   const isError = demo === 'error';
@@ -157,51 +194,63 @@ export default function FlowEditorPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Flow Editor" description="Canvas node berbasis token dengan pan/zoom, handle ≥44px, dan state matrix." />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <aside className="lg:col-span-3 space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Palette</CardTitle>
-              <CardDescription>Tambah jenis node ke kanvas (demo).</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {paletteItems.map((item) => (
-                <button
-                  key={item.type}
-                  type="button"
-                  className="flex w-full items-center gap-2 rounded-md border border-border px-3 py-2 text-sm text-foreground hover:bg-accent"
-                  onClick={() => {
-                    const node: FlowNode = {
-                      id: `n-${Date.now()}`,
-                      type: item.type,
-                      position: { x: 400, y: 300 },
-                      data: { label: item.title, kind: item.type },
-                    };
-                    setNodes((prev) => [...prev, node]);
-                    void toast({ title: 'Ditambah', description: item.title });
-                  }}
-                >
-                  <Plus className="h-4 w-4 shrink-0" />
-                  <span>{item.title}</span>
-                </button>
-              ))}
-            </CardContent>
-          </Card>
-        </aside>
 
+      {/* Kontrol demo + tema + minimap (AC-02/AC-05 panel demo). */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <PaletteSwitcher />
+          <Switch
+            checked={minimapEnabled}
+            onCheckedChange={setMinimapEnabled}
+            aria-label={minimapEnabled ? 'Sembunyikan minimap' : 'Tampilkan minimap'}
+            data-testid="flow-minimap-switch"
+          />
+          <span className="text-xs text-muted-foreground">{resolvedTheme === 'dark' ? 'Gelap' : 'Terang'}</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button variant={demo === 'data' ? 'default' : 'outline'} size="sm" onClick={() => setDemo('data')}>
+            Muat contoh
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setDemo('loading')}>
+            Simulasi memuat
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setDemo('empty')}>Kosongkan</Button>
+          <Button variant="outline" size="sm" onClick={() => setDemo('error')}>Paksa error</Button>
+          <Button variant="destructive" size="sm" onClick={handleInvalidEdgeDemo}>
+            Edge tak valid
+          </Button>
+          <Button onClick={handleResetDemo}>Atur ulang demo</Button>
+        </div>
+      </div>
+
+      {/* Panduan 6 langkah (AC-02, Bahasa Indonesia). */}
+      <Card className="border border-info/30 bg-info/5">
+        <CardHeader>
+          <CardTitle className="text-sm">Cara menggunakan demo</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ol className="list-decimal pl-5 space-y-1 text-sm text-foreground/90">
+            <li>Mulai dari node <strong>Mulai</strong> yang sudah ada di kanvas.</li>
+            <li>Tambah node dari palet di kanvas (seret jenis node atau klik [+] pada item).</li>
+            <li>Sambungkan handle sumber ke handle target untuk membentuk alur.</li>
+            <li>Aktifkan <strong>snap ke grid</strong> dari toolbar kanvas untuk penempatan rapi.</li>
+            <li>Buka <strong>minimap</strong> untuk menavigasi kanvas besar, lalu seret viewport.</li>
+            <li>Pilih node untuk mengubah judul melalui Inspector (sheet kanan; bottom-sheet di layar kecil).</li>
+          </ol>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <section className="lg:col-span-9">
           <Card>
             <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-2">
               <div>
                 <CardTitle className="text-sm">Kanvas alur</CardTitle>
-                <CardDescription className="text-xs">{demo} state · {nodes.length} node, {edges.length} edge</CardDescription>
+                <CardDescription className="text-xs">
+                  {demo === 'data' ? `${nodes.length} node · ${edges.length} edge` : demo} state
+                </CardDescription>
               </div>
               <div className="flex items-center gap-2">
-                <Separator orientation="vertical" className="h-4" />
-                <Button variant="outline" size="sm" onClick={() => setDemo('data')}>Muat contoh</Button>
-                <Button variant="outline" size="sm" onClick={() => setDemo('loading')}>Simulasi memuat</Button>
-                <Button variant="outline" size="sm" onClick={() => setDemo('empty')}>Kosongkan</Button>
-                <Button variant="outline" size="sm" onClick={() => setDemo('error')}>Paksa error</Button>
                 <Separator orientation="vertical" className="h-4" />
                 <Button
                   variant={snapToGrid ? 'default' : 'outline'}
@@ -214,7 +263,7 @@ export default function FlowEditorPage() {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-0">
               <FlowEditor
                 nodes={demoNodes}
                 edges={demoEdges}
@@ -230,7 +279,7 @@ export default function FlowEditorPage() {
                   setDemo('data');
                   void toast({ title: 'Diretry', description: 'Flow dimuat ulang.' });
                 }}
-                minimap
+                minimap={minimapEnabled}
                 snapToGrid={snapToGrid}
                 gridSize={gridSize}
                 ariaLabel="Editor alur demonstrasi"
@@ -246,9 +295,20 @@ export default function FlowEditorPage() {
         </section>
       </div>
 
-      {/* Inspector sheet on-demand (story 005-04): hanya buka saat seleksi eksplisit. */}
+      {/* Inspector on-demand — bottom-sheet di layar kecil (AC-05), sheet kanan di desktop. */}
       <Sheet open={!!selected}>
-        <SheetContent side="right" className="w-80">
+        <SheetTrigger asChild>
+          {selected && (
+            <Button variant="outline" size="sm" data-testid="flow-inspector-trigger">
+              Buka inspector
+            </Button>
+          )}
+        </SheetTrigger>
+        <SheetContent
+          side={isMobile ? 'bottom' : 'right'}
+          className={isMobile ? 'h-[60vh] max-h-[60vh]' : 'w-80'}
+          data-testid="flow-inspector"
+        >
           {selected ? (
             <InspectorPanel
               selection={selected}
@@ -261,6 +321,7 @@ export default function FlowEditorPage() {
               onCancel={handleCancel}
             />
           ) : null}
+          <SheetClose />
         </SheetContent>
       </Sheet>
     </div>
@@ -268,19 +329,8 @@ export default function FlowEditorPage() {
 }
 
 // ---------------------------------------------------------------------------
-// InspectorPanel — komposisi inspector on-demand (story 005-04)
+// InspectorSummary + InspectorPanel — komposisi inspector on-demand (story 005-04)
 // ---------------------------------------------------------------------------
-
-type InspectorPanelProps = {
-  selection: { nodes: FlowNode[]; edges: FlowEdge[] };
-  draftTitle: string;
-  titleError: boolean;
-  onChangeTitle: (value: string) => void;
-  onBlurTitle: (value: string) => void;
-  onSaveTitle: () => void;
-  onDelete: (selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => void;
-  onCancel: () => void;
-};
 
 function InspectorSummary({ selection }: { selection: { nodes: FlowNode[]; edges: FlowEdge[] } }) {
   const total = selection.nodes.length + selection.edges.length;
@@ -304,6 +354,17 @@ function InspectorSummary({ selection }: { selection: { nodes: FlowNode[]; edges
     </div>
   );
 }
+
+type InspectorPanelProps = {
+  selection: { nodes: FlowNode[]; edges: FlowEdge[] };
+  draftTitle: string;
+  titleError: boolean;
+  onChangeTitle: (value: string) => void;
+  onBlurTitle: (value: string) => void;
+  onSaveTitle: () => void;
+  onDelete: (selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => void;
+  onCancel: () => void;
+};
 
 function InspectorPanel({
   selection,
@@ -391,11 +452,7 @@ function InspectorPanel({
               <Input readOnly value={String(edgeCount)} className="text-xs" />
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                onClick={onSaveTitle}
-                disabled={titleError || draftTitle.trim().length === 0}
-              >
+              <Button size="sm" onClick={onSaveTitle} disabled={titleError || draftTitle.trim().length === 0}>
                 Simpan
               </Button>
               <Button
