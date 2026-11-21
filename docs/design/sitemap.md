@@ -74,8 +74,8 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.29 | Flow Editor | `/patterns/flow-editor` | implemented |
 | S-005.29.01 | Flow Editor — palette node (panel kiri) | `/patterns/flow-editor` (panel kiri) | implemented |
 | S-005.29.02 | Flow Editor — inspector properti (panel kanan/sheet) | `/patterns/flow-editor` (panel kanan) | implemented |
-| S-005.30 | Transfer List | `/patterns/transfer-list` | planned |
-| S-005.31 | Cascader & Tree Select | `/patterns/cascader-tree-select` | planned |
+| S-005.30 | Transfer List | `/patterns/transfer-list` | implemented |
+| S-005.31 | Cascader & Tree Select | `/patterns/cascader-tree-select` | implemented |
 | S-005.32 | Mention & Emoji | `/patterns/mention-emoji` | planned |
 | S-005.33 | Org Chart Editor (legacy, diganti 011) | `/patterns/org-chart-editor` | deprecated |
 | S-005.34 | Org Chart Studio (PRD 011) | `/patterns/org-chart-studio` | implemented |
@@ -87,6 +87,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.37.02 | Import Wizard — langkah mapping | `/patterns/import-wizard` (langkah 2) | in-design |
 | S-005.37.03 | Import Wizard — langkah validasi | `/patterns/import-wizard` (langkah 3) | in-design |
 | S-005.37.04 | Import Wizard — langkah konfirmasi | `/patterns/import-wizard` (langkah 4) | in-design |
+| S-005.41 | Permission Matrix (PRD 018) | `/patterns/permission-matrix` | in-design |
 | S-006 | Guidelines | `/guidelines` | implemented |
 | S-007 | Contribution | `/contribution` | implemented |
 | S-008 | What's New | `/whats-new` | implemented |

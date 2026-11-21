@@ -37,7 +37,7 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 |---|---|---|
 | `base` | Primitive visual dan kontrol dasar | button, badge, card, input, textarea, label, separator, skeleton, avatar, tabs, checkbox, switch, tooltip, progress, spinner, radio-group, slider, accordion, collapsible, kbd, toggle, aspect-ratio, scroll-area, palette-switcher, theme-provider |
 | `form` | Input dan validasi | form, select, combobox, tag-input, date-picker, input-otp, number-input, time-picker, filter-builder, stepper, segmented-control, file-input, file-upload, rich-text-editor (baru, PRD 006), image-cropper (baru, PRD 015) |
-| `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart (legacy PRD 003, diganti 011), event-calendar (baru, PRD 004), diff-viewer (baru, PRD 013) |
+| `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart (legacy PRD 003, diganti 011), event-calendar (baru, PRD 004), diff-viewer (baru, PRD 013), permission-matrix (baru, PRD 018) |
 | `feedback` | Status dan respons sistem | dialog, alert, alert-dialog, toast, toaster, empty-state, use-toast |
 | `navigation` | Navigasi dan pencarian | dropdown-menu, breadcrumb, pagination, command-palette, context-menu, navigation-menu |
 | `overlay` | Lapisan di atas konten | sheet, popover, hover-card |
@@ -80,6 +80,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Org Chart Editor | Editor hierarki organisasi v1 (legacy PRD 010, diganti 011 — lihat Org Chart Studio) |
 | Org Chart Studio | Editor + visualisasi hierarki satu komponen: kartu lega inline-edit via gagang `+`, drag reparent + dialog setara, undo/redo 50, search + auto-expand, pohon SR internal, state matrix 6 demo (composed, kategori `canvas` xyflow token-mapped); penyusun: org-chart-studio (baru), sheet, context-menu, tooltip, form, input, badge, avatar, skeleton, empty-state, alert, button, toast |
 | Mind Map | Peta ide radial ringan turunan org chart studio: root sentral + cabang dua sisi seimbang, tambah inline 1-klik, lipat cabang + hitungan tersembunyi (composed, kategori `canvas` xyflow token-mapped); penyusun: mind-map (baru), button, tooltip, skeleton, empty-state, alert, badge |
+| Permission Matrix | Grid otorisasi role × resource: toggle massal baris/kolom + indeterminate, sel terkunci beralasan, dirty + ringkasan (composed, kategori `data-display`); penyusun: permission-matrix (baru), checkbox (`base`), badge, skeleton, empty-state, alert, button, tooltip |
 | Product Tour | Highlight, step, dismiss |
 | Results | Sukses/gagal, next action |
 | Rich Text Editor | Toolbar format + konten Prose + link popover + counter (composed, kategori `form`); penyusun: rich-text-editor (baru), button, tooltip, popover, dialog, input, badge, skeleton, empty-state, alert, kbd |

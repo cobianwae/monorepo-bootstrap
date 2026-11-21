@@ -1,0 +1,71 @@
+<!-- Flow permission matrix — PRD 018, layar S-005.41 -->
+<!-- Job utama: buka grid 5×8 → toggle massal baris/kolom → kelola sel terkunci via keyboard → tinjau dirty + reset/simpan -->
+<!-- Constraint: tanpa dependency (compose checkbox + pola tabel existing); controlled nested record; sel boolean v1; FR-010 bertingkat ditunda -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman permission matrix] --> B[Skeleton grid + teks SR Memuat izin]
+  B --> V[Validasi data role dan resource]
+  V --> Q{Hasil validasi?}
+  Q -- gagal: data invalid --> ERR[Tampilkan error + penyebab + tombol Muat contoh]
+  ERR --> R[User memperbaiki input atau memuat contoh]
+  R --> V
+  Q -- kosong: tanpa role atau resource --> EMP[Tampilkan empty + CTA tambah atau muat contoh]
+  EMP --> C[User memilih tambah atau muat contoh]
+  C --> V
+  Q -- berhasil --> H[Render grid: header baris dan kolom terasosiasi + sel checkbox]
+  H --> D[Grid siap; alur toggle: flow 2]
+```
+
+```mermaid
+flowchart TD
+  A[User di grid izin] --> B{Pilih toggle apa?}
+  B -- sel tunggal --> S[Toggle satu sel; lewati bila terkunci + tampilkan alasan]
+  B -- header baris --> RB[Toggle semua sel baris resource itu]
+  B -- header kolom --> CB[Toggle semua sel kolom role itu]
+  B -- header pojok semua --> AL[Toggle seluruh grid]
+  S --> U[Hitung ulang header: semua atau kosong atau sebagian]
+  RB --> U
+  CB --> U
+  AL --> U
+  U --> I{Status header?}
+  I -- semua menyala --> F[Tampilkan centang penuh]
+  I -- semua mati --> O[Tampilkan kosong]
+  I -- sebagian --> M[Tampilkan indeterminate + label SR sebagian]
+  F --> K{Ada sel terkunci?}
+  O --> K
+  M --> K
+  K -- ya --> L[Terkunci tidak berubah; tooltip alasan; keyboard dilewati]
+  K -- tidak --> D[Selesai; dirty dihitung: flow 4]
+  L --> D
+```
+
+```mermaid
+flowchart TD
+  A[User menavigasi grid via keyboard] --> B[Panah pindah antar sel dan header]
+  B --> N{Fokus di mana?}
+  N -- sel biasa --> T[Tekan Space toggle sel + umumkan menyala atau mati]
+  N -- header baris atau kolom --> H[Tekan Enter atau Space toggle massal baris atau kolom]
+  N -- sel terkunci --> K[Tolak toggle; umumkan alasan kunci; fokus tetap]
+  T --> G[Header induk diperbarui ke penuh kosong atau indeterminate]
+  H --> G
+  K --> G
+  G --> S{Shortcut massal?}
+  S -- ya --> P[Toggle baris atau kolom fokus tanpa pindah fokus]
+  S -- tidak --> E[Lanjut navigasi panah]
+  P --> E
+```
+
+```mermaid
+flowchart TD
+  A[User mengubah izin] --> B[Banner ringkasan muncul: N perubahan + daftar + tombol Reset dan Simpan]
+  B --> C{Pilih aksi?}
+  C -- ubah lagi --> A
+  C -- Reset --> RS[Kembalikan ke nilai awal; banner hilang; umumkan dibatalkan]
+  C -- Simpan --> SV[Panggil onChange sekali dengan diff; banner hilang; umumkan tersimpan]
+  RS --> E[Selesai]
+  SV --> E
+  E --> DM[Alur demo showcase: dataset 5x8 + kunci + dirty + toggle light dark]
+  DM --> DK[User memicu loading empty error + keyboard penuh + audit kontras]
+  DK --> SM[Smoke build lolos]
+```
