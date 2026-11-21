@@ -1,6 +1,6 @@
 # CR-010 — Org Chart Studio gate-2 follow-up (tutup OQ + perapian approved)
 
-**Status:** approved (2026-11-21, oleh user)
+**Status:** done (2026-11-21, di-merge ke dev)
 **Sumber:** review artefak `011` (skill `reviewer`)
 **Ref:** `docs/prd/011-org-chart-studio.md`, `docs/design/org-chart-studio.md`, `docs/design/wireframes/org-chart-studio.md`, `docs/stories/011-02-tambah-inline-panel-detail.md`, `docs/stories/011-04-cari-keyboard-pohon-sr.md`
 
@@ -55,9 +55,9 @@ Branch: `cr-010-org-chart-studio-gate2-followup`
 Commit: `docs: tutup OQ 011 + perapian gate-2 approved [CR-010]`
 
 - [x] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Tanpa branch CR terpisah — commit langsung di atas dev sesuai instruksi user (docs-only).
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.

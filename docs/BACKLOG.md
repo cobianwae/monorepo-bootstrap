@@ -78,7 +78,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 |---|---|---|---|
 | CR-008 | Perapian dokumen PRD 001 & design upload-queue | approved | `docs/cr/cr-008-prd001-cleanup.md` |
 | CR-009 | OrgChartEditor layak total (fondasi + visual + a11y + showcase) | in-progress | `docs/cr/cr-009-org-chart-editor-layak.md` |
-| CR-010 | Org Chart Studio gate-2 follow-up (tutup OQ + perapian approved) | approved | `docs/cr/cr-010-org-chart-studio-gate2-followup.md` |
+| CR-010 | Org Chart Studio gate-2 follow-up (tutup OQ + perapian approved) | done | `docs/cr/cr-010-org-chart-studio-gate2-followup.md` |
 
 ## Catatan
 
