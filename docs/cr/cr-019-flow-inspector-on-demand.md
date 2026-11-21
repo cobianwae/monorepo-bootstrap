@@ -24,11 +24,11 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Tambah `onOpenChange` pada `Sheet` → tutup via X/Esc/overlay meng-clear `selected` + kembalikan fokus ke canvas.
-- [ ] Pisahkan path tambah vs seleksi eksplisit → tambah dari palette/`[+]` tidak membuka sheet; klik/`Enter`/rincian/menu membuka sheet.
-- [ ] Perbaiki `<SheetClose />` kosong (hapus atau beri label `Tutup inspector`).
-- [ ] Lengkapi `InspectorPanel` sesuai AC-03/AC-05 (edge: label input + hapus; node: deskripsi/status/duplikat/meta).
-- [ ] Hilangkan duplikasi `InspectorSummary` vs `Sheet` saat sheet terbuka.
+- [x] Tambah `onOpenChange` pada `Sheet` → tutup via X/Esc/overlay meng-clear `selected` + kembalikan fokus ke canvas.
+- [x] Pisahkan path tambah vs seleksi eksplisit → tambah dari palette/`[+]` tidak membuka sheet; klik/`Enter`/rincian/menu membuka sheet.
+- [x] Perbaiki `<SheetClose />` kosong (hapus atau beri label `Tutup inspector`).
+- [x] Lengkapi `InspectorPanel` sesuai AC-03/AC-05 (edge: label input + hapus; node: deskripsi/status/duplikat/meta).
+- [x] Hilangkan duplikasi `InspectorSummary` vs `Sheet` saat sheet terbuka.
 - [ ] Sinkron docs: status PRD 005 + lokasi `<Toaster>`.
 - [ ] Verifikasi: `pnpm lint`, tambah-tidak-buka + tutup-X/Esc/overlay + hapus-edge manual, SR baca hitungan seleksi.
 
@@ -55,10 +55,10 @@
 Branch: `cr-019-flow-inspector-on-demand`
 Commit: `fix: inspector flow-editor on-demand tidak mengunci [CR-019]`
 
-- [ ] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR disetujui user.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan (lint, test showcase 68/68, tsc, build; browser/SR manual belum).
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui (status tetap `approved` menunggu `done` dari user).
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
