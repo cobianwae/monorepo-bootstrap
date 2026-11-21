@@ -720,7 +720,7 @@ describe('MindMap tambah/hapus/undo (012-02)', () => {
     expect(onChangeSpy).not.toHaveBeenCalled();
     expect(document.body.querySelector('[data-testid="mind-map-delete-confirm"]')).toBeNull();
     expect(container.querySelector('[data-testid="mind-map-announcement"]')?.textContent).toContain(
-      'Root tidak bisa dihapus',
+      'Ide pusat tidak bisa dihapus',
     );
 
     fireEvent.contextMenu(container.querySelector('[data-node-id="q1"]')!);

@@ -28,7 +28,7 @@ describe('MindMap integrasi ReactFlow (CR-020)', () => {
 
   it('toggle mobile menampilkan minimap tanpa hidden; prop false tetap menonaktifkan', () => {
     const { container, rerender } = render(<MindMap data={data} />);
-    const toggle = screen.getByRole('button', { name: 'Tampilkan minimap' });
+    const toggle = screen.getByRole('button', { name: 'Tampilkan peta mini' });
     const minimap = () => container.querySelector('.react-flow__minimap')!;
     expect(minimap().classList.contains('hidden')).toBe(true);
     fireEvent.click(toggle);
@@ -38,7 +38,7 @@ describe('MindMap integrasi ReactFlow (CR-020)', () => {
     expect(minimap().classList.contains('hidden')).toBe(true);
     rerender(<MindMap data={data} minimap={false} />);
     expect(container.querySelector('.react-flow__minimap')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Tampilkan minimap' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Tampilkan peta mini' })).toBeNull();
   });
 
   it('viewport asli berpindah dari hasil pan ke target edit, tanpa mengubah zoom', async () => {

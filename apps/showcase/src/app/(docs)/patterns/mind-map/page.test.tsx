@@ -57,7 +57,7 @@ describe('MindMapPatternPage (012-03)', () => {
     expect(container.querySelectorAll('[data-testid="mind-map-node"]')).toHaveLength(50);
     fireEvent.click(screen.getByRole('button', { name: 'Mode gelap' }));
     expect(container.querySelector('[data-theme="pulse"]')?.className).toContain('dark');
-    fireEvent.click(screen.getByRole('button', { name: 'Minimap' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Peta mini' }));
     expect(screen.queryByTestId('mind-map-minimap')).toBeNull();
   });
 });

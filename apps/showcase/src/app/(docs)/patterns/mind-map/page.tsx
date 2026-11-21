@@ -85,15 +85,15 @@ export default function MindMapPatternPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      <PageHeader title="Mind Map" description="Petakan ide, cari cabang, dan kelola hierarki tanpa meninggalkan kanvas." />
+      <PageHeader title="Mind Map" description="Ubah curah pendapat menjadi peta ide yang bisa dicari, dilipat, dan dikelola langsung di kanvas." />
       <section aria-labelledby="mind-steps">
         <h2 id="mind-steps" className="text-lg font-semibold">Alur brainstorming</h2>
         <ol className="mt-2 list-decimal space-y-1 pl-6 text-sm text-muted-foreground">
           <li>Buka peta Peluncuran Q1.</li>
-          <li>Tambah anak atau saudara, ketik label, lalu Enter untuk menyimpan.</li>
+          <li>Tambah cabang atau saudara, ketik nama ide, lalu Enter untuk menyimpan.</li>
           <li>Lipat dan buka cabang lewat Space atau expander.</li>
           <li>Hapus cabang, konfirmasi, lalu urungkan lewat Ctrl+Z.</li>
-          <li>Cari label untuk membuka jalur menuju hasil.</li>
+          <li>Cari nama ide untuk membuka jalur menuju hasil.</li>
           <li>Pan, zoom, fit-view, lalu reset ke 100%.</li>
         </ol>
       </section>
@@ -111,7 +111,7 @@ export default function MindMapPatternPage() {
           </div>
           <div role="group" aria-label="Tampilan demo" className="flex flex-wrap gap-2">
             <Button variant="outline" className="min-h-11" aria-pressed={dark} onClick={() => setDark(!dark)}>Mode gelap</Button>
-            <Button variant="outline" className="min-h-11" aria-pressed={minimap} onClick={() => setMinimap(!minimap)}>Minimap</Button>
+            <Button variant="outline" className="min-h-11" aria-pressed={minimap} onClick={() => setMinimap(!minimap)}>Peta mini</Button>
           </div>
         </div>
         <MindMap data={data} onChange={setData} expandedIds={expanded} onExpandedChange={setExpanded}
@@ -120,16 +120,22 @@ export default function MindMapPatternPage() {
           minimap={minimap} searchSlot={<div className="mb-3">
           <label htmlFor="mind-search" className="mb-1 block text-sm font-medium">Cari ide</label>
           <Input id="mind-search" type="search" value={query} onChange={(event) => search(event.target.value)}
+            placeholder="Cth: Riset pasar" aria-describedby="mind-search-status"
             disabled={demoState === 'Loading' || demoState === 'Invalid'} />
-          <p role="status" aria-live="polite" data-testid="mind-search-results" className="mt-1 text-sm text-muted-foreground">
-            {query.trim() ? (matches.length ? `${matches.length} hasil cocok` : 'Tidak ada hasil') : `${data.length} ide · cari berdasarkan label`}
+          <p role="status" aria-live="polite" id="mind-search-status" data-testid="mind-search-results" className="mt-1 text-sm text-muted-foreground">
+            {query.trim() ? (matches.length ? `${matches.length} hasil cocok` : 'Tidak ada hasil') : `${data.length} ide · cari berdasarkan nama ide`}
           </p>
         </div>} />
       </section>
       <section aria-labelledby="mind-keyboard">
         <h2 id="mind-keyboard" className="text-lg font-semibold">Keyboard & aksesibilitas</h2>
-        <p className="mt-2 text-sm text-muted-foreground">Node: ←/→ saudara di sisi sama, ↑ parent, ↓ anak pertama. Enter/F2 edit, Space lipat, Delete/Backspace hapus. Ctrl/Cmd+Z urungkan; Ctrl+Y atau Cmd+Shift+Z ulangi. Input teks memakai shortcut edit native.</p>
-        <p className="mt-2 text-sm text-muted-foreground">Kanvas: panah pan, +/− zoom, 0 reset, F fit. Pohon aksesibel: ↑/↓ baris, → buka/anak, ← lipat/parent, Home/End awal/akhir. Buka panel pohon untuk alternatif pembaca layar. Gerakan mengikuti prefers-reduced-motion. Semua handler demo lokal, tanpa request server.</p>
+        <ul className="mt-2 grid gap-1 text-sm text-muted-foreground sm:grid-cols-2">
+          <li><kbd className="rounded border border-border bg-muted px-1">Enter</kbd>/<kbd className="rounded border border-border bg-muted px-1">F2</kbd> ubah nama ide, <kbd className="rounded border border-border bg-muted px-1">Space</kbd> lipat/buka</li>
+          <li><kbd className="rounded border border-border bg-muted px-1">Delete</kbd> hapus cabang, <kbd className="rounded border border-border bg-muted px-1">Ctrl/⌘+Z</kbd> urungkan</li>
+          <li>Panah telusuri ide; <kbd className="rounded border border-border bg-muted px-1">Home</kbd>/<kbd className="rounded border border-border bg-muted px-1">End</kbd> ke awal/akhir daftar</li>
+          <li>Kanvas: panah pan, <kbd className="rounded border border-border bg-muted px-1">+</kbd>/<kbd className="rounded border border-border bg-muted px-1">−</kbd> zoom, <kbd className="rounded border border-border bg-muted px-1">0</kbd> reset, <kbd className="rounded border border-border bg-muted px-1">F</kbd> fit</li>
+        </ul>
+        <p className="mt-2 text-sm text-muted-foreground">Buka panel pohon untuk alternatif pembaca layar. Gerakan mengikuti prefers-reduced-motion. Semua handler demo lokal, tanpa request server.</p>
       </section>
       <section aria-labelledby="mind-recipe">
         <h2 id="mind-recipe" className="text-lg font-semibold">Resep integrasi</h2>
