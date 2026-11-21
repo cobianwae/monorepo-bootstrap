@@ -2,10 +2,12 @@
 
 import * as React from 'react';
 import { EditorContent, useEditor } from '@tiptap/react';
+import type { Extension } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import Image from '@tiptap/extension-image';
 import {
   Bold,
   Italic,
@@ -20,6 +22,7 @@ import {
   Undo2,
   Redo2,
   Link2,
+  ImagePlus,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { proseVariants } from '../layout/prose';
@@ -32,6 +35,16 @@ import { Skeleton } from '../base/skeleton';
 import { Input } from '../base/input';
 import { Label } from '../base/label';
 import { Button } from '../base/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../feedback/dialog';
+
+export { htmlToMarkdown, markdownToHtml } from './rich-text-editor-serializer';
 
 export type RichTextMode = 'editable' | 'readonly' | 'disabled';
 
@@ -53,6 +66,10 @@ export interface RichTextEditorProps {
   onRetry?: () => void;
   maxLength?: number;
   showCounter?: boolean;
+  /** Slot mention RM-10: extension tambahan (append-only, tidak mengganti set inti D1). */
+  extensions?: Extension[];
+  /** Disiapkan untuk konsumen (di luar v1, tanpa implementasi upload). */
+  onImageUpload?: (file: File) => Promise<{ src: string }>;
   ariaLabel?: string;
   className?: string;
 }
@@ -101,6 +118,18 @@ function isValidLinkUrl(raw: string): boolean {
 function linkErrorFor(raw: string): string | null {
   if (!raw.trim()) return 'URL tautan wajib diisi';
   if (!isValidLinkUrl(raw)) return 'Gunakan format https://… atau /path';
+  return null;
+}
+
+function isValidImageUrl(raw: string): boolean {
+  return isValidLinkUrl(raw);
+}
+
+function imageErrorFor(url: string, alt: string, previewFailed: boolean): string | null {
+  if (!url.trim()) return 'URL gambar wajib diisi';
+  if (!isValidImageUrl(url)) return 'URL tidak valid';
+  if (previewFailed) return 'Gambar gagal dimuat — periksa URL';
+  if (!alt.trim()) return 'alt wajib';
   return null;
 }
 
@@ -204,6 +233,8 @@ export function RichTextEditor({
   onRetry,
   maxLength = 10000,
   showCounter = true,
+  extensions = [],
+  onImageUpload,
   ariaLabel = 'Rich text editor',
   className,
 }: RichTextEditorProps) {
@@ -218,6 +249,11 @@ export function RichTextEditor({
   const [linkUrl, setLinkUrl] = React.useState('');
   const [linkError, setLinkError] = React.useState<string | null>(null);
   const [isEditingLink, setIsEditingLink] = React.useState(false);
+  const [imageOpen, setImageOpen] = React.useState(false);
+  const [imageUrl, setImageUrl] = React.useState('');
+  const [imageAlt, setImageAlt] = React.useState('');
+  const [imagePreviewFailed, setImagePreviewFailed] = React.useState(false);
+  void onImageUpload;
   const linkInputRef = React.useRef<HTMLInputElement | null>(null);
   const openedHrefRef = React.useRef('');
   const isMobile = useIsMobile();
@@ -246,6 +282,8 @@ export function RichTextEditor({
       Underline,
       Link.configure({ openOnClick: false, autolink: true }),
       Placeholder.configure({ placeholder }),
+      Image.configure({ HTMLAttributes: { class: 'rounded-xl border border-border' } }),
+      ...extensions,
     ],
     content: value,
     immediatelyRender: false,
@@ -422,6 +460,41 @@ export function RichTextEditor({
     setLinkOpen(false);
     setLinkError(null);
   }, []);
+
+  const imageError = imageErrorFor(imageUrl, imageAlt, imagePreviewFailed);
+  const imageSaveDisabled = imageError !== null;
+
+  const openImageDialog = React.useCallback(() => {
+    if (!editor || nonEditable) return;
+    setImageUrl('');
+    setImageAlt('');
+    setImagePreviewFailed(false);
+    setImageOpen(true);
+  }, [editor, nonEditable]);
+
+  const handleImageUrlChange = React.useCallback((next: string) => {
+    setImageUrl(next);
+    setImagePreviewFailed(false);
+  }, []);
+
+  const handleImageAltChange = React.useCallback((next: string) => {
+    setImageAlt(next);
+  }, []);
+
+  const handleImageSave = React.useCallback(() => {
+    const src = imageUrl.trim();
+    const alt = imageAlt.trim();
+    const err = imageErrorFor(imageUrl, imageAlt, imagePreviewFailed);
+    if (err || !editor) return;
+    editor.chain().focus().setImage({ src, alt }).run();
+    setAnnounce('Gambar disisipkan');
+    setImageOpen(false);
+  }, [editor, imageAlt, imagePreviewFailed, imageUrl]);
+
+  const handleImageOpenChange = React.useCallback((next: boolean) => {
+    setImageOpen(next);
+    if (!next) focusEditor();
+  }, [focusEditor]);
 
   React.useEffect(() => {
     if (!editor) return;
@@ -675,6 +748,93 @@ export function RichTextEditor({
             </PopoverContent>
           </Popover>
         )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label="Sisip gambar"
+              disabled={nonEditable}
+              onClick={openImageDialog}
+              data-testid="rte-button-image"
+              className={cn(TOOLBAR_BUTTON_CLASSES, TOOLBAR_IDLE_CLASSES)}
+            >
+              <ImagePlus className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Sisip gambar</TooltipContent>
+        </Tooltip>
+        <Dialog open={imageOpen} onOpenChange={handleImageOpenChange}>
+          <DialogContent data-testid="rte-image-dialog" aria-label="Sisip gambar">
+            <DialogHeader>
+              <DialogTitle>Sisip gambar</DialogTitle>
+              <DialogDescription>Tempel URL gambar dan isi alt agar terbaca pembaca layar.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="rte-image-url">URL gambar</Label>
+                <Input
+                  id="rte-image-url"
+                  data-testid="rte-image-url"
+                  value={imageUrl}
+                  onChange={(event) => handleImageUrlChange(event.target.value)}
+                  placeholder="https://contoh.com/gambar.png"
+                  autoComplete="off"
+                  inputMode="url"
+                  aria-invalid={imageError ? true : undefined}
+                  aria-describedby={imageError ? 'rte-image-error' : undefined}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="rte-image-alt">Teks alt</Label>
+                <Input
+                  id="rte-image-alt"
+                  data-testid="rte-image-alt"
+                  value={imageAlt}
+                  onChange={(event) => handleImageAltChange(event.target.value)}
+                  placeholder="Deskripsi singkat gambar"
+                  autoComplete="off"
+                  aria-invalid={imageError ? true : undefined}
+                  aria-describedby={imageError ? 'rte-image-error' : undefined}
+                />
+              </div>
+              {imageUrl.trim() && isValidImageUrl(imageUrl) ? (
+                <div className="overflow-hidden rounded-xl border border-border">
+                  <img
+                    src={imageUrl.trim()}
+                    alt=""
+                    aria-hidden="true"
+                    data-testid="rte-image-preview"
+                    className="max-h-48 w-full object-contain bg-muted/20"
+                    onError={() => setImagePreviewFailed(true)}
+                    onLoad={() => setImagePreviewFailed(false)}
+                  />
+                </div>
+              ) : null}
+              {imageError ? (
+                <p role="alert" data-testid="rte-image-error" className="text-xs text-destructive">
+                  {imageError}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground">Pratinjau tampil setelah URL valid. Alt wajib diisi.</p>
+              )}
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="ghost" size="sm" data-testid="rte-image-cancel" onClick={() => setImageOpen(false)}>
+                Batal
+              </Button>
+              <Button
+                type="button"
+                variant="highlight"
+                size="sm"
+                data-testid="rte-image-save"
+                disabled={imageSaveDisabled}
+                onClick={handleImageSave}
+              >
+                Sisipkan
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <div className="ml-auto flex items-center gap-0.5">
           <Tooltip>
             <TooltipTrigger asChild>

@@ -1,6 +1,6 @@
 # 006-04 — Gambar M-010 + serializer markdown + slot mention
 
-Status: approved
+Status: review
 PRD: `docs/prd/006-rich-text-editor.md`
 Design: `docs/design/rich-text-editor.md`
 FR: `FR-009`, `FR-015`, `FR-013`
@@ -35,11 +35,11 @@ Goal: Sisip gambar via URL (alt wajib) + util markdown round-trip + arsitektur s
 
 ## Tasks
 
-- [ ] M-010: `dialog` URL + alt wajib + pratinjau + validasi; `setImage({src, alt})` di kursor; `data-testid=rte-image-dialog`
-- [ ] `onImageUpload?` opsional disiapkan (di luar v1, tanpa implementasi upload)
-- [ ] `form/rich-text-editor-serializer.ts`: `htmlToMarkdown`/`markdownToHtml` murni tanpa dep baru (cakupan inti saja)
-- [ ] Prop `extensions?: Extension[]` (append-only, tidak mengganti set inti D1)
-- [ ] Test: sisip/tolak gambar, pratinjau gagal, round-trip markdown inti, regresi toolbar dengan extension injeksi
+- [x] M-010: `dialog` URL + alt wajib + pratinjau + validasi; `setImage({src, alt})` di kursor; `data-testid=rte-image-dialog`
+- [x] `onImageUpload?` opsional disiapkan (di luar v1, tanpa implementasi upload)
+- [x] `form/rich-text-editor-serializer.ts`: `htmlToMarkdown`/`markdownToHtml` murni tanpa dep baru (cakupan inti saja)
+- [x] Prop `extensions?: Extension[]` (append-only, tidak mengganti set inti D1)
+- [x] Test: sisip/tolak gambar, pratinjau gagal, round-trip markdown inti, regresi toolbar dengan extension injeksi
 
 ## Dependencies
 
