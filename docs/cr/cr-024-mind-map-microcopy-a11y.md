@@ -50,29 +50,32 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Samakan istilah root→ide pusat (temuan 1).
-- [ ] Perbaiki status/placeholder pencarian (temuan 2).
-- [ ] Terjemahkan toggle Minimap (temuan 3).
-- [ ] Tulis ulang deskripsi + daftar keyboard + hint 11px→xs (temuan 4).
-- [ ] Perbesar target input inline (temuan 5).
-- [ ] Tampilkan gagang tambah di touch/mobile (temuan 6).
-- [ ] Update test yang assert string/testid lama.
+- [x] Samakan istilah root→ide pusat (temuan 1).
+- [x] Perbaiki status/placeholder pencarian (temuan 2).
+- [x] Terjemahkan toggle Minimap (temuan 3).
+- [x] Tulis ulang deskripsi + daftar keyboard + hint 11px→xs (temuan 4).
+- [x] Perbesar target input inline (temuan 5).
+- [x] Tampilkan gagang tambah di touch/mobile (temuan 6).
+- [x] Update test yang assert string/testid lama.
 
 ## Keputusan
 
 | # | Keputusan | Alasan |
 |---|---|---|
-| 1 | — | Menunggu persetujuan user; perubahan string bisa memengaruhi test. |
+| 1 | Approved user (“approve aja dulu”); diimplementasikan berurutan setelah CR-023. | Scope disetujui sekaligus. |
+| 2 | Gagang: `[@media(hover:none)]:opacity-100` (bukan `md:hidden` persisten). | Presisi: hanya perangkat tanpa hover yang selalu tampil; desktop hover-reveal tetap. |
+| 3 | aria toggle peta mini dinamis mengikuti `aria-pressed`. | State terumumkan benar ke SR. |
+| 4 | Keyboard section memakai grid `<ul>` + `<kbd>` ber-token, bukan list-disc polos. | Lebih mudah dipindai, konsisten token. |
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA (khusus hint `text-xs` baru).
-- [ ] Perilaku Radix/a11y tidak rusak.
-- [ ] API `cva` dan export tetap konsisten.
-- [ ] State loading, empty, dan error relevan tersedia.
-- [ ] Showcase/docs diperbarui bila perlu.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA (khusus hint `text-xs` baru).
+- [x] Perilaku Radix/a11y tidak rusak.
+- [x] API `cva` dan export tetap konsisten.
+- [x] State loading, empty, dan error relevan tersedia.
+- [x] Showcase/docs diperbarui bila perlu.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
 
 - Cek light/dark: hint, badge, input di kedua mode.
 - Cek state: editing (hint/error), empty, hasil cari kosong/berisi, dialog hapus.
@@ -83,10 +86,10 @@
 Branch: `cr-024-mind-map-microcopy-a11y`
 Commit: `fix: rapikan microcopy mind map [CR-024]`
 
-- [ ] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
+- [x] CR disetujui user.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
 - [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
 - [ ] `docs/STATUS.md` diperbarui bila relevan.
 - [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.

@@ -107,7 +107,7 @@ export default function MindMapPatternPage() {
               <Button key={state} variant={demoState === state ? 'default' : 'ghost'} className="min-h-11"
                 aria-pressed={demoState === state} onClick={() => selectState(state)}>{state}</Button>
             ))}
-            <Button variant="ghost" className="min-h-11" onClick={() => load(LARGE, 'Berisi')}>Muat 50 node</Button>
+            <Button variant="ghost" className="min-h-11" aria-label="Muat contoh 50 node" onClick={() => load(LARGE, 'Berisi')}>Muat 50 node</Button>
           </div>
           <div role="group" aria-label="Tampilan demo" className="flex flex-wrap gap-2">
             <Button variant="outline" className="min-h-11" aria-pressed={dark} onClick={() => setDark(!dark)}>Mode gelap</Button>
@@ -139,8 +139,8 @@ export default function MindMapPatternPage() {
       </section>
       <section aria-labelledby="mind-recipe">
         <h2 id="mind-recipe" className="text-lg font-semibold">Resep integrasi</h2>
-        <pre className="my-2 overflow-x-auto rounded-md bg-muted p-4 text-sm text-foreground"><code>{RECIPE}</code></pre>
-        <Button variant="outline" onClick={async () => {
+        <pre tabIndex={0} aria-label="Contoh kode integrasi MindMap" className="my-2 overflow-x-auto rounded-md bg-muted p-4 text-sm text-foreground"><code>{RECIPE}</code></pre>
+        <Button variant="outline" className="min-h-11" onClick={async () => {
           try {
             await navigator.clipboard.writeText(RECIPE);
             setCopied('Resep disalin');

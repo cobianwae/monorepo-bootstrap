@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import MindMapPatternPage from './page';
 
@@ -53,11 +53,43 @@ describe('MindMapPatternPage (012-03)', () => {
 
   it('50 node, tema lokal light/dark dan toggle minimap', () => {
     const { container } = render(<MindMapPatternPage />);
-    fireEvent.click(screen.getByRole('button', { name: 'Muat 50 node' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Muat contoh 50 node' }));
     expect(container.querySelectorAll('[data-testid="mind-map-node"]')).toHaveLength(50);
     fireEvent.click(screen.getByRole('button', { name: 'Mode gelap' }));
     expect(container.querySelector('[data-theme="pulse"]')?.className).toContain('dark');
     fireEvent.click(screen.getByRole('button', { name: 'Peta mini' }));
     expect(screen.queryByTestId('mind-map-minimap')).toBeNull();
+  });
+
+  it('input cari punya placeholder contoh dan terhubung ke status hasil', () => {
+    render(<MindMapPatternPage />);
+    const input = screen.getByRole('searchbox', { name: 'Cari ide' });
+    expect(input.getAttribute('placeholder')).toBe('Cth: Riset pasar');
+    expect(input.getAttribute('aria-describedby')).toBe('mind-search-status');
+    expect(screen.getByTestId('mind-search-results').id).toBe('mind-search-status');
+  });
+
+  it('input cari hanya tampil saat peta siap (unmount saat Loading/Invalid)', () => {
+    // Perilaku komponen: loading/invalid/empty adalah early return tanpa searchSlot,
+    // sehingga input unmount alih-alih disabled. Prop disabled tetap sebagai pengaman.
+    render(<MindMapPatternPage />);
+    const panel = within(screen.getByRole('group', { name: 'Panel demo' }));
+    expect(screen.getByRole('searchbox', { name: 'Cari ide' })).toBeTruthy();
+    fireEvent.click(panel.getByRole('button', { name: 'Invalid' }));
+    expect(screen.queryByRole('searchbox', { name: 'Cari ide' })).toBeNull();
+    fireEvent.click(panel.getByRole('button', { name: 'Loading' }));
+    expect(screen.queryByRole('searchbox', { name: 'Cari ide' })).toBeNull();
+    fireEvent.click(panel.getByRole('button', { name: 'Berisi' }));
+    const input = screen.getByRole('searchbox', { name: 'Cari ide' }) as HTMLInputElement;
+    expect(input.disabled).toBe(false);
+  });
+
+  it('salin resep memenuhi target sentuh dan memberi umpan balik', async () => {
+    render(<MindMapPatternPage />);
+    Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } });
+    const button = screen.getByRole('button', { name: 'Salin resep' });
+    expect(button.className).toContain('min-h-11');
+    fireEvent.click(button);
+    await screen.findByText('Resep disalin');
   });
 });
