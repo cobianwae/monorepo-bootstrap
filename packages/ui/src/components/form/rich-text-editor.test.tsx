@@ -391,3 +391,105 @@ describe('RichTextEditor 006-03 mode + counter + states', () => {
     expect(editable?.getAttribute('aria-describedby')).toBe(describedBy);
   });
 });
+
+describe('RichTextEditor 006-04 gambar + markdown + mention', () => {
+  it('renders image toolbar button and opens M-010 with required validation', async () => {
+    render(<RichTextEditor value="<p>Halo</p>" />);
+    const imageButton = await screen.findByTestId('rte-button-image');
+    expect(imageButton.getAttribute('aria-label')).toContain('gambar');
+    fireEvent.click(imageButton);
+    const dialog = await screen.findByTestId('rte-image-dialog');
+    expect(dialog.getAttribute('aria-label')).toBe('Sisip gambar');
+    // Kosong: tolak + pesan + Sisipkan disabled + dialog tetap terbuka.
+    expect(screen.getByTestId('rte-image-error').textContent).toContain('wajib diisi');
+    expect((screen.getByTestId('rte-image-save') as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.getByTestId('rte-image-dialog')).toBeDefined();
+  });
+
+  it('rejects invalid URL without inserting a broken image', async () => {
+    const onChange = vi.fn();
+    render(<RichTextEditor value="<p>Halo</p>" onChange={onChange} />);
+    fireEvent.click(await screen.findByTestId('rte-button-image'));
+    const url = await screen.findByTestId('rte-image-url');
+    fireEvent.change(url, { target: { value: 'notaurl' } });
+    fireEvent.change(await screen.findByTestId('rte-image-alt'), { target: { value: 'Alt' } });
+    expect(screen.getByTestId('rte-image-error').textContent).toContain('URL tidak valid');
+    expect((screen.getByTestId('rte-image-save') as HTMLButtonElement).disabled).toBe(true);
+    expect(onChange).not.toHaveBeenCalled();
+    expect(screen.getByTestId('rte-image-dialog')).toBeDefined();
+  });
+
+  it('requires alt text and keeps dialog open until filled', async () => {
+    render(<RichTextEditor value="<p>Halo</p>" />);
+    fireEvent.click(await screen.findByTestId('rte-button-image'));
+    fireEvent.change(await screen.findByTestId('rte-image-url'), {
+      target: { value: 'https://contoh.com/gambar.png' },
+    });
+    // Alt kosong → tolak dengan pesan "alt wajib".
+    expect(screen.getByTestId('rte-image-error').textContent).toContain('alt wajib');
+    expect((screen.getByTestId('rte-image-save') as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.change(await screen.findByTestId('rte-image-alt'), { target: { value: 'Kucing' } });
+    expect(screen.queryByTestId('rte-image-error')).toBeNull();
+    expect((screen.getByTestId('rte-image-save') as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it('inserts image at cursor with rounded border + alt, undo restores', async () => {
+    const onChange = vi.fn();
+    render(<RichTextEditor value="<p>Halo</p>" onChange={onChange} />);
+    fireEvent.click(await screen.findByTestId('rte-button-image'));
+    fireEvent.change(await screen.findByTestId('rte-image-url'), {
+      target: { value: 'https://contoh.com/gambar.png' },
+    });
+    fireEvent.change(await screen.findByTestId('rte-image-alt'), { target: { value: 'Kucing' } });
+    fireEvent.click(screen.getByTestId('rte-image-save'));
+    await waitFor(() => {
+      const last = onChange.mock.calls.at(-1)?.[0] as string | undefined;
+      expect(last ?? '').toContain('<img');
+      expect(last ?? '').toContain('alt="Kucing"');
+      expect(last ?? '').toContain('https://contoh.com/gambar.png');
+    });
+    expect(screen.getByTestId('rte-live').textContent).toContain('Gambar disisipkan');
+    await waitFor(() => {
+      expect(screen.queryByTestId('rte-image-dialog')).toBeNull();
+    });
+    // Undo mengembalikan (gambar hilang dari HTML terakhir).
+    const undo = await screen.findByTestId('rte-button-undo');
+    fireEvent.click(undo);
+    await waitFor(() => {
+      const last = onChange.mock.calls.at(-1)?.[0] as string | undefined;
+      expect(last ?? '').not.toContain('<img');
+    });
+  });
+
+  it('round-trips core markdown without new deps', async () => {
+    const { htmlToMarkdown, markdownToHtml } = await import('./rich-text-editor-serializer');
+    const html =
+      '<h1>Judul</h1><h2>Sub</h2><h3>Kecil</h3><p>Halo <strong>tebal</strong> dan <em>miring</em> serta <code>kode</code> + <a href="https://contoh.com">tautan</a></p><ul><li>Satu</li><li>Dua</li></ul><ol><li>Pertama</li></ol><blockquote><p>Kutipan</p></blockquote><pre><code>const a = 1;</code></pre><p><img src="https://contoh.com/g.png" alt="G" /></p>';
+    const md = htmlToMarkdown(html);
+    expect(md).toContain('# Judul');
+    expect(md).toContain('**tebal**');
+    expect(md).toContain('[tautan](https://contoh.com)');
+    expect(md).toContain('![G](https://contoh.com/g.png)');
+    const back = markdownToHtml(md);
+    expect(back).toContain('<h1>');
+    expect(back).toContain('<strong>tebal</strong>');
+    expect(back).toContain('<a href="https://contoh.com">tautan</a>');
+    expect(back).toContain('<img');
+    // Di luar inti: fallback HTML mentah diteruskan.
+    expect(markdownToHtml('<table><tr><td>X</td></tr></table>')).toContain('<table>');
+    expect(htmlToMarkdown('<table><tr><td>X</td></tr></table>')).toContain('<table>');
+  });
+
+  it('accepts injected extensions without breaking FR-001/002 toolbar', async () => {
+    const { Extension } = await import('@tiptap/core');
+    const Dummy = Extension.create({ name: 'dummy00604' });
+    const onChange = vi.fn();
+    render(<RichTextEditor value="<p>Baris biasa</p>" onChange={onChange} extensions={[Dummy]} />);
+    const h1 = await screen.findByTestId('rte-button-h1');
+    fireEvent.click(h1);
+    await waitFor(() => {
+      expect(onChange).toHaveBeenCalled();
+    });
+    expect(onChange.mock.calls.at(-1)?.[0] as string).toContain('<h1');
+  });
+});

@@ -88,7 +88,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 006-01 | RTE fondasi controlled + toolbar inline/blok + undo | done | `docs/stories/006-01-fondasi-toolbar-controlled.md` |
 | 006-02 | RTE link M-009 + shortcut + keyboard penuh | done | `docs/stories/006-02-link-shortcut-keyboard.md` |
 | 006-03 | RTE mode + counter + state matrix | done | `docs/stories/006-03-mode-counter-states.md` |
-| 006-04 | RTE gambar M-010 + serializer markdown + slot mention | approved | `docs/stories/006-04-gambar-markdown-mention.md` |
+| 006-04 | RTE gambar M-010 + serializer markdown + slot mention | done | `docs/stories/006-04-gambar-markdown-mention.md` |
 | 006-05 | RTE showcase final + audit kontras + smoke | approved | `docs/stories/006-05-showcase-audit-smoke.md` |
 | 007-01 | Transfer list assign role + showcase | approved | `docs/stories/007-01-transfer-list.md` |
 | 008-01 | Cascader alamat/kategori + showcase | approved | `docs/stories/008-01-cascader.md` |
