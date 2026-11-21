@@ -2222,6 +2222,7 @@ export function OrgChartStudio({
           className,
         )}
       >
+        <p className="sr-only">Memuat struktur organisasi…</p>
         <div className="flex flex-col items-center gap-4" aria-hidden="true">
           <Skeleton data-testid="org-studio-skeleton-box" className="h-[84px] w-[240px]" />
           <div className="h-8 w-px bg-border" />

@@ -799,3 +799,82 @@ describe('OrgChartStudio cari/keyboard/pohon SR/motion (011-04)', () => {
     }
   });
 });
+
+describe('OrgChartStudio state matrix + showcase (011-05)', () => {
+  it('AC-01: loading — skeleton 8 kartu + aria-busy + teks SR', () => {
+    const { container } = render(<OrgChartStudio data={flatData} loading />);
+    expect(container.querySelectorAll('[data-testid="org-studio-skeleton-box"]')).toHaveLength(8);
+    expect(container.querySelector('[aria-busy="true"]')).not.toBeNull();
+    expect(screen.getByText('Memuat struktur organisasi…')).not.toBeNull();
+  });
+
+  it('AC-01: empty — role=status + CTA Buat root memicu onEmptyAction', () => {
+    const onEmptyAction = vi.fn();
+    const { container } = render(
+      <OrgChartStudio data={[]} emptyActionLabel="Buat root" onEmptyAction={onEmptyAction} />,
+    );
+    expect(container.querySelector('[role="status"]')).not.toBeNull();
+    const button = screen.getByRole('button', { name: 'Buat root' });
+    fireEvent.click(button);
+    expect(onEmptyAction).toHaveBeenCalledTimes(1);
+  });
+
+  it('AC-01: invalid duplikat — role=alert + penyebab + id pertama + salin detail', () => {
+    const duplikat = [
+      { id: 'ceo', parentId: null as string | null, title: 'CEO' },
+      { id: 'eng', parentId: 'ceo' as string | null, title: 'Eng' },
+      { id: 'eng', parentId: 'ceo' as string | null, title: 'Ganda' },
+    ];
+    const { container } = render(<OrgChartStudio data={duplikat} />);
+    const alert = container.querySelector('[role="alert"]');
+    expect(alert).not.toBeNull();
+    expect(alert?.textContent).toContain('duplikat');
+    expect(alert?.textContent).toContain('eng');
+    expect(screen.getByRole('button', { name: 'Salin detail error' })).not.toBeNull();
+  });
+
+  it('AC-01: invalid parent-hilang dan siklus menyebut id pelanggar', () => {
+    const missing = render(
+      <OrgChartStudio
+        data={[
+          { id: 'ceo', parentId: null, title: 'CEO' },
+          { id: 'orphan', parentId: 'tidak-ada', title: 'Yatim' },
+        ]}
+      />,
+    );
+    expect(missing.container.querySelector('[role="alert"]')?.textContent).toContain('orphan');
+    missing.unmount();
+    const cycle = render(
+      <OrgChartStudio
+        data={[
+          { id: 'ceo', parentId: null, title: 'CEO' },
+          { id: 'a', parentId: 'b', title: 'A' },
+          { id: 'b', parentId: 'a', title: 'B' },
+        ]}
+      />,
+    );
+    expect(cycle.container.querySelector('[role="alert"]')?.textContent).toContain('Siklus');
+    cycle.unmount();
+  });
+
+  it('AC-01: error eksternal — role=alert di atas pesan konsumen', () => {
+    const { container } = render(<OrgChartStudio data={flatData} error="Gagal sinkronisasi (demo)." />);
+    const alert = container.querySelector('[role="alert"]');
+    expect(alert).not.toBeNull();
+    expect(alert?.textContent).toContain('Gagal sinkronisasi');
+  });
+
+  it('AC-02: success + contoh — role=application, 40 node contoh render semua', () => {
+    const success = render(<OrgChartStudio data={flatData} />);
+    expect(success.container.querySelector('[role="application"]')).not.toBeNull();
+    expect(success.container.querySelectorAll('[data-testid="org-studio-node"]')).toHaveLength(4);
+    success.unmount();
+    const big: OrgStudioInput = [{ id: 'ceo', parentId: null, title: 'CEO' }];
+    for (let i = 0; i < 39; i += 1) {
+      big.push({ id: `n-${i}`, parentId: i < 3 ? 'ceo' : `n-${Math.floor((i - 3) / 3)}`, title: `Node ${i}` });
+    }
+    const contoh = render(<OrgChartStudio data={big} />);
+    expect(contoh.container.querySelectorAll('[data-testid="org-studio-node"]')).toHaveLength(40);
+    contoh.unmount();
+  });
+});
