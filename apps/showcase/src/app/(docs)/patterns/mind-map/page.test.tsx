@@ -82,6 +82,10 @@ describe('MindMapPatternPage (012-03)', () => {
     expect(input.getAttribute('placeholder')).toBe('Cth: Riset pasar');
     expect(input.getAttribute('aria-describedby')).toBe('mind-search-status');
     expect(screen.getByTestId('mind-search-results').id).toBe('mind-search-status');
+    const actions = screen.getByRole('button', { name: 'Tambah cabang ide pusat' }).parentElement!;
+    expect(actions.parentElement!.contains(input)).toBe(true);
+    expect(input.compareDocumentPosition(actions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByTestId('mind-search-results').parentElement!.className).not.toContain('mb-3');
   });
 
   it('input cari hanya tampil saat peta siap (unmount saat Loading/Invalid)', () => {

@@ -196,15 +196,26 @@ describe('MindMap keyboard, SR dan states (012-03)', () => {
     } finally { window.matchMedia = original; }
   });
 
-  it('slot search setelah toolbar dan sebelum canvas dalam urutan DOM', () => {
+  it('slot search dan toolbar satu baris responsif dengan urutan DOM search → aksi → canvas', () => {
     const { container } = render(<MindMap data={flatData} searchSlot={<input aria-label="Cari ide" />} />);
     const search = screen.getByRole('textbox', { name: 'Cari ide' });
     const toolbar = screen.getByTestId('mind-map-redo');
     const viewport = screen.getByTestId('mind-map-viewport');
-    expect(toolbar.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(search.compareDocumentPosition(viewport) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const actions = screen.getByTestId('mind-map-add-root').parentElement!;
+    const row = actions.parentElement!;
+    expect(row.contains(search)).toBe(true);
+    expect(row.className).toContain('flex-wrap');
+    expect(search.compareDocumentPosition(actions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(toolbar.compareDocumentPosition(viewport) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(viewport.tabIndex).toBe(0);
     expect(container.querySelectorAll('[data-node-id][tabindex="0"]')).toHaveLength(1);
+  });
+  it('tanpa searchSlot toolbar tetap rata kanan tanpa wrapper pencarian kosong', () => {
+    render(<MindMap data={flatData} />);
+    const actions = screen.getByTestId('mind-map-add-root').parentElement!;
+    expect(actions.className).toContain('ml-auto');
+    expect(actions.parentElement!.children).toHaveLength(1);
+    expect(within(actions).getAllByRole('button')).toHaveLength(3);
   });
   it('audit Pulse light/dark: teks ≥4.5 dan penanda visual ≥3', () => {
     const pulse = THEMES.find((theme) => theme.id === 'pulse')!;

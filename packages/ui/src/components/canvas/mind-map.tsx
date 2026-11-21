@@ -1819,49 +1819,51 @@ export function MindMap({
         )}
       >
         {error ? <div role="alert" className="mb-3 rounded-md border border-destructive bg-card p-3 text-sm text-foreground">{error}</div> : null}
-        {/* Toolbar kanan (wireframe §1): tambah anak root + undo/redo. Fit/
-            reset zoom tetap di Controls di atas kanvas. */}
-        <div className="mb-2 flex flex-wrap items-center justify-end gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            aria-label="Tambah cabang ide pusat"
-            data-testid="mind-map-add-root"
-            className="min-h-11"
-            onClick={() => {
-              if (normalized.rootId) spawnPending(normalized.rootId);
-            }}
-          >
-            <Plus className="h-4 w-4" aria-hidden="true" />
-            Tambah cabang ide pusat
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            data-testid="mind-map-undo"
-            className="min-h-11"
-            disabled={!canUndo}
-            onClick={undo}
-          >
-            <Undo2 className="h-4 w-4" aria-hidden="true" />
-            Urungkan
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            data-testid="mind-map-redo"
-            className="min-h-11"
-            disabled={!canRedo}
-            onClick={redo}
-          >
-            <Redo2 className="h-4 w-4" aria-hidden="true" />
-            Ulangi
-          </Button>
+        {/* CR-028: pencarian mendahului toolbar kanan dalam urutan visual/fokus.
+            Fit/reset zoom tetap di Controls di atas kanvas. */}
+        <div className="mb-2 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+          {searchSlot ? <div className="min-w-0 basis-80 flex-1">{searchSlot}</div> : null}
+          <div className="ml-auto flex max-w-full flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              aria-label="Tambah cabang ide pusat"
+              data-testid="mind-map-add-root"
+              className="min-h-11"
+              onClick={() => {
+                if (normalized.rootId) spawnPending(normalized.rootId);
+              }}
+            >
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              Tambah cabang ide pusat
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              data-testid="mind-map-undo"
+              className="min-h-11"
+              disabled={!canUndo}
+              onClick={undo}
+            >
+              <Undo2 className="h-4 w-4" aria-hidden="true" />
+              Urungkan
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              data-testid="mind-map-redo"
+              className="min-h-11"
+              disabled={!canRedo}
+              onClick={redo}
+            >
+              <Redo2 className="h-4 w-4" aria-hidden="true" />
+              Ulangi
+            </Button>
+          </div>
         </div>
-        {searchSlot}
         <ReactFlowProvider>
           <MindCanvasInner
             nodes={flowNodes}

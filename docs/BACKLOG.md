@@ -88,6 +88,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-025 | Mind Map: tindak lanjut audit halaman (target sentuh salin resep, grup aksi, pre keyboard, cakupan test) | approved | `docs/cr/cr-025-mind-map-audit-followup.md` |
 | CR-026 | Mind Map: tata letak, hierarki, dan ikonografi halaman showcase (panel demo, pencarian, spacing, tipografi) | approved | `docs/cr/cr-026-mind-map-showcase-layout.md` |
 | CR-027 | Mind Map: polish halaman showcase (urutan demo, bingkai ganda, ikon status, resep salin) | approved | `docs/cr/cr-027-mind-map-showcase-polish.md` |
+| CR-028 | Mind Map: pencarian dan toolbar dalam satu baris (komponen `packages/ui`, urutan DOM) | approved | `docs/cr/cr-028-mind-map-toolbar-search-row.md` |
 
 ## Catatan
 

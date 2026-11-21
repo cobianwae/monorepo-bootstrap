@@ -24,7 +24,7 @@ CR-020 `done` atas approval user (2026-11-22), implementasi `9000a26` di `arah-s
 3. Sinkron sitemap: S-005.30/S-005.31 `planned` → `implemented` (007-01/008-01/02 live); S-005.41 `in-design` (018).
 4. Mind Map: CR-020 `done` atas approval user; walkthrough Chrome sudah lulus, pembaca layar bersuara native tetap tindak lanjut.
 5. CR-020 `done`: sinkronisasi dev `aa6e0d8` (CR-021) terverifikasi; lint/build/test hijau (706 UI, 68 showcase, 8 token), typecheck hanya 12 error baseline FlowEditor. Push branch dan merge/push `dev` diizinkan user.
-6. CR-027 `approved`, implementasi di branch `cr-027-mind-map-showcase-polish` dari CR-026 `7e8bc71`: demo-first, panel datar, ikon dan feedback salin. Lint/tsc showcase/build dan 74 showcase lulus; full suite awal hijau, final 705/706 UI (baseline RTE; worker dibatasi), typecheck workspace baseline FlowEditor. Chrome 1440/390px light/dark selaras dicek. Menunggu review user; CR-028 tetap draft, belum dikerjakan.
+6. CR-027/028 `approved`, menunggu review user. CR-028 di branch `cr-028-mind-map-toolbar-search-row` dari CR-027 `742667d`: pencarian → aksi → kanvas, satu baris responsif. Lint/build/test workspace hijau (707 UI, 74 showcase, 8 token), typecheck hanya 12 baseline FlowEditor. Chrome light/dark selaras 320/390/768/1440px tanpa overflow; Tab mengikuti visual. Belum push/merge.
 
 ## Known Issues
 

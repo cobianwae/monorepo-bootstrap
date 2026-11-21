@@ -47,8 +47,8 @@ export default function MindMapPatternPage() {
   };
 
   const searchSlot = (
-    <div className="mb-3 flex flex-wrap items-end gap-x-4 gap-y-2">
-      <div className="min-w-64 flex-1 space-y-1 sm:max-w-sm">
+    <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
+      <div className="min-w-0 basis-64 flex-1 space-y-1 sm:max-w-sm">
         <Label htmlFor="mind-search">Cari ide</Label>
         <div className="relative">
           <Search
