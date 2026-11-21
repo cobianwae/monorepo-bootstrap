@@ -41,7 +41,7 @@ Story 005-01 (`done`, ter-merge ke `dev`) — Flow editor fondasi canvas + node 
 12. Story 006-03 mode + counter + state matrix — implementasi selesai, verifikasi hijau, status `done`, di-merge ke `dev` — `006-03`.
 13. Story 006-04 gambar M-010 + serializer markdown + slot mention — implementasi selesai, verifikasi hijau (27/27 RTE), status `done`, di-merge ke `dev` — `006-04`.
 14. Story 006-05 showcase final + audit + smoke — implementasi selesai, verifikasi hijau (typecheck/lint/531 test/test:tokens/showcase build), status `done` — `006-05`.
-15. Story 008-01 Cascader `done` (approved oleh user) — komponen + 9 test + showcase S-005.31 hijau — `008-01`.
+15. Story 008-01 Cascader `done` (approved oleh user) — komponen + 9 test + showcase S-005.31 hijau — `008-01`. Story 008-02 TreeSelect `review` — komponen + 7 test + showcase S-005.31 hijau — `008-02`.
 
 ## Known Issues
 
