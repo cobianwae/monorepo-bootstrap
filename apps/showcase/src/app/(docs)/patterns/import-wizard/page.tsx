@@ -3,8 +3,12 @@
 import * as React from 'react';
 import { Button, Card, CardContent, CardFooter, CardHeader, CardTitle, PageHeader, Stepper } from '@ds/ui';
 import { DEMO_FIELDS, DEMO_TEMPLATE_NAME } from './_lib/demo-fields';
+import { DEMO_DATASETS, toDemoFile, type DemoDatasetId } from './_lib/demo-datasets';
 import { parseCsv } from './_lib/parse-csv';
 import { toTemplateCsv } from './_lib/template';
+import { buildValidation, type ValidationFilter } from './_lib/validation-view';
+import { buildImportResult, planSubmit, type FailPolicy } from './_lib/submit';
+import type { ImportResult } from './_lib/types';
 import {
   MAX_FUNCTIONAL_STEP,
   TOTAL_STEPS,
@@ -20,9 +24,14 @@ import {
 } from './_lib/wizard-state';
 import { MappingStep } from './_components/mapping-step';
 import { UploadStep, type DelimiterChoice } from './_components/upload-step';
+import { ValidationStep } from './_components/validation-step';
+import { ConfirmStep } from './_components/confirm-step';
+import { DemoPanel } from './_components/demo-panel';
 
 const STEP_LABELS = ['Upload', 'Mapping', 'Validasi', 'Konfirmasi'];
 const STEP_HEADINGS = ['Unggah file CSV', 'Petakan kolom', 'Validasi data', 'Konfirmasi impor'];
+const DONE_HEADING = 'Impor siap diproses';
+const NEXT_LABELS = ['Lanjut ke mapping', 'Lanjut ke validasi', 'Lanjut ke konfirmasi'];
 const FILE_WINS_NOTICE = 'Berkas sudah dipakai; teks tempel diabaikan. Hapus berkas untuk memakai teks tempel.';
 
 export default function ImportWizardPage() {
@@ -31,33 +40,47 @@ export default function ImportWizardPage() {
   const [delimiter, setDelimiter] = React.useState<DelimiterChoice>('auto');
   const [pasteText, setPasteText] = React.useState('');
   const [pasteNotice, setPasteNotice] = React.useState<string | null>(null);
+  const [filter, setFilter] = React.useState<ValidationFilter>('all');
+  const [validationPage, setValidationPage] = React.useState(1);
+  const [policy, setPolicy] = React.useState<FailPolicy>('skip');
+  const [rejection, setRejection] = React.useState<string | null>(null);
+  const [result, setResult] = React.useState<ImportResult | null>(null);
+  const [lastSummary, setLastSummary] = React.useState<string | null>(null);
 
   const requestId = React.useRef(0);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const headingRef = React.useRef<HTMLHeadingElement>(null);
   const gateReasonRef = React.useRef<HTMLParagraphElement>(null);
+  const summaryRef = React.useRef<HTMLDivElement>(null);
   const skipFocus = React.useRef(true);
 
-  // Ganti langkah → fokus ke judul langkah (bukan saat render pertama).
+  const completed = result !== null;
+
+  // Ganti langkah atau selesai impor → fokus ke judul (bukan saat render pertama).
   React.useEffect(() => {
     if (skipFocus.current) {
       skipFocus.current = false;
       return;
     }
     headingRef.current?.focus();
-  }, [state.step]);
+  }, [state.step, completed]);
 
-  const runParse = React.useCallback(async (source: WizardSource, chosen: DelimiterChoice) => {
-    const id = ++requestId.current;
-    setParsing(true);
-    setState((prev) => setSource(prev, source));
-    const parsed = await parseCsv(source.kind === 'file' ? source.file : source.text, {
-      delimiter: chosen,
-    });
-    if (id !== requestId.current) return;
-    setState((prev) => applyParsed(prev, parsed, DEMO_FIELDS));
-    setParsing(false);
-  }, []);
+  const runParse = React.useCallback(
+    async (source: WizardSource, chosen: DelimiterChoice, delayMs = 0) => {
+      const id = ++requestId.current;
+      setParsing(true);
+      setState((prev) => setSource(prev, source));
+      if (delayMs > 0) await new Promise((resolve) => setTimeout(resolve, delayMs));
+      const parsed = await parseCsv(source.kind === 'file' ? source.file : source.text, {
+        delimiter: chosen,
+      });
+      if (id !== requestId.current) return;
+      setState((prev) => applyParsed(prev, parsed, DEMO_FIELDS));
+      setValidationPage(1);
+      setParsing(false);
+    },
+    []
+  );
 
   const fileActive = state.source?.kind === 'file';
 
@@ -99,20 +122,57 @@ export default function ImportWizardPage() {
   };
 
   const handleTarget = (header: string, key: string | null): string | null => {
-    const result = setTarget(state, header, key, DEMO_FIELDS);
-    if (result.error) return result.error;
-    setState(result.state);
+    const next = setTarget(state, header, key, DEMO_FIELDS);
+    if (next.error) return next.error;
+    setState(next.state);
     return null;
+  };
+
+  const handleDemo = (id: DemoDatasetId, delayMs = 0) => {
+    setResult(null);
+    setRejection(null);
+    setFilter('all');
+    setPasteNotice(null);
+    setState((prev) => ({ ...prev, step: 1 }));
+    void runParse({ kind: 'file', file: toDemoFile(DEMO_DATASETS[id]) }, delimiter, delayMs);
+  };
+
+  const handleRestart = () => {
+    requestId.current++;
+    setParsing(false);
+    setState(initialWizardState());
+    setPasteText('');
+    setPasteNotice(null);
+    setFilter('all');
+    setValidationPage(1);
+    setPolicy('skip');
+    setRejection(null);
+    setResult(null);
+  };
+
+  const handleReupload = () => {
+    handleRestart();
+  };
+
+  const handleSubmit = () => {
+    if (!state.parsed || state.parsed.error || !view) return;
+    const built = buildImportResult(state.parsed.rows, state.mapping, view.rowErrors, policy);
+    if (!built.ok) {
+      setRejection(built.reason);
+      summaryRef.current?.focus();
+      return;
+    }
+    setRejection(null);
+    setResult(built.result);
+    setLastSummary(
+      `${built.result.rows.length} baris, dilewati ${built.result.skipped}, gagal ${built.result.failed}`
+    );
   };
 
   const gate = canContinue(state, DEMO_FIELDS);
   const nextAvailable = state.step < MAX_FUNCTIONAL_STEP;
   const nextBlocked = !gate.ok || !nextAvailable;
-  const nextReason = !gate.ok
-    ? gate.reason
-    : !nextAvailable
-      ? 'Validasi menyusul pada iterasi berikutnya.'
-      : undefined;
+  const nextReason = !gate.ok ? gate.reason : undefined;
 
   const handleNext = () => {
     if (nextBlocked) {
@@ -125,13 +185,20 @@ export default function ImportWizardPage() {
   const headers = state.parsed && !state.parsed.error ? state.parsed.headers : [];
   const missing = missingRequired(state.mapping, DEMO_FIELDS);
   const stepIndex = state.step - 1;
+  const headingText = completed ? DONE_HEADING : STEP_HEADINGS[stepIndex];
+
+  const view =
+    state.parsed && !state.parsed.error
+      ? buildValidation(state.parsed.rows, state.mapping, DEMO_FIELDS)
+      : null;
+  const plan = view ? planSubmit(view.validCount, view.invalidCount, policy) : null;
 
   return (
     <div className="space-y-10 animate-in fade-in-50 duration-200">
       <PageHeader
         eyebrow="Pattern"
         title="Import Wizard CSV"
-        description="Wizard impor CSV 4 langkah: unggah atau tempel, petakan kolom, validasi, lalu konfirmasi. Langkah validasi dan konfirmasi menyusul."
+        description="Wizard impor CSV 4 langkah: unggah atau tempel, petakan kolom, validasi, lalu konfirmasi."
       />
 
       <Card className="mx-auto max-w-4xl" data-testid="iw-card">
@@ -148,7 +215,7 @@ export default function ImportWizardPage() {
             data-testid="iw-stepper"
           />
           <p className="text-xs text-muted-foreground">
-            Langkah 3–4 belum tersedia; hanya langkah selesai yang bisa diklik.
+            Langkah yang sudah terbuka bisa diklik; langkah berikutnya terbuka setelah gate lolos.
           </p>
 
           <div className="space-y-4">
@@ -157,10 +224,10 @@ export default function ImportWizardPage() {
               tabIndex={-1}
               className="text-lg font-semibold text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
             >
-              {STEP_HEADINGS[stepIndex]}
+              {headingText}
             </h2>
             <p role="status" aria-live="polite" className="sr-only" data-testid="iw-live">
-              Langkah {state.step} dari {TOTAL_STEPS}: {STEP_HEADINGS[stepIndex]}
+              Langkah {state.step} dari {TOTAL_STEPS}: {headingText}
             </p>
 
             {state.step === 1 && (
@@ -190,6 +257,37 @@ export default function ImportWizardPage() {
                 onChangeTarget={handleTarget}
               />
             )}
+
+            {state.step === 3 && view && state.parsed && (
+              <ValidationStep
+                rows={state.parsed.rows}
+                mapping={state.mapping}
+                fields={DEMO_FIELDS}
+                view={view}
+                filter={filter}
+                onFilterChange={(value) => {
+                  setFilter(value);
+                  setValidationPage(1);
+                }}
+                page={validationPage}
+                onPageChange={setValidationPage}
+                onFixMapping={() => setState((prev) => goToStep(prev, 2, DEMO_FIELDS))}
+                onReupload={handleReupload}
+              />
+            )}
+
+            {state.step === 4 && plan && (
+              <ConfirmStep
+                plan={plan}
+                policy={policy}
+                onPolicyChange={setPolicy}
+                onSubmit={handleSubmit}
+                rejection={rejection}
+                summaryRef={summaryRef}
+                result={result}
+                onRestart={handleRestart}
+              />
+            )}
           </div>
 
           {state.source && state.parsed && !state.parsed.error && (
@@ -205,36 +303,40 @@ export default function ImportWizardPage() {
             type="button"
             variant="outline"
             data-testid="iw-back"
-            disabled={state.step === 1}
+            disabled={state.step === 1 || completed}
             onClick={() => setState((prev) => goToStep(prev, prev.step - 1, DEMO_FIELDS))}
           >
             Kembali
           </Button>
-          <div className="flex flex-col items-stretch gap-2 sm:items-end">
-            {nextReason && (
-              <p
-                ref={gateReasonRef}
-                id="iw-gate-reason"
-                tabIndex={-1}
-                data-testid="iw-gate-reason"
-                className="text-xs text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+          {nextAvailable && (
+            <div className="flex flex-col items-stretch gap-2 sm:items-end">
+              {nextReason && (
+                <p
+                  ref={gateReasonRef}
+                  id="iw-gate-reason"
+                  tabIndex={-1}
+                  data-testid="iw-gate-reason"
+                  className="text-xs text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                >
+                  {nextReason}
+                </p>
+              )}
+              <Button
+                type="button"
+                data-testid="iw-next"
+                aria-disabled={nextBlocked}
+                aria-describedby={nextReason ? 'iw-gate-reason' : undefined}
+                className={nextBlocked ? 'opacity-50' : undefined}
+                onClick={handleNext}
               >
-                {nextReason}
-              </p>
-            )}
-            <Button
-              type="button"
-              data-testid="iw-next"
-              aria-disabled={nextBlocked}
-              aria-describedby={nextReason ? 'iw-gate-reason' : undefined}
-              className={nextBlocked ? 'opacity-50' : undefined}
-              onClick={handleNext}
-            >
-              {state.step === 1 ? 'Lanjut ke mapping' : 'Lanjut ke validasi'}
-            </Button>
-          </div>
+                {NEXT_LABELS[stepIndex]}
+              </Button>
+            </div>
+          )}
         </CardFooter>
       </Card>
+
+      <DemoPanel onLoad={handleDemo} lastResultSummary={lastSummary} />
     </div>
   );
 }

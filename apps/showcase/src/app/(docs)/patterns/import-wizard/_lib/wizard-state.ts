@@ -11,8 +11,8 @@ import { suggestMapping } from './mapping';
 import type { CsvParseResult, TargetField } from './types';
 
 export const TOTAL_STEPS = 4;
-/** Langkah yang fungsional di story 014-02 (1 Upload, 2 Mapping). */
-export const MAX_FUNCTIONAL_STEP = 2;
+/** Semua langkah fungsional sejak story 014-03 (1 Upload … 4 Konfirmasi). */
+export const MAX_FUNCTIONAL_STEP = TOTAL_STEPS;
 
 /** Mapping: header CSV → key field target; `null` = Abaikan. */
 export type Mapping = Record<string, string | null>;
@@ -157,7 +157,15 @@ export function canContinue(state: WizardState, fields: TargetField[]): GateResu
     }
     return { ok: true };
   }
-  return { ok: false, reason: 'Langkah ini belum tersedia.' };
+  if (state.step === 3) {
+    // Validasi tidak memblokir maju: baris gagal ditangani di konfirmasi (policy).
+    const missing = missingRequired(state.mapping, fields);
+    if (missing.length > 0) {
+      return { ok: false, reason: 'Kembali ke mapping: target wajib belum terpetakan.' };
+    }
+    return { ok: true };
+  }
+  return { ok: false, reason: 'Ini langkah terakhir.' };
 }
 
 /**
