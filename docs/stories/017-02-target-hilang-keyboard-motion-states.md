@@ -1,6 +1,6 @@
 # 017-02 — Target hilang + keyboard + motion + states
 
-Status: approved
+Status: done
 PRD: `docs/prd/017-product-tour.md` (approved, gate 1)
 Design: `docs/design/wireframes/product-tour.md` (approved, gate 2, K2/K4/K5 + §2.3/§3/§4) + `docs/design/flows/product-tour.mmd` (diagram 2–3)
 FR: `FR-003`, `FR-005`, `FR-006`, `FR-007`
@@ -41,11 +41,11 @@ Goal: Tur robust dan aksesibel tanpa showcase final: target hilang dilewati angg
 
 ## Tasks
 
-- [ ] Implementasi resolusi target tiap navigasi (K4: `offsetParent` + `getBoundingClientRect` + `visibility`; ref prioritas, selector fallback) + status `skipped-missing` + pemberitahuan teks + error semua-hilang (`alert` + fokus)
-- [ ] Implementasi alur lewati K2: progres > 1 → `feedback/alert-dialog` compose ("Lewati tur?" + [Lanjut tur][Ya, lewati]); langkah 1 langsung `onSkip`; wiring `onStepChange` status
-- [ ] Implementasi keyboard + fokus (§4): simpan pemicu, fokus judul `tabindex=-1` tiap langkah, Tab cycling footer, Esc flow 3, `inert` + `aria-hidden` belakang, kembalikan fokus saat akhir; live region polite + `role=dialog` + progress `aria-label`
-- [ ] Implementasi reduced-motion (K5): media query mematikan animasi/scroll-halus/transisi; tanpa prop tambahan
-- [ ] Test co-located: lewati 1 hilang + semua hilang, dialog hanya progres > 1, keyboard penuh tanpa mouse, fokus kembali `activeElement`, reduced-motion, tiap state + peran ARIA; tanpa dependency/token baru
+- [x] Implementasi resolusi target tiap navigasi (K4: `offsetParent` + `getBoundingClientRect` + `visibility`; ref prioritas, selector fallback) + status `skipped-missing` + pemberitahuan teks + error semua-hilang (`alert` + fokus)
+- [x] Implementasi alur lewati K2: progres > 1 → `feedback/alert-dialog` compose ("Lewati tur?" + [Lanjut tur][Ya, lewati]); langkah 1 langsung `onSkip`; wiring `onStepChange` status
+- [x] Implementasi keyboard + fokus (§4): simpan pemicu, fokus judul `tabindex=-1` tiap langkah, Tab cycling footer, Esc flow 3, `inert` + `aria-hidden` belakang, kembalikan fokus saat akhir; live region polite + `role=dialog` + progress `aria-label`
+- [x] Implementasi reduced-motion (K5): media query mematikan animasi/scroll-halus/transisi; tanpa prop tambahan
+- [x] Test co-located: lewati 1 hilang + semua hilang, dialog hanya progres > 1, keyboard penuh tanpa mouse, fokus kembali `activeElement`, reduced-motion, tiap state + peran ARIA; tanpa dependency/token baru
 
 ## Dependencies
 
