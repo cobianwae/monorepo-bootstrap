@@ -39,6 +39,7 @@ export * from './components/navigation/command-palette';
 export * from './components/form/combobox';
 export * from './components/form/tag-input';
 export * from './components/form/cascader';
+export * from './components/form/tree-select';
 export * from './components/form/transfer-list';
 export * from './components/form/date-picker';
 export * from './components/form/input-otp';

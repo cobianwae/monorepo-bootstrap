@@ -1,6 +1,6 @@
 # 008-02 — Tree select compose tree-view + showcase
 
-Status: approved
+Status: done
 Spec: `docs/design/spec-cascader-tree-select.md`
 FR: `FR-007`, `FR-008`, `FR-009`, `FR-010`, `FR-011`
 Screens: `S-005.31`
@@ -40,14 +40,14 @@ Goal: Komponen `TreeSelect` — trigger select membuka popover berisi `tree-view
 
 ## Tasks
 
-- [ ] Buat `packages/ui/src/components/form/tree-select.tsx` + tipe (single/multiple, `value`/`onChange`)
-- [ ] Trigger select + popover berisi `tree-view` existing + pilih-menutup
-- [ ] Auto-expand ancestors + mode multiple via `tag-input` (maks 3 + "+N")
-- [ ] Clearable + searchable + state loading/empty/error
-- [ ] Keyboard + ARIA setara cascader + audit a11y
-- [ ] Barrel export + test co-located (pilih-menutup, auto-expand, +N collapse, filter, clear)
-- [ ] Scenario S-005.31 bagian tree select + smoke build
-- [ ] Update BACKLOG + STATUS-LOG; sitemap S-005.31 `planned` → `implemented` (bila 008-01 sudah)
+- [x] Buat `packages/ui/src/components/form/tree-select.tsx` + tipe (single/multiple, `value`/`onChange`)
+- [x] Trigger select + popover berisi `tree-view` existing + pilih-menutup
+- [x] Auto-expand ancestors + mode multiple via `tag-input` (maks 3 + "+N")
+- [x] Clearable + searchable + state loading/empty/error
+- [x] Keyboard + ARIA setara cascader + audit a11y
+- [x] Barrel export + test co-located (pilih-menutup, auto-expand, +N collapse, filter, clear)
+- [x] Scenario S-005.31 bagian tree select + smoke build
+- [x] Update BACKLOG + STATUS-LOG; sitemap S-005.31 `planned` → `implemented` (bila 008-01 sudah)
 
 ## Dependencies
 
