@@ -118,3 +118,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Story 008-01 Cascader selesai (komponen kolom 3 tingkat + lazy/search + clearable/disabled/error + keyboard/ARIA, 9 test hijau; showcase S-005.31 + smoke build hijau; typecheck/lint hijau kecuali known issue flow-editor.test.tsx per CR-015), status `review` — `008-01`.
 - 2026-11-21 — Story 008-01 `done` (approved oleh user) — `008-01`.
 - 2026-11-21 — Story 008-02 TreeSelect selesai (trigger popover + tree-view existing, single leaf pilih-menutup, auto-expand ancestors, multiple maks 3 tag + collapse +N, clearable/searchable, state loading/empty/error; 7 test hijau; showcase S-005.31 + smoke build hijau; lint hijau, typecheck hanya gagal di known issue flow-editor.test.tsx per CR-015), status `review` — `008-02`.
+- 2026-11-21 — Story 008-02 `done` (approved oleh user) — `008-02`.

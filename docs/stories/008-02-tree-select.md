@@ -1,6 +1,6 @@
 # 008-02 — Tree select compose tree-view + showcase
 
-Status: review
+Status: done
 Spec: `docs/design/spec-cascader-tree-select.md`
 FR: `FR-007`, `FR-008`, `FR-009`, `FR-010`, `FR-011`
 Screens: `S-005.31`
