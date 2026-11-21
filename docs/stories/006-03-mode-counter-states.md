@@ -1,6 +1,6 @@
 # 006-03 — Mode + counter + state matrix
 
-Status: approved
+Status: done
 PRD: `docs/prd/006-rich-text-editor.md`
 Design: `docs/design/rich-text-editor.md`
 FR: `FR-007`, `FR-008`, `FR-011`
@@ -35,11 +35,11 @@ Goal: Placeholder/disabled/readonly + counter 10.000 (peringatan) + matrix loadi
 
 ## Tasks
 
-- [ ] Props `mode/placeholder/loading/error/onRetry/maxLength/showCounter`; hitung counter dari `getText()` di `onUpdate` (tanpa `character-count` baru)
-- [ ] Skeleton + `alert` + empty placeholder; `data-testid=rte-counter/rte-error/rte-empty`
-- [ ] Ambang 90%/100% + gaya `warning`/`destructive` + pesan teks; over-limit tidak memblokir ketik/simpan
-- [ ] Test: tiga mode, ambang counter, matrix loading/empty/error + retry, `aria-busy/describedby`
-- [ ] Showcase: sambungkan pemicu state ke draf S-005.22 (panel demo final di 006-05)
+- [x] Props `mode/placeholder/loading/error/onRetry/maxLength/showCounter`; hitung counter dari `getText()` di `onUpdate` (tanpa `character-count` baru)
+- [x] Skeleton + `alert` + empty placeholder; `data-testid=rte-counter/rte-error/rte-empty`
+- [x] Ambang 90%/100% + gaya `warning`/`destructive` + pesan teks; over-limit tidak memblokir ketik/simpan
+- [x] Test: tiga mode, ambang counter, matrix loading/empty/error + retry, `aria-busy/describedby`
+- [x] Showcase: sambungkan pemicu state ke draf S-005.22 (panel demo final di 006-05)
 
 ## Dependencies
 

@@ -27,15 +27,32 @@ import { Separator } from '../base/separator';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../base/tooltip';
 import { Popover, PopoverAnchor, PopoverContent } from '../overlay/popover';
 import { Sheet, SheetContent, SheetTitle } from '../overlay/sheet';
+import { Alert, AlertDescription, AlertTitle } from '../feedback/alert';
+import { Skeleton } from '../base/skeleton';
 import { Input } from '../base/input';
 import { Label } from '../base/label';
 import { Button } from '../base/button';
+
+export type RichTextMode = 'editable' | 'readonly' | 'disabled';
+
+function stripHtmlToLength(html: string): number {
+  if (typeof document === 'undefined') return 0;
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return (div.textContent ?? '').length;
+}
 
 export interface RichTextEditorProps {
   value: string;
   onChange?: (html: string) => void;
   onTextChange?: (text: string, stats: { chars: number; words: number }) => void;
   placeholder?: string;
+  mode?: RichTextMode;
+  loading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
+  maxLength?: number;
+  showCounter?: boolean;
   ariaLabel?: string;
   className?: string;
 }
@@ -181,11 +198,22 @@ export function RichTextEditor({
   onChange,
   onTextChange,
   placeholder = 'Tulis sesuatu…',
+  mode = 'editable',
+  loading = false,
+  error = null,
+  onRetry,
+  maxLength = 10000,
+  showCounter = true,
   ariaLabel = 'Rich text editor',
   className,
 }: RichTextEditorProps) {
   const [, bump] = React.useReducer((x: number) => x + 1, 0);
   const [announce, setAnnounce] = React.useState('');
+  // Counter dihitung dari teks polos (getText); nilai awal diderivasi dari
+  // HTML agar tidak flash 0 — onCreate/onUpdate mengoreksi dari editor.
+  const [chars, setChars] = React.useState(() => stripHtmlToLength(value));
+  const overAnnouncedRef = React.useRef(false);
+  const counterId = React.useId();
   const [linkOpen, setLinkOpen] = React.useState(false);
   const [linkUrl, setLinkUrl] = React.useState('');
   const [linkError, setLinkError] = React.useState<string | null>(null);
@@ -202,7 +230,13 @@ export function RichTextEditor({
     onTextChangeRef.current = onTextChange;
   }, [onTextChange]);
 
+  const isDisabled = mode === 'disabled';
+  const isReadOnly = mode === 'readonly';
+  const hasError = error !== null && error !== '';
+  const nonEditable = isDisabled || isReadOnly || loading || hasError;
+
   const editor = useEditor({
+    editable: !nonEditable,
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
@@ -219,12 +253,19 @@ export function RichTextEditor({
       attributes: {
         class: cn(proseVariants(), 'min-h-[160px] w-full px-3 py-2 focus:outline-none'),
         'aria-label': ariaLabel,
+        'aria-describedby': counterId,
+        ...(isDisabled ? { 'aria-disabled': 'true' } : null),
+        ...(isReadOnly ? { 'aria-readonly': 'true' } : null),
       },
+    },
+    onCreate: ({ editor: e }) => {
+      setChars(e.getText().length);
     },
     onUpdate: ({ editor: e }) => {
       onChangeRef.current?.(e.getHTML());
       const text = e.getText();
       const trimmed = text.trim();
+      setChars(text.length);
       onTextChangeRef.current?.(text, {
         chars: text.length,
         words: trimmed ? trimmed.split(/\s+/).length : 0,
@@ -241,8 +282,42 @@ export function RichTextEditor({
     const current = editor.getHTML();
     if (value !== current) {
       editor.commands.setContent(value, { emitUpdate: false });
+      setChars(editor.getText().length);
     }
   }, [value, editor]);
+
+  React.useEffect(() => {
+    if (!editor || editor.isDestroyed) return;
+    const next = !nonEditable;
+    // Guard: setEditable memancarkan event update (→ onChange palsu),
+    // jadi hanya panggil saat status editable benar-benar berubah.
+    if (editor.isEditable !== next) {
+      editor.setEditable(next);
+    }
+    // Disabled dilewati fokus; readonly tetap bisa dibaca SR.
+    try {
+      if (isDisabled) {
+        editor.view.dom.setAttribute('tabindex', '-1');
+      } else {
+        editor.view.dom.removeAttribute('tabindex');
+      }
+    } catch {
+      // Best-effort: DOM belum siap saat teardown.
+    }
+  }, [editor, nonEditable, isDisabled]);
+
+  const counterStatus = chars > maxLength ? 'over' : chars >= 0.9 * maxLength ? 'near' : 'normal';
+  const overBy = chars - maxLength;
+
+  React.useEffect(() => {
+    if (counterStatus === 'over' && !overAnnouncedRef.current) {
+      overAnnouncedRef.current = true;
+      setAnnounce(`Melewati batas ${overBy} karakter`);
+    }
+    if (counterStatus !== 'over') {
+      overAnnouncedRef.current = false;
+    }
+  }, [counterStatus, overBy]);
 
   const populateLinkState = React.useCallback(() => {
     const href = (editor?.getAttributes('link')?.href as string | undefined) ?? '';
@@ -255,7 +330,7 @@ export function RichTextEditor({
 
   const openLinkPopover = React.useCallback(
     (presetHref?: string) => {
-      if (!editor) return;
+      if (!editor || nonEditable) return;
       if (presetHref !== undefined) {
         openedHrefRef.current = presetHref;
         setIsEditingLink(true);
@@ -267,7 +342,7 @@ export function RichTextEditor({
       populateLinkState();
       setLinkOpen(true);
     },
-    [editor, populateLinkState]
+    [editor, nonEditable, populateLinkState]
   );
 
   const handleLinkOpenChange = React.useCallback(
@@ -406,6 +481,7 @@ export function RichTextEditor({
           type="button"
           aria-label="Tautan (Ctrl+K)"
           aria-pressed={isLinkActive}
+          disabled={nonEditable}
           onClick={() => openLinkPopover()}
           data-testid="rte-button-link"
           className={cn(TOOLBAR_BUTTON_CLASSES, isLinkActive ? TOOLBAR_ACTIVE_CLASSES : TOOLBAR_IDLE_CLASSES)}
@@ -511,29 +587,64 @@ export function RichTextEditor({
       ]
     : [];
 
+  const isEmpty = chars === 0 && !loading && !hasError;
+
+  const counterClass =
+    counterStatus === 'over'
+      ? 'text-destructive'
+      : counterStatus === 'near'
+        ? 'text-warning'
+        : 'text-muted-foreground';
+
+  const loadingSkeleton = (
+    <div aria-busy="true" data-testid="rte-loading">
+      <div className="flex flex-wrap items-center gap-1 border-b border-border/60 p-2" aria-hidden="true">
+        <Skeleton className="h-8 w-24" />
+        <Skeleton className="h-8 w-32" />
+        <Skeleton className="ml-auto h-8 w-16" />
+      </div>
+      <div className="space-y-2 p-3" aria-hidden="true">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
+        <Skeleton className="h-24 w-full" />
+      </div>
+      <span className="sr-only">Memuat editor…</span>
+    </div>
+  );
+
   return (
     <TooltipProvider delayDuration={0}>
-    <div className={cn('w-full overflow-hidden rounded-md border border-border bg-card', className)}>
+    <div
+      className={cn('w-full overflow-hidden rounded-md border border-border bg-card', className)}
+      aria-busy={loading || undefined}
+    >
+      {loading ? (
+        loadingSkeleton
+      ) : (
+      <>
+      {isReadOnly ? null : (
       <div
         role="toolbar"
         aria-label="Format teks"
+        aria-disabled={isDisabled || undefined}
         data-testid="rte-toolbar"
         className="flex flex-wrap items-center gap-1 border-b border-border/60 bg-card p-2"
       >
         <div className="flex items-center gap-0.5">
           {inlineTools.map((tool) => (
-            <ToolbarButton key={tool.name} {...tool} />
+            <ToolbarButton key={tool.name} {...tool} disabled={nonEditable || undefined} />
           ))}
         </div>
         <Separator orientation="vertical" className="mx-1 h-5" decorative />
         <div className="flex items-center gap-0.5">
           {blockTools.map((tool) => (
-            <ToolbarButton key={tool.name} {...tool} />
+            <ToolbarButton key={tool.name} {...tool} disabled={nonEditable || undefined} />
           ))}
         </div>
         <Separator orientation="vertical" className="mx-1 h-5" decorative />
         {isMobile ? (
-          <Sheet open={linkOpen} onOpenChange={handleLinkOpenChange}>
+          <Sheet open={linkOpen && !nonEditable} onOpenChange={handleLinkOpenChange}>
             {linkControl}
             <SheetContent
               side="bottom"
@@ -547,7 +658,7 @@ export function RichTextEditor({
             </SheetContent>
           </Sheet>
         ) : (
-          <Popover open={linkOpen} onOpenChange={handleLinkOpenChange}>
+          <Popover open={linkOpen && !nonEditable} onOpenChange={handleLinkOpenChange}>
             <PopoverAnchor asChild>
               <span className="inline-flex">{linkControl}</span>
             </PopoverAnchor>
@@ -570,7 +681,7 @@ export function RichTextEditor({
               <button
                 type="button"
                 aria-label="Urungkan (Ctrl+Z)"
-                disabled={!canUndo}
+                disabled={!canUndo || nonEditable}
                 onClick={handleUndo}
                 data-testid="rte-button-undo"
                 className={cn(TOOLBAR_BUTTON_CLASSES, TOOLBAR_IDLE_CLASSES)}
@@ -585,7 +696,7 @@ export function RichTextEditor({
               <button
                 type="button"
                 aria-label="Ulangi (Ctrl+Shift+Z)"
-                disabled={!canRedo}
+                disabled={!canRedo || nonEditable}
                 onClick={handleRedo}
                 data-testid="rte-button-redo"
                 className={cn(TOOLBAR_BUTTON_CLASSES, TOOLBAR_IDLE_CLASSES)}
@@ -597,12 +708,65 @@ export function RichTextEditor({
           </Tooltip>
         </div>
       </div>
-      <div data-testid="rte-content" className="min-h-[160px]">
+      )}
+      {hasError ? (
+        <div className="p-3">
+          <Alert variant="destructive" data-testid="rte-error">
+            <AlertTitle>Gagal memuat konten</AlertTitle>
+            <AlertDescription className="flex flex-wrap items-center gap-2">
+              <span>{error}</span>
+              {onRetry ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  data-testid="rte-error-retry"
+                  onClick={onRetry}
+                >
+                  Coba lagi
+                </Button>
+              ) : null}
+            </AlertDescription>
+          </Alert>
+        </div>
+      ) : null}
+      <div
+        data-testid="rte-content"
+        className={cn('min-h-[160px]', counterStatus === 'over' && 'rounded-sm ring-1 ring-destructive/50')}
+      >
         <EditorContent editor={editor} />
       </div>
+      {isEmpty ? (
+        <p data-testid="rte-empty" className="px-3 pb-1 text-xs text-muted-foreground">
+          Editor kosong — mulai mengetik atau pilih format.
+        </p>
+      ) : null}
+      {showCounter ? (
+        <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border/60 bg-card px-3 py-1.5">
+          {counterStatus === 'near' ? (
+            <span className="text-xs text-warning">mendekati batas</span>
+          ) : null}
+          {counterStatus === 'over' ? (
+            <p role="alert" data-testid="rte-counter-alert" className="text-xs text-destructive">
+              melewati batas {overBy} karakter
+            </p>
+          ) : null}
+          <p
+            id={counterId}
+            data-testid="rte-counter"
+            role="status"
+            aria-live="polite"
+            className={cn('text-xs tabular-nums', counterClass)}
+          >
+            {chars}/{maxLength}
+          </p>
+        </div>
+      ) : null}
       <div aria-live="polite" role="status" data-testid="rte-live" className="sr-only">
         {announce}
       </div>
+      </>
+      )}
     </div>
     </TooltipProvider>
   );

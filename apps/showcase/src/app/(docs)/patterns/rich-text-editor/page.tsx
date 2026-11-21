@@ -117,6 +117,10 @@ export default function RichTextEditorPage() {
   const [wordCount, setWordCount] = React.useState(0);
   const [draftValue, setDraftValue] = React.useState(DRAFT_CONTENT);
   const [draftWords, setDraftWords] = React.useState(0);
+  const [draftMode, setDraftMode] = React.useState<'editable' | 'readonly' | 'disabled'>('editable');
+  const [draftLoading, setDraftLoading] = React.useState(false);
+  const [draftError, setDraftError] = React.useState<string | null>(null);
+  const [draftMaxLength, setDraftMaxLength] = React.useState(10000);
 
   React.useEffect(() => {
     const t = setTimeout(() => setIsMounted(true), 400);
@@ -216,7 +220,47 @@ export default function RichTextEditorPage() {
             value={draftValue}
             onChange={setDraftValue}
             onTextChange={(_text, stats) => setDraftWords(stats.words)}
+            mode={draftMode}
+            loading={draftLoading}
+            error={draftError}
+            onRetry={() => setDraftError(null)}
+            maxLength={draftMaxLength}
           />
+          {/* Panel pemicu state 006-03 — panel demo final di 006-05 */}
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Mode:</span>
+            {(['editable', 'readonly', 'disabled'] as const).map((mode) => (
+              <Button
+                key={mode}
+                variant={draftMode === mode ? 'highlight' : 'outline'}
+                size="sm"
+                onClick={() => setDraftMode(mode)}
+              >
+                {mode}
+              </Button>
+            ))}
+            <span className="text-muted-foreground">State:</span>
+            <Button variant="outline" size="sm" onClick={() => { setDraftLoading(true); window.setTimeout(() => setDraftLoading(false), 1500); }}>
+              loading 1,5 dtk
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => { setDraftValue(''); setDraftError(null); }}>
+              empty
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setDraftError('Konten gagal dimuat') }>
+              error
+            </Button>
+            <span className="text-muted-foreground">Counter:</span>
+            <Button variant="outline" size="sm" onClick={() => setDraftMaxLength(10000)}>
+              10.000
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setDraftMaxLength(50)}>
+              batas 50 (uji ambang)
+            </Button>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Counter = teks polos (<code className="font-mono">getText()</code>); selisih 1–2 char vs HTML
+            entity wajar. Over-limit = peringatan, bukan blokir.
+          </p>
         </CardContent>
       </Card>
 

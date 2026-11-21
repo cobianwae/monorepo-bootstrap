@@ -293,3 +293,101 @@ describe('RichTextEditor 006-02 link + shortcut + keyboard', () => {
     expect(last).toContain('<strong>');
   });
 });
+
+describe('RichTextEditor 006-03 mode + counter + states', () => {
+  it('renders placeholder + empty hint, disabled, and readonly variants', async () => {
+    const { unmount } = render(<RichTextEditor value="" />);
+    await waitFor(() => {
+      expect(screen.getByTestId('rte-empty')).toBeDefined();
+    });
+    expect(screen.getByTestId('rte-counter')).toBeDefined();
+    unmount();
+
+    const { unmount: unmountDisabled } = render(
+      <RichTextEditor value="<p>Nilai tetap terlihat</p>" mode="disabled" />
+    );
+    const toolbar = await screen.findByTestId('rte-toolbar');    expect(toolbar.getAttribute('aria-disabled')).toBe('true');
+    const buttons = screen.getAllByTestId(/^rte-button-/);
+    for (const button of buttons) {
+      expect((button as HTMLButtonElement).disabled).toBe(true);
+    }
+    await waitFor(() => {
+      expect(screen.getByTestId('rte-content').textContent ?? '').toContain('Nilai tetap terlihat');
+    });
+    unmountDisabled();
+
+    const { unmount: unmountReadonly } = render(
+      <RichTextEditor value="<p>Konten baca</p>" mode="readonly" />
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('rte-content').textContent ?? '').toContain('Konten baca');
+    });
+    // Readonly menyembunyikan toolbar tetapi konten tetap terbaca SR.
+    expect(screen.queryByTestId('rte-toolbar')).toBeNull();
+    unmountReadonly();
+  });
+
+  it('warns at 90% and alerts over 100% without blocking typing', async () => {
+    const { unmount: unmountNear } = render(
+      <RichTextEditor value="<p>123456789</p>" maxLength={10} showCounter />
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId('rte-counter').textContent).toContain('9/10');
+    });
+    const counter = screen.getByTestId('rte-counter');
+    // 90% = gaya warning + teks "mendekati batas"
+    expect(counter.className).toContain('text-warning');
+    expect(screen.getByText('mendekati batas')).toBeDefined();
+    unmountNear();
+
+    const { unmount } = render(
+      <RichTextEditor value="<p>123456789012</p>" maxLength={10} showCounter />
+    );
+    const alert = await screen.findByTestId('rte-counter-alert');
+    expect(alert.getAttribute('role')).toBe('alert');
+    expect(alert.textContent).toContain('melewati batas 2 karakter');
+    // Mengetik tetap boleh: editor tetap editable saat over-limit.
+    const editable = await waitFor(() => {
+      const contents = screen.getAllByTestId('rte-content');
+      const found = contents[contents.length - 1]?.querySelector('[contenteditable="true"]');
+      expect(found).not.toBeNull();
+      return found as HTMLElement;
+    });
+    expect(editable.getAttribute('contenteditable')).toBe('true');
+    unmount();
+  });
+
+  it('shows loading skeleton with aria-busy and SR text', async () => {
+    render(<RichTextEditor value="<p>Halo</p>" loading />);
+    const skeleton = await screen.findByTestId('rte-loading');
+    expect(skeleton.getAttribute('aria-busy')).toBe('true');
+    expect(screen.getByText('Memuat editor…')).toBeDefined();
+    // Toolbar + counter disembunyikan saat loading.
+    expect(screen.queryByTestId('rte-toolbar')).toBeNull();
+    expect(screen.queryByTestId('rte-counter')).toBeNull();
+  });
+
+  it('shows error alert with retry and keeps content out of edit mode', async () => {
+    const onRetry = vi.fn();
+    render(
+      <RichTextEditor value="<p>Data terakhir</p>" error="Konten gagal dimuat" onRetry={onRetry} />
+    );
+    const alert = await screen.findByTestId('rte-error');
+    expect(alert.getAttribute('role')).toBe('alert');
+    expect(alert.textContent).toContain('Konten gagal dimuat');
+    fireEvent.click(screen.getByTestId('rte-error-retry'));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('wires counter a11y: describedby + polite status, disabled skipped from focus', async () => {
+    render(<RichTextEditor value="<p>Halo</p>" mode="disabled" />);
+    const counter = await screen.findByTestId('rte-counter');
+    expect(counter.getAttribute('role')).toBe('status');
+    expect(counter.getAttribute('aria-live')).toBe('polite');
+    const describedBy = counter.getAttribute('id');
+    expect(describedBy).not.toBeNull();
+    const editable = screen.getByTestId('rte-content').querySelector('[contenteditable]');
+    expect(editable?.getAttribute('contenteditable')).toBe('false');
+    expect(editable?.getAttribute('aria-describedby')).toBe(describedBy);
+  });
+});
