@@ -1,6 +1,6 @@
 # 017-01 — Fondasi wrapper + navigasi + callback
 
-Status: review
+Status: done
 PRD: `docs/prd/017-product-tour.md` (approved, gate 1)
 Design: `docs/design/wireframes/product-tour.md` (approved, gate 2, K1/K3/K4/K6 + §2.1/§2.2/§2.4) + `docs/design/flows/product-tour.mmd` (diagram 1–2) + sitemap `S-005.20`
 FR: `FR-001`, `FR-002`, `FR-004`
