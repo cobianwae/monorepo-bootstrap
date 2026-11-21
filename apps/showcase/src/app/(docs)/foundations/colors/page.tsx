@@ -21,6 +21,7 @@ import { ShieldCheck, Check, Copy, Sparkles, Palette, ArrowRight } from 'lucide-
 import Link from 'next/link';
 import { Button } from '@ds/ui';
 import { PageHeader } from '@ds/ui';
+import { SectionHeading } from '@/components/section-heading';
 
 export default function ColorsPage() {
   const tokenPairs = React.useMemo(() => auditSemanticTokenPairs(), []);
@@ -69,10 +70,10 @@ export default function ColorsPage() {
       />
 
       {/* Live Custom Contrast Checker Playground */}
-      <Card className="border-primary/30 bg-primary/5">
+      <Card className="border-highlight/30 bg-highlight/5">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
+            <Sparkles className="h-5 w-5 text-highlight" />
             <CardTitle className="text-base">Live Interactive Contrast Checker</CardTitle>
           </div>
           <CardDescription>
@@ -131,7 +132,7 @@ export default function ColorsPage() {
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                <div className="rounded-lg bg-foreground/15 backdrop-blur-xs px-3 py-1.5 text-center text-foreground font-mono">
+                <div className="rounded-lg bg-current/10 backdrop-blur-xs px-3 py-1.5 text-center font-mono">
                   <span className="block text-xs uppercase tracking-wider">Ratio</span>
                   <span className="text-lg font-bold">{customRatio.ratioFormatted}</span>
                 </div>
@@ -152,9 +153,7 @@ export default function ColorsPage() {
 
       {/* Audited Semantic Pair Contrast Matrix */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-foreground">
-          Audited Semantic Token Pairs
-        </h2>
+        <SectionHeading title="Audited Semantic Token Pairs" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {tokenPairs.map((pair) => (
@@ -192,9 +191,7 @@ export default function ColorsPage() {
 
       {/* Token Palette Reference */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-foreground">
-          Semantic Color Tokens Catalog
-        </h2>
+        <SectionHeading title="Semantic Color Tokens Catalog" />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {COLOR_TOKENS.map((token) => (
@@ -202,7 +199,7 @@ export default function ColorsPage() {
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold text-sm text-foreground">{token.name}</span>
-                  <Badge variant="outline" className="text-[10px] uppercase font-mono">
+                  <Badge variant="outline" className="text-xs uppercase font-mono">
                     {token.category}
                   </Badge>
                 </div>
@@ -214,7 +211,7 @@ export default function ColorsPage() {
                       className="h-12 w-full rounded-md border border-border shadow-xs"
                       style={{ backgroundColor: token.lightHex }}
                     />
-                    <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>Light</span>
                       <button
                         onClick={() => copyToClipboard(token.lightHex, `${token.variable}-light`)}
@@ -235,7 +232,7 @@ export default function ColorsPage() {
                       className="h-12 w-full rounded-md border border-border shadow-xs"
                       style={{ backgroundColor: token.darkHex }}
                     />
-                    <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>Dark</span>
                       <button
                         onClick={() => copyToClipboard(token.darkHex, `${token.variable}-dark`)}
@@ -256,7 +253,7 @@ export default function ColorsPage() {
                   {token.description}
                 </p>
 
-                <div className="flex items-center justify-between pt-1 border-t border-border/50 text-[11px] font-mono text-muted-foreground">
+                <div className="flex items-center justify-between pt-1 border-t border-border/50 text-xs font-mono text-muted-foreground">
                   <span>{token.variable}</span>
                 </div>
               </CardContent>

@@ -23,12 +23,16 @@ import {
   Sparkles,
   Check,
   ShieldCheck,
+  ShieldAlert,
   ArrowRight,
   Code2,
   Eye,
   Wand2,
+  Layers,
+  Palette,
 } from 'lucide-react';
 import { PageHeader, useTheme } from '@ds/ui';
+import { SectionHeading } from '@/components/section-heading';
 
 export default function ThemesPage() {
   const { palette, setPalette, resolvedTheme, artDirection, setArtDirection } = useTheme();
@@ -42,6 +46,11 @@ export default function ThemesPage() {
     () => auditThemeTokenPairs(palette),
     [palette]
   );
+
+  // Klaim kepatuhan dihitung dari audit, bukan ditulis tangan.
+  const aaFailureCount = activeAuditedPairs.filter((pair) => !pair.compliance.passAA).length;
+  const allPassAA = aaFailureCount === 0;
+  const minRatio = Math.min(...activeAuditedPairs.map((pair) => pair.compliance.ratio));
 
   return (
     <div className="space-y-10 animate-in fade-in-50 duration-200">
@@ -95,9 +104,15 @@ export default function ThemesPage() {
                 Tone: <span className="text-foreground font-semibold">{activeThemeDef.name}</span>
               </div>
               <div className="h-3 w-px bg-border" />
-              <div className="flex items-center gap-1 text-success font-semibold">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                <span>100% WCAG AA Passing</span>
+              <div
+                className={`flex items-center gap-1 font-semibold ${allPassAA ? 'text-success' : 'text-destructive'}`}
+              >
+                {allPassAA ? <ShieldCheck className="h-3.5 w-3.5" /> : <ShieldAlert className="h-3.5 w-3.5" />}
+                <span>
+                  {allPassAA
+                    ? `100% WCAG AA Passing (${activeAuditedPairs.length} pairs)`
+                    : `${aaFailureCount} of ${activeAuditedPairs.length} pairs below AA`}
+                </span>
               </div>
             </div>
           </div>
@@ -129,7 +144,7 @@ export default function ThemesPage() {
 
               <div className="flex items-center justify-between rounded-lg bg-card border border-border p-2.5 text-xs">
                 <span className="text-muted-foreground">Badge accent:</span>
-                <Badge variant="highlight" className="text-[10px] px-2 py-0.5">
+                <Badge variant="highlight" className="text-xs px-2 py-0.5">
                   {activeThemeDef.name} Style
                 </Badge>
               </div>
@@ -140,14 +155,15 @@ export default function ThemesPage() {
 
       {/* 3 Art Directions */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold tracking-tight text-foreground font-display">
-            Art Direction Library
-          </h3>
-          <span className="text-xs text-muted-foreground font-mono">
-            Click to switch direction
-          </span>
-        </div>
+        <SectionHeading
+          icon={Layers}
+          title="Art Direction Library"
+          actions={
+            <span className="text-xs text-muted-foreground font-mono">
+              Click to switch direction
+            </span>
+          }
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {ART_DIRECTIONS.map((dir) => {
@@ -198,11 +214,11 @@ export default function ThemesPage() {
                     {dir.description}
                   </p>
                   <div className="space-y-2 border-t border-border pt-3">
-                    <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Typography</span>
+                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-muted-foreground">Typography</span>
                     <p className="text-xs font-mono">{dir.typography.googleFont}</p>
                   </div>
                   <div className="space-y-2 border-t border-border pt-3">
-                    <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">Motifs</span>
+                    <span className="text-xs font-mono font-semibold uppercase tracking-wider text-muted-foreground">Motifs</span>
                     <ul className="text-xs text-muted-foreground list-disc pl-4 space-y-1">
                       {dir.art.signature.map((s, i) => (
                         <li key={i}>{s}</li>
@@ -218,11 +234,7 @@ export default function ThemesPage() {
       
       {/* Color Tones for Active Art Direction */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold tracking-tight text-foreground font-display">
-            Color Tones for {activeDirectionDef.name}
-          </h3>
-        </div>
+        <SectionHeading icon={Palette} title={`Color Tones for ${activeDirectionDef.name}`} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {activeTones.map((theme) => {
@@ -267,7 +279,7 @@ export default function ThemesPage() {
                         <CardTitle className="text-base font-display flex items-center gap-2">
                           {theme.name}
                           {isSelected && (
-                            <Badge variant="highlight" className="text-[10px] px-2 py-0.5 font-mono">
+                            <Badge variant="highlight" className="text-xs px-2 py-0.5 font-mono">
                               Active
                             </Badge>
                           )}
@@ -305,10 +317,10 @@ export default function ThemesPage() {
                   </p>
 
                   {/* Swatch chips */}
-                  <div className="grid grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
+                  <div className="grid grid-cols-3 gap-2 pt-1 font-mono text-xs">
                     <div className="rounded-md border border-border/80 p-2 space-y-1">
                       <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground text-[10px]">Primary</span>
+                        <span className="text-muted-foreground text-xs">Primary</span>
                         <span
                           className="h-2.5 w-2.5 rounded-full"
                           style={{ backgroundColor: primaryHex }}
@@ -319,7 +331,7 @@ export default function ThemesPage() {
 
                     <div className="rounded-md border border-border/80 p-2 space-y-1">
                       <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground text-[10px]">Highlight</span>
+                        <span className="text-muted-foreground text-xs">Highlight</span>
                         <span
                           className="h-2.5 w-2.5 rounded-full"
                           style={{ backgroundColor: highlightHex }}
@@ -330,7 +342,7 @@ export default function ThemesPage() {
 
                     <div className="rounded-md border border-border/80 p-2 space-y-1">
                       <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground text-[10px]">Surface</span>
+                        <span className="text-muted-foreground text-xs">Surface</span>
                         <span
                           className="h-2.5 w-2.5 rounded-full"
                           style={{ backgroundColor: surfaceHex }}
@@ -358,9 +370,15 @@ export default function ThemesPage() {
                 Mathematical WCAG 2.1 ratio audit for all semantic pairs in the {activeThemeDef.name} tone.
               </CardDescription>
             </div>
-            <div className="flex items-center gap-1.5 rounded-md bg-success/10 border border-success/30 px-2.5 py-1 text-xs text-success font-semibold">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              <span>All Pairs ≥ 4.5:1</span>
+            <div
+              className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-semibold ${
+                allPassAA
+                  ? 'bg-success/10 border-success/30 text-success'
+                  : 'bg-destructive/10 border-destructive/30 text-destructive'
+              }`}
+            >
+              {allPassAA ? <ShieldCheck className="h-3.5 w-3.5" /> : <ShieldAlert className="h-3.5 w-3.5" />}
+              <span>{allPassAA ? 'All Pairs ≥ 4.5:1' : `Lowest ratio ${minRatio.toFixed(2)}:1`}</span>
             </div>
           </div>
         </CardHeader>
@@ -410,7 +428,7 @@ export default function ThemesPage() {
                     <td className="py-2.5 text-right">
                       <Badge
                         variant={pair.compliance.passAAA ? 'default' : 'secondary'}
-                        className={`text-[10px] px-2 py-0 ${
+                        className={`text-xs px-2 py-0 ${
                           pair.compliance.passAAA
                             ? 'bg-success text-success-foreground'
                             : 'bg-primary/20 text-primary border-primary/30'

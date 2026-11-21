@@ -4,6 +4,7 @@ import { BREAKPOINT_TOKENS, Z_INDEX_TOKENS } from '@ds/tokens';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Badge, Banner } from '@ds/ui';
 import { MonitorSmartphone, Layers } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
+import { SectionHeading } from '@/components/section-heading';
 
 const RESPONSIVE_PATTERNS = [
   {
@@ -53,15 +54,11 @@ export default function BreakpointsPage() {
 
       {/* Breakpoint Scale */}
       <section id="scale" className="space-y-4 scroll-mt-20">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <MonitorSmartphone className="h-6 w-6 text-highlight" />
-            <span>Breakpoint Scale</span>
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Each token represents the minimum viewport width where the modifier applies.
-          </p>
-        </div>
+        <SectionHeading
+          icon={MonitorSmartphone}
+          title="Breakpoint Scale"
+          description="Each token represents the minimum viewport width where the modifier applies."
+        />
 
         <div className="space-y-3">
           {BREAKPOINT_TOKENS.map((bp) => {
@@ -73,7 +70,7 @@ export default function BreakpointsPage() {
                   <span className="w-24 shrink-0 font-mono text-xs text-muted-foreground">{bp.value}</span>
                   <div className="h-6 flex-1 rounded-md bg-muted/60 overflow-hidden">
                     <div
-                      className="h-full rounded-md bg-primary/20 border-r-2 border-primary flex items-center px-2 text-[10px] font-mono text-primary"
+                      className="h-full rounded-md bg-highlight/20 border-r-2 border-highlight flex items-center px-2 text-xs font-mono text-foreground"
                       style={{ width: `${pct}%` }}
                     >
                       ≤{bp.px}px
@@ -88,15 +85,11 @@ export default function BreakpointsPage() {
 
       {/* Responsive Patterns */}
       <section id="patterns" className="space-y-4 scroll-mt-20">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Layers className="h-6 w-6 text-highlight" />
-            <span>Responsive Composition Patterns</span>
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Standard recipes for grids, spacing, and tables that adapt gracefully across breakpoints.
-          </p>
-        </div>
+        <SectionHeading
+          icon={Layers}
+          title="Responsive Composition Patterns"
+          description="Standard recipes for grids, spacing, and tables that adapt gracefully across breakpoints."
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {RESPONSIVE_PATTERNS.map((pattern) => (
@@ -111,7 +104,7 @@ export default function BreakpointsPage() {
                     <div key={i} className="h-10 rounded-md bg-muted/40 border border-border/60" />
                   ))}
                 </div>
-                <div className="rounded-lg bg-muted/40 p-3 font-mono text-[10px] text-muted-foreground overflow-x-auto">
+                <div className="rounded-lg bg-muted/40 p-3 font-mono text-xs text-muted-foreground overflow-x-auto">
                   <pre>{pattern.cls}</pre>
                 </div>
               </CardContent>
@@ -122,15 +115,11 @@ export default function BreakpointsPage() {
 
       {/* Z-Index Scale */}
       <section id="z-index" className="space-y-4 scroll-mt-20">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Layers className="h-6 w-6 text-highlight" />
-            <span>Z-Index Scale</span>
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            A disciplined stacking order prevents overlay collisions. Components must not invent ad-hoc z-values.
-          </p>
-        </div>
+        <SectionHeading
+          icon={Layers}
+          title="Z-Index Scale"
+          description="A disciplined stacking order prevents overlay collisions. Components must not invent ad-hoc z-values."
+        />
 
         <Card className="border-border">
           <CardContent className="p-6 overflow-x-auto">

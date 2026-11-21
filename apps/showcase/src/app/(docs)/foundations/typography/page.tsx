@@ -12,9 +12,12 @@ import {
   Label,
   Badge,
   Prose,
+  SegmentedControl,
+  SegmentedControlItem,
 } from '@ds/ui';
-import { BookOpen, Sliders } from 'lucide-react';
+import { BookOpen, Sliders, Ruler, LayoutTemplate, ScrollText } from 'lucide-react';
 import { PageHeader, useTheme } from '@ds/ui';
+import { SectionHeading } from '@/components/section-heading';
 
 const PAIRING_EXAMPLES = [
   {
@@ -146,7 +149,7 @@ export default function TypographyPage() {
                     <CardTitle className="text-xl font-bold tracking-tight text-foreground truncate max-w-[160px] sm:max-w-xs">
                       {family.name}
                     </CardTitle>
-                    <Badge variant="secondary" className="font-mono text-[10px] shrink-0">
+                    <Badge variant="secondary" className="font-mono text-xs shrink-0">
                       Variable Font
                     </Badge>
                   </div>
@@ -156,7 +159,7 @@ export default function TypographyPage() {
                 </div>
               </div>
               <div className="mt-3 text-left font-mono text-xs text-muted-foreground">
-                <code className="bg-muted/80 px-2 py-1 rounded text-[10px] sm:text-[11px] text-foreground">
+                <code className="bg-muted/80 px-2 py-1 rounded text-xs text-foreground">
                   {family.variable}
                 </code>
               </div>
@@ -209,10 +212,10 @@ export default function TypographyPage() {
       </div>
 
       {/* Interactive Typography Preview Playground */}
-      <Card className="border-primary/30 bg-primary/5 shadow-xs">
+      <Card className="border-highlight/30 bg-highlight/5 shadow-xs">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-2">
-            <Sliders className="h-4 w-4 text-primary" />
+            <Sliders className="h-4 w-4 text-highlight" />
             <CardTitle className="text-base">Interactive Specimen Tester</CardTitle>
           </div>
           <CardDescription className="text-xs">
@@ -234,51 +237,44 @@ export default function TypographyPage() {
 
             <div className="space-y-2">
               <Label>Preview Role</Label>
-              <div className="flex rounded-lg border border-border bg-card p-1">
+              <SegmentedControl
+                type="single"
+                aria-label="Preview Role"
+                value={selectedRole}
+                onValueChange={(next) => {
+                  if (next) setSelectedRole(next as 'display' | 'body' | 'mono');
+                }}
+                className="w-full"
+              >
                 {[
                   { label: 'Display', value: 'display' },
                   { label: 'Body', value: 'body' },
                   { label: 'Mono', value: 'mono' },
                 ].map((item) => (
-                  <button
-                    key={item.value}
-                    type="button"
-                    onClick={() => setSelectedRole(item.value as 'display' | 'body' | 'mono')}
-                    className={`flex-1 rounded-md py-1 text-xs font-mono font-medium transition-colors ${
-                      selectedRole === item.value
-                        ? 'bg-primary text-primary-foreground shadow-xs'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
+                  <SegmentedControlItem key={item.value} value={item.value} className="flex-1 font-mono text-xs">
                     {item.label}
-                  </button>
+                  </SegmentedControlItem>
                 ))}
-              </div>
+              </SegmentedControl>
             </div>
 
             <div className="space-y-2">
               <Label>Active Weight</Label>
-              <div className="flex rounded-lg border border-border bg-card p-1">
-                {[
-                  { label: '400', value: '400' },
-                  { label: '500', value: '500' },
-                  { label: '600', value: '600' },
-                  { label: '700', value: '700' },
-                ].map((item) => (
-                  <button
-                    key={item.value}
-                    type="button"
-                    onClick={() => setSelectedWeight(item.value)}
-                    className={`flex-1 rounded-md py-1 text-xs font-mono font-medium transition-colors ${
-                      selectedWeight === item.value
-                        ? 'bg-primary text-primary-foreground shadow-xs'
-                        : 'text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
+              <SegmentedControl
+                type="single"
+                aria-label="Active Weight"
+                value={selectedWeight}
+                onValueChange={(next) => {
+                  if (next) setSelectedWeight(next);
+                }}
+                className="w-full"
+              >
+                {['400', '500', '600', '700'].map((weight) => (
+                  <SegmentedControlItem key={weight} value={weight} className="flex-1 font-mono text-xs">
+                    {weight}
+                  </SegmentedControlItem>
                 ))}
-              </div>
+              </SegmentedControl>
             </div>
           </div>
         </CardContent>
@@ -286,29 +282,32 @@ export default function TypographyPage() {
 
       {/* Structured Scale Specimen List */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-foreground">Typographic Hierarchy Scale</h2>
-          <span className="font-mono text-xs text-muted-foreground">
-            8 Proportional Steps
-          </span>
-        </div>
+        <SectionHeading
+          icon={Ruler}
+          title="Typographic Hierarchy Scale"
+          actions={
+            <span className="font-mono text-xs text-muted-foreground">
+              {TYPOGRAPHY_SCALE.length} Proportional Steps
+            </span>
+          }
+        />
 
         <div className="space-y-3">
           {TYPOGRAPHY_SCALE.map((item) => (
             <Card
               key={item.name}
-              className="border-border hover:border-primary/40 transition-colors duration-150 overflow-hidden"
+              className="border-border hover:border-highlight/40 transition-colors duration-150 overflow-hidden"
             >
               <CardContent className="p-5 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/40 pb-2.5">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-sm text-foreground">{item.name}</span>
-                    <Badge variant="outline" className="font-mono text-[10px] px-1.5 py-0">
+                    <Badge variant="outline" className="font-mono text-xs px-1.5 py-0">
                       {item.size}
                     </Badge>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-3 font-mono text-[11px] text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-3 font-mono text-xs text-muted-foreground">
                     <span>LH: {item.lineHeight}</span>
                     <span>Tracking: {item.tracking}</span>
                     <span>Weight: {item.weight}</span>
@@ -336,21 +335,21 @@ export default function TypographyPage() {
 
       {/* Practical Typographic Pairing Recipes */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-foreground">Real-World Typographic Pairings</h2>
+        <SectionHeading icon={LayoutTemplate} title="Real-World Typographic Pairings" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {PAIRING_EXAMPLES.map((pair) => (
             <Card key={pair.title} className="border-border">
               <CardHeader className="pb-3 border-b border-border/50 bg-muted/20">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-sm font-semibold">{pair.title}</CardTitle>
-                  <Badge variant="secondary" className="text-[10px]">
+                  <Badge variant="secondary" className="text-xs">
                     Layout Pattern
                   </Badge>
                 </div>
                 <CardDescription className="text-xs">{pair.role}</CardDescription>
               </CardHeader>
               <CardContent className="p-6 space-y-3">
-                <div className="font-mono text-[11px] font-semibold text-primary tracking-wider">
+                <div className="font-mono text-xs font-semibold text-foreground tracking-wider">
                   {pair.meta}
                 </div>
                 <h3 className="text-2xl font-bold tracking-tight text-foreground font-display">
@@ -367,10 +366,15 @@ export default function TypographyPage() {
 
       {/* Long-Form Reading (Prose) */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-foreground">Long-Form Reading Surface</h2>
-        <p className="text-sm text-muted-foreground">
-          Rich-text and markdown surfaces use the <code className="font-mono text-xs">Prose</code> component, which styles headings, paragraphs, links, lists, quotes, and code blocks with the typography scale.
-        </p>
+        <SectionHeading
+          icon={ScrollText}
+          title="Long-Form Reading Surface"
+          description={
+            <>
+              Rich-text and markdown surfaces use the <code className="font-mono text-xs">Prose</code> component, which styles headings, paragraphs, links, lists, quotes, and code blocks with the typography scale.
+            </>
+          }
+        />
         <Card className="border-border">
           <CardContent className="p-6 sm:p-8">
             <Prose>

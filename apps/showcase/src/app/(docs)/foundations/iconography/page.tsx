@@ -60,6 +60,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, Badge, CodeB
 import { Shapes, Sparkles as SparklesIcon } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
 import type { LucideIcon } from 'lucide-react';
+import { SectionHeading } from '@/components/section-heading';
 
 const SIZES = [
   { name: 'sm', cls: 'h-3.5 w-3.5', use: 'Inline text, button icons, compact badges' },
@@ -107,15 +108,11 @@ export default function IconographyPage() {
 
       {/* Size Scale */}
       <section id="sizes" className="space-y-4 scroll-mt-20">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Layers className="h-6 w-6 text-highlight" />
-            <span>Size Scale</span>
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Four standardized sizes — never scale icons arbitrarily.
-          </p>
-        </div>
+        <SectionHeading
+          icon={Layers}
+          title="Size Scale"
+          description="Four standardized sizes — never scale icons arbitrarily."
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {SIZES.map((size) => (
@@ -128,7 +125,7 @@ export default function IconographyPage() {
                   <p className="font-semibold text-foreground">{size.name}</p>
                   <p className="font-mono text-muted-foreground">{size.cls}</p>
                 </div>
-                <p className="text-[11px] text-muted-foreground">{size.use}</p>
+                <p className="text-xs text-muted-foreground">{size.use}</p>
               </CardContent>
             </Card>
           ))}
@@ -137,42 +134,37 @@ export default function IconographyPage() {
 
       {/* Curated Set */}
       <section id="gallery" className="space-y-4 scroll-mt-20">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <SparklesIcon className="h-6 w-6 text-highlight" />
-            <span>Curated Icon Set</span>
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            The approved vocabulary for product UIs. Prefer these over ad-hoc imports to keep the system coherent.
-          </p>
-        </div>
+        <SectionHeading
+          icon={SparklesIcon}
+          title="Curated Icon Set"
+          description="The approved vocabulary for product UIs. Prefer these over ad-hoc imports to keep the system coherent."
+        />
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-2">
-          {CURATED_ICONS.map((Icon, i) => (
-            <div
-              key={i}
-              className="rounded-lg border border-border bg-card p-3 flex flex-col items-center justify-center gap-2 hover:border-highlight/50 hover:bg-highlight/5 transition-colors"
-            >
-              <Icon className="h-4 w-4 text-foreground" />
-              <span className="text-[9px] font-mono text-muted-foreground truncate w-full text-center">
-                {Icon.displayName ?? `icon-${i}`}
-              </span>
-            </div>
-          ))}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+          {CURATED_ICONS.map((Icon, i) => {
+            const name = Icon.displayName ?? `icon-${i}`;
+            return (
+              <div
+                key={i}
+                className="rounded-lg border border-border bg-card p-3 flex flex-col items-center justify-center gap-2 hover:border-highlight/50 hover:bg-highlight/5 transition-colors"
+              >
+                <Icon className="h-4 w-4 text-foreground" />
+                <span title={name} className="text-xs font-mono text-muted-foreground truncate w-full text-center">
+                  {name}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </section>
 
       {/* Usage */}
       <section id="usage" className="space-y-4 scroll-mt-20">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <FileText className="h-6 w-6 text-highlight" />
-            <span>Usage &amp; Accessibility</span>
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Decorative icons hide from screen readers; meaningful icons require an accessible name.
-          </p>
-        </div>
+        <SectionHeading
+          icon={FileText}
+          title="Usage & Accessibility"
+          description="Decorative icons hide from screen readers; meaningful icons require an accessible name."
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="border-border">

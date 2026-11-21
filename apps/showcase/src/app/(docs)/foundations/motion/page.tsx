@@ -5,6 +5,7 @@ import { MOTION_TOKENS } from '@ds/tokens';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Badge, Banner } from '@ds/ui';
 import { Play, Sparkles, Timer, Zap, MoveRight } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
+import { SectionHeading } from '@/components/section-heading';
 
 export default function MotionPage() {
   const [animate, setAnimate] = React.useState(false);
@@ -26,7 +27,7 @@ export default function MotionPage() {
         title="Motion & Animation"
         description={
           <>
-            Intentional motion language built on a <strong>4-step duration scale</strong> and two easing
+            Intentional motion language built on a <strong>3-step duration scale</strong> and two easing
             curves (spring &amp; smooth), always respecting <strong>prefers-reduced-motion</strong>.
           </>
         }
@@ -42,27 +43,23 @@ export default function MotionPage() {
         }
       />
 
-      <Banner variant="highlight" actionText="Play All" actionHref="#durations">
+      <Banner variant="highlight" actionText="Play All" actionHref="#durations" onActionClick={triggerAnimation}>
         <strong>Motion principles:</strong> subtle by default, directional, and never the only channel for conveying state (color + motion together).
       </Banner>
 
       {/* Duration Scale */}
       <section id="durations" className="space-y-4 scroll-mt-20">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-              <Timer className="h-6 w-6 text-highlight" />
-              <span>Duration Scale</span>
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              Fast for micro-interactions, normal for UI transitions, slow for large structural movement.
-            </p>
-          </div>
-          <Button size="sm" onClick={triggerAnimation} className="gap-1.5">
-            <Play className="h-3.5 w-3.5" />
-            Play Animations
-          </Button>
-        </div>
+        <SectionHeading
+          icon={Timer}
+          title="Duration Scale"
+          description="Fast for micro-interactions, normal for UI transitions, slow for large structural movement. All three share one easing so only duration differs."
+          actions={
+            <Button size="sm" onClick={triggerAnimation} className="gap-1.5">
+              <Play className="h-3.5 w-3.5" />
+              Play Animations
+            </Button>
+          }
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
@@ -70,13 +67,13 @@ export default function MotionPage() {
               name: 'Fast',
               value: MOTION_TOKENS.durations.fast,
               use: 'Button active states, tooltip fade-in, checkbox toggles.',
-              cls: 'duration-150 ease-out',
+              cls: 'duration-150 ease-smooth',
             },
             {
               name: 'Normal',
               value: MOTION_TOKENS.durations.normal,
               use: 'Dropdown menus, modals, tab switches, accordion expands.',
-              cls: 'duration-250 ease-spring',
+              cls: 'duration-250 ease-smooth',
             },
             {
               name: 'Slow',
@@ -94,7 +91,7 @@ export default function MotionPage() {
                 <div className="h-16 w-full rounded-lg bg-muted p-2 flex items-center">
                   <div
                     key={key}
-                    className={`h-12 w-12 rounded-lg bg-primary transition-all ${item.cls} motion-reduce:transition-none ${
+                    className={`h-12 w-12 rounded-lg bg-highlight transition-all ${item.cls} motion-reduce:transition-none ${
                       animate ? 'translate-x-[180px] bg-success' : 'translate-x-0'
                     }`}
                   />
@@ -107,15 +104,11 @@ export default function MotionPage() {
 
       {/* Easing Curves */}
       <section id="easings" className="space-y-4 scroll-mt-20">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Zap className="h-6 w-6 text-highlight" />
-            <span>Easing Curves</span>
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Spring for entry &amp; emphasis, smooth for exits and neutral movement.
-          </p>
-        </div>
+        <SectionHeading
+          icon={Zap}
+          title="Easing Curves"
+          description="Spring for entry & emphasis, smooth for exits and neutral movement. Both curves run at the same duration so only the curve differs."
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
@@ -141,7 +134,7 @@ export default function MotionPage() {
                 <div className="h-16 w-full rounded-lg bg-muted p-2 flex items-center overflow-hidden">
                   <div
                     key={`${key}-${item.name}`}
-                    className={`h-12 w-12 rounded-lg bg-highlight transition-transform duration-500 ${item.cls} motion-reduce:transition-none ${
+                    className={`h-12 w-12 rounded-lg bg-highlight transition-transform duration-400 ${item.cls} motion-reduce:transition-none ${
                       animate ? 'translate-x-[220px]' : 'translate-x-0'
                     }`}
                   />
@@ -154,20 +147,16 @@ export default function MotionPage() {
 
       {/* Directional Motion */}
       <section id="direction" className="space-y-4 scroll-mt-20">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <MoveRight className="h-6 w-6 text-highlight" />
-            <span>Directional Motion</span>
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Movement should mirror spatial relationships: content enters from where it will live, exits toward where it came from.
-          </p>
-        </div>
+        <SectionHeading
+          icon={MoveRight}
+          title="Directional Motion"
+          description="Movement should mirror spatial relationships: content enters from where it will live, exits toward where it came from."
+        />
 
         <Card className="border-border">
           <CardContent className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { dir: 'Slide In (right)', from: '-translate-x-24 opacity-0', to: 'translate-x-0 opacity-100' },
+              { dir: 'Slide In (from left)', from: '-translate-x-24 opacity-0', to: 'translate-x-0 opacity-100' },
               { dir: 'Slide Up (bottom)', from: 'translate-y-8 opacity-0', to: 'translate-y-0 opacity-100' },
               { dir: 'Scale Fade (modal)', from: 'scale-90 opacity-0', to: 'scale-100 opacity-100' },
             ].map((item) => (
@@ -179,7 +168,7 @@ export default function MotionPage() {
                 <div className="h-20 rounded-lg bg-card border border-border flex items-center justify-center overflow-hidden">
                   <div
                     key={`${key}-${item.dir}`}
-                    className={`h-8 w-24 rounded-md bg-primary/20 border border-primary/40 flex items-center justify-center text-[10px] font-mono text-primary transition-all duration-300 ease-smooth motion-reduce:transition-none ${
+                    className={`h-8 w-24 rounded-md bg-highlight/20 border border-highlight/40 flex items-center justify-center text-xs font-mono text-foreground transition-all duration-250 ease-smooth motion-reduce:transition-none ${
                       animate ? item.to : item.from
                     }`}
                   >
@@ -194,20 +183,20 @@ export default function MotionPage() {
 
       {/* Reduced Motion */}
       <section id="reduced-motion" className="space-y-4 scroll-mt-20">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-highlight" />
-            <span>Reduced Motion Support</span>
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Every animation ships with a <code className="font-mono text-xs">motion-reduce:transition-none</code> fallback and respects the user&apos;s system preference.
-          </p>
-        </div>
+        <SectionHeading
+          icon={Sparkles}
+          title="Reduced Motion Support"
+          description={
+            <>
+              Every animation ships with a <code className="font-mono text-xs">motion-reduce:transition-none</code> fallback and respects the user&apos;s system preference.
+            </>
+          }
+        />
 
         <Card className="border-border">
           <CardContent className="p-6 space-y-3">
             <div className="rounded-lg bg-muted/40 p-4 font-mono text-xs text-muted-foreground overflow-x-auto">
-              <pre>{`<div className="transition-all duration-300 ease-spring motion-reduce:transition-none">
+              <pre>{`<div className="transition-all duration-250 ease-spring motion-reduce:transition-none">
   content
 </div>`}</pre>
             </div>
