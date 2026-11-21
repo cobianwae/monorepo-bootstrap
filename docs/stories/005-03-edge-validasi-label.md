@@ -1,6 +1,6 @@
 # 005-03 — Edge sambung + validasi + label
 
-Status: review
+Status: done
 PRD: `docs/prd/005-flow-editor.md`
 Design: `docs/design/flow-editor.md`
 FR: `FR-003`, `FR-011`
