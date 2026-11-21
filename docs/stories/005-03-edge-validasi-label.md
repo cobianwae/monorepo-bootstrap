@@ -1,6 +1,6 @@
 # 005-03 — Edge sambung + validasi + label
 
-Status: approved
+Status: review
 PRD: `docs/prd/005-flow-editor.md`
 Design: `docs/design/flow-editor.md`
 FR: `FR-003`, `FR-011`
@@ -47,11 +47,11 @@ Goal: Sambung antar-handle via pointer dan keyboard, invalid ditolak dengan pesa
 
 ## Tasks
 
-- [ ] Validasi default (self-loop/duplikat/handle-penuh/arah) + AND custom
-- [ ] Keyboard connect Enter-Tab-Enter + Esc + focus-return
-- [ ] Label chip `badge` + tombol edit + marker panah token `muted-foreground`
-- [ ] Hapus edge + toast wiring (host toast final di 005-05, API disiapkan di sini)
-- [ ] Test: valid drag + keyboard + 4 kasus invalid + custom rule + label + hapus
+- [x] Validasi default (self-loop/duplikat/handle-penuh/arah) + AND custom
+- [x] Keyboard connect Enter-Tab-Enter + Esc + focus-return
+- [x] Label chip `badge` + tombol edit + marker panah token `muted-foreground`
+- [x] Hapus edge + toast wiring (host toast final di 005-05, API disiapkan di sini)
+- [x] Test: valid drag + keyboard + 4 kasus invalid + custom rule + label + hapus
 - [ ] Showcase: dataset 2 node untuk latihan sambung (final di 005-06)
 
 ## Dependencies

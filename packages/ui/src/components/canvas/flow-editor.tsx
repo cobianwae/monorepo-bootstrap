@@ -114,6 +114,22 @@ export interface FlowEditorProps {
 }
 
 // ---------------------------------------------------------------------------
+// Konteks koneksi keyboard edge (story 005-03 AC-02).
+// Digunakan oleh FlowNode/FlowHandle tanpa perlu membungkus nodeTypes,
+// sehingga elemen handle tidak ter-remount saat status connecting berubah
+// dan referensi elemen untuk fokus-kembali tetap valid.
+// ---------------------------------------------------------------------------
+
+interface FlowConnectContextValue {
+  connecting: { nodeId: string } | null;
+  setConnecting: React.Dispatch<React.SetStateAction<{ nodeId: string } | null>>;
+  registerHandleRefs: (nodeId: string, refs: { source: HTMLElement; target: HTMLElement }) => void;
+  onHandleKeyDown: (nodeId: string, type: 'source' | 'target', key: string) => void;
+}
+
+const FlowConnectContext = React.createContext<FlowConnectContextValue | null>(null);
+
+// ---------------------------------------------------------------------------
 // useFlowHistory — kontrak untuk story 005-02–04 (implementasi penuh di 005-05)
 // ---------------------------------------------------------------------------
 
@@ -157,24 +173,41 @@ interface FlowHandleProps {
   position: 'left' | 'right';
   isConnectable?: boolean;
   dataTestId?: string;
+  nodeId: string;
 }
 
-function FlowHandle({ type, position, isConnectable = true, dataTestId }: FlowHandleProps) {
-  const sideClass = position === 'left' ? '-left-2.5' : '-right-2.5';
-  return (
-    <div
-      data-testid={dataTestId}
-      className={cn(
-        'absolute top-1/2 -translate-y-1/2 flex items-center justify-center',
-        sideClass,
-        'w-12 h-12 rounded-full bg-border shadow-sm focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 cursor-pointer',
-        isConnectable === false ? 'opacity-50 cursor-not-allowed' : '',
-      )}
-    >
-      <Handle type={type} position={position as Position} className="h-3 w-3 rounded-full" />
-    </div>
-  );
-}
+const FlowHandle = React.forwardRef<HTMLDivElement, FlowHandleProps>(
+  ({ type, position, isConnectable = true, dataTestId, nodeId }, ref) => {
+    const connectCtx = React.useContext(FlowConnectContext);
+    const onHandleKeyDown = connectCtx?.onHandleKeyDown;
+    const isConnectingSource = connectCtx?.connecting?.nodeId === nodeId;
+    const sideClass = position === 'left' ? '-left-2.5' : '-right-2.5';
+    return (
+      <div
+        ref={ref}
+        data-testid={dataTestId}
+        tabIndex={0}
+        aria-label={type === 'source' ? `Handle keluaran ${nodeId}` : `Handle masuk ${nodeId}`}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            void onHandleKeyDown?.(nodeId, type, event.key);
+          }
+        }}
+        className={cn(
+          'absolute top-1/2 -translate-y-1/2 flex items-center justify-center',
+          sideClass,
+          'w-12 h-12 rounded-full bg-border shadow-sm cursor-pointer',
+          'focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2',
+          isConnectingSource ? 'ring-2 ring-primary ring-offset-2' : '',
+          isConnectable === false ? 'opacity-50 cursor-not-allowed' : '',
+        )}
+      >
+        <Handle type={type} position={position as Position} className="h-3 w-3 rounded-full" />
+      </div>
+    );
+  });
+FlowHandle.displayName = 'FlowHandle';
 
 // ---------------------------------------------------------------------------
 // Node custom DS — ukuran deterministik 220×88, kontrak a11y D4
@@ -201,6 +234,16 @@ function FlowNode({
   onDelete,
   status = 'default',
 }: FlowNodeProps) {
+  const connectCtx = React.useContext(FlowConnectContext);
+  const registerHandleRefs = connectCtx?.registerHandleRefs;
+  const sourceRef = React.useRef<HTMLDivElement>(null);
+  const targetRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (registerHandleRefs && sourceRef.current && targetRef.current) {
+      registerHandleRefs(id, { source: sourceRef.current, target: targetRef.current });
+    }
+  }, [id, registerHandleRefs, sourceRef, targetRef]);
   const isDisabled = data.disabled === true;
   const statusBadge = {
     default: 'bg-muted text-muted-foreground',
@@ -275,8 +318,18 @@ function FlowNode({
         </div>
       </div>
       {/* Handle kiri = input (target), kanan = output (source). Hit-area ≥44px via wrapper 48×48. */}
-      <FlowHandle type="target" position="left" dataTestId={`flow-handle-${id}-target`} />
-      <FlowHandle type="source" position="right" dataTestId={`flow-handle-${id}-source`} />
+      <FlowHandle
+        ref={targetRef}
+        type="target" position="left"
+        dataTestId={`flow-handle-${id}-target`}
+        nodeId={id}
+      />
+      <FlowHandle
+        ref={sourceRef}
+        type="source" position="right"
+        dataTestId={`flow-handle-${id}-source`}
+        nodeId={id}
+      />
     </div>
   );
 }
@@ -714,6 +767,10 @@ export function FlowEditor(props: FlowEditorProps) {
   const [internalEdges, setInternalEdges] = React.useState<FlowEdge[]>(defaultEdges ?? []);
   const [zoomLevel, setZoomLevel] = React.useState(1);
   const [isInteractionLocked, setIsInteractionLocked] = React.useState(false);
+  const [connecting, setConnecting] = React.useState<{ nodeId: string } | null>(null);
+  const [selectedEdgeId, setSelectedEdgeId] = React.useState<string | null>(null);
+  const [connectionSuccess, setConnectionSuccess] = React.useState<string | null>(null);
+  const [connectionAlert, setConnectionAlert] = React.useState<string | null>(null);
 
   const nodes = isControlled ? nodesProp : internalNodes;
   const edges = isControlled ? edgesProp : internalEdges;
@@ -761,49 +818,178 @@ export function FlowEditor(props: FlowEditorProps) {
     [isControlled, onEdgesChange],
   );
 
-  const handleConnect = React.useCallback(
-    (connection: Connection) => {
-      const { source, target, sourceHandle, targetHandle } = connection;
-      if (source === target) {
-        void toast({ title: 'Koneksi ditolak', description: 'Self-loop tidak diizinkan.', duration: 3000 });
-        return;
-      }
-      const duplicate = edges.some(
-        (e) =>
-          e.source === source &&
-          e.target === target &&
-          e.sourceHandle === sourceHandle &&
-          e.targetHandle === targetHandle,
-      );
-      if (duplicate) {
-        void toast({ title: 'Koneksi ditolak', description: 'Edge duplikat sudah ada.', duration: 3000 });
-        return;
-      }
-      if (isValidConnection && !isValidConnection({ source, target, sourceHandle, targetHandle })) {
-        return;
-      }
-      if (isControlled) {
-        void onConnect?.(connection);
-        return;
-      }
-      const newEdge: FlowEdge = {
-        id: `edge-${crypto.randomUUID()}`,
-        source,
-        target,
-        sourceHandle,
-        targetHandle,
-        animated: false,
-      };
-      setInternalEdges((prev) => [...prev, newEdge]);
-    },
-    [isControlled, edges, onConnect, isValidConnection],
+// ---------------------------------------------------------------------------
+// Validasi koneksi edge (design §3 langkah 2, story 005-03 AC-03 / AC-04)
+// ---------------------------------------------------------------------------
+
+type ConnectionRejectReason = 'self-loop' | 'duplikat' | 'handle-penuh' | 'custom';
+
+const connectionRejectMessage: Record<ConnectionRejectReason, string> = {
+  'self-loop': 'Sambungan ditolak: self-loop tidak diizinkan.',
+  'duplikat': 'Sambungan ditolak: edge duplikat sudah ada.',
+  'handle-penuh': 'Sambungan ditolak: handle tujuan sudah penuh.',
+  custom: 'Sambungan ditolak: aturan kustom menolak koneksi.',
+};
+
+/**
+ * Validasi koneksi default. Hasil akhir = default AND custom (AC-04): aturan
+ * kustom konsumen hanya boleh MENGENCAT, tidak boleh melonggarkan aturan default
+ * (self-loop, duplikat, handle penuh, arah).
+ */
+function validateConnection(
+  connection: Connection,
+  edges: FlowEdge[],
+  isValidConnection: FlowEditorProps['isValidConnection'],
+): { ok: true } | { ok: false; reason: ConnectionRejectReason } {
+  const { source, target, sourceHandle, targetHandle } = connection;
+
+  // Self-loop: node menyambung ke dirinya sendiri.
+  if (source === target) {
+    return { ok: false, reason: 'self-loop' };
+  }
+
+  // Arah: sumber (output handle) → tujuan (input handle). xyflow melalui UI
+  // hanya menyambung source handle ke target handle; arah terbalik tidak dapat
+  // diinisiasi lewat handle, dan self-loop sudah ditolak di atas.
+
+  // Duplikat pasangan (source, sourceHandle, target, targetHandle) sudah ada.
+  const duplicate = edges.some(
+    (e) =>
+      e.source === source &&
+      e.target === target &&
+      e.sourceHandle === sourceHandle &&
+      e.targetHandle === targetHandle,
   );
+  if (duplicate) {
+    return { ok: false, reason: 'duplikat' };
+  }
+
+  // Handle tujuan penuh: satu target handle hanya boleh satu koneksi (maxConnections: 1).
+  const targetFull = edges.some((e) => e.target === target && e.targetHandle === targetHandle);
+  if (targetFull) {
+    return { ok: false, reason: 'handle-penuh' };
+  }
+
+  // Aturan kustom konsumen hanya boleh menambahkan penolakan (AND).
+  if (isValidConnection && !isValidConnection({ source, target, sourceHandle, targetHandle })) {
+    return { ok: false, reason: 'custom' };
+  }
+
+  return { ok: true };
+}
+
+const handleConnect = React.useCallback(
+  (connection: Connection): boolean => {
+    const { source, target } = connection;
+    const validation = validateConnection(connection, edges, isValidConnection);
+    if (!validation.ok) {
+      const message = connectionRejectMessage[validation.reason];
+      void toast({ title: 'Koneksi ditolak', description: message, duration: 4000 });
+      setConnectionAlert(message);
+      setConnectionSuccess(null);
+      return false;
+    }
+
+    setConnectionAlert(null);
+    setConnectionSuccess(`Edge ${source}→${target} tersambung`);
+
+    if (isControlled) {
+      void onConnect?.(connection);
+      return true;
+    }
+
+    const newEdge: FlowEdge = {
+      id: `edge-${crypto.randomUUID()}`,
+      source,
+      target,
+      sourceHandle: connection.sourceHandle,
+      targetHandle: connection.targetHandle,
+      animated: false,
+    };
+    setInternalEdges((prev) => [...prev, newEdge]);
+    _history.push(nodes, edges);
+    return true;
+  },
+  // validateConnection dan connectionRejectMessage adalah konstanta modul-level (stabil), tidak perlu dalam daftar dependensi.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [isControlled, edges, onConnect, isValidConnection, nodes, _history],
+);
+
+// Clear alert penolakan setelah durasi agar role="alert" sementara (AC-03).
+React.useEffect(() => {
+  if (!connectionAlert) return;
+  const timer = setTimeout(() => setConnectionAlert(null), 4000);
+  return () => clearTimeout(timer);
+}, [connectionAlert]);
 
   const handleSelectionChange = React.useCallback(
     (selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => {
+      setSelectedEdgeId(selection.edges[0]?.id ?? null);
       void onSelectionChange?.({ nodes: selection.nodes, edges: selection.edges });
     },
     [onSelectionChange],
+  );
+
+  const removeSelectedEdge = React.useCallback(() => {
+    if (!selectedEdgeId) return;
+    if (isControlled) {
+      void onEdgesChange?.([{ id: selectedEdgeId, type: 'remove' }] as unknown as EdgeChangeset<FlowEdge>);
+      _history.push(nodes, edges);
+    } else {
+      setInternalEdges((prev) => prev.filter((e) => e.id !== selectedEdgeId));
+      _history.push(nodes, edges);
+    }
+    setSelectedEdgeId(null);
+  }, [selectedEdgeId, isControlled, onEdgesChange, nodes, edges, _history]);
+
+  const handleRefs = React.useRef<Map<string, { source: HTMLElement; target: HTMLElement }>>(new Map());
+  const registerHandleRefs = React.useCallback(
+    (nodeId: string, refs: { source: HTMLElement; target: HTMLElement }) => {
+      handleRefs.current.set(nodeId, refs);
+    },
+    [],
+  );
+
+  const handleHandleKeyDown = React.useCallback(
+    (nodeId: string, type: 'source' | 'target', key: string) => {
+      if (key !== 'Enter' && key !== 'Escape') return;
+      if (key === 'Escape') {
+        setConnecting(null);
+        return;
+      }
+      // key === 'Enter'
+      if (type === 'source') {
+        setConnecting({ nodeId });
+        return;
+      }
+      // type === 'target': coba sambungkan dari handle sumber yang sedang connecting.
+      if (connecting && connecting.nodeId !== nodeId) {
+        const connection: Connection = {
+          source: connecting.nodeId,
+          target: nodeId,
+          sourceHandle: 'source',
+          targetHandle: 'target',
+        };
+        const connected = handleConnect(connection);
+        setConnecting(null);
+        if (!connected) {
+          // Fokus kembali ke handle sumber saat penolakan (AC-02).
+          handleRefs.current.get(connecting.nodeId)?.source.focus();
+        }
+      }
+    },
+    [connecting, handleConnect],
+  );
+
+  const handleEditorKeyDown = React.useCallback(
+    (event: React.KeyboardEvent) => {
+      if ((event.key === 'Delete' || event.key === 'Backspace') && selectedEdgeId) {
+        event.preventDefault();
+        removeSelectedEdge();
+        void toast({ title: 'Dihapus', description: 'Edge dihapus — Urungkan', duration: 3000 });
+      }
+    },
+    [selectedEdgeId, removeSelectedEdge],
   );
 
   const handleAddFromPalette = React.useCallback(
@@ -843,6 +1029,7 @@ export function FlowEditor(props: FlowEditorProps) {
       className={cn('relative w-full', className)}
       aria-label={ariaLabel}
       role="application"
+      onKeyDown={handleEditorKeyDown}
     >
       {/* State matrix — loading */}
       {loading && (
@@ -885,9 +1072,10 @@ export function FlowEditor(props: FlowEditorProps) {
       )}
 
       {!loading && (
-        <FlowCanvasHost
-          nodes={nodes}
-          edges={edges}
+        <FlowConnectContext.Provider value={{ connecting, setConnecting, registerHandleRefs, onHandleKeyDown: handleHandleKeyDown }}>
+          <FlowCanvasHost
+            nodes={nodes}
+            edges={edges}
           onNodesChange={handleNodesChange}
           onEdgesChange={handleEdgesChange}
           onConnect={handleConnect}
@@ -910,13 +1098,28 @@ export function FlowEditor(props: FlowEditorProps) {
           fitView={() => {}}
           ariaLabel={ariaLabel}
           paletteItems={paletteItems ?? []}
-        />
+          />
+        </FlowConnectContext.Provider>
       )}
 
       {/* Live region zoom level */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {zoomLabel}
       </div>
+
+      {/* Live region sukses sambung edge (AC-01) */}
+      {connectionSuccess && (
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          {connectionSuccess}
+        </div>
+      )}
+
+      {/* Alert penolakan koneksi sementara (AC-03) */}
+      {connectionAlert && (
+        <div role="alert" aria-live="assertive" aria-atomic="true" className="sr-only">
+          {connectionAlert}
+        </div>
+      )}
 
       {/* Daftar alternatif screen reader (node + edge) */}
       <div className="sr-only" aria-label="Daftar node dan edge">
