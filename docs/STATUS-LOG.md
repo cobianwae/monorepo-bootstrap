@@ -57,3 +57,5 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Story 004-02 `done` (approved oleh user) dan di-merge ke `dev` — `004-02`
 
 - 2026-11-21 — Story 004-03 multi-hari + overlap + detail event M-006 + DnD selesai, status review: segmen per hari dengan penanda ▸/◂ + teks SR di month/all-day, algoritma interval-column (event bentrok sama lebar + label "n bentrok", tetap Tab-reachable), detail popover desktop/sheet mobile berisi judul/waktu/lokasi/kategori/deskripsi + aksi konsumen onAction/renderEventActions + Esc focus-return, DnD internal Pointer Events (preview bayangan + gate editable) dan menu keyboard "Move to selected slot" dengan payload onEventDrop setara; props baru editable/onEventDrop/renderEvent/onAction/renderEventActions + tipe EventDropInfo; showcase /patterns/calendar dataset konferensi 3 hari + 2 bentrok + toggle Editable + log drop/action; verifikasi typecheck/lint/test (404 @ds/ui)/showcase build hijau — `004-03`
+
+- 2026-11-21 — Story 004-03 multi-hari + overlap + detail event M-006 + DnD selesai (`done`, approved oleh user) dan di-merge ke `dev` — `004-03`

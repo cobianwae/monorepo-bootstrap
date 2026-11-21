@@ -1,6 +1,6 @@
 # 004-03 — Multi-hari + konflik overlap + detail event + DnD
 
-Status: review
+Status: done
 PRD: `docs/prd/004-calendar-scheduler.md`
 Design: `docs/design/calendar-scheduler.md` (approved, gate 2)
 FR: `FR-003` (multi-hari), `FR-004`, `FR-005`, `FR-013` (could)
