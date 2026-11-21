@@ -1,6 +1,6 @@
 # 014-02 — Shell stepper + upload + mapping
 
-Status: approved
+Status: review
 PRD: `docs/prd/014-import-wizard.md` (approved, gate 1)
 Design: `docs/design/import-wizard.md` (approved, gate 2) + `docs/design/flows/import-wizard.mmd` (flow 1–2) + `docs/design/wireframes/import-wizard.md` (§2.1–2.2, §4)
 FR: `FR-001`, `FR-002`, `FR-005`, `FR-007`, `FR-008`, `FR-009`
@@ -41,10 +41,10 @@ Goal: Kerangka wizard 4 langkah berdiri dengan langkah 1–2 fungsional: unggah/
 
 ## Tasks
 
-- [ ] Buat route `/patterns/import-wizard` draf: `PageHeader` + card wizard + `Stepper` 4 langkah + `h2 tabindex=-1` + live region + footer [Kembali][Lanjut] + status strip (wireframe §1)
-- [ ] Implementasi langkah 1 (§2.1): dropzone + `file-input`, `textarea` tempel, radio delimiter auto/manual, tombol template (Blob dari 014-01), state empty/loading(`progress`)/error(`alert`) + `data-testid` `iw-*`
-- [ ] Implementasi langkah 2 (§2.2): tabel mapping + `select` per header + badge wajib + pesan duplikat + gate Lanjut + fokus-ke-pesan
-- [ ] Store satu (`file → mapping`) terjaga saat mundur; wiring util 014-01 (tanpa duplikasi logika)
+- [x] Buat route `/patterns/import-wizard` draf: `PageHeader` + card wizard + `Stepper` 4 langkah + `h2 tabindex=-1` + live region + footer [Kembali][Lanjut] + status strip (wireframe §1)
+- [x] Implementasi langkah 1 (§2.1): dropzone + `file-input`, `textarea` tempel, radio delimiter auto/manual, tombol template (Blob dari 014-01), state empty/loading(`progress`)/error(`alert`) + `data-testid` `iw-*`
+- [x] Implementasi langkah 2 (§2.2): tabel mapping + `select` per header + badge wajib + pesan duplikat + gate Lanjut + fokus-ke-pesan
+- [x] Store satu (`file → mapping`) terjaga saat mundur; wiring util 014-01 (tanpa duplikasi logika)
 - [ ] Test co-located/showcase: gate wajib, duplikat ditolak, state terjaga, fokus `h2` + live region; tanpa token baru, audit `test:tokens` awal
 
 ## Dependencies
@@ -56,3 +56,13 @@ Goal: Kerangka wizard 4 langkah berdiri dengan langkah 1–2 fungsional: unggah/
 
 - Risiko: drag-only tidak keyboard — mitigasi tombol Pilih file selalu ada; paste vs file prioritas didokumentasikan
 - Keputusan: D1 composed existing primitives; validasi penuh di 014-03; delimiter manual + template di langkah 1 per flow 1
+
+## Catatan Implementasi (2026-11-21)
+
+- Task 5 (test) **belum tuntas**: logika gate, duplikat ditolak, dan state terjaga saat mundur teruji (`_lib/wizard-state.test.ts`, 31 test showcase hijau). Fokus `h2` dan live region belum teruji otomatis: `apps/showcase` tidak memiliki `@testing-library/react` atau jsdom; menambahkannya butuh approval dependency.
+- Deviasi disetujui user: loading parsing tanpa persentase (`progressbar` indeterminate + "Memparsing berkas…").
+- Belum sesuai AC-05: langkah depan stepper tidak memiliki `aria-disabled` per langkah karena `Stepper` di `packages/ui` tidak menerima prop itu; diganti teks "Langkah 3–4 belum tersedia". Mengubah API `Stepper` butuh approval.
+- Belum sesuai AC-02: state file kosong belum punya tombol CTA "Pilih file lain" (hanya teks).
+- Temuan (CR, bukan edit langsung karena 014-01 `done`): `_lib/mapping.ts` kamus `SYNONYM` memuat `sulam: 'email'`, seharusnya `surel` (design §3 langkah 3). Header "Surel" tidak tersaran.
+- Known issue di luar scope: typecheck `packages/ui` gagal di `flow-editor.test.tsx` (CR-015). Tes `FlowEditor undo/redo … batas stack 50` timeout 5000 ms dan flaky.
+- `pnpm test:tokens` tidak dijalankan: tidak ada perubahan token.
