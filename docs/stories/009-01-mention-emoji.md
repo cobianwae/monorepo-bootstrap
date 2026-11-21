@@ -1,6 +1,6 @@
 # 009-01 — Mention + emoji picker untuk chat + showcase
 
-Status: approved
+Status: review
 Spec: `docs/design/spec-mention-emoji.md`
 FR: `FR-001`, `FR-002`, `FR-003`, `FR-004`, `FR-005`, `FR-006`, `FR-008`
 Screens: `S-005.32`
@@ -40,13 +40,13 @@ Goal: Perkaya input `chat.tsx` dengan mention `@user` (popover kandidat + token 
 
 ## Tasks
 
-- [ ] Perluas `packages/ui/src/components/data-display/chat.tsx`: props opsional (`candidates`, `onMention`, emoji) non-breaking + token mention
-- [ ] Popover kandidat `@` (filter, loading, kosong, error callback) + render chip di bubble
-- [ ] Popover emoji picker (kategori + pencarian + sisip di kursor)
-- [ ] Navigasi keyboard + ARIA kedua popover + audit a11y
-- [ ] Test co-located (filter, 3 jalur pilih, payload token, sisip kursor, Escape)
-- [ ] Scenario showcase S-005.32 (`/patterns/mention-emoji`) + smoke build
-- [ ] Update BACKLOG + STATUS-LOG; sitemap S-005.32 `planned` → `implemented`
+- [x] Perluas `packages/ui/src/components/data-display/chat.tsx`: props opsional (`candidates`, `onMention`, emoji) non-breaking + token mention
+- [x] Popover kandidat `@` (filter, loading, kosong, error callback) + render chip di bubble
+- [x] Popover emoji picker (kategori + pencarian + sisip di kursor)
+- [x] Navigasi keyboard + ARIA kedua popover + audit a11y
+- [x] Test co-located (filter, 3 jalur pilih, payload token, sisip kursor, Escape)
+- [x] Scenario showcase S-005.32 (`/patterns/mention-emoji`) + smoke build
+- [x] Update BACKLOG + STATUS-LOG; sitemap S-005.32 `planned` → `implemented`
 
 ## Dependencies
 
@@ -57,3 +57,7 @@ Goal: Perkaya input `chat.tsx` dengan mention `@user` (popover kandidat + token 
 
 - Risiko: deteksi `@` + posisi kursor di tengah teks — tangani hati-hati dengan selection API
 - Keputusan: kandidat selalu dari callback konsumen (tanpa fetch internal); integration point RTE PRD 006 disiapkan tanpa diimplementasi
+- Implementasi: `ChatComposer` menerima props opsional `candidates`, `candidatesStatus`, `onMentionQuery`, `onMention`, `emojiPicker`; `onSend` kini menerima argumen opsional `mentions: ChatMentionToken[]` (non-breaking untuk pemanggil lama). Komponen pendukung di `chat-composer-tools.tsx` (diekspor dari barrel).
+- Verifikasi: 19 test baru di `chat-mention-emoji.test.tsx` lulus; `chat-and-support.test.tsx` lulus. `pnpm lint` hijau. `pnpm typecheck` hanya 12 error baseline FlowEditor. `pnpm -C apps/showcase build` hijau (route `/patterns/mention-emoji`). Tidak ada perubahan token, `pnpm test:tokens` tidak dijalankan.
+- Belum dilakukan: audit a11y dengan alat (AC-05) dan pemeriksaan visual light/dark di browser; scenario sudah memakai token semantik. FR-007 (recent emoji) tetap ditunda sesuai spec.
+- Known issue baseline: `pnpm test` UI menunjukkan timeout pada `flow-editor` (005-05) dan `org-chart-editor` (stack 50) pada run paralel; dengan `--maxWorkers=2 --testTimeout=30000` hanya timeout `OrgChartEditor stack undo dibatasi 50` (57 detik) tersisa. File tersebut tidak disentuh story ini.

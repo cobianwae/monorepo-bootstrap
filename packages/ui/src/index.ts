@@ -193,6 +193,7 @@ export * from './components/marketing/stats-band';
 
 // AI / Chat & Supporting Primitives
 export * from './components/data-display/chat';
+export * from './components/data-display/chat-composer-tools';
 export * from './components/layout/prose';
 export * from './components/form/search-input';
 export * from './components/feedback/banner';
