@@ -87,6 +87,9 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.37.02 | Import Wizard — langkah mapping | `/patterns/import-wizard` (langkah 2) | in-design |
 | S-005.37.03 | Import Wizard — langkah validasi | `/patterns/import-wizard` (langkah 3) | in-design |
 | S-005.37.04 | Import Wizard — langkah konfirmasi | `/patterns/import-wizard` (langkah 4) | in-design |
+| S-005.38 | Image Cropper (PRD 015) | `/patterns/image-cropper` | in-design |
+| S-005.38.01 | Image Cropper — scenario avatar 1:1 + pratinjau lingkaran | `/patterns/image-cropper` (scenario avatar) | in-design |
+| S-005.38.02 | Image Cropper — scenario cover 16:9 | `/patterns/image-cropper` (scenario cover) | in-design |
 | S-006 | Guidelines | `/guidelines` | implemented |
 | S-007 | Contribution | `/contribution` | implemented |
 | S-008 | What's New | `/whats-new` | implemented |

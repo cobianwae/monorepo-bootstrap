@@ -1,0 +1,68 @@
+<!-- Flow image cropper — PRD 015, layar S-005.38 (.01 avatar, .02 cover) -->
+<!-- Job utama: pilih foto → atur area crop → pratinjau live → simpan blob via callback -->
+<!-- Constraint: react-easy-crop + wrapper token-first DS; decode/resize util co-located; microcopy Bahasa Indonesia -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman image cropper] --> B[Empty state: ilustrasi + Pilih foto + batas 10 MB + aspek default]
+  B --> C{User memasukkan gambar?}
+  C -- pilih file / drag-drop --> P[Decode gambar: baca file + koreksi orientasi EXIF + cek ukuran]
+  P --> Q{Hasil decode?}
+  Q -- masih decode --> L[Tampilkan loading: skeleton area crop + teks SR Memuat gambar + aria-busy]
+  L --> P
+  Q -- gagal: format rusak / terlalu besar --> ERR[Tampilkan error + penyebab + tombol Pilih foto lain]
+  ERR --> R[User mengganti file]
+  R --> P
+  Q -- kosong: belum ada gambar --> B
+  Q -- berhasil --> H[Area crop tampil: aspek terkunci + gambar pas di dalam area]
+  H --> F2[Alur atur crop: flow 2]
+  F2 --> F3[Alur pratinjau dan simpan: flow 3]
+```
+
+```mermaid
+flowchart TD
+  A[User di area crop] --> B[Drag kanvas geser + drag sudut resize + slider dan tombol zoom]
+  B --> C{Aspek terkunci?}
+  C -- ya 1 banding 1, 16 banding 9, 4 banding 3 --> D[Resize menjaga rasio; gambar tidak lepas dari area]
+  C -- bebas --> E[Resize bebas tanpa kunci rasio]
+  D --> F{User memakai aksi cepat?}
+  E --> F
+  F -- tombol putar 90 derajat --> G[Rotasi preset diterapkan; area crop dihitung ulang]
+  F -- slider atau tombol tambah kurang --> Z[Zoom min-maks dijaga; gambar tetap menutupi area]
+  F -- keyboard panah, tambah, kurang, R, nol --> K[Operasi setara tanpa mouse; live region umumkan posisi dan zoom]
+  G --> H[Pratinjau live diperbarui]
+  Z --> H
+  K --> H
+  H --> I{User puas area?}
+  I -- belum --> B
+  I -- salah area --> RS[User menekan Atur ulang: kembali ke crop awal tanpa upload ulang]
+  RS --> B
+  I -- sudah --> J[Alur pratinjau dan simpan: flow 3]
+```
+
+```mermaid
+flowchart TD
+  A[Pratinjau live mengikuti area crop] --> B[Varian lingkaran untuk avatar + persegi untuk cover]
+  B --> C{Scenario aktif?}
+  C -- avatar S-005_38_01 --> AV[Pratinjau lingkaran 1 banding 1 + dimensi target 512x512]
+  C -- cover S-005_38_02 --> CO[Pratinjau 16 banding 9 + dimensi target 1280x720]
+  AV --> D[User menekan Simpan]
+  CO --> D
+  D --> E[Canvas render: potong piksel area + resize ke dimensi target]
+  E --> F{Hasil render?}
+  F -- gagal --> ERR[Tampilkan error render + tombol Coba lagi]
+  ERR --> D
+  F -- berhasil --> O[Callback onComplete dipanggil: blob + dataURL + dimensi]
+  O --> SC[Tampilkan sukses: pratinjau akhir + dimensi + tombol Pilih foto lain]
+  SC --> R[User mengulang tanpa upload ulang atau memilih foto baru]
+  R --> A
+```
+
+```mermaid
+flowchart TD
+  A[User membuka panel demo showcase] --> B[Dataset: avatar contoh + cover contoh + file rusak + file raksasa]
+  B --> C[User memicu state: loading, empty, error, success + toggle light dark]
+  C --> D[State tampil sesuai matrix; kontras parity dicek]
+  D --> E[User menguji keyboard penuh + aspek 1 banding 1, 16 banding 9, 4 banding 3, bebas]
+  E --> F[Smoke build lolos; resep onComplete 15 baris disalin]
+```

@@ -36,7 +36,7 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 | Kategori | Tujuan | Komponen utama |
 |---|---|---|
 | `base` | Primitive visual dan kontrol dasar | button, badge, card, input, textarea, label, separator, skeleton, avatar, tabs, checkbox, switch, tooltip, progress, spinner, radio-group, slider, accordion, collapsible, kbd, toggle, aspect-ratio, scroll-area, palette-switcher, theme-provider |
-| `form` | Input dan validasi | form, select, combobox, tag-input, date-picker, input-otp, number-input, time-picker, filter-builder, stepper, segmented-control, file-input, file-upload, rich-text-editor (baru, PRD 006) |
+| `form` | Input dan validasi | form, select, combobox, tag-input, date-picker, input-otp, number-input, time-picker, filter-builder, stepper, segmented-control, file-input, file-upload, rich-text-editor (baru, PRD 006), image-cropper (baru, PRD 015) |
 | `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart (legacy PRD 003, diganti 011), event-calendar (baru, PRD 004), diff-viewer (baru, PRD 013) |
 | `feedback` | Status dan respons sistem | dialog, alert, alert-dialog, toast, toaster, empty-state, use-toast |
 | `navigation` | Navigasi dan pencarian | dropdown-menu, breadcrumb, pagination, command-palette, context-menu, navigation-menu |
@@ -74,6 +74,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Notifications | Toast/inbox, read state |
 | Onboarding | Step, skip, progress |
 | Import Wizard | Impor CSV 4 langkah: upload → mapping → validasi → konfirmasi; pratinjau error per sel, template contoh, hasil via callback (composed, kategori `form` + `data-display`, tanpa komponen baru v1); penyusun: stepper, file-input/file-upload (compose), select/combobox, data-table/table, alert, badge, progress, skeleton, empty-state, button |
+| Image Cropper | Potong avatar/cover: aspek terkunci, zoom/geser/rotasi preset 90°, pratinjau live + lingkaran, output blob via callback (composed, kategori `form`); penyusun: image-cropper (baru, wrapper react-easy-crop token-first), file-input, slider, button, avatar, skeleton, empty-state, alert, dialog (varian milik konsumen via compose) |
 | Optimistic Updates | Perubahan langsung + rollback |
 | Org Chart | Diagram hierarki organisasi read-only (legacy PRD 003, diganti 011 — lihat Org Chart Studio) |
 | Org Chart Editor | Editor hierarki organisasi v1 (legacy PRD 010, diganti 011 — lihat Org Chart Studio) |
