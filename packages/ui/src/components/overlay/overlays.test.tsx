@@ -67,7 +67,7 @@ describe('Overlay & Menu Components', () => {
           </SheetContent>
         </Sheet>
       );
-      const close = screen.getByRole('button', { name: 'Close' });
+      const close = screen.getByRole('button', { name: 'Tutup panel' });
       expect(close.className).toContain('h-8');
       expect(close.className).toContain('w-8');
       expect(close.className).toContain('after:-inset-1.5');

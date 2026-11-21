@@ -2,7 +2,8 @@
 
 // FlowEditor — fondasi canvas + node custom DS (story 005-01, PRD 005, design flow-editor).
 // Wrapper di atas @xyflow/react 13.0.2 (sudah terdaftar; bukan dependency baru).
-// Default CSS xyflow TIDAK diimpor — semua permukaan dipetakan ke token (design D1/D11).
+// CSS default xyflow DIIMPOR di styles.css (@import) lalu semua permukaan dipetakan ke token
+// lewat variabel --xy-* dan selector .react-flow__* (design D1/D11; CR-021 #7).
 // Kontrak deklaratif penuh (design D3): nodes/edges controlled + onNodesChange/onEdgesChange/
 // onConnect/onSelectionChange; uncontrolled via defaultNodes/defaultEdges untuk demo.
 // State matrix: loading (skeleton + aria-busy), empty (role="status" + CTA), error (role="alert" + retry).
@@ -263,7 +264,9 @@ const FlowHandle = React.forwardRef<HTMLDivElement, FlowHandleProps>(
     const connectCtx = React.useContext(FlowConnectContext);
     const onHandleKeyDown = connectCtx?.onHandleKeyDown;
     const isConnectingSource = connectCtx?.connecting?.nodeId === nodeId;
-    const sideClass = position === 'left' ? '-left-2.5' : '-right-2.5';
+    // Pusat hit-area tepat di tepi node (−24px / +24px dari sisi), sehingga titik
+    // sambung xyflow berada di tepi dan tidak menimpa judul/status node.
+    const sideClass = position === 'left' ? '-left-6' : '-right-6';
     return (
       <div
         ref={ref}
@@ -277,15 +280,25 @@ const FlowHandle = React.forwardRef<HTMLDivElement, FlowHandleProps>(
           }
         }}
         className={cn(
-          'absolute top-1/2 -translate-y-1/2 flex items-center justify-center',
+          'absolute top-1/2 -translate-y-1/2 z-10 flex h-12 w-12 items-center justify-center rounded-full',
           sideClass,
-          'w-12 h-12 rounded-full bg-border shadow-sm cursor-pointer',
-          'focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2',
+          'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           isConnectingSource ? 'ring-2 ring-primary ring-offset-2' : '',
           isConnectable === false ? 'opacity-50 cursor-not-allowed' : '',
         )}
       >
-        <Handle type={type} position={position as Position} className="h-3 w-3 rounded-full" />
+        {/* Hit-area 48px transparan (wrapper); xyflow Handle diposisikan statis di tengahnya. */}
+        <Handle
+          type={type}
+          position={position as Position}
+          isConnectable={isConnectable}
+          className="!relative !left-auto !top-auto !h-full !w-full !transform-none !border-0 !bg-transparent !rounded-full"
+        >
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-border bg-background"
+          />
+        </Handle>
       </div>
     );
   });
@@ -299,8 +312,6 @@ interface FlowNodeProps {
   data: FlowNodeData;
   id: string;
   selected: boolean;
-  positionX: number;
-  positionY: number;
   onSelect?: (id: string) => void;
   onDelete?: (id: string) => void;
   status?: FlowStatus;
@@ -310,8 +321,6 @@ function FlowNode({
   data,
   id,
   selected,
-  positionX,
-  positionY,
   onSelect,
   onDelete,
   status = 'default',
@@ -353,12 +362,12 @@ function FlowNode({
     <div
       data-testid={`flow-node-${id}`}
       className={cn(
-        'absolute left-0 top-0 z-10 flex w-[220px] h-[88px] flex-col items-start gap-1 rounded-md border shadow-sm transition-colors duration-200',
+        // Posisi ditangani xyflow lewat wrapper .react-flow__node; ukuran deterministik 220×88.
+        'relative flex w-[220px] h-[88px] flex-col items-start gap-1 rounded-md border shadow-sm transition-colors duration-200',
         'border-border bg-card text-foreground',
         selected ? 'border-primary ring-2 ring-primary ring-offset-2' : 'hover:border-primary/50',
         isDisabled ? 'opacity-60' : '',
       )}
-      style={{ transform: `translate(${positionX}px, ${positionY}px)` }}
       role="button"
       aria-selected={selected ? true : false}
       aria-label={`Node ${data.label}`}
@@ -380,7 +389,8 @@ function FlowNode({
         }
       }}
     >
-      <div className="flex w-full items-center gap-2 p-3 pr-2">
+      {/* px-6: ruang bagi hit-area handle kiri/kanan (48px, separuhnya masuk ke dalam node). */}
+      <div className="flex w-full items-center gap-2 py-3 px-6">
         <Tooltip>
           <TooltipTrigger asChild>
             <span
@@ -399,7 +409,7 @@ function FlowNode({
           {data.kind ?? '-'}
         </Badge>
       </div>
-      <div className="flex w-full flex-col gap-0.5 px-3 pt-0.5 pb-2">
+      <div className="flex w-full flex-col gap-0.5 px-6 pt-0.5 pb-2">
         <p className={cn('text-xs text-muted-foreground line-clamp-2', isDisabled ? 'opacity-80' : '')}>
           {data.description ?? ''}
         </p>
@@ -566,7 +576,7 @@ function FlowControls({
   const buttonClass =
     'flex h-8 w-8 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
   return (
-    <div data-testid="flow-controls" className="absolute right-3 top-3 z-20 flex flex-col items-end gap-1 rounded-md border border-border bg-card p-1 shadow-sm">
+    <div data-testid="flow-controls" className="absolute bottom-3 left-3 z-20 flex flex-row items-center gap-1 rounded-md border border-border bg-card p-1 shadow-sm">
       <div className="flex gap-1">
         <button type="button" aria-label="Perkecil" onClick={zoomOut} className={buttonClass} data-testid="flow-zoom-out">
           <span className="text-[10px] font-bold">−</span>
@@ -641,12 +651,13 @@ function FlowToolbar({
   minimapOpen = true,
   onToggleMinimap,
 }: FlowToolbarProps) {
+  // Target ≥44px (CR-021 #3); label teks tampil, tidak meluap keluar kotak.
   const buttonClass =
-    'flex h-8 w-8 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+    'flex h-11 items-center justify-center gap-1 whitespace-nowrap rounded-sm px-3 text-xs text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
   return (
     <div
       data-testid="flow-toolbar"
-      className="absolute left-3 top-3 z-20 flex flex-col items-start gap-1 rounded-md border border-border bg-card p-1 shadow-sm"
+      className="absolute left-3 top-3 z-20 flex max-w-[calc(100%-1.5rem)] flex-row flex-wrap items-center gap-1 rounded-md border border-border bg-card p-1 shadow-sm"
     >
       <button
         type="button"
@@ -747,6 +758,8 @@ interface FlowCanvasHostProps {
   fitView: () => void;
   ariaLabel: string;
   paletteItems: FlowPaletteItem[];
+  /** Toolbar pola (undo/redo/snap/grid) — dirender di dalam #flow-canvas (CR-021 #3). */
+  toolbar?: React.ReactNode;
 }
 
 function CanvasDropZone() {
@@ -806,6 +819,7 @@ function FlowCanvasHost({
   onNodeContextMenu,
   onEdgeContextMenu,
   onPaneContextMenu,
+  toolbar,
 }: FlowCanvasHostProps) {
   const apiRef = React.useRef<FlowCanvasApi | null>(null);
   const sensors = useSensors(
@@ -857,6 +871,7 @@ function FlowCanvasHost({
 
   return (
     <DndContext
+      id="flow-editor-dnd"
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
@@ -871,6 +886,7 @@ function FlowCanvasHost({
           className="relative w-full h-[560px] min-h-[320px] overflow-hidden rounded-md border border-border bg-background"
           role="application"
         >
+          {toolbar}
           <ReactFlowProvider>
             <ReactFlow
               aria-label={ariaLabel}
@@ -897,7 +913,7 @@ function FlowCanvasHost({
               nodesConnectable={!isInteractionLocked}
               elementsSelectable
               proOptions={{ hideAttribution: true }}
-              fitView={false}
+              fitView
               fitViewOptions={{ padding: 0.2 }}
               onNodeClick={(_event, _node) => {
                 // seleksi diatur melalui onSelectionChange xyflow; tidak ada state internal tambahan
@@ -1564,20 +1580,6 @@ React.useEffect(() => {
       {/* Skip-link ke kanvas untuk navigasi keyboard (AC-01). */}
       <SkipLink targetId="flow-canvas">Lewati ke kanvas</SkipLink>
 
-      {/* Toolbar pola — undo/redo + snap/grid (story 005-05 AC-03/AC-05). */}
-      <FlowToolbar
-        canUndo={_history.canUndo}
-        canRedo={_history.canRedo}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-        snapToGrid={isSnapToGrid}
-        onToggleSnap={toggleSnap}
-        showGrid={showGrid}
-        onToggleGrid={toggleGrid}
-        minimapOpen={minimapOpen}
-        onToggleMinimap={toggleMinimap}
-      />
-
       {/* State matrix — loading */}
       {loading && (
         <div
@@ -1623,6 +1625,20 @@ React.useEffect(() => {
           <FlowCanvasHost
             nodes={nodes}
             edges={edges}
+          toolbar={
+            <FlowToolbar
+              canUndo={_history.canUndo}
+              canRedo={_history.canRedo}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
+              snapToGrid={isSnapToGrid}
+              onToggleSnap={toggleSnap}
+              showGrid={showGrid}
+              onToggleGrid={toggleGrid}
+              minimapOpen={minimapOpen}
+              onToggleMinimap={toggleMinimap}
+            />
+          }
           onNodesChange={handleNodesChange}
           onEdgesChange={handleEdgesChange}
           onConnect={handleConnect}
