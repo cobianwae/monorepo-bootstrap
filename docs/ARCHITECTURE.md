@@ -55,6 +55,8 @@ Aturan:
 4. `packages/ui/src/styles.css` — konsumsi token oleh komponen.
 5. Komponen memakai kelas semantik (`bg-primary`, `text-muted-foreground`), bukan hex/RGB.
 
+Scope tema bersarang (`<div data-theme="…" class="dark">`) didukung lewat blok pemetaan ulang `--color-*` pada `[data-theme], .dark` di `tokens.css` (CR-033), karena `@theme` me-resolve `--color-*` di `:root`. Daftar blok itu harus identik dengan `@theme`; dijaga oleh `tokens-css.test.ts`.
+
 Tema yang tersedia: `pulse`, `sunset`, `botanic`, `midnight`, `nebula`, `lagoon`, `ink`, `graphite`.
 Setiap tema wajib punya perilaku light dan dark yang kontrasnya lolos audit.
 

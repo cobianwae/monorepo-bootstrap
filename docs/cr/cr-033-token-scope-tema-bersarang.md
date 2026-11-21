@@ -62,12 +62,13 @@ Keduanya benar setelah prototipe. Ini bukti mekanisme, bukan pengganti verifikas
 
 ## Tasks (jalur small-fix)
 
-- [ ] T1: tambah blok pemetaan ulang 39 `--color-*` pada `[data-theme], .dark` di `tokens.css`.
-- [ ] Guard drift: test baru `packages/tokens/src/tokens-css.test.ts` yang membaca `tokens.css`, mengambil pasangan `--color-X: var(--X)` dari `@theme` dan dari blok scope, lalu menegaskan himpunan dan pemetaannya sama (mencegah kedua daftar tidak sinkron).
-- [ ] Verifikasi browser (Chrome headless, build/dev showcase) pada `/patterns/mind-map`: empat kombinasi global terang/gelap × lokal terang/gelap; periksa kartu node, edge, minimap, kontrol zoom, dan panel; ukur warna efektif bukan hanya class.
-- [ ] Verifikasi regresi visual ringan: satu halaman showcase lain di tema terang dan gelap tidak berubah (sampel, mis. `components/data-display`).
-- [ ] Perbarui Known Issue di `docs/STATUS.md` (preview lokal light di tema global dark) sesuai hasil verifikasi; jangan klaim fix penuh jika kombinasi tertentu masih bermasalah.
-- [ ] Verifikasi: `pnpm test:tokens`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build` (dan build `apps/web` bila skrip tersedia).
+- [x] T1: tambah blok pemetaan ulang 39 `--color-*` pada `[data-theme], .dark` di `tokens.css`.
+- [x] Guard drift: test baru `packages/tokens/src/tokens-css.test.ts` yang membaca `tokens.css`, mengambil pasangan `--color-X: var(--X)` dari `@theme` dan dari blok scope, lalu menegaskan himpunan dan pemetaannya sama (mencegah kedua daftar tidak sinkron).
+- [x] Verifikasi browser (Chrome headless, build/dev showcase) pada `/patterns/mind-map`: empat kombinasi global terang/gelap × lokal terang/gelap; periksa kartu node, edge, minimap, kontrol zoom, dan panel; ukur warna efektif bukan hanya class.
+- [x] Verifikasi regresi visual ringan: satu halaman showcase lain di tema terang dan gelap tidak berubah (sampel, mis. `components/data-display`).
+- [x] Perbarui Known Issue di `docs/STATUS.md` (preview lokal light di tema global dark) sesuai hasil verifikasi; jangan klaim fix penuh jika kombinasi tertentu masih bermasalah.
+- [x] Verifikasi targeted: `pnpm test:tokens`, tsc tokens dan showcase, `pnpm lint`, test showcase (hasil di bawah).
+- [ ] Verifikasi akhir rantai CR-033 → 032: `pnpm test` penuh dan `pnpm -C apps/showcase build` (ditunda; lihat Hasil verifikasi, butir "Tidak dijalankan").
 
 ## Keputusan
 
@@ -81,17 +82,37 @@ Keduanya benar setelah prototipe. Ini bukti mekanisme, bukan pengganti verifikas
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik (tidak ada nilai baru).
-- [ ] Kontras light dan dark lolos WCAG AA (nilai tidak berubah; `contrast.test.ts` tetap hijau; kontras efektif kanvas lokal dicek sampel di browser).
-- [ ] Perilaku Radix/a11y tidak rusak (tidak ada perubahan markup).
-- [ ] API `cva` dan export tetap konsisten (tidak ada perubahan `packages/ui`).
-- [ ] State loading, empty, dan error relevan tersedia (state demo mind-map tetap terjangkau; dicek di mode terang/gelap).
-- [ ] Showcase/docs diperbarui bila perlu (`docs/STATUS.md` Known Issue; `docs/ARCHITECTURE.md` bagian Token Pipeline bila perlu satu kalimat tentang scope bersarang).
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass (catatan baseline: 12 error `flow-editor.test.tsx` pada typecheck dan test RTE `rte-link-save` kadang gagal; bukan scope).
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik (tidak ada nilai baru).
+- [x] Kontras light dan dark lolos WCAG AA (nilai tidak berubah; `contrast.test.ts` tetap hijau; kontras efektif kanvas lokal dicek sampel di browser).
+- [x] Perilaku Radix/a11y tidak rusak (tidak ada perubahan markup).
+- [x] API `cva` dan export tetap konsisten (tidak ada perubahan `packages/ui`).
+- [ ] State loading, empty, dan error relevan tersedia (state demo tetap terjangkau; di browser hanya state default "Contoh Q1" yang diukur pada mode terang/gelap, state lain belum).
+- [x] Showcase/docs diperbarui bila perlu (`docs/STATUS.md` Known Issue; `docs/ARCHITECTURE.md` bagian Token Pipeline bila perlu satu kalimat tentang scope bersarang).
+- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass (typecheck: hanya 12 error baseline; `pnpm test` penuh ditunda; catatan baseline: 12 error `flow-editor.test.tsx` pada typecheck dan test RTE `rte-link-save` kadang gagal; bukan scope).
 
 - Cek light/dark: empat kombinasi global × lokal pada halaman mind-map; satu halaman pembanding di kedua tema global.
 - Cek state: Loading, Empty, Invalid, Error eksternal, Berisi, Contoh Q1 pada mode lokal gelap.
 - Cek test: `packages/tokens` (guard baru + `contrast.test.ts`); `page.test.tsx:74` tidak berubah di CR ini (class tetap `dark`).
+
+### Hasil verifikasi — 2026-11-22
+
+Halaman asli `/patterns/mind-map`, Chrome headless (CDP) terhadap dev server `:4000`; tombol "Mode gelap" ditekan dan class `dark` pada `<html>` di-toggle. Diukur pada elemen label node "Fitur inti" (latar buram terdekat + warna teks). Kondisi "sebelum" memakai `tokens.css` dari `HEAD`, "sesudah" memakai perubahan CR ini.
+
+| Global / lokal | Sebelum (latar node / teks) | Sesudah (latar node / teks) |
+|---|---|---|
+| terang / terang | `oklch(1 0 0)` / `oklch(0.18 0.02 260)` | sama |
+| terang / **gelap** | `oklch(1 0 0)` / `oklch(0.18 0.02 260)` — node **tetap terang** di kanvas gelap | `oklch(0.18 0.018 260)` / `oklch(0.96 0.005 260)` |
+| gelap / gelap | `oklch(0.18 0.018 260)` / `oklch(0.96 0.005 260)` | sama |
+| gelap / **terang** | `oklch(0.18 0.018 260)` / `oklch(0.96 0.005 260)` — node **tetap gelap** di kanvas terang | `oklch(1 0 0)` / `oklch(0.18 0.02 260)` |
+
+- Latar kanvas dan stroke edge sudah mengikuti scope lokal sebelum perbaikan (memakai `var(--…)` mentah); yang tertinggal adalah node (utilitas `--color-*`). Itu gejala yang dilaporkan: kanvas berubah, blok node tidak.
+- Screenshot ditinjau untuk terang/gelap dan gelap/terang: sesudah perbaikan node, minimap, dan kanvas konsisten. Berkas lokal tidak di-commit: `/tmp/cr033/before-*.png`, `/tmp/cr033/after-*.png`.
+- Regresi: `/components/data-display` (1915 elemen) diukur pada `<html>` terang dan gelap (color, background, border, outline, fill, stroke): **0 perbedaan** antara CSS lama dan baru.
+- `pnpm test:tokens`: 10/10 (2 test baru + 8 kontras). Uji mutasi: menghapus satu baris dari blok scope membuat guard drift gagal; file dikembalikan.
+- tsc `packages/tokens` dan `apps/showcase` hijau; `pnpm lint` workspace bersih; `pnpm typecheck` hanya menampilkan 12 error baseline `flow-editor.test.tsx` di `packages/ui` (runner berhenti di sana); test showcase 74/74.
+- Catatan jujur: pengukuran awal yang mengambil "turunan buram pertama" node salah membaca pembungkus; angka di tabel berasal dari pengukuran ulang per elemen label.
+- Tidak dijalankan: (1) `pnpm test` penuh, karena `packages/ui` dan komponen tidak diubah; akan dijalankan di akhir rantai. (2) `pnpm -C apps/showcase build`, karena `next build` menimpa `.next` yang sedang dipakai dev server `:4000`; kompilasi Tailwind sudah terbukti lewat dev server yang menyajikan blok baru. (3) build `apps/web`.
+- Batasan: hanya state default "Contoh Q1" yang diukur; panel kontrol dan judul section masih ikut membalik saat "Mode gelap" ditekan sampai CR-030 membatasi scope lokal ke kanvas. SR bersuara native tidak diuji.
 
 ## Eksekusi
 
@@ -99,9 +120,9 @@ Branch: `cr-033-token-scope-tema-bersarang`
 Commit: `fix: pemetaan ulang variabel warna pada scope tema bersarang [CR-033]`
 
 - [x] CR disetujui user (instruksi user: "approve smua", sesi /improve-ui).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat (`cr-033-token-scope-tema-bersarang` dari `dev`).
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan (targeted; sisanya ditunda, lihat Hasil verifikasi).
+- [x] CR di-tick; status di `docs/BACKLOG.md` tetap `approved` (hanya user yang menetapkan `done`).
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
