@@ -71,12 +71,17 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 011-03 | Studio pindah drag/dialog + hapus + undo/redo | done | `docs/stories/011-03-pindah-hapus-undo.md` |
 | 011-04 | Studio cari + keyboard + pohon SR + motion/sentuh | todo | `docs/stories/011-04-cari-keyboard-pohon-sr.md` |
 | 011-05 | Studio states + showcase + audit kontras + legacy deprecated | todo | `docs/stories/011-05-states-showcase-audit-legacy.md` |
-| 005-01 | Flow editor fondasi canvas + node custom DS | approved | `docs/stories/005-01-canvas-node-foundation.md` |
+| 005-01 | Flow editor fondasi canvas + node custom DS | review | `docs/stories/005-01-canvas-node-foundation.md` |
 | 005-02 | Flow editor palette drag + tambah keyboard + snap | approved | `docs/stories/005-02-palette-drop-snap.md` |
 | 005-03 | Flow editor edge sambung + validasi + label | approved | `docs/stories/005-03-edge-validasi-label.md` |
 | 005-04 | Flow editor seleksi + inspector on-demand + hapus | approved | `docs/stories/005-04-seleksi-inspector-hapus.md` |
 | 005-05 | Flow editor undo/redo + toolbar pola | approved | `docs/stories/005-05-undo-redo-toolbar.md` |
 | 005-06 | Flow editor minimap + showcase + audit | approved | `docs/stories/005-06-minimap-showcase-audit.md` |
+| 006-01 | RTE fondasi controlled + toolbar inline/blok + undo | todo | `docs/stories/006-01-fondasi-toolbar-controlled.md` |
+| 006-02 | RTE link M-009 + shortcut + keyboard penuh | todo | `docs/stories/006-02-link-shortcut-keyboard.md` |
+| 006-03 | RTE mode + counter + state matrix | todo | `docs/stories/006-03-mode-counter-states.md` |
+| 006-04 | RTE gambar M-010 + serializer markdown + slot mention | todo | `docs/stories/006-04-gambar-markdown-mention.md` |
+| 006-05 | RTE showcase final + audit kontras + smoke | todo | `docs/stories/006-05-showcase-audit-smoke.md` |
 
 ## Change Requests
 

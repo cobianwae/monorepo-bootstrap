@@ -1,6 +1,6 @@
 # 005-01 — Fondasi canvas + node custom DS
 
-Status: approved
+Status: review
 PRD: `docs/prd/005-flow-editor.md`
 Design: `docs/design/flow-editor.md`
 FR: `FR-001`, `FR-002`, `FR-010`, `FR-012`, `FR-013`
@@ -53,14 +53,14 @@ Goal: Canvas xyflow token-mapped hidup dengan controls Indonesia, 2 jenis node D
 
 ## Tasks
 
-- [ ] `FlowEditor` di `packages/ui/src/components/canvas/flow-editor.tsx` + `index.ts` export (named)
-- [ ] Token-mapping `.xyflow__*` di `packages/ui/src/styles.css` (variable existing; tanpa `border-strong`)
-- [ ] Controls token + `aria-label` Indonesia (Perkecil/Tingkat zoom/Perbesar/Selaras tampilan/Atur 100%/Kunci interaksi)
-- [ ] `FlowNode`/`FlowNodeData` + 2 `nodeTypes` demo + kontrak a11y D4 + `data-testid` (temuan #10)
-- [ ] State matrix: skeleton, empty + CTA, error + retry
-- [ ] Test: render + zoom limits + reset-vs-fit + handle focus + state matrix + cek cepat kontras edge
-- [ ] Kontrak `useFlowHistory` (tipe + stub/mock) untuk dipakai 005-02–04; implementasi penuh di 005-05
-- [ ] Showcase draf route `/patterns/flow-editor` (final di 005-06)
+- [x] `FlowEditor` di `packages/ui/src/components/canvas/flow-editor.tsx` + `index.ts` export (named)
+- [x] Token-mapping `.xyflow__*` di `packages/ui/src/styles.css` (variable existing; tanpa `border-strong`)
+- [x] Controls token + `aria-label` Indonesia (Perkecil/Tingkat zoom/Perbesar/Selaras tampilan/Atur 100%/Kunci interaksi)
+- [x] `FlowNode`/`FlowNodeData` + 2 `nodeTypes` demo + kontrak a11y D4 + `data-testid` (temuan #10)
+- [x] State matrix: skeleton, empty + CTA, error + retry
+- [x] Test: render + zoom limits + reset-vs-fit + handle focus + state matrix + cek cepat kontras edge
+- [x] Kontrak `useFlowHistory` (tipe + stub/mock) untuk dipakai 005-02–04; implementasi penuh di 005-05
+- [x] Showcase draf route `/patterns/flow-editor` (final di 005-06)
 
 ## Dependencies
 
