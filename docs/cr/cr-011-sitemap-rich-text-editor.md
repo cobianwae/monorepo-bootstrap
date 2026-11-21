@@ -1,6 +1,6 @@
 # CR-011 — Sitemap & rujukan docs Rich Text Editor (PRD 006)
 
-**Status:** approved
+**Status:** done
 **Sumber:** review
 **Ref:** `docs/design/sitemap.md:65`, `docs/design/sitemap.md:102-114`, `docs/prd/006-rich-text-editor.md:99-100`, `docs/design/rich-text-editor.md` §8, `docs/stories/006-05-showcase-audit-smoke.md:52`
 
