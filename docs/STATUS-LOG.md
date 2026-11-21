@@ -129,3 +129,6 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Story 012-01 `done` (approved oleh user) — `012-01`.
 - 2026-11-21 — Story 017-01 Tour fondasi selesai (wrapper driver.js 1.14.0 token-first K1 + tour-types/tour.tsx controlled + tour.css terisolasi + announcer SR; 7 test co-located hijau, total packages/ui 599; lint hijau, typecheck hanya known issue flow-editor.test.tsx per CR-015), status `review` — `017-01`.
 - 2026-11-21 — Story 017-01 `done` (approved oleh user) — `017-01`.
+- 2026-11-21 — Story 014-02 Import wizard shell stepper + upload + mapping: route `/patterns/import-wizard` (langkah 1 upload/tempel/delimiter/template/error-empty, langkah 2 mapping + gate wajib + duplikat ditolak), state mundur terjaga, 35 test showcase hijau (termasuk tes halaman jsdom: gate, fokus h2/live region, state mundur), lint hijau, build showcase hijau; devDependencies testing ditambahkan di showcase; status `review` — `014-02`.
+- 2026-11-21 — Story 014-02 `done` (approved oleh user) — `014-02`.
+>

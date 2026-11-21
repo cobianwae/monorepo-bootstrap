@@ -83,8 +83,8 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.35 | Mind Map (PRD 012) | `/patterns/mind-map` | in-design |
 | S-005.36 | Diff Viewer (PRD 013) | `/patterns/diff-viewer` | in-design |
 | S-005.37 | Import Wizard (PRD 014) | `/patterns/import-wizard` | in-design |
-| S-005.37.01 | Import Wizard — langkah upload | `/patterns/import-wizard` (langkah 1) | in-design |
-| S-005.37.02 | Import Wizard — langkah mapping | `/patterns/import-wizard` (langkah 2) | in-design |
+| S-005.37.01 | Import Wizard — langkah upload | `/patterns/import-wizard` (langkah 1) | implemented |
+| S-005.37.02 | Import Wizard — langkah mapping | `/patterns/import-wizard` (langkah 2) | implemented |
 | S-005.37.03 | Import Wizard — langkah validasi | `/patterns/import-wizard` (langkah 3) | in-design |
 | S-005.37.04 | Import Wizard — langkah konfirmasi | `/patterns/import-wizard` (langkah 4) | in-design |
 | S-005.41 | Permission Matrix (PRD 018) | `/patterns/permission-matrix` | in-design |
