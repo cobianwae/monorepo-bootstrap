@@ -1,6 +1,6 @@
 # CR-019 — Flow Editor inspector on-demand tidak mengunci
 
-**Status:** approved
+**Status:** done
 **Sumber:** review artefak 005 + laporan bug user (“tiba-tiba muncul drawer inspector, nggak bisa diclose, nggak bisa ngapa-ngapain, nggak jelas isinya”)
 **Ref:** `docs/prd/005-flow-editor.md` (FR-006), `docs/design/flow-editor.md` (D7), `docs/stories/005-04-seleksi-inspector-hapus.md` (AC-01–AC-05), `docs/stories/005-06-minimap-showcase-audit.md` (AC-05), `apps/showcase/src/app/(docs)/patterns/flow-editor/page.tsx`, `packages/ui/src/components/overlay/sheet.tsx`
 
