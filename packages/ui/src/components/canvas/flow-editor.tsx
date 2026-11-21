@@ -58,6 +58,7 @@ import { EmptyState } from '../feedback/empty-state';
 import { Skeleton } from '../base/skeleton';
 import { toast } from '../feedback/use-toast';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../base/tooltip';
+import { SkipLink } from '../layout/skip-link';
 
 // ---------------------------------------------------------------------------
 // Tipe publik (design §2)
@@ -326,12 +327,26 @@ function FlowNode({
     }
   }, [id, registerHandleRefs, sourceRef, targetRef]);
   const isDisabled = data.disabled === true;
-  const statusBadge = {
-    default: 'bg-muted text-muted-foreground',
-    running: 'bg-primary text-primary-foreground animate-pulse',
-    success: 'bg-success text-success-foreground',
-    warning: 'bg-warning text-warning-foreground',
-    error: 'bg-destructive text-destructive-foreground',
+  const statusDot = {
+    default: 'bg-muted',
+    running: 'bg-primary animate-pulse',
+    success: 'bg-success',
+    warning: 'bg-warning',
+    error: 'bg-destructive',
+  }[status];
+  const statusText = {
+    default: 'text-muted-foreground',
+    running: 'text-primary-foreground',
+    success: 'text-success-foreground',
+    warning: 'text-warning-foreground',
+    error: 'text-destructive-foreground',
+  }[status];
+  const statusLabel = {
+    default: 'Siap',
+    running: 'Berjalan',
+    success: 'Sukses',
+    warning: 'Peringatan',
+    error: 'Gagal',
   }[status];
 
   return (
@@ -390,10 +405,11 @@ function FlowNode({
         </p>
         <div className="flex w-full items-end justify-between">
           <span
-            className={cn('text-micro text-muted-foreground', statusBadge)}
+            className="flex items-center gap-1"
             data-testid={`flow-node-status-${id}`}
           >
-            {status}
+            <span className={cn('h-1.5 w-1.5 rounded-full', statusDot)} aria-hidden="true" />
+            <span className={cn('text-micro', statusText)}>{statusLabel}</span>
           </span>
           {isDisabled ? <span className="text-micro text-muted-foreground">disabled</span> : null}
         </div>
@@ -439,9 +455,10 @@ const defaultNodeTypes: Record<string, ComponentType<{ data: FlowNodeData; selec
 interface FlowPaletteProps {
   items: FlowPaletteItem[];
   onAdd: (item: FlowPaletteItem) => void; // [+] keyboard → posisi tengah viewport (ditangani host)
+  className?: string;
 }
 
-export function FlowPalette({ items, onAdd }: FlowPaletteProps) {
+export function FlowPalette({ items, onAdd, className }: FlowPaletteProps) {
   const [query, setQuery] = React.useState('');
 
   const filtered = items.filter(
@@ -451,7 +468,7 @@ export function FlowPalette({ items, onAdd }: FlowPaletteProps) {
   );
 
   return (
-    <section data-testid="flow-palette" className="flex w-64 flex-col gap-2">
+    <section data-testid="flow-palette" className={cn('flex flex-col gap-2', className ?? 'w-64')}>
       <label htmlFor="flow-palette-search" className="sr-only">
         Cari jenis node
       </label>
@@ -608,6 +625,8 @@ interface FlowToolbarProps {
   onToggleSnap: () => void;
   showGrid: boolean;
   onToggleGrid: () => void;
+  minimapOpen?: boolean;
+  onToggleMinimap?: () => void;
 }
 
 function FlowToolbar({
@@ -619,6 +638,8 @@ function FlowToolbar({
   onToggleSnap,
   showGrid,
   onToggleGrid,
+  minimapOpen = true,
+  onToggleMinimap,
 }: FlowToolbarProps) {
   const buttonClass =
     'flex h-8 w-8 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
@@ -668,6 +689,17 @@ function FlowToolbar({
       >
         Grid
       </button>
+      <div aria-hidden="true" className="h-5 w-px bg-border mx-1" />
+      <button
+        type="button"
+        aria-pressed={minimapOpen}
+        aria-label={minimapOpen ? 'Sembunyikan minimap' : 'Tampilkan minimap'}
+        onClick={onToggleMinimap}
+        className={cn(buttonClass, minimapOpen ? '' : 'opacity-50')}
+        data-testid="flow-toggle-minimap"
+      >
+        Minimap
+      </button>
     </div>
   );
 }
@@ -703,6 +735,8 @@ interface FlowCanvasHostProps {
   snapToGrid: boolean;
   gridSize: number;
   minimap: boolean;
+  minimapExplicit?: boolean;
+  onToggleMinimap?: () => void;
   showGrid: boolean;
   isInteractionLocked: boolean;
   onToggleLock: () => void;
@@ -758,6 +792,7 @@ function FlowCanvasHost({
   snapToGrid,
   gridSize,
   minimap,
+  minimapExplicit = false,
   showGrid,
   isInteractionLocked,
   onToggleLock,
@@ -826,13 +861,14 @@ function FlowCanvasHost({
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-4">
+      <div className="flex flex-col md:flex-row gap-4">
         {paletteItems && paletteItems.length > 0 ? (
-          <FlowPalette items={paletteItems} onAdd={handleKeyboardAdd} />
+          <FlowPalette items={paletteItems} onAdd={handleKeyboardAdd} className="w-full md:w-64" />
         ) : null}
 
         <div
-          className="relative w-full h-[560px] overflow-hidden rounded-md border border-border bg-background"
+          id="flow-canvas"
+          className="relative w-full h-[560px] min-h-[320px] overflow-hidden rounded-md border border-border bg-background"
           role="application"
         >
           <ReactFlowProvider>
@@ -883,15 +919,22 @@ function FlowCanvasHost({
                 <Background variant={('dots' as unknown as BackgroundVariant)} gap={gridSize * 4} />
               )}
               {minimap ? (
-                <MiniMap
-                  data-testid="flow-minimap"
-                  pannable
-                  zoomable
-                  aria-label="Minimap"
-                  className="hidden md:block !border-border !bg-card"
-                  maskColor="color-mix(in oklch, var(--background) 70%, transparent)"
-                  nodeColor="var(--primary)"
-                />
+                <div tabIndex={-1} data-testid="flow-minimap-wrap" aria-label="Minimap">
+                  <MiniMap
+                    data-testid="flow-minimap"
+                    pannable
+                    zoomable
+                    className={
+                      minimapExplicit
+                        ? minimap
+                          ? 'block !border-border !bg-card'
+                          : 'hidden !border-border !bg-card'
+                        : 'hidden md:block !border-border !bg-card'
+                    }
+                    maskColor="color-mix(in oklch, var(--background) 70%, transparent)"
+                    nodeColor="var(--primary)"
+                  />
+                </div>
               ) : null}
               <FlowControls
                 zoomLevel={zoomLevel}
@@ -989,6 +1032,21 @@ export function FlowEditor(props: FlowEditorProps) {
   const [historyAnnounce, setHistoryAnnounce] = React.useState('');
   const [isSnapToGrid, setIsSnapToGrid] = React.useState(snapToGrid ?? false);
   const [showGrid, setShowGrid] = React.useState(true);
+  const [showNodeList, setShowNodeList] = React.useState(false);
+  // Minimap: default true (FR-008, design D10). State internal mengikuti prop
+  // `minimap` sebagai nilai awal; toggle pengguna tidak mengubah API publik.
+  const [minimapOpen, setMinimapOpen] = React.useState(minimap ?? true);
+  // `minimapExplicit` ditetapkan saat pengguna menekan toggle minimap: di bawah
+  // md minimap disembunyikan default (`hidden md:block`) dan toggle paksa tampil
+  // atau sembunuhi lewat kelas `block`/`hidden` (AC-01).
+  const [minimapExplicit, setMinimapExplicit] = React.useState(false);
+
+  React.useEffect(() => {
+    setMinimapOpen(minimap ?? true);
+    // Prop `minimap` (dikontrol halaman showcase) menjadi kebenaran utama:
+    // reset pengecualian toggle agar perilaku responsif <md konsisten.
+    setMinimapExplicit(false);
+  }, [minimap]);
 
   const handleUndo = React.useCallback(() => {
     const snap = _history.undo({ nodes, edges });
@@ -1266,6 +1324,56 @@ React.useEffect(() => {
     void toast({ title: 'Dihapus', description: `${selNodes.length} node, ${edgeList.length} edge dihapus — Urungkan`, duration: 4000 });
   }, [selection, edges, isControlled, onDelete, nodes, _history]);
 
+  // Fokus pada node/edge dari daftar SR (AC-03): seleksi elemen + fokus DOM bila tersedia.
+  const focusNode = React.useCallback(
+    (id: string) => {
+      const node = nodes.find((n) => n.id === id);
+      if (!node) return;
+      const next: FlowSelection = { nodes: [node], edges: [] };
+      setSelection(next);
+      void onSelectionChange?.(next);
+      if (typeof document !== 'undefined') {
+        const el = document.querySelector<HTMLElement>(`[data-testid="flow-node-${id}"]`);
+        el?.focus();
+      }
+      setHistoryAnnounce(`Fokus pada node ${node.data.label}`);
+    },
+    [nodes, onSelectionChange],
+  );
+
+  const focusEdge = React.useCallback(
+    (id: string) => {
+      const edge = edges.find((e) => e.id === id);
+      if (!edge) return;
+      const next: FlowSelection = { nodes: [], edges: [edge] };
+      setSelection(next);
+      void onSelectionChange?.(next);
+      if (typeof document !== 'undefined') {
+        const el = document.querySelector<HTMLElement>(`[data-testid="flow-edge-${id}"]`);
+        el?.focus();
+      }
+      setHistoryAnnounce(`Fokus pada edge ${edge.source} → ${edge.target}`);
+    },
+    [edges, onSelectionChange],
+  );
+
+  const removeSingleNode = React.useCallback(
+    (node: FlowNode) => {
+      const related = edges.filter((e) => e.source === node.id || e.target === node.id);
+      handleDeleteSelected({ nodes: [node], edges: related });
+      setHistoryAnnounce(`Node ${node.data.label} dihapus`);
+    },
+    [edges, handleDeleteSelected],
+  );
+
+  const removeSingleEdge = React.useCallback(
+    (edge: FlowEdge) => {
+      handleDeleteSelected({ nodes: [], edges: [edge] });
+      setHistoryAnnounce(`Edge ${edge.source} → ${edge.target} dihapus`);
+    },
+    [handleDeleteSelected],
+  );
+
   const openContextMenu = React.useCallback(
     (kind: 'node' | 'edge' | 'canvas', id: string | null, x: number, y: number) => {
       setContextMenu({ kind, id, x, y });
@@ -1427,6 +1535,10 @@ React.useEffect(() => {
 
   const toggleSnap = React.useCallback(() => setIsSnapToGrid((prev) => !prev), []);
   const toggleGrid = React.useCallback(() => setShowGrid((prev) => !prev), []);
+  const toggleMinimap = React.useCallback(() => {
+    setMinimapExplicit(true);
+    setMinimapOpen((prev) => !prev);
+  }, []);
 
   const zoomIn = React.useCallback(() => setZoomLevel((z) => Math.min(z + 0.25, 2)), []);
   const zoomOut = React.useCallback(() => setZoomLevel((z) => Math.max(z - 0.25, 0.25)), []);
@@ -1448,6 +1560,9 @@ React.useEffect(() => {
       role="application"
       onKeyDown={handleEditorKeyDown}
     >
+      {/* Skip-link ke kanvas untuk navigasi keyboard (AC-01). */}
+      <SkipLink targetId="flow-canvas">Lewati ke kanvas</SkipLink>
+
       {/* Toolbar pola — undo/redo + snap/grid (story 005-05 AC-03/AC-05). */}
       <FlowToolbar
         canUndo={_history.canUndo}
@@ -1458,6 +1573,8 @@ React.useEffect(() => {
         onToggleSnap={toggleSnap}
         showGrid={showGrid}
         onToggleGrid={toggleGrid}
+        minimapOpen={minimapOpen}
+        onToggleMinimap={toggleMinimap}
       />
 
       {/* State matrix — loading */}
@@ -1517,7 +1634,8 @@ React.useEffect(() => {
           onAddFromPalette={handleAddFromPalette}
           snapToGrid={isSnapToGrid}
           gridSize={gridSize}
-          minimap={minimap}
+          minimap={minimapOpen}
+          minimapExplicit={minimapExplicit}
           showGrid={showGrid}
           isInteractionLocked={isInteractionLocked}
           onToggleLock={() => setIsInteractionLocked((prev) => !prev)}
@@ -1531,6 +1649,7 @@ React.useEffect(() => {
           onNodeContextMenu={handleNodeContextMenu}
           onEdgeContextMenu={handleEdgeContextMenu}
           onPaneContextMenu={handlePaneContextMenu}
+          onToggleMinimap={toggleMinimap}
           />
         </FlowConnectContext.Provider>
       )}
@@ -1561,20 +1680,93 @@ React.useEffect(() => {
         </div>
       )}
 
-      {/* Daftar alternatif screen reader (node + edge) */}
-      <div className="sr-only" aria-label="Daftar node dan edge">
-        <ul>
-          {nodes.map((node) => (
-            <li key={node.id} data-testid={`flow-sr-node-${node.id}`}>
-              {node.data.label}
-            </li>
-          ))}
-          {edges.map((edge) => (
-            <li key={edge.id} data-testid={`flow-sr-edge-${edge.id}`}>
-              Edge dari {edge.source} ke {edge.target}
-            </li>
-          ))}
-        </ul>
+      {/* Daftar alternatif screen reader (node + edge) — toggle terlihat + tombol per baris (AC-03). */}
+      <div className="space-y-2">
+        <button
+          type="button"
+          aria-expanded={showNodeList}
+          aria-controls="flow-node-edge-list"
+          onClick={() => setShowNodeList((prev) => !prev)}
+          data-testid="flow-sr-toggle"
+          className="rounded-md border border-border bg-card px-2 py-1 text-xs text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          {showNodeList ? 'Sembunyikan daftar node & edge' : 'Tampilkan daftar node & edge'}
+        </button>
+        <div
+          id="flow-node-edge-list"
+          role="region"
+          aria-label="Daftar node dan edge"
+          className={cn(
+            'rounded-md border border-border bg-card p-3 text-sm text-foreground',
+            showNodeList ? '' : 'sr-only',
+          )}
+        >
+          <ul className="flex flex-col gap-1">
+            {nodes.map((node) => {
+              const connectionCount = edges.filter(
+                (e) => e.source === node.id || e.target === node.id,
+              ).length;
+              return (
+                <li
+                  key={node.id}
+                  data-testid={`flow-sr-node-${node.id}`}
+                  className="flex items-center justify-between gap-2"
+                >
+                  <span>
+                    {node.data.label}, {connectionCount} koneksi
+                  </span>
+                  <span className="flex shrink-0 items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => focusNode(node.id)}
+                      data-testid={`flow-sr-focus-node-${node.id}`}
+                      className="rounded-sm border border-border px-2 py-0.5 text-xs hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      Fokus
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeSingleNode(node)}
+                      data-testid={`flow-sr-hapus-node-${node.id}`}
+                      className="rounded-sm border border-destructive/40 px-2 py-0.5 text-xs text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      Hapus
+                    </button>
+                  </span>
+                </li>
+              );
+            })}
+            {edges.map((edge) => (
+              <li
+                key={edge.id}
+                data-testid={`flow-sr-edge-${edge.id}`}
+                className="flex items-center justify-between gap-2"
+              >
+                <span>
+                  {edge.source} → {edge.target}, label: {edge.label ?? '—'}
+                </span>
+                <span className="flex shrink-0 items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => focusEdge(edge.id)}
+                    data-testid={`flow-sr-focus-edge-${edge.id}`}
+                    className="rounded-sm border border-border px-2 py-0.5 text-xs hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    Fokus
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeSingleEdge(edge)}
+                    data-testid={`flow-sr-hapus-edge-${edge.id}`}
+                    className="rounded-sm border border-destructive/40 px-2 py-0.5 text-xs text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    Hapus
+                  </button>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       {/* Live region hitungan seleksi (AC-02) */}
