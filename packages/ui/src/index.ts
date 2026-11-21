@@ -45,6 +45,32 @@ export * from './components/form/number-input';
 export * from './components/form/time-picker';
 export * from './components/data-display/org-chart';
 export * from './components/canvas/org-chart-editor';
+// org-chart-studio mengekspor getAncestors sendiri (FR-001 self-contained);
+// dialias di barrel agar tidak tabrakan dengan org-chart (TS2308).
+export {
+  OrgChartStudio,
+  STUDIO_NODE_HEIGHT,
+  STUDIO_NODE_WIDTH,
+  computeStudioPositions,
+  normalizeStudioInput,
+  toStudioFlowEdges,
+  toStudioFlowNodes,
+  getAncestors as getStudioAncestors,
+} from './components/canvas/org-chart-studio';
+export type {
+  OrgChartStudioError,
+  OrgChartStudioProps,
+  OrgStudioAccent,
+  OrgStudioInput,
+  OrgStudioNodeFlat,
+  OrgStudioNodeNested,
+  OrgStudioNodeNormalized,
+  StudioFlowEdge,
+  StudioFlowNode,
+  StudioNodeData,
+  StudioNormalizedResult,
+  StudioPosition,
+} from './components/canvas/org-chart-studio';
 export * from './components/data-display/file-manager';
 export * from './components/data-display/data-table';
 export * from './components/form/filter-builder';

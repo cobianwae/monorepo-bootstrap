@@ -1,6 +1,6 @@
 # 011-01 — Fondasi kanvas, kartu lega, dan layout seimbang
 
-Status: todo
+Status: review
 PRD: `docs/prd/011-org-chart-studio.md`
 Design: `docs/design/org-chart-studio.md`
 FR: `FR-001`, `FR-002`, `FR-003`, `FR-004`, `FR-013`, `FR-017`
@@ -35,13 +35,13 @@ Goal: Komponen `OrgChartStudio` berdiri di atas `@xyflow/react` dengan satu layo
 
 ## Tasks
 
-- [ ] Buat `packages/ui/src/components/canvas/org-chart-studio.tsx` + tipe `OrgStudioNodeFlat/Nested`, `OrgChartStudioProps`, util `getAncestors` (design §2)
-- [ ] Normalisasi + validasi terstruktur reuse pola 003/010 (bukan throw); konversi flat → xyflow `nodes`/`edges`
-- [ ] Implementasi balanced-tidy post-order (§3 langkah 3) + mapping xyflow langkah 4; memo layout
-- [ ] Node custom `StudioNode` 240×84: avatar 32, nama, jabatan, badge, strip aksen, expander, tooltip; edge `smoothstep` 1px
-- [ ] Controls + minimap + toolbar dasar (reset/fit) token-mapped; `role="application"`, `ariaLabel` default
-- [ ] Barrel export + test co-located (flat=nested, 4 invalid, determinisme layout, expand controlled/uncontrolled, reset/fit dipanggil)
-- [ ] Docs: catat slot/gap/level + keputusan tunda `d3-hierarchy` di story; siapkan draf seksi showcase (tanpa halaman penuh — scope 011-05)
+- [x] Buat `packages/ui/src/components/canvas/org-chart-studio.tsx` + tipe `OrgStudioNodeFlat/Nested`, `OrgChartStudioProps`, util `getAncestors` (design §2)
+- [x] Normalisasi + validasi terstruktur reuse pola 003/010 (bukan throw); konversi flat → xyflow `nodes`/`edges`
+- [x] Implementasi balanced-tidy post-order (§3 langkah 3) + mapping xyflow langkah 4; memo layout
+- [x] Node custom `StudioNode` 240×84: avatar 32, nama, jabatan, badge, strip aksen, expander, tooltip; edge `smoothstep` 1px
+- [x] Controls + minimap + toolbar dasar (reset/fit) token-mapped; `role="application"`, `ariaLabel` default
+- [x] Barrel export + test co-located (flat=nested, 4 invalid, determinisme layout, expand controlled/uncontrolled, reset/fit dipanggil)
+- [x] Docs: catat slot/gap/level + keputusan tunda `d3-hierarchy` di story; siapkan draf seksi showcase (tanpa halaman penuh — scope 011-05)
 
 ## Dependencies
 

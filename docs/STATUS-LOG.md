@@ -62,3 +62,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 2026-11-21 — Docs artefak 011 + CR-010 didorong ke dev: baseline PRD/design/stories/flows 011, adendum ID S-005.34, OQ#1–3 decided, expander 44px + shortcut panel, BACKLOG/STATUS sinkron — 011, CR-010
 2026-11-21 — CR-010 `done` (di-merge ke dev; tanpa branch terpisah sesuai instruksi user) — CR-010
 2026-11-21 — CR-009 DIHENTIKAN (reversal keputusan diselesaikan-dulu; mulai dari awal via 011) — CR-009, 011
+- 2026-11-21 — Story 011-01 fondasi OrgChartStudio selesai (normalize/validasi + balanced-tidy 240×84 + kartu lega + pan/zoom/reset/fit, test 15 hijau; typecheck/lint/test/test:tokens hijau) — `011-01`.
