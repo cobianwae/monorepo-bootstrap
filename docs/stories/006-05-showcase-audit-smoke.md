@@ -1,6 +1,6 @@
 # 006-05 — Showcase final + audit kontras + smoke
 
-Status: review
+Status: done
 PRD: `docs/prd/006-rich-text-editor.md`
 Design: `docs/design/rich-text-editor.md`
 FR: `FR-012`, `FR-014`

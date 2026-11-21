@@ -108,3 +108,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Story 006-04 gambar M-010 + serializer markdown + slot mention selesai (dialog URL + alt wajib + pratinjau + setImage rounded border, htmlToMarkdown/markdownToHtml murni inti, extensions append-only + onImageUpload disiapkan, @tiptap/extension-image + @tiptap/core 3.30.1; 6 test baru hijau, 27/27 RTE; typecheck/lint/test:tokens hijau), status `review` — `006-04`.
 - 2026-11-21 — Story 006-04 `done` (approved oleh user) dan di-merge ke `dev` — `006-04`.
 - 2026-11-21 — Story 006-05 showcase final + audit + smoke selesai (upgrade S-005.22 komponen-only + ol 6 langkah + panel demo + resep 15 baris, demo ringkas S-004.03 #rte-demo, audit Pulse AA light/dark + 3 smoke test, 531 test + typecheck/lint/test:tokens/showcase build hijau), status `review` — `006-05`.
+- 2026-11-21 — Story 006-05 `done` (approved oleh user) — `006-05`.
