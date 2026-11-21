@@ -36,7 +36,7 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 | Kategori | Tujuan | Komponen utama |
 |---|---|---|
 | `base` | Primitive visual dan kontrol dasar | button, badge, card, input, textarea, label, separator, skeleton, avatar, tabs, checkbox, switch, tooltip, progress, spinner, radio-group, slider, accordion, collapsible, kbd, toggle, aspect-ratio, scroll-area, palette-switcher, theme-provider |
-| `form` | Input dan validasi | form, select, combobox, tag-input, date-picker, input-otp, number-input, time-picker, filter-builder, stepper, segmented-control, file-input, file-upload |
+| `form` | Input dan validasi | form, select, combobox, tag-input, date-picker, input-otp, number-input, time-picker, filter-builder, stepper, segmented-control, file-input, file-upload, rich-text-editor (baru, PRD 006) |
 | `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart (legacy PRD 003, diganti 011), event-calendar (baru, PRD 004) |
 | `feedback` | Status dan respons sistem | dialog, alert, alert-dialog, toast, toaster, empty-state, use-toast |
 | `navigation` | Navigasi dan pencarian | dropdown-menu, breadcrumb, pagination, command-palette, context-menu, navigation-menu |
@@ -78,7 +78,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Org Chart Studio | Editor + visualisasi hierarki satu komponen: kartu lega inline-edit via gagang `+`, drag reparent + dialog setara, undo/redo 50, search + auto-expand, pohon SR internal, state matrix 6 demo (composed, kategori `canvas` xyflow token-mapped); penyusun: org-chart-studio (baru), sheet, context-menu, tooltip, form, input, badge, avatar, skeleton, empty-state, alert, button, toast |
 | Product Tour | Highlight, step, dismiss |
 | Results | Sukses/gagal, next action |
-| Rich Text Editor | Toolbar, konten, a11y |
+| Rich Text Editor | Toolbar format + konten Prose + link popover + counter (composed, kategori `form`); penyusun: rich-text-editor (baru), button, tooltip, popover, dialog, input, badge, skeleton, empty-state, alert, kbd |
 | Settings | Section, form, save state |
 | Stepper | Multi-step, validasi per step |
 | Virtualized List | Performa list besar |

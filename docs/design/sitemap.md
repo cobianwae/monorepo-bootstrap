@@ -62,7 +62,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.19 | Optimistic Updates | `/patterns/optimistic-updates` | implemented |
 | S-005.20 | Product Tour | `/patterns/product-tour` | implemented |
 | S-005.21 | Results | `/patterns/results` | implemented |
-| S-005.22 | Rich Text Editor | `/patterns/rich-text-editor` | implemented |
+| S-005.22 | Rich Text Editor (upgrade basis `form/rich-text-editor` reusable, PRD 006) | `/patterns/rich-text-editor` | in-design |
 | S-005.23 | Settings | `/patterns/settings` | implemented |
 | S-005.24 | Stepper | `/patterns/stepper` | implemented |
 | S-005.25 | Virtualized List | `/patterns/virtualized-list` | implemented |
@@ -111,6 +111,8 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | M-006 | Event detail (popover di desktop, dialog/sheet di mobile; edit/hapus milik konsumen via callback) | S-005.04 | in-design |
 | M-007 | Pilih atasan baru Org Chart Studio (dialog pindah + validasi siklus + preview path) | S-005.34 | in-design |
 | M-008 | Konfirmasi hapus Org Chart Studio (hitungan turunan + pilihan reparent/hapus subtree + proteksi root) | S-005.34 | in-design |
+| M-009 | Link editor (popover di desktop, dialog/sheet di mobile; sisip/edit/hapus + validasi URL) | S-005.22 | in-design |
+| M-010 | Sisip gambar via URL + alt text wajib (dialog; tanpa alt ditolak dengan pesan) | S-005.22 | in-design |
 
 ## Route Groups
 
