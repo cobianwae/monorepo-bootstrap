@@ -16,6 +16,7 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Story 005-06 `done` (approved oleh user) dan di-merge ke `dev` — `005-06`.
 
 - 2026-11-21 — Story 014-01 Util parsing, mapping, validasi + template selesai implementasi: papaparse wrapper (header:true, skipEmptyLines greedy, delimiter auto/manual, batas 5 MB/10.000 baris warning, XLSX ditolak "v1 CSV saja"), suggestMapping kamus sinonim ID (skor 100/90/70), validateRows urutan wajib→tipe→pola→unik→custom pesan Indonesia, toTemplateCsv; 20 unit test co-located hijau, showcase typecheck/lint/test/build hijau; typecheck full merah baseline packages/ui flow-editor.test.tsx (out of scope, known issue), status `review` — `014-01`.
+- 2026-11-21 — Story 014-01 `done` (approved oleh user) dan di-merge ke `dev` — `014-01`.
 - 2026-11-19 — Validasi baseline: graphify MCP connected, `pnpm typecheck`, `pnpm lint`, dan `pnpm test` hijau — `chore/opencode-workflow`.
 - 2026-11-19 — CR-001 keyboard access clickable table row selesai — `CR-001`.
 - 2026-11-20 — CR-002 touch target ≥44px selesai — `CR-002`.
