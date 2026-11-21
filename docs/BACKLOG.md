@@ -66,7 +66,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 017-02 | Product tour target hilang + keyboard + motion + states | approved | `docs/stories/017-02-target-hilang-keyboard-motion-states.md` |
 | 017-03 | Product tour showcase + audit + smoke | approved | `docs/stories/017-03-showcase-audit-smoke.md` |
 | 018-01 | Permission matrix fondasi grid + toggle + kunci | done | `docs/stories/018-01-fondasi-grid-toggle-kunci.md` |
-| 018-02 | Permission matrix keyboard + banner + states | approved | `docs/stories/018-02-keyboard-banner-states.md` |
+| 018-02 | Permission matrix keyboard + banner + states | done | `docs/stories/018-02-keyboard-banner-states.md` |
 | 018-03 | Permission matrix showcase + audit + smoke | approved | `docs/stories/018-03-showcase-audit-smoke.md` |
 
 ## Change Requests
