@@ -1,6 +1,6 @@
 # 005-04 — Seleksi + inspector on-demand + hapus atomik
 
-Status: review
+Status: done
 PRD: `docs/prd/005-flow-editor.md`
 Design: `docs/design/flow-editor.md`
 FR: `FR-005`, `FR-006`
