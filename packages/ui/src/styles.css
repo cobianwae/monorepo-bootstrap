@@ -1,3 +1,4 @@
+@import "@xyflow/react/dist/style.css";
 @import "@ds/tokens/tokens.css";
 
 @source "./components";

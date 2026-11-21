@@ -91,6 +91,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-009 | OrgChartEditor layak total (DIHENTIKAN 2026-11-21, diganti 011) | dihentikan | `docs/cr/cr-009-org-chart-editor-layak.md` |
 | CR-010 | Org Chart Studio gate-2 follow-up (tutup OQ + perapian approved) | done | `docs/cr/cr-010-org-chart-studio-gate2-followup.md` |
 | CR-011 | Sitemap & rujukan docs Rich Text Editor (PRD 006) | approved | `docs/cr/cr-011-sitemap-rich-text-editor.md` |
+| CR-014 | Org Chart Studio layak-pakai (tambah terlihat + garis + tombol jelas) | approved | `docs/cr/cr-014-studio-layak-pakai.md` |
 
 ## Catatan
 

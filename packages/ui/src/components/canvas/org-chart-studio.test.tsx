@@ -20,6 +20,7 @@ const mockFitView = vi.fn();
 const mockZoomIn = vi.fn();
 const mockZoomOut = vi.fn();
 const mockSetViewport = vi.fn();
+const mockSetCenter = vi.fn();
 
 vi.mock('@xyflow/react', async (importOriginal) => {
   const xyflow = (await importOriginal()) as Record<string, unknown>;
@@ -30,6 +31,7 @@ vi.mock('@xyflow/react', async (importOriginal) => {
       zoomOut: mockZoomOut,
       fitView: mockFitView,
       setViewport: mockSetViewport,
+      setCenter: mockSetCenter,
       getViewport: () => ({ x: 0, y: 0, zoom: 1 }),
     }),
   };
@@ -157,11 +159,12 @@ describe('OrgChartStudio fondasi (011-01)', () => {
 
   it('AC-04: reset 100% memakai setViewport dan fit memakai fitView', () => {
     render(<OrgChartStudio data={flatData} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Reset zoom' }));
-    expect(mockSetViewport).toHaveBeenCalledWith({ x: 0, y: 0, zoom: 1 });
-    fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
+    // CR-014: label Indonesia; reset hanya kembalikan zoom 100% di posisi sekarang.
+    fireEvent.click(screen.getByRole('button', { name: 'Atur ulang zoom 100%' }));
+    expect(mockSetViewport).toHaveBeenCalledWith({ x: 0, y: 0, zoom: 1 }, { duration: 200 });
+    fireEvent.click(screen.getByRole('button', { name: 'Perbesar' }));
     expect(mockZoomIn).toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: 'Fit view' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Paskan tampilan' }));
     // 011-04: durasi zoom eksplisit (200 default; 0 saat reduced-motion).
     expect(mockFitView).toHaveBeenCalledWith({ padding: 0.2, duration: 200 });
   });
@@ -176,7 +179,8 @@ describe('OrgChartStudio fondasi (011-01)', () => {
     fireEvent.keyDown(canvasBox, { key: '-' });
     expect(mockZoomOut).toHaveBeenCalled();
     fireEvent.keyDown(canvasBox, { key: '0' });
-    expect(mockSetViewport).toHaveBeenCalledWith({ x: 0, y: 0, zoom: 1 });
+    // CR-014: reset keyboard juga mempertahankan posisi pan.
+    expect(mockSetViewport).toHaveBeenCalledWith({ x: 0, y: 0, zoom: 1 }, { duration: 200 });
     fireEvent.keyDown(canvasBox, { key: 'f' });
     expect(mockFitView).toHaveBeenCalledWith({ padding: 0.2, duration: 200 });
   });
@@ -876,5 +880,74 @@ describe('OrgChartStudio state matrix + showcase (011-05)', () => {
     const contoh = render(<OrgChartStudio data={big} />);
     expect(contoh.container.querySelectorAll('[data-testid="org-studio-node"]')).toHaveLength(40);
     contoh.unmount();
+  });
+});
+
+describe('OrgChartStudio layak-pakai (CR-014)', () => {
+  beforeEach(() => {
+    mockSetCenter.mockClear();
+  });
+
+  it('temuan #6: tiap kartu merender Handle source/target sehingga edge tersambung (error 008 hilang)', () => {
+    const { container } = render(<OrgChartStudio data={flatData} />);
+    const nodes = container.querySelectorAll('[data-testid="org-studio-node"]');
+    expect(nodes.length).toBe(4);
+    for (const node of Array.from(nodes)) {
+      // Handle xyflow: [data-handleid] + [data-nodeid] pada wrapper handle.
+      expect(node.querySelector('[data-handleid="in"]')).not.toBeNull();
+      expect(node.querySelector('[data-handleid="out"]')).not.toBeNull();
+    }
+  });
+
+  it('temuan #6: edge membawa sourceHandle/targetHandle yang cocok dengan Handle kartu', () => {
+    const normalized = normalizeStudioInput(flatData);
+    const edges = toStudioFlowEdges(normalized, new Set(['ceo', 'cto', 'cfo', 'eng']));
+    expect(edges).toHaveLength(3);
+    for (const edge of edges) {
+      expect(edge.sourceHandle).toBe('out');
+      expect(edge.targetHandle).toBe('in');
+    }
+    expect(edges.map((edge) => edge.id)).toContain('ceo>cto');
+  });
+
+  it('temuan #1: gagang + selalu terlihat (tanpa opacity-0) dan ber-title untuk Tooltip native', () => {
+    const { container } = render(<OrgChartStudio data={flatData} />);
+    const handle = container.querySelector('[data-testid="org-studio-add-child-ceo"]') as HTMLElement;
+    expect(handle).not.toBeNull();
+    expect(handle.className).not.toMatch(/opacity-0/);
+    expect(handle.getAttribute('title')).toBe('Tambah bawahan untuk Direktur Utama');
+    expect(handle.className).toMatch(/nodrag/);
+  });
+
+  it('temuan #2: tambah node memusatkan viewport ke kartu baru via setCenter', () => {
+    const { container } = render(<OrgChartStudio data={flatData} />);
+    fireEvent.click(container.querySelector('[data-testid="org-studio-add-child-ceo"]') as HTMLElement);
+    const input = container.querySelector('[data-testid="org-studio-inline-input-studio-baru-1"]') as HTMLInputElement;
+    expect(input).not.toBeNull();
+    // focusNodeId = kartu baru → StudioCanvas meminta setCenter ke posisinya.
+    expect(mockSetCenter).toHaveBeenCalled();
+    const [x, y, options] = mockSetCenter.mock.calls[0] as [number, number, { zoom: number; duration: number }];
+    expect(typeof x).toBe('number');
+    expect(typeof y).toBe('number');
+    expect(options.zoom).toBe(1);
+  });
+
+  it('temuan #4: ikon Reset (RotateCcw) beda dari Fit dan berlabel Indonesia', () => {
+    render(<OrgChartStudio data={flatData} />);
+    expect(screen.getByRole('button', { name: 'Perkecil' })).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Perbesar' })).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Atur ulang zoom 100%' })).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Paskan tampilan' })).not.toBeNull();
+    expect(screen.queryByRole('button', { name: 'Reset zoom' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Fit view' })).toBeNull();
+  });
+
+  it('temuan #5: toggle minimap internal menyembunyikan/menampilkan peta', () => {
+    const { container } = render(<OrgChartStudio data={flatData} />);
+    expect(container.querySelector('[data-testid="org-studio-minimap"]')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Sembunyikan peta' }));
+    expect(container.querySelector('[data-testid="org-studio-minimap"]')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Tampilkan peta' }));
+    expect(container.querySelector('[data-testid="org-studio-minimap"]')).not.toBeNull();
   });
 });
