@@ -1,6 +1,6 @@
 # 018-03 — Showcase + audit kontras + smoke
 
-Status: review
+Status: done
 PRD: `docs/prd/018-permission-matrix.md` (approved, gate 1)
 Design: `docs/design/wireframes/permission-matrix.md` (approved, gate 2) + `docs/design/flows/permission-matrix.mmd` (diagram 4) + sitemap `S-005.41`
 FR: `FR-008`, `FR-009` (regresi `FR-001`–`FR-007`)
@@ -91,3 +91,4 @@ Nilai hex dari `packages/tokens/src/tokens.ts` (`lightHex`/`darkHex`) dan `packa
 - Browser automation tidak tersedia di sesi ini (tidak ada tool browser atau Playwright/Puppeteer). Belum diverifikasi secara visual: walkthrough Tab nyata, screen reader, sticky saat scroll, tampilan mobile (`<md`), dan tampilan light/dark di browser, termasuk tooltip sel terkunci. Tooltip Radix dirender di portal `body`, sehingga berada di luar pembungkus `.dark` lokal; efeknya perlu dicek manual.
 - Test jsdom bukan pengganti verifikasi tersebut. Cek manual ini menjadi catatan review.
 - Kegagalan baseline (typecheck `packages/ui`) tidak diperbaiki di story ini.
+- User menyetujui dan menetapkan `done` pada 2026-11-21; catatan verifikasi browser manual (Tab, screen reader, sticky, mobile, light/dark, tooltip portal) tetap tercatat untuk review.
