@@ -1,6 +1,6 @@
 # 012-03 — Keyboard + cari + states + showcase audit
 
-Status: approved
+Status: review
 PRD: `docs/prd/012-mind-map.md` (revisi OQ#2/OQ#3 2026-11-21)
 Design: `docs/design/wireframes/mind-map.md` + `docs/design/flows/mind-map.mmd`
 FR: `FR-005`, `FR-007`, `FR-008`, `FR-009`
@@ -35,12 +35,12 @@ Goal: Mind map layak-pakai — keyboard penuh + pohon SR, search auto-expand, st
 
 ## Tasks
 
-- [ ] Pohon SR internal `role="tree"` + keyboard map §5 + live region + focus-ring + reduced-motion
-- [ ] Search presentasional (`highlightedIds` + reuse `getAncestors` + auto-expand via `onExpandedChange`)
-- [ ] State matrix §4 (loading skeleton, empty CTA, invalid + salin detail, eksternal alert)
-- [ ] Showcase `/patterns/mind-map` S-005.35: contoh Q1 + 50 node, `ol` 6 langkah, panel 6 state, resep integrasi 15 baris, papan keyboard + catatan a11y
+- [x] Pohon SR internal `role="tree"` + keyboard map §5 + live region + focus-ring + reduced-motion
+- [x] Search presentasional (`highlightedIds` + reuse `getAncestors` + auto-expand via `onExpandedChange`)
+- [x] State matrix §4 (loading skeleton, empty CTA, invalid + salin detail, eksternal alert)
+- [x] Showcase `/patterns/mind-map` S-005.35: contoh Q1 + 50 node, `ol` 6 langkah, panel 6 state, resep integrasi 15 baris, papan keyboard + catatan a11y
 - [ ] Audit kontras light & dark + smoke build; catat tabel audit
-- [ ] Test co-located (keyboard map, SR roles, search expand, 6 states)
+- [x] Test co-located (keyboard map, SR roles, search expand, 6 states)
 
 ## Dependencies
 
@@ -49,5 +49,43 @@ Goal: Mind map layak-pakai — keyboard penuh + pohon SR, search auto-expand, st
 
 ## Notes
 
+- Rencana implementasi disetujui user; branch `012-03-keyboard-cari-showcase-audit` dari `origin/dev` `c9a88b1` di worktree `arah-cr`.
+- Tambahan API `searchSlot?: React.ReactNode` disetujui user untuk urutan toolbar → search → canvas, tanpa memindahkan logika pencarian ke komponen.
+- Framing: sebagai pengguna keyboard/SR, saya ingin menemukan dan mengelola ide tanpa mouse sehingga brainstorming tetap lancar. Must: AC-01–04 (keyboard/SR, search, states, showcase/audit); should: contoh 50 node; could/won't: drag-reparent ditunda. AC Given/When/Then di atas menjadi kontrak pengujian.
+- Blast radius: graphify dicoba (`graph_stats`, `get_neighbors`); graph dibangun pada `1568661`, stale dan tidak memuat MindMap. Fallback referensi kode: komponen + test/barrel UI, route baru + navigasi showcase; belum ada konsumen MindMap di app.
+
 - Risiko: auto-expand search berkonflik dengan collapsed manual — mitigasi gabung path via `onExpandedChange` tanpa menimpa manual
 - Keputusan: FR-010 tetap ditunda (K2/OQ#3 decided); sitemap `implemented` + BACKLOG arsip saat 012 shipped
+
+## Audit aksesibilitas
+
+Audit berbasis kode dan test DOM, tema demo Pulse. Rasio dari `getContrastRatio`
+di `@ds/tokens`; nilai warna mengikuti definisi tema, bukan warna inline komponen.
+
+| Elemen / pasangan token | Light | Dark | Batas | Hasil |
+|---|---:|---:|---:|---|
+| Label pill / card (`foreground`) | 17.72 | 16.39 | 4.5 | Lulus |
+| Caption & ikon controls / card (`muted-foreground`) | 7.73 | 7.03 | 4.5 | Lulus |
+| Badge Cocok / secondary (`secondary-foreground`) | 14.90 | 13.84 | 4.5 | Lulus |
+| Ring fokus / sorotan / pill card (`primary`) | 8.97 | 5.29 | 3 | Lulus |
+| Minimap / viewport kanvas (`primary` / background) | 8.67 | 5.65 | 3 | Lulus |
+| Dot success / card | 5.48 | 9.37 | 3 | Lulus |
+| Dot warning / card | 3.19 | 10.79 | 3 | Lulus |
+| Dot info / card | 5.17 | 7.09 | 3 | Lulus |
+
+- Minimap tanpa mask tint yang menurunkan kontras dot; outline viewport `primary` 2px. Border edge dekoratif bukan satu-satunya pembawa relasi: pohon aksesibel menyajikan parent/child.
+- Urutan DOM toolbar → `searchSlot` → kanvas → node roving → controls → panel pohon diuji; gagang, expander, toolbar, dan controls berukuran 44px. Pohon memiliki `tree`/`group`/`treeitem`, `aria-level`/`expanded`/`selected`, roving tabindex dan aksi tombol.
+- Ring fokus utama 2px offset 2px. Keyboard pan 40px; reduced-motion memberi durasi zoom 0 dan mematikan animasi skeleton. Input edit mempertahankan shortcut native.
+- Pencarian gabung ancestor ke expanded controlled, mempertahankan toggle cabang lain, tidak memaksa cabang terbuka kembali setelah toggle manual. Hit-count/no-results memakai live region, sorotan memakai ring + badge teks + border dashed.
+- Walkthrough browser, zoom 200%, viewport mobile, dan pembaca layar nyata belum dijalankan; jangan menganggap test DOM sebagai validasi visual/SR manual.
+
+## Verifikasi
+
+- `pnpm typecheck`: terblokir 12 error baseline `flow-editor.test.tsx:702–749` (`HTMLElement.disabled`); tidak ada error baru MindMap. `pnpm --filter @ds/showcase build:types` hijau.
+- `pnpm lint`: hijau.
+- `pnpm test`: default paralel menghasilkan 7 timeout (FlowEditor, OrgChartEditor, FileManager, PermissionMatrix) + satu timeout RPC worker. Tanpa perubahan konfigurasi, `pnpm --filter @ds/ui exec vitest run --maxWorkers=2 --testTimeout=30000` hijau **674/674** termasuk **43 MindMap**; batas undo MindMap juga lulus ulang (2.16 detik). Smoke RTE yang sebelumnya tercatat gagal kini lulus pada run ini, tidak diubah.
+- `pnpm --filter @ds/showcase exec vitest run --maxWorkers=2 --testTimeout=30000`: **64/64**, termasuk tiga scenario MindMap (six states, pencarian/ekspansi/toggle, 50 node/mode/minimap).
+- `pnpm test:tokens`: **8/8** hijau. Audit Pulse juga diuji co-located pada test MindMap.
+- `pnpm -C apps/showcase build`: **terblokir**, error `next/font` Google loader (`Cannot read properties of null (reading '1')`, `loader.js:122`) pada IBM Plex di `src/app/layout.tsx` yang tidak disentuh. Tidak mengganti font/config/dependency di luar scope. Task audit/smoke dibiarkan belum tercentang karena build produksi belum hijau; perlu verifikasi ulang sebelum acceptance final.
+- Warning test non-fatal: `act(...)` saat penutupan dialog MindMap/RTE, ukuran chart jsdom nol, posisi ContextMenu sebelum interaksi.
+- Status `review`, bukan `done`; persetujuan akhir user, smoke build, dan validasi browser/SR masih terbuka. Sitemap tetap `in-design`, PRD tidak diubah menjadi shipped.
