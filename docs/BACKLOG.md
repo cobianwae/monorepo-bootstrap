@@ -104,6 +104,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-010 | Org Chart Studio gate-2 follow-up (tutup OQ + perapian approved) | done | `docs/cr/cr-010-org-chart-studio-gate2-followup.md` |
 | CR-011 | Sitemap & rujukan docs Rich Text Editor (PRD 006) | done | `docs/cr/cr-011-sitemap-rich-text-editor.md` |
 | CR-014 | Org Chart Studio layak-pakai (tambah terlihat + garis + tombol jelas) | done | `docs/cr/cr-014-studio-layak-pakai.md` |
+| CR-015 | Verifikasi baseline dev (known issue flow-editor.test.tsx) + bersihkan entri stale | approved | `docs/cr/cr-015-baseline-flow-editor-test.md` |
 
 ## Catatan
 

@@ -42,10 +42,7 @@ Story 005-01 (`done`, ter-merge ke `dev`) — Flow editor fondasi canvas + node 
 
 - Graphify bersifat per-machine; graph tidak di-commit.
 - `apps/web` dan `apps/api` masih tipis; integration test belum aktif.
-- Baseline `dev` merah (pre-existing, di luar scope CR-011): `pnpm typecheck`/`lint` gagal
-  oleh unused import di `packages/ui/src/components/canvas/flow-editor.test.tsx`
-  (milik 005-02; lih. STATUS-LOG CR-008/CR-011).
-- Baseline `dev`: `pnpm typecheck`/`lint` merah pre-existing di `packages/ui/src/components/canvas/flow-editor.test.tsx` (import `useReactFlow` tak terpakai) — di luar scope CR-008.
+- Baseline `dev` terverifikasi hijau (typecheck/lint/test, 494 test) per 2026-11-21 — lihat CR-015.
 
 ## Aturan Update
 
