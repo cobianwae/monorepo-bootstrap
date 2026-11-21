@@ -1,6 +1,6 @@
 # 005-06 — Minimap + showcase end-to-end + audit
 
-Status: review
+Status: done
 PRD: `docs/prd/005-flow-editor.md`
 Design: `docs/design/flow-editor.md`
 FR: `FR-008`, `FR-010`, `FR-014`, `FR-016`
