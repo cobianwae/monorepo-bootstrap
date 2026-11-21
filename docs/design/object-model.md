@@ -37,7 +37,7 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 |---|---|---|
 | `base` | Primitive visual dan kontrol dasar | button, badge, card, input, textarea, label, separator, skeleton, avatar, tabs, checkbox, switch, tooltip, progress, spinner, radio-group, slider, accordion, collapsible, kbd, toggle, aspect-ratio, scroll-area, palette-switcher, theme-provider |
 | `form` | Input dan validasi | form, select, combobox, tag-input, date-picker, input-otp, number-input, time-picker, filter-builder, stepper, segmented-control, file-input, file-upload, rich-text-editor (baru, PRD 006) |
-| `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart (legacy PRD 003, diganti 011), event-calendar (baru, PRD 004) |
+| `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart (legacy PRD 003, diganti 011), event-calendar (baru, PRD 004), diff-viewer (baru, PRD 013) |
 | `feedback` | Status dan respons sistem | dialog, alert, alert-dialog, toast, toaster, empty-state, use-toast |
 | `navigation` | Navigasi dan pencarian | dropdown-menu, breadcrumb, pagination, command-palette, context-menu, navigation-menu |
 | `overlay` | Lapisan di atas konten | sheet, popover, hover-card |
@@ -60,6 +60,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Command Palette | Pencarian aksi, keyboard-first |
 | Dashboard | Ringkasan metrik, grid responsif |
 | Data Table | Sort, filter, pagination, bulk action |
+| Diff Viewer | Review diff tambah/hapus: mode unified/split, header file + collapse hunk, navigasi hunk keyboard (composed, kategori `data-display`); penyusun: diff-viewer (baru), badge, segmented-control, collapsible, skeleton, empty-state, alert, button |
 | Dynamic Form | Schema-driven, validasi |
 | File Upload | Upload queue: validasi batch per file, progres per item, cancel/retry, thumbnail; penyusun: file-upload (baru), file-input, progress, button, badge, alert |
 | File Manager | Hierarki folder + aksi file + quota + preview (composed, kategori `data-display`); penyusun: tree-view, data-table, breadcrumb, context-menu, bulk-action-bar, file-upload, dialog/sheet, progress, skeleton, empty-state |

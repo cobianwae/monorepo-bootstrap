@@ -1,0 +1,60 @@
+<!-- Flow diff viewer — PRD 013, layar S-005.36 -->
+<!-- Job utama: buka diff multi-file → pilih mode unified/split → lipat/buka hunk → navigasi hunk via keyboard -->
+<!-- Constraint: parsing via `diff` (jsdiff), render milik sendiri token-first; tanpa syntax highlighting v1; batas 500 baris -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman diff viewer] --> B[Skeleton header file + baris + teks SR Memuat diff]
+  B --> P[Parsing input: string unified-diff via diff atau hunk JSON dinormalisasi]
+  P --> Q{Hasil parsing?}
+  Q -- gagal: patch invalid --> ERR[Tampilkan error + penyebab baris N + tombol Salin detail]
+  ERR --> R[User memperbaiki input atau memuat contoh]
+  R --> P
+  Q -- kosong: tidak ada perubahan --> EMP[Tampilkan empty: tidak ada perubahan]
+  EMP --> C[User memilih revisi lain atau memuat contoh]
+  C --> P
+  Q -- berhasil --> H[Render per file: header nama + badge tambah kurang; hunk konteks terlipat default]
+  H --> L{Baris melebihi 500?}
+  L -- ya --> M[Render 500 pertama + tombol Muat 500 lagi]
+  L -- tidak --> D[Diff tampil penuh; alur mode: flow 2]
+  M --> D
+```
+
+```mermaid
+flowchart TD
+  A[User di layar diff] --> B[Toggle Unified atau Split via segmented control]
+  B --> C{Mode aktif?}
+  C -- unified --> U[Baris satu kolom: nomor lama dan baru sejajar + prefix tambah kurang]
+  C -- split --> S[Dua kolom: kiri lama kanan baru; pasangan baris sejajar]
+  U --> T[User melipat atau membuka hunk dan file via pointer atau Enter Space]
+  S --> T
+  T --> V[Hunk diperbarui; fokus tetap di header; posisi live region]
+  V --> W{Masih ada baris tersisa?}
+  W -- ya --> X[Tombol Muat 500 lagi menambah baris; fokus tidak hilang]
+  X --> T
+  W -- tidak --> Z[Selesai; alur navigasi: flow 3]
+```
+
+```mermaid
+flowchart TD
+  A[User menavigasi hunk] --> B{Teknik navigasi?}
+  B -- tombol Hunk sebelum berikut --> N[Hunk aktif berpindah + ring primary]
+  B -- keyboard n atau p --> N
+  N --> L[Live region: Hunk 2 dari 5 + nama file]
+  L --> F{Fokus ikut ke hunk?}
+  F -- ya --> G[Header hunk menerima fokus; Enter Space lipat buka]
+  F -- tidak --> H[Posisi cukup diumumkan tanpa pindah fokus]
+  G --> K{Baris punya slot komentar?}
+  K -- ya --> J[renderComment tampil di bawah baris; Tab mencapai slot]
+  K -- tidak --> E[Lanjut navigasi hunk]
+  J --> E
+```
+
+```mermaid
+flowchart TD
+  A[User membuka panel demo showcase] --> B[Dataset: 3 file contoh atau besar 2000 baris atau invalid atau kosong]
+  B --> C[User memicu state: loading empty error + toggle light dark]
+  C --> D[State tampil sesuai matrix; kontras parity dicek]
+  D --> E[User menyuntik slot komentar mock + toggle mode + navigasi hunk]
+  E --> F[Smoke build lolos; resep 15 baris disalin]
+```
