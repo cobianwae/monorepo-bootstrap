@@ -59,7 +59,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 014-01 | Import wizard util parse/mapping/validasi + template | done | `docs/stories/014-01-util-parse-mapping-validasi.md` |
 | 014-02 | Import wizard shell stepper + upload + mapping | done | `docs/stories/014-02-shell-upload-mapping.md` |
 | 014-03 | Import wizard validasi + konfirmasi + showcase final | done | `docs/stories/014-03-validasi-konfirmasi-showcase.md` |
-| 015-01 | Image cropper fondasi wrapper + aspek + output blob | approved | `docs/stories/015-01-fondasi-wrapper-output.md` |
+| 015-01 | Image cropper fondasi wrapper + aspek + output blob | done | `docs/stories/015-01-fondasi-wrapper-output.md` |
 | 015-02 | Image cropper kontrol + pratinjau + keyboard + states | approved | `docs/stories/015-02-kontrol-pratinjau-keyboard-states.md` |
 | 015-03 | Image cropper showcase avatar + cover + audit + smoke | approved | `docs/stories/015-03-showcase-audit-smoke.md` |
 | 017-01 | Product tour fondasi wrapper + navigasi + callback | done | `docs/stories/017-01-fondasi-wrapper-navigasi-callback.md` |
