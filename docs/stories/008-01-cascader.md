@@ -1,6 +1,6 @@
 # 008-01 — Cascader alamat/kategori + showcase
 
-Status: review
+Status: done
 Spec: `docs/design/spec-cascader-tree-select.md`
 FR: `FR-001`, `FR-002`, `FR-003`, `FR-004`, `FR-005`, `FR-006`
 Screens: `S-005.31`
