@@ -1,6 +1,6 @@
 # 011-03 — Pindah (drag + dialog), hapus, dan undo/redo
 
-Status: review
+Status: done
 PRD: `docs/prd/011-org-chart-studio.md`
 Design: `docs/design/org-chart-studio.md`
 FR: `FR-007`, `FR-008`, `FR-009`, `FR-013`, `FR-019`
