@@ -1,6 +1,6 @@
 # CR-029 — Mind Map: hierarki header dan judul section (setara data-display)
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit `/improve-ui` — perbandingan halaman `patterns/mind-map` dengan `components/data-display` (cluster A); berbasis kode, belum ada pengecekan visual di browser
 **Ref:** `apps/showcase/src/app/(docs)/patterns/mind-map/page.tsx`, `_components/mind-map-shortcuts.tsx`, `_components/mind-map-recipe.tsx`, pembanding `apps/showcase/src/app/(docs)/components/data-display/page.tsx:399-414,444`
 

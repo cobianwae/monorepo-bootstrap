@@ -1,6 +1,6 @@
 # CR-031 — Mind Map: pakai komponen DS (Kbd, Timeline) dan restyle resep
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit `/improve-ui` — perbandingan halaman `patterns/mind-map` dengan `components/data-display` (cluster C); berbasis kode, belum ada pengecekan visual di browser
 **Ref:** `apps/showcase/src/app/(docs)/patterns/mind-map/page.tsx:135-156`, `_components/mind-map-shortcuts.tsx`, `_components/mind-map-recipe.tsx`, `packages/ui/src/components/base/kbd.tsx`, `packages/ui/src/components/data-display/timeline.tsx`, `packages/ui/src/components/data-display/code-block.tsx`, `docs/cr/cr-024-mind-map-microcopy-a11y.md`, `docs/cr/cr-025-mind-map-audit-followup.md`, `docs/cr/cr-027-mind-map-showcase-polish.md`
 

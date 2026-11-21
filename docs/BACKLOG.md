@@ -89,11 +89,11 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-026 | Mind Map: tata letak, hierarki, dan ikonografi halaman showcase (panel demo, pencarian, spacing, tipografi) | done | `docs/cr/cr-026-mind-map-showcase-layout.md` |
 | CR-027 | Mind Map: polish halaman showcase (urutan demo, bingkai ganda, ikon status, resep salin) | done | `docs/cr/cr-027-mind-map-showcase-polish.md` |
 | CR-028 | Mind Map: pencarian dan toolbar dalam satu baris (komponen `packages/ui`, urutan DOM) | done | `docs/cr/cr-028-mind-map-toolbar-search-row.md` |
-| CR-029 | Mind Map: hierarki header dan judul section setara data-display (h2 display + ikon, badge header) | approved | `docs/cr/cr-029-mind-map-hierarki-header-section.md` |
-| CR-030 | Mind Map: panggung demo dalam Card, tema lokal hanya di kanvas, panel 2 baris | approved | `docs/cr/cr-030-mind-map-panggung-demo-card.md` |
-| CR-031 | Mind Map: pakai Kbd dan Timeline, restyle resep (logika salin dipertahankan) | approved | `docs/cr/cr-031-mind-map-komponen-ds-kbd-timeline-resep.md` |
-| CR-032 | Mind Map: section "Kapan dipakai" (opsional, konten baru) | approved | `docs/cr/cr-032-mind-map-kapan-dipakai.md` |
-| CR-033 | Token: scope tema bersarang tidak me-resolve ulang `--color-*` (dark mode kanvas mind-map; dikerjakan lebih dulu) | approved | `docs/cr/cr-033-token-scope-tema-bersarang.md` |
+| CR-029 | Mind Map: hierarki header dan judul section setara data-display (h2 display + ikon, badge header) | done | `docs/cr/cr-029-mind-map-hierarki-header-section.md` |
+| CR-030 | Mind Map: panggung demo dalam Card, tema lokal hanya di kanvas, panel 2 baris | done | `docs/cr/cr-030-mind-map-panggung-demo-card.md` |
+| CR-031 | Mind Map: pakai Kbd dan Timeline, restyle resep (logika salin dipertahankan) | done | `docs/cr/cr-031-mind-map-komponen-ds-kbd-timeline-resep.md` |
+| CR-032 | Mind Map: section "Kapan dipakai" (opsional, konten baru) | done | `docs/cr/cr-032-mind-map-kapan-dipakai.md` |
+| CR-033 | Token: scope tema bersarang tidak me-resolve ulang `--color-*` (dark mode kanvas mind-map; dikerjakan lebih dulu) | done | `docs/cr/cr-033-token-scope-tema-bersarang.md` |
 
 ## Catatan
 

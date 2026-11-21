@@ -1,6 +1,6 @@
 # CR-033 — Token: scope tema bersarang tidak me-resolve ulang `--color-*` (dark mode kanvas mind-map)
 
-**Status:** approved
+**Status:** done
 **Sumber:** bug — laporan user pada sesi `/improve-ui` ("dark modenya juga gak jalan… block itemnya aneh"); akar masalah dibuktikan dengan Chrome headless terhadap CSS dev server (2026-11-22)
 **Ref:** `packages/tokens/src/tokens.css:1-40`, `packages/ui/src/components/canvas/mind-map.tsx:538-539,1242-1245`, `apps/showcase/src/app/(docs)/patterns/mind-map/page.tsx:95-100`, `page.test.tsx:74`, `docs/cr/cr-027-mind-map-showcase-polish.md` (Known Issue tema campuran), `docs/cr/cr-030-mind-map-panggung-demo-card.md`
 

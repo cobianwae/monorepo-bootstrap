@@ -1,6 +1,6 @@
 # CR-030 — Mind Map: panggung demo dalam Card (kurangi bingkai bersarang)
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit `/improve-ui` — perbandingan halaman `patterns/mind-map` dengan `components/data-display` (cluster B); berbasis kode, belum ada pengecekan visual di browser
 **Ref:** `apps/showcase/src/app/(docs)/patterns/mind-map/page.tsx:95-133`, `_components/mind-map-demo-panel.tsx`, `packages/ui/src/components/canvas/mind-map.tsx:1211`, `docs/cr/cr-027-mind-map-showcase-polish.md` (Known Issue tema campuran)
 

@@ -1,6 +1,6 @@
 # CR-032 — Mind Map: section "Kapan dipakai" (opsional)
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit `/improve-ui` — perbandingan halaman `patterns/mind-map` dengan `components/data-display` (cluster D); berbasis kode, belum ada pengecekan visual di browser
 **Ref:** `apps/showcase/src/app/(docs)/patterns/mind-map/page.tsx`, pembanding galeri kartu `apps/showcase/src/app/(docs)/components/data-display/page.tsx:453-465`
 
