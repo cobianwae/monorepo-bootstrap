@@ -75,6 +75,34 @@ export type {
   StudioNormalizedResult,
   StudioPosition,
 } from './components/canvas/org-chart-studio';
+// mind-map 012-01: named export list — semua simbol ber-prefix `Mind*` sehingga
+// aman dari tabrakan TS2308 dengan Org*/Studio*; util ancestor tidak diekspor
+// (kontrak `label` beda dari getAncestors studio — lihat catatan mind-map.tsx).
+export {
+  MindMap,
+  MIND_NODE_HEIGHT_BRANCH,
+  MIND_NODE_HEIGHT_ROOT,
+  MIND_NODE_WIDTH_BRANCH,
+  MIND_NODE_WIDTH_ROOT,
+  computeMindMapPositions,
+  normalizeMindInput,
+  toMindFlowEdges,
+  toMindFlowNodes,
+} from './components/canvas/mind-map';
+export type {
+  MindAccent,
+  MindFlowEdge,
+  MindFlowNode,
+  MindInput,
+  MindMapError,
+  MindMapProps,
+  MindNodeData,
+  MindNodeFlat,
+  MindNodeNested,
+  MindNodeNormalized,
+  MindNormalizedResult,
+  MindPosition,
+} from './components/canvas/mind-map';
 export * from './components/data-display/file-manager';
 export * from './components/data-display/data-table';
 export * from './components/form/filter-builder';
