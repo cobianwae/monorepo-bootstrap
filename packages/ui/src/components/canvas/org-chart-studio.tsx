@@ -598,19 +598,23 @@ function getInitials(title: string): string {
     .join('');
 }
 
-// Gagang "+" 011-02 (FR-005, D5) + CR-014: selalu terlihat (bukan opacity-0 —
-// tak-terlihat = tak-tertemukan di sentuh), dilengkapi title + Tooltip native,
-// dan tidak memicu pan kanvas (nodrag/nopan + stopPropagation pointer).
+// Gagang "+" 011-02 (FR-005, D5) + CR-014: muncul saat hover/fokus/kartu
+// terpilih (bukan opacity-0 total seperti spec awal yang tak-tertemukan, dan
+// bukan selalu-terlihat yang bikin kanvas penuh pil + terlihat "keluar-keluar").
+// Alur sentuh: ketuk kartu (terpilih, + muncul menetap) → ketuk +.
+// Dilengkapi title + Tooltip native, dan tidak memicu pan kanvas.
 function StudioAddHandle({
   testId,
   label,
   className,
   onAdd,
+  visible = false,
 }: {
   testId: string;
   label: string;
   className?: string;
   onAdd: () => void;
+  visible?: boolean;
 }) {
   return (
     <button
@@ -630,7 +634,9 @@ function StudioAddHandle({
       }}
       className={cn(
         'nodrag nopan absolute z-20 flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground',
-        'opacity-100 transition-colors duration-200 motion-reduce:transition-none',
+        visible
+          ? 'opacity-100'
+          : 'opacity-0 transition-opacity duration-200 group-hover/studio-node:opacity-100 group-focus-within/studio-node:opacity-100 focus:opacity-100 motion-reduce:transition-none',
         'hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
         className,
       )}
@@ -926,6 +932,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
             testId={`org-studio-add-child-${node.id}`}
             label={`Tambah bawahan untuk ${node.title}`}
             onAdd={() => onAddChild(node.id)}
+            visible={isSelected || isEditing}
             className="left-1/2 top-full -translate-x-1/2 -translate-y-1/2"
           />
           {canAddSibling ? (
@@ -933,6 +940,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
               testId={`org-studio-add-sibling-${node.id}`}
               label={`Tambah sejawat untuk ${node.title}`}
               onAdd={() => onAddSibling(node.id)}
+              visible={isSelected || isEditing}
               className="left-full top-1/2 -translate-x-1/2 -translate-y-1/2"
             />
           ) : null}

@@ -178,7 +178,7 @@ export const STUDIO_RECIPE_LINES: string[] = [
 
 export const STUDIO_STEPS: Array<{ title: string; detail: string }> = [
   { title: 'Buka kanvas', detail: 'Struktur rapi langsung terbaca: root di atas, anak menyebar seimbang. Panel detail tidak terbuka sendiri.' },
-  { title: 'Tambah bawahan inline', detail: 'Klik gagang + bawah kartu CEO (selalu terlihat, tooltip “Tambah bawahan”) → ketik nama → Enter simpan (Esc batal). Kanvas otomatis memusatkan ke kartu baru. Gagang + samping = tambah sejawat. Tanpa buka form.' },
+  { title: 'Tambah bawahan inline', detail: 'Klik kartu CEO (terpilih, gagang + muncul menetap) → klik + bawah (tooltip “Tambah bawahan”) → ketik nama → Enter simpan (Esc batal). Kanvas otomatis memusatkan ke kartu baru. Gagang + samping = tambah sejawat. Tanpa buka form.' },
   { title: 'Pindah node', detail: 'Seret kartu ke tim lain (garis hijau + preview path) atau dialog M-007 via panel — setara keyboard.' },
   { title: 'Hapus + Urungkan', detail: 'Delete membuka M-008 (sebut N turunan, root diproteksi) → konfirmasi → toast “Dihapus — Urungkan”.' },
   { title: 'Cari orang', detail: 'Ketik nama/jabatan di pencarian → sorot ring + badge Cocok + path ancestor terbuka + live region jumlah.' },

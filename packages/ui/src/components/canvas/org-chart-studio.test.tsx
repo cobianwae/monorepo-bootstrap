@@ -910,13 +910,17 @@ describe('OrgChartStudio layak-pakai (CR-014)', () => {
     expect(edges.map((edge) => edge.id)).toContain('ceo>cto');
   });
 
-  it('temuan #1: gagang + selalu terlihat (tanpa opacity-0) dan ber-title untuk Tooltip native', () => {
+  it('temuan #1: gagang + tersembunyi hingga hover/fokus/kartu terpilih, ber-title untuk Tooltip native', () => {
     const { container } = render(<OrgChartStudio data={flatData} />);
     const handle = container.querySelector('[data-testid="org-studio-add-child-ceo"]') as HTMLElement;
     expect(handle).not.toBeNull();
-    expect(handle.className).not.toMatch(/opacity-0/);
+    // Default: tersembunyi (kanvas bersih, tidak "keluar-keluar" penuh pil +).
+    expect(handle.className).toMatch(/opacity-0/);
     expect(handle.getAttribute('title')).toBe('Tambah bawahan untuk Direktur Utama');
     expect(handle.className).toMatch(/nodrag/);
+    // Kartu diklik (terpilih) → gagang menetap terlihat, alur sentuh tanpa hover.
+    fireEvent.click(container.querySelector('[data-node-id="ceo"]') as HTMLElement);
+    expect(handle.className).not.toMatch(/opacity-0/);
   });
 
   it('temuan #2: tambah node memusatkan viewport ke kartu baru via setCenter', () => {
