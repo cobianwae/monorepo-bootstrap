@@ -96,8 +96,10 @@ Skenario utama:
   link), `base/button.tsx` (toolbar button), `navigation/menubar.tsx` (referensi pola
   menu), `data-display/chat.tsx` (konsumen masa depan), `form/textarea.tsx` (fallback
   plain mode).
-- Dokumen design: `docs/design/rich-text-editor.md` dibuat saat gate 2 (anatomi
-  toolbar, mapping mark/blok ke token, state matrix, wireframe).
+- Dokumen design (approved gate 2, 2026-11-21): `docs/design/rich-text-editor.md` (anatomi
+  toolbar, mapping mark/blok ke token, state matrix) + wireframe
+  `docs/design/wireframes/rich-text-editor.md` + flows
+  `docs/design/flows/rich-text-editor.mmd`.
 - Analisis awal: `docs/discussions/2026-11-20-component-landscape.md` (tabel §4),
   roadmap RM-11.
 
