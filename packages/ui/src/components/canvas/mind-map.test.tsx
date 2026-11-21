@@ -196,15 +196,26 @@ describe('MindMap keyboard, SR dan states (012-03)', () => {
     } finally { window.matchMedia = original; }
   });
 
-  it('slot search setelah toolbar dan sebelum canvas dalam urutan DOM', () => {
+  it('slot search dan toolbar satu baris responsif dengan urutan DOM search → aksi → canvas', () => {
     const { container } = render(<MindMap data={flatData} searchSlot={<input aria-label="Cari ide" />} />);
     const search = screen.getByRole('textbox', { name: 'Cari ide' });
     const toolbar = screen.getByTestId('mind-map-redo');
     const viewport = screen.getByTestId('mind-map-viewport');
-    expect(toolbar.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(search.compareDocumentPosition(viewport) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const actions = screen.getByTestId('mind-map-add-root').parentElement!;
+    const row = actions.parentElement!;
+    expect(row.contains(search)).toBe(true);
+    expect(row.className).toContain('flex-wrap');
+    expect(search.compareDocumentPosition(actions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(toolbar.compareDocumentPosition(viewport) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(viewport.tabIndex).toBe(0);
     expect(container.querySelectorAll('[data-node-id][tabindex="0"]')).toHaveLength(1);
+  });
+  it('tanpa searchSlot toolbar tetap rata kanan tanpa wrapper pencarian kosong', () => {
+    render(<MindMap data={flatData} />);
+    const actions = screen.getByTestId('mind-map-add-root').parentElement!;
+    expect(actions.className).toContain('ml-auto');
+    expect(actions.parentElement!.children).toHaveLength(1);
+    expect(within(actions).getAllByRole('button')).toHaveLength(3);
   });
   it('audit Pulse light/dark: teks ≥4.5 dan penanda visual ≥3', () => {
     const pulse = THEMES.find((theme) => theme.id === 'pulse')!;
@@ -435,7 +446,7 @@ describe('MindMap fondasi (012-01)', () => {
     expect(Math.abs(kolomKanan.length - kolomKiri.length) * 6).toBeLessThanOrEqual(6);
   });
 
-  it('AC-03: edge bezier 1px token border + satu edge per pasangan parent-child', () => {
+  it('AC-03: edge bezier 1.5px + satu edge per pasangan parent-child + garis putus primary ke node cocok', () => {
     const normalized = normalizeMindInput(flatData);
     const visible = new Set([
       'q1',
@@ -453,8 +464,19 @@ describe('MindMap fondasi (012-01)', () => {
     expect(edges).toHaveLength(8);
     for (const edge of edges) {
       expect(edge.type).toBe('default'); // bezier (K4)
-      expect(edge.style).toEqual({ strokeWidth: 1, stroke: 'var(--border)' });
+      expect(edge.style).toEqual({ strokeWidth: 1.5, stroke: 'var(--border)' });
     }
+    // Paritas studio 011-04: edge menuju node cocok memakai garis putus primary.
+    const highlighted = toMindFlowEdges(normalized, positions, visible, ['wawancara']);
+    expect(highlighted.find((edge) => edge.target === 'wawancara')?.style).toEqual({
+      strokeWidth: 1.5,
+      stroke: 'var(--primary)',
+      strokeDasharray: '5 4',
+    });
+    expect(highlighted.find((edge) => edge.target === 'kompetitor')?.style).toEqual({
+      strokeWidth: 1.5,
+      stroke: 'var(--border)',
+    });
     // Root memancar dua sisi: anak kanan via out-r, anak kiri via out-l.
     const rootEdges = edges.filter((edge) => edge.source === 'q1');
     expect(rootEdges.find((edge) => edge.target === 'riset')?.sourceHandle).toBe('out-r');
@@ -709,7 +731,7 @@ describe('MindMap tambah/hapus/undo (012-02)', () => {
     expect(onChangeSpy).not.toHaveBeenCalled();
     expect(document.body.querySelector('[data-testid="mind-map-delete-confirm"]')).toBeNull();
     expect(container.querySelector('[data-testid="mind-map-announcement"]')?.textContent).toContain(
-      'Root tidak bisa dihapus',
+      'Ide pusat tidak bisa dihapus',
     );
 
     fireEvent.contextMenu(container.querySelector('[data-node-id="q1"]')!);

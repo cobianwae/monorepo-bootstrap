@@ -513,14 +513,19 @@ export function toMindFlowEdges(
   normalized: MindNormalizedResult,
   positions: MindPosition[],
   visibleIds: Set<string>,
+  highlightedIds: string[] = [],
 ): MindFlowEdge[] {
   const sideById = new Map(positions.map((position) => [position.id, position.side]));
+  const highlightedSet = new Set(highlightedIds);
   const edges: MindFlowEdge[] = [];
   for (const node of normalized.nodes) {
     if (!visibleIds.has(node.id)) continue;
     for (const childId of node.childIds) {
       if (!visibleIds.has(childId)) continue;
       const childSide = sideById.get(childId) ?? 'right';
+      // Paritas studio 011-04: edge menuju node cocok memakai garis putus
+      // primary; edge normal 1.5px border (CR-023: keterbacaan di atas background).
+      const isMatch = highlightedSet.has(childId);
       edges.push({
         id: `${node.id}>${childId}`,
         source: node.id,
@@ -529,7 +534,9 @@ export function toMindFlowEdges(
         sourceHandle: node.depth === 0 ? (childSide === 'right' ? 'out-r' : 'out-l') : 'out',
         targetHandle: 'in',
         type: 'default', // bezier — konektor halus radial (wireframe §2, K4)
-        style: { strokeWidth: 1, stroke: 'var(--border)' },
+        style: isMatch
+          ? { strokeWidth: 1.5, stroke: 'var(--primary)', strokeDasharray: '5 4' }
+          : { strokeWidth: 1.5, stroke: 'var(--border)' },
       });
     }
   }
@@ -554,7 +561,7 @@ const mindPillVariants = cva(
   {
     variants: {
       level: {
-        root: 'h-16 w-[200px] border-2 border-primary/40 px-3',
+        root: 'h-16 w-[200px] border-2 border-primary bg-primary/5 px-3',
         branch: 'h-12 w-[160px] border-border px-2.5',
       },
     },
@@ -603,7 +610,7 @@ function MindAddHandle({
             onAdd();
           }}
           className={cn(
-            'nodrag nopan absolute z-20 flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground opacity-0 motion-safe:transition-opacity hover:text-primary focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 group-hover/mind-node:opacity-100 group-focus-within/mind-node:opacity-100 motion-reduce:transition-none',
+            'nodrag nopan absolute z-20 flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground opacity-0 motion-safe:transition-opacity hover:text-primary focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 group-hover/mind-node:opacity-100 group-focus-within/mind-node:opacity-100 motion-reduce:transition-none [@media(hover:none)]:opacity-100',
             className,
           )}
         >
@@ -722,7 +729,7 @@ function MindNode({ data }: { data: MindNodeData }) {
             mindPillVariants({ level: isRoot ? 'root' : 'branch' }),
             'group/mind-node focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
             isNew && 'ring-2 ring-primary',
-            data.highlighted && 'ring-2 ring-primary border-dashed',
+            data.highlighted && 'ring-2 ring-primary border-dashed border-primary',
             node.disabled && 'pointer-events-none opacity-60',
           )}
         >
@@ -834,7 +841,7 @@ function MindNode({ data }: { data: MindNodeData }) {
                   if (handledRef.current) return;
                   commitDraft();
                 }}
-                className="h-7 border-0 bg-transparent px-1 text-[13px] shadow-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                className="h-9 border-0 bg-transparent px-1 text-[13px] shadow-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               />
             </div>
           ) : (
@@ -860,12 +867,12 @@ function MindNode({ data }: { data: MindNodeData }) {
                 role="alert"
                 id={`mind-map-inline-err-${node.id}`}
                 data-testid={`mind-map-inline-err-${node.id}`}
-                className="absolute left-1/2 top-full z-20 mt-1 -translate-x-1/2 whitespace-nowrap rounded-sm bg-card px-1 text-[11px] text-destructive shadow-sm"
+                className="absolute left-1/2 top-full z-20 mt-1 -translate-x-1/2 whitespace-nowrap rounded-sm bg-card px-1 text-xs text-destructive shadow-sm"
               >
                 Label tidak boleh kosong.
               </span>
             ) : (
-              <span className="absolute left-1/2 top-full z-20 mt-1 -translate-x-1/2 whitespace-nowrap rounded-sm bg-card px-1 text-[11px] text-muted-foreground shadow-sm">
+              <span className="absolute left-1/2 top-full z-20 mt-1 -translate-x-1/2 whitespace-nowrap rounded-sm bg-card px-1 text-xs text-muted-foreground shadow-sm">
                 Enter simpan · Esc batal
               </span>
             )
@@ -882,7 +889,7 @@ function MindNode({ data }: { data: MindNodeData }) {
             </Badge>
           ) : null}
           {data.highlighted ? (
-            <Badge variant="secondary" size="sm" className="absolute -top-3 right-0">Cocok</Badge>
+            <Badge variant="default" size="sm" className="absolute -top-2 right-1">Cocok</Badge>
           ) : null}
           {!isEditing && !node.disabled ? (
             <>
@@ -950,7 +957,7 @@ function MindNode({ data }: { data: MindNodeData }) {
         </ContextMenuItem>
         {isRoot ? (
           <p className="max-w-56 px-2 py-1 text-xs text-muted-foreground">
-            Root tidak bisa dihapus — hapus cabangnya dulu.
+            Ide pusat tidak bisa dihapus — hapus cabangnya dulu.
           </p>
         ) : null}
       </ContextMenuContent>
@@ -1038,7 +1045,7 @@ function MindAccessibleTree({
   return (
     <details className="mt-3 rounded-md border border-border p-2">
       <summary className="min-h-11 cursor-pointer rounded-sm p-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">Pohon aksesibel — navigasi tanpa kanvas</summary>
-      <p className="p-2 text-xs text-muted-foreground">Panah menelusuri pohon; Home/End ke awal/akhir. Enter/F2 edit, Space lipat, Delete hapus. Root tidak bisa dihapus.</p>
+      <p className="p-2 text-xs text-muted-foreground">Panah menelusuri pohon; Home/End ke awal/akhir. Enter/F2 edit, Space lipat, Delete hapus. Ide pusat tidak bisa dihapus.</p>
       <div ref={treeRef} role="tree" aria-label="Pohon ide">
         {normalized.rootId ? renderNode(normalized.rootId) : null}
       </div>
@@ -1230,9 +1237,9 @@ function MindCanvas({
             <MiniMap
               pannable
               zoomable
-              aria-label="Minimap"
+              aria-label="Peta mini"
               className={cn('!border-border !bg-card', mobileMinimap ? 'block' : 'hidden md:block')}
-              maskColor="transparent"
+              maskColor="color-mix(in oklch, var(--background) 70%, transparent)"
               maskStrokeColor="var(--primary)"
               maskStrokeWidth={2}
               nodeColor="var(--primary)"
@@ -1245,12 +1252,12 @@ function MindCanvas({
             type="button"
             variant="outline"
             size="sm"
-            aria-label="Tampilkan minimap"
+            aria-label={mobileMinimap ? 'Sembunyikan peta mini' : 'Tampilkan peta mini'}
             aria-pressed={mobileMinimap}
             className="nodrag nopan absolute bottom-2 left-2 z-10 min-h-11 md:hidden"
             onClick={() => setMobileMinimap((visible) => !visible)}
           >
-            Minimap
+            Peta mini
           </Button>
         ) : null}
       </ReactFlow>
@@ -1575,7 +1582,7 @@ export function MindMap({
       const node = normalized.byId.get(nodeId);
       if (!node) return;
       if (node.depth === 0) {
-        setAnnouncement('Root tidak bisa dihapus — hapus cabangnya dulu.');
+        setAnnouncement('Ide pusat tidak bisa dihapus — hapus cabangnya dulu.');
         return;
       }
       if (node.descendantCount === 0) {
@@ -1703,8 +1710,8 @@ export function MindMap({
     [normalized, positions, expandedSet, toggleExpanded, editingId, newNodeId, handlers, activeId, highlightedIds, navigateNode, focusNodeId],
   );
   const flowEdges = React.useMemo(
-    () => toMindFlowEdges(normalized, positions, visibleIds),
-    [normalized, positions, visibleIds],
+    () => toMindFlowEdges(normalized, positions, visibleIds, highlightedIds),
+    [normalized, positions, visibleIds, highlightedIds],
   );
 
   // Fokus pill target (setelah commit/Esc/hapus kembali ke node/parent).
@@ -1723,13 +1730,28 @@ export function MindMap({
     return (
       <div aria-busy="true" aria-label="Memuat peta ide" className={cn('rounded-md border border-border p-6', className)}>
         <p role="status" className="sr-only">Memuat peta ide…</p>
-        <div aria-hidden="true" className="grid min-h-80 grid-cols-2 items-center gap-6">
-          {Array.from({ length: 6 }, (_, index) => (
-            <div key={index} className="flex items-center">
-              <span className="h-px w-8 bg-border" />
-              <Skeleton data-testid="mind-map-skeleton" className="h-12 w-40 rounded-full motion-reduce:animate-none" />
+        <div aria-hidden="true" className="flex min-h-80 flex-col items-center justify-center gap-6">
+          <div className="flex items-center">
+            <Skeleton data-testid="mind-map-skeleton" className="h-16 w-[200px] rounded-full motion-reduce:animate-none" />
+          </div>
+          <div className="grid w-full grid-cols-2 gap-6">
+            <div className="flex flex-col items-end gap-6">
+              {Array.from({ length: 3 }, (_, index) => (
+                <div key={`kiri-${index}`} className="flex items-center">
+                  <Skeleton data-testid="mind-map-skeleton" className="h-12 w-40 rounded-full motion-reduce:animate-none" />
+                  <span className="h-px w-8 bg-border" />
+                </div>
+              ))}
             </div>
-          ))}
+            <div className="flex flex-col items-start gap-6">
+              {Array.from({ length: 2 }, (_, index) => (
+                <div key={`kanan-${index}`} className="flex items-center">
+                  <span className="h-px w-8 bg-border" />
+                  <Skeleton data-testid="mind-map-skeleton" className="h-12 w-40 rounded-full motion-reduce:animate-none" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -1739,7 +1761,7 @@ export function MindMap({
     const { message, nodeId } = normalized.error;
     const detail = nodeId ? `${message} (node: ${nodeId})` : message;
     return (
-      <div role="alert" className={cn('rounded-md border border-border bg-card p-4 text-sm text-foreground', className)}>
+      <div role="alert" className={cn('rounded-md border border-destructive bg-card p-4 text-sm text-foreground', className)}>
         <p>{message}</p>
         {nodeId ? <p className="mt-1 text-muted-foreground">Node terkait: {nodeId}</p> : null}
         <Button
@@ -1797,49 +1819,51 @@ export function MindMap({
         )}
       >
         {error ? <div role="alert" className="mb-3 rounded-md border border-destructive bg-card p-3 text-sm text-foreground">{error}</div> : null}
-        {/* Toolbar kanan (wireframe §1): tambah anak root + undo/redo. Fit/
-            reset zoom tetap di Controls di atas kanvas. */}
-        <div className="mb-2 flex flex-wrap items-center justify-end gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            aria-label="Tambah anak root"
-            data-testid="mind-map-add-root"
-            className="min-h-11"
-            onClick={() => {
-              if (normalized.rootId) spawnPending(normalized.rootId);
-            }}
-          >
-            <Plus className="h-4 w-4" aria-hidden="true" />
-            Tambah anak root
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            data-testid="mind-map-undo"
-            className="min-h-11"
-            disabled={!canUndo}
-            onClick={undo}
-          >
-            <Undo2 className="h-4 w-4" aria-hidden="true" />
-            Urungkan
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            data-testid="mind-map-redo"
-            className="min-h-11"
-            disabled={!canRedo}
-            onClick={redo}
-          >
-            <Redo2 className="h-4 w-4" aria-hidden="true" />
-            Ulangi
-          </Button>
+        {/* CR-028: pencarian mendahului toolbar kanan dalam urutan visual/fokus.
+            Fit/reset zoom tetap di Controls di atas kanvas. */}
+        <div className="mb-2 flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+          {searchSlot ? <div className="min-w-0 basis-80 flex-1">{searchSlot}</div> : null}
+          <div className="ml-auto flex max-w-full flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              aria-label="Tambah cabang ide pusat"
+              data-testid="mind-map-add-root"
+              className="min-h-11"
+              onClick={() => {
+                if (normalized.rootId) spawnPending(normalized.rootId);
+              }}
+            >
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              Tambah cabang ide pusat
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              data-testid="mind-map-undo"
+              className="min-h-11"
+              disabled={!canUndo}
+              onClick={undo}
+            >
+              <Undo2 className="h-4 w-4" aria-hidden="true" />
+              Urungkan
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              data-testid="mind-map-redo"
+              className="min-h-11"
+              disabled={!canRedo}
+              onClick={redo}
+            >
+              <Redo2 className="h-4 w-4" aria-hidden="true" />
+              Ulangi
+            </Button>
+          </div>
         </div>
-        {searchSlot}
         <ReactFlowProvider>
           <MindCanvasInner
             nodes={flowNodes}

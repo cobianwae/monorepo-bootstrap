@@ -1,48 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { Button, Input, MindMap, PageHeader, getAncestors, type MindNodeFlat } from '@ds/ui';
-
-const EXAMPLE: MindNodeFlat[] = [
-  { id: 'q1', parentId: null, label: 'Peluncuran Q1' },
-  { id: 'riset', parentId: 'q1', label: 'Riset pasar', accent: 'success' },
-  { id: 'produk', parentId: 'q1', label: 'Produk MVP', accent: 'info' },
-  { id: 'marketing', parentId: 'q1', label: 'Marketing', accent: 'warning' },
-  { id: 'wawancara', parentId: 'riset', label: 'Wawancara pengguna' },
-  { id: 'kompetitor', parentId: 'riset', label: 'Analisis kompetitor' },
-  { id: 'fitur', parentId: 'produk', label: 'Fitur inti' },
-  { id: 'uji', parentId: 'produk', label: 'Uji kegunaan' },
-  { id: 'materi', parentId: 'marketing', label: 'Materi kampanye' },
-  { id: 'kanal', parentId: 'marketing', label: 'Kanal distribusi' },
-  { id: 'harga', parentId: 'produk', label: 'Harga' },
-  { id: 'persona', parentId: 'riset', label: 'Persona' },
-];
-const LARGE: MindNodeFlat[] = [
-  EXAMPLE[0],
-  ...Array.from({ length: 49 }, (_, index): MindNodeFlat => ({
-    id: `ide-${index + 1}`,
-    parentId: index < 3 ? 'q1' : `ide-${(index % 3) + 1}`,
-    label: `Ide ${index + 1}`,
-    ...(index < 3 ? { accent: 'primary' as const } : {}),
-  })),
-];
-const STATES = ['Berisi', 'Contoh Q1', 'Loading', 'Empty', 'Invalid', 'Error eksternal'] as const;
-type DemoState = typeof STATES[number];
-const RECIPE = `const [data, setData] = useState(ideas);
-const [expanded, setExpanded] = useState(parents);
-const [query, setQuery] = useState('');
-const studio = data.map(n => ({ ...n, title: n.label }));
-const find = text => data.filter(n =>
-  text.trim() && n.label.toLowerCase().includes(text.trim().toLowerCase()));
-const matches = find(query);
-function search(text) {
-  setQuery(text);
-  const paths = find(text).flatMap(n => getAncestors(studio, n.id));
-  setExpanded(ids => [...new Set([...ids, ...paths])]);
-}
-<MindMap data={data} onChange={setData} highlightedIds={matches.map(n => n.id)}
-  expandedIds={expanded} onExpandedChange={setExpanded}
-  searchSlot={<label>Cari ide<input value={query} onChange={e => search(e.target.value)} /></label>} />`;
+import { Network, Search } from 'lucide-react';
+import { Input, Label, MindMap, PageHeader, getAncestors, type MindNodeFlat } from '@ds/ui';
+import { MindDemoPanel } from './_components/mind-map-demo-panel';
+import { MindMapRecipe } from './_components/mind-map-recipe';
+import { MindMapShortcuts } from './_components/mind-map-shortcuts';
+import { EXAMPLE, LARGE, STEPS, type DemoState } from './_components/mind-map-demo-data';
 
 export default function MindMapPatternPage() {
   const [data, setData] = React.useState<MindNodeFlat[]>(EXAMPLE);
@@ -51,7 +15,6 @@ export default function MindMapPatternPage() {
   const [demoState, setDemoState] = React.useState<DemoState>('Contoh Q1');
   const [dark, setDark] = React.useState(false);
   const [minimap, setMinimap] = React.useState(true);
-  const [copied, setCopied] = React.useState('');
   const matches = query.trim()
     ? data.filter((node) => node.label.toLocaleLowerCase('id').includes(query.trim().toLocaleLowerCase('id')))
     : [];
@@ -68,7 +31,7 @@ export default function MindMapPatternPage() {
   };
   const load = (next: MindNodeFlat[], state: DemoState) => {
     setData(next);
-    setExpanded([...new Set(next.flatMap((node) => node.parentId ? [node.parentId] : []))]);
+    setExpanded([...new Set(next.flatMap((node) => (node.parentId ? [node.parentId] : [])))]);
     setQuery('');
     setDemoState(state);
   };
@@ -83,61 +46,117 @@ export default function MindMapPatternPage() {
     }
   };
 
+  const searchSlot = (
+    <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
+      <div className="min-w-0 basis-64 flex-1 space-y-1 sm:max-w-sm">
+        <Label htmlFor="mind-search">Cari ide</Label>
+        <div className="relative">
+          <Search
+            aria-hidden="true"
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          />
+          <Input
+            id="mind-search"
+            type="search"
+            className="pl-9"
+            value={query}
+            onChange={(event) => search(event.target.value)}
+            placeholder="Cth: Riset pasar"
+            aria-describedby="mind-search-status"
+            disabled={demoState === 'Loading' || demoState === 'Invalid'}
+          />
+        </div>
+      </div>
+      <p
+        role="status"
+        aria-live="polite"
+        id="mind-search-status"
+        data-testid="mind-search-results"
+        className="text-sm text-muted-foreground"
+      >
+        {query.trim()
+          ? matches.length
+            ? `${matches.length} hasil cocok`
+            : 'Tidak ada hasil'
+          : `${data.length} ide · cari berdasarkan nama ide`}
+      </p>
+    </div>
+  );
+
   return (
-    <div className="flex flex-col gap-6 p-6">
-      <PageHeader title="Mind Map" description="Petakan ide, cari cabang, dan kelola hierarki tanpa meninggalkan kanvas." />
-      <section aria-labelledby="mind-steps">
-        <h2 id="mind-steps" className="text-lg font-semibold">Alur brainstorming</h2>
-        <ol className="mt-2 list-decimal space-y-1 pl-6 text-sm text-muted-foreground">
-          <li>Buka peta Peluncuran Q1.</li>
-          <li>Tambah anak atau saudara, ketik label, lalu Enter untuk menyimpan.</li>
-          <li>Lipat dan buka cabang lewat Space atau expander.</li>
-          <li>Hapus cabang, konfirmasi, lalu urungkan lewat Ctrl+Z.</li>
-          <li>Cari label untuk membuka jalur menuju hasil.</li>
-          <li>Pan, zoom, fit-view, lalu reset ke 100%.</li>
+    <div className="animate-in fade-in-50 space-y-10 duration-200">
+      <PageHeader
+        eyebrow="UX Recipe Scenario"
+        eyebrowIcon={Network}
+        title="Mind Map"
+        description="Ubah curah pendapat menjadi peta ide yang bisa dicari, dilipat, dan dikelola langsung di kanvas."
+      />
+
+      <section
+        aria-labelledby="mind-demo"
+        data-theme="pulse"
+        className={`${dark ? 'dark' : 'light'} space-y-3 rounded-lg border border-border bg-background p-4 text-foreground`}
+        style={{ colorScheme: dark ? 'dark' : 'light' }}
+      >
+        <div className="space-y-1">
+          <h2 id="mind-demo" className="text-lg font-semibold text-foreground">
+            Demo interaktif
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Pilih status data atau tampilan di panel, lalu coba langsung di kanvas.
+          </p>
+        </div>
+        <MindDemoPanel
+          demoState={demoState}
+          onSelectState={selectState}
+          onLoadLarge={() => load(LARGE, 'Berisi')}
+          dark={dark}
+          onDarkChange={setDark}
+          minimap={minimap}
+          onMinimapChange={setMinimap}
+        />
+        <MindMap
+          data={data}
+          onChange={setData}
+          expandedIds={expanded}
+          onExpandedChange={setExpanded}
+          highlightedIds={matches.map((node) => node.id)}
+          loading={demoState === 'Loading'}
+          error={
+            demoState === 'Error eksternal'
+              ? 'Perubahan belum tersimpan. Peta tetap tersedia; coba simpan lagi melalui aplikasi konsumen.'
+              : null
+          }
+          minimap={minimap}
+          searchSlot={searchSlot}
+        />
+      </section>
+
+      <section aria-labelledby="mind-steps" className="space-y-3">
+        <div className="space-y-1">
+          <h2 id="mind-steps" className="text-lg font-semibold text-foreground">
+            Alur brainstorming
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Ikuti enam langkah ini untuk mengembangkan ide pusat menjadi rencana yang terstruktur.
+          </p>
+        </div>
+        <ol className="space-y-3">
+          {STEPS.map((step, index) => (
+            <li key={step.title} className="flex items-start gap-3 text-sm">
+              <span aria-hidden="true" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-foreground">
+                {index + 1}
+              </span>
+              <p className="pt-0.5 text-muted-foreground">
+                <span className="font-medium text-foreground">{step.title}:</span> {step.detail}
+              </p>
+            </li>
+          ))}
         </ol>
       </section>
-      <section aria-labelledby="mind-demo" data-theme="pulse"
-        className={`${dark ? 'dark' : 'light'} rounded-lg border border-border bg-background p-4 text-foreground`}
-        style={{ colorScheme: dark ? 'dark' : 'light' }}>
-        <h2 id="mind-demo" className="text-lg font-semibold">Demo interaktif</h2>
-        <div role="group" aria-label="Panel demo" className="my-3 flex flex-wrap gap-2">
-          {STATES.map((state) => (
-            <Button key={state} variant={demoState === state ? 'default' : 'outline'} className="min-h-11"
-              aria-pressed={demoState === state} onClick={() => selectState(state)}>{state}</Button>
-          ))}
-          <Button variant="outline" className="min-h-11" onClick={() => load(LARGE, 'Berisi')}>Muat 50 node</Button>
-          <Button variant="outline" className="min-h-11" aria-pressed={dark} onClick={() => setDark(!dark)}>Mode gelap</Button>
-          <Button variant="outline" className="min-h-11" aria-pressed={minimap} onClick={() => setMinimap(!minimap)}>Minimap</Button>
-        </div>
-        <MindMap data={data} onChange={setData} expandedIds={expanded} onExpandedChange={setExpanded}
-          highlightedIds={matches.map((node) => node.id)} loading={demoState === 'Loading'}
-          error={demoState === 'Error eksternal' ? 'Perubahan belum tersimpan. Peta tetap tersedia; coba simpan lagi melalui aplikasi konsumen.' : null}
-          minimap={minimap} searchSlot={<div className="mb-3">
-          <label htmlFor="mind-search" className="mb-1 block text-sm font-medium">Cari ide</label>
-          <Input id="mind-search" type="search" value={query} onChange={(event) => search(event.target.value)}
-            disabled={demoState === 'Loading' || demoState === 'Invalid'} />
-          <p role="status" aria-live="polite" data-testid="mind-search-results" className="mt-1 text-sm text-muted-foreground">
-            {query.trim() ? (matches.length ? `${matches.length} hasil cocok` : 'Tidak ada hasil') : `${data.length} ide · cari berdasarkan label`}
-          </p>
-        </div>} />
-      </section>
-      <section aria-labelledby="mind-keyboard">
-        <h2 id="mind-keyboard" className="text-lg font-semibold">Keyboard & aksesibilitas</h2>
-        <p className="mt-2 text-sm text-muted-foreground">Node: ←/→ saudara di sisi sama, ↑ parent, ↓ anak pertama. Enter/F2 edit, Space lipat, Delete/Backspace hapus. Ctrl/Cmd+Z urungkan; Ctrl+Y atau Cmd+Shift+Z ulangi. Input teks memakai shortcut edit native.</p>
-        <p className="mt-2 text-sm text-muted-foreground">Kanvas: panah pan, +/− zoom, 0 reset, F fit. Pohon aksesibel: ↑/↓ baris, → buka/anak, ← lipat/parent, Home/End awal/akhir. Buka panel pohon untuk alternatif pembaca layar. Gerakan mengikuti prefers-reduced-motion. Semua handler demo lokal, tanpa request server.</p>
-      </section>
-      <section aria-labelledby="mind-recipe">
-        <h2 id="mind-recipe" className="text-lg font-semibold">Resep integrasi</h2>
-        <pre className="my-2 overflow-x-auto rounded-md bg-muted p-4 text-sm text-foreground"><code>{RECIPE}</code></pre>
-        <Button variant="outline" onClick={async () => {
-          try {
-            await navigator.clipboard.writeText(RECIPE);
-            setCopied('Resep disalin');
-          } catch { setCopied('Tidak dapat menyalin. Pilih teks resep secara manual.'); }
-        }}>Salin resep</Button>
-        <p role="status" className="mt-1 text-sm text-muted-foreground">{copied}</p>
-      </section>
+
+      <MindMapShortcuts />
+      <MindMapRecipe />
     </div>
   );
 }
