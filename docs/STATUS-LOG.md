@@ -115,3 +115,5 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Story 006-05 `done` (approved oleh user) — `006-05`.
 - 2026-11-21 — Story 007-01 TransferList assign role selesai (dual-listbox controlled value/onChange, 3 cara pindah, multi-select shift/ctrl, filter per panel, ARIA listbox + focus management, skeleton/empty/error, 10 test hijau; showcase S-005.30 + smoke build hijau; typecheck hanya gagal di known issue flow-editor.test.tsx per CR-015), status `review` — `007-01`.
 - 2026-11-21 — Story 007-01 `done` (approved oleh user) — `007-01`.
+- 2026-11-21 — Story 008-01 Cascader selesai (komponen kolom 3 tingkat + lazy/search + clearable/disabled/error + keyboard/ARIA, 9 test hijau; showcase S-005.31 + smoke build hijau; typecheck/lint hijau kecuali known issue flow-editor.test.tsx per CR-015), status `review` — `008-01`.
+- 2026-11-21 — Story 008-01 `done` (approved oleh user) — `008-01`.

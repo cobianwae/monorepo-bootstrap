@@ -91,7 +91,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 006-04 | RTE gambar M-010 + serializer markdown + slot mention | done | `docs/stories/006-04-gambar-markdown-mention.md` |
 | 006-05 | RTE showcase final + audit kontras + smoke | done | `docs/stories/006-05-showcase-audit-smoke.md` |
 | 007-01 | Transfer list assign role + showcase | done | `docs/stories/007-01-transfer-list.md` |
-| 008-01 | Cascader alamat/kategori + showcase | approved | `docs/stories/008-01-cascader.md` |
+| 008-01 | Cascader alamat/kategori + showcase | done | `docs/stories/008-01-cascader.md` |
 | 008-02 | Tree select compose tree-view + showcase | approved | `docs/stories/008-02-tree-select.md` |
 | 009-01 | Mention + emoji picker untuk chat + showcase | approved | `docs/stories/009-01-mention-emoji.md` |
 | 012-01 | Mind map fondasi dua sisi + pill + pan/zoom | approved | `docs/stories/012-01-fondasi-dua-sisi-pill-panzoom.md` |
