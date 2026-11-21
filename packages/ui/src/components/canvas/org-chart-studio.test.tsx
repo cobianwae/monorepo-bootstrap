@@ -4,10 +4,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { Toaster } from '../feedback/toaster';
 import {
   OrgChartStudio,
+  applyDelete,
   computeStudioPositions,
   getAncestors,
+  getDescendants,
+  isValidMove,
   normalizeStudioInput,
+  pushHistoryCapped,
   toStudioFlowEdges,
+  STUDIO_UNDO_LIMIT,
   type OrgStudioInput,
 } from './org-chart-studio';
 
@@ -341,8 +346,9 @@ describe('OrgChartStudio tambah 1-klik + panel detail (011-02)', () => {
     expect(screen.getByTestId('org-studio-detail-title')).not.toBeNull();
     expect(screen.getByTestId('org-studio-detail-subtitle')).not.toBeNull();
     expect(screen.getByTestId('org-studio-detail-badge')).not.toBeNull();
-    expect((screen.getByTestId('org-studio-detail-move') as HTMLButtonElement).disabled).toBe(true);
-    expect((screen.getByTestId('org-studio-detail-delete') as HTMLButtonElement).disabled).toBe(true);
+    // 011-03: tombol pindah/hapus panel aktif (M-007/M-008); root tetap diproteksi.
+    expect((screen.getByTestId('org-studio-detail-move') as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByTestId('org-studio-detail-delete') as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(screen.getByRole('button', { name: 'Tutup' }));
     expect(screen.queryByTestId('org-studio-detail-title')).toBeNull();
     // double-click membuka panel (query ulang: node di-render ulang)
@@ -402,5 +408,208 @@ describe('OrgChartStudio tambah 1-klik + panel detail (011-02)', () => {
     const undone = onChangeSpy.mock.calls[1][0] as { id: string }[];
     expect(undone).toHaveLength(4);
     expect(undone.find((node) => node.id === 'studio-baru-1')).toBeUndefined();
+  });
+});
+
+describe('OrgChartStudio pindah/hapus/undo (011-03)', () => {
+  function ControlledStudio({
+    initial = flatData,
+    onChangeSpy,
+  }: {
+    initial?: OrgStudioInput;
+    onChangeSpy?: (next: { id: string; parentId: string | null; title: string }[]) => void;
+  }) {
+    const [data, setData] = React.useState(initial);
+    return (
+      <OrgChartStudio
+        data={data}
+        onChange={(next) => {
+          onChangeSpy?.(next);
+          setData(next);
+        }}
+      />
+    );
+  }
+
+  function dragTo(container: HTMLElement, sourceId: string, targetId: string): void {
+    const source = container.querySelector(`[data-node-id="${sourceId}"]`) as HTMLElement;
+    const target = container.querySelector(`[data-node-id="${targetId}"]`) as HTMLElement;
+    fireEvent.dragStart(source);
+    fireEvent.dragOver(target);
+    fireEvent.drop(target);
+    fireEvent.dragEnd(source);
+  }
+
+  function openPanel(container: HTMLElement, nodeId: string, title: string): void {
+    const card = container.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
+    fireEvent.click(card);
+    fireEvent.click(screen.getByRole('button', { name: `Detail ${title}` }));
+  }
+
+  it('helper: isValidMove menolak diri/descendant/no-op dan menerima valid', () => {
+    const flat = flatData as unknown as Parameters<typeof isValidMove>[0];
+    expect(isValidMove(flat, 'cto', 'cto').valid).toBe(false);
+    expect(isValidMove(flat, 'cto', 'cto').reason).toContain('diri sendiri');
+    expect(isValidMove(flat, 'ceo', 'eng').valid).toBe(false);
+    expect(isValidMove(flat, 'ceo', 'eng').reason).toContain('siklus');
+    expect(isValidMove(flat, 'cto', 'ceo').valid).toBe(false);
+    expect(isValidMove(flat, 'eng', 'cfo').valid).toBe(true);
+    expect(getDescendants(flat, 'ceo').sort()).toEqual(['cfo', 'cto', 'eng']);
+  });
+
+  it('helper: applyDelete reparent vs subtree; root diproteksi', () => {
+    const flat = flatData as unknown as Parameters<typeof applyDelete>[0];
+    const reparented = applyDelete(flat, 'cto', 'reparent') as { id: string; parentId: string | null }[];
+    expect(reparented.find((n) => n.id === 'cto')).toBeUndefined();
+    expect(reparented.find((n) => n.id === 'eng')?.parentId).toBe('ceo');
+    const subtree = applyDelete(flat, 'cto', 'subtree') as { id: string }[];
+    expect(subtree.map((n) => n.id).sort()).toEqual(['ceo', 'cfo']);
+    expect(applyDelete(flat, 'ceo', 'subtree')).toHaveLength(4);
+  });
+
+  it('helper: pushHistoryCapped membatasi 50 snapshot', () => {
+    let past: { id: string }[][] = [];
+    for (let i = 0; i < STUDIO_UNDO_LIMIT + 10; i += 1) {
+      past = pushHistoryCapped(past as never, [{ id: `s-${i}` }] as never) as unknown as {
+        id: string;
+      }[][];
+    }
+    expect(past).toHaveLength(STUDIO_UNDO_LIMIT);
+    expect(past[0][0].id).toBe('s-10');
+  });
+
+  it('AC-01: drag valid memindah + satu onChange + preview path + live region', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    const source = container.querySelector('[data-node-id="eng"]') as HTMLElement;
+    const target = container.querySelector('[data-node-id="cfo"]') as HTMLElement;
+    fireEvent.dragStart(source);
+    fireEvent.dragOver(target);
+    expect(target.getAttribute('data-drop')).toBe('valid');
+    expect(screen.getByTestId('org-studio-drag-feedback').textContent).toContain('Lepas untuk pindah');
+    expect(screen.getByTestId('org-studio-drag-feedback').textContent).toContain(
+      'Direktur Utama / CFO / Engineer',
+    );
+    fireEvent.drop(target);
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    const next = onChangeSpy.mock.calls[0][0] as { id: string; parentId: string | null }[];
+    expect(next.find((n) => n.id === 'eng')?.parentId).toBe('cfo');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('dipindah ke');
+    fireEvent.dragEnd(source);
+  });
+
+  it('AC-01: drag invalid (ke descendant) ditolak + alert + tanpa onChange', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    const source = container.querySelector('[data-node-id="cto"]') as HTMLElement;
+    const target = container.querySelector('[data-node-id="eng"]') as HTMLElement;
+    fireEvent.dragStart(source);
+    fireEvent.dragOver(target);
+    expect(target.getAttribute('data-drop')).toBe('invalid');
+    fireEvent.drop(target);
+    expect(onChangeSpy).not.toHaveBeenCalled();
+    expect(screen.getByTestId('org-studio-drag-feedback').textContent).toContain('siklus');
+    expect(container.querySelector('[role="alert"]')).not.toBeNull();
+    fireEvent.dragEnd(source);
+  });
+
+  it('AC-02: dialog M-007 setara drag — pilih atasan + preview + konfirmasi', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    openPanel(container, 'eng', 'Engineer');
+    fireEvent.click(screen.getByTestId('org-studio-detail-move'));
+    fireEvent.click(screen.getByRole('radio', { name: /CFO/ }));
+    expect(screen.getByTestId('org-studio-move-preview').textContent).toContain('Direktur Utama / CFO / Engineer');
+    fireEvent.click(screen.getByTestId('org-studio-move-confirm'));
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    const next = onChangeSpy.mock.calls[0][0] as { id: string; parentId: string | null }[];
+    expect(next.find((n) => n.id === 'eng')?.parentId).toBe('cfo');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('dipindah ke');
+  });
+
+  it('AC-02: M-007 menonaktifkan diri + turunan beserta alasan', () => {
+    const { container } = render(<ControlledStudio />);
+    openPanel(container, 'cto', 'CTO');
+    fireEvent.click(screen.getByTestId('org-studio-detail-move'));
+    expect(screen.getByRole('radio', { name: /CTO.*Node itu sendiri/ })).toHaveProperty('disabled', true);
+    expect(screen.getByRole('radio', { name: /Engineer.*Turunan/ })).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('org-studio-move-confirm')).toHaveProperty('disabled', true);
+  });
+
+  it('AC-03: M-008 mode reparent memindahkan anak ke kakek + menyebut N turunan', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    openPanel(container, 'cto', 'CTO');
+    fireEvent.click(screen.getByTestId('org-studio-detail-delete'));
+    expect(screen.getByText(/beserta 1 turunan/)).not.toBeNull();
+    fireEvent.click(screen.getByRole('radio', { name: /atasan di atasnya/ }));
+    fireEvent.click(screen.getByTestId('org-studio-delete-confirm'));
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    const next = onChangeSpy.mock.calls[0][0] as { id: string; parentId: string | null }[];
+    expect(next.find((n) => n.id === 'cto')).toBeUndefined();
+    expect(next.find((n) => n.id === 'eng')?.parentId).toBe('ceo');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('dihapus');
+  });
+
+  it('AC-03: M-008 mode subtree menghapus seluruh turunan', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    openPanel(container, 'cto', 'CTO');
+    fireEvent.click(screen.getByTestId('org-studio-detail-delete'));
+    fireEvent.click(screen.getByRole('radio', { name: /Hapus subtree/ }));
+    fireEvent.click(screen.getByTestId('org-studio-delete-confirm'));
+    const next = onChangeSpy.mock.calls[0][0] as { id: string }[];
+    expect(next.map((n) => n.id).sort()).toEqual(['ceo', 'cfo']);
+  });
+
+  it('AC-03: root diproteksi — tombol hapus disabled + Delete keyboard diabaikan', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    openPanel(container, 'ceo', 'Direktur Utama');
+    expect(screen.getByTestId('org-studio-detail-delete')).toHaveProperty('disabled', true);
+    fireEvent.click(screen.getByRole('button', { name: 'Tutup' }));
+    const ceoCard = container.querySelector('[data-node-id="ceo"]') as HTMLElement;
+    fireEvent.keyDown(ceoCard, { key: 'Delete' });
+    expect(screen.queryByTestId('org-studio-delete-confirm')).toBeNull();
+    expect(onChangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('AC-03: Delete keyboard membuka M-008 untuk non-root', () => {
+    const { container } = render(<ControlledStudio />);
+    const card = container.querySelector('[data-node-id="cfo"]') as HTMLElement;
+    fireEvent.keyDown(card, { key: 'Delete' });
+    expect(screen.getByTestId('org-studio-delete-confirm')).not.toBeNull();
+  });
+
+  it('AC-04: toolbar undo/redo round-trip pindah + live region', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    expect(screen.getByTestId('org-studio-undo')).toHaveProperty('disabled', true);
+    expect(screen.getByTestId('org-studio-redo')).toHaveProperty('disabled', true);
+    dragTo(container, 'eng', 'cfo');
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('org-studio-undo')).toHaveProperty('disabled', false);
+    fireEvent.click(screen.getByTestId('org-studio-undo'));
+    expect(onChangeSpy).toHaveBeenCalledTimes(2);
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('dibatalkan');
+    const undone = onChangeSpy.mock.calls[1][0] as { id: string; parentId: string | null }[];
+    expect(undone.find((n) => n.id === 'eng')?.parentId).toBe('cto');
+    expect(screen.getByTestId('org-studio-redo')).toHaveProperty('disabled', false);
+    fireEvent.click(screen.getByTestId('org-studio-redo'));
+    expect(onChangeSpy).toHaveBeenCalledTimes(3);
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('diulang');
+    const redone = onChangeSpy.mock.calls[2][0] as { id: string; parentId: string | null }[];
+    expect(redone.find((n) => n.id === 'eng')?.parentId).toBe('cfo');
+  });
+
+  it('AC-04: Ctrl+Z / Ctrl+Y memicu undo/redo', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    dragTo(container, 'eng', 'cfo');
+    const app = container.querySelector('[role="application"]') as HTMLElement;
+    fireEvent.keyDown(app, { key: 'z', ctrlKey: true });
+    expect(onChangeSpy).toHaveBeenCalledTimes(2);
+    fireEvent.keyDown(app, { key: 'y', ctrlKey: true });
+    expect(onChangeSpy).toHaveBeenCalledTimes(3);
   });
 });

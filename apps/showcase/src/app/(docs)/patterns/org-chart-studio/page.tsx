@@ -1,8 +1,9 @@
 'use client';
 
-// Draf showcase OrgChartStudio (011-02): demonstrasi tambah 1-klik inline-edit
-// + panel detail on-demand dengan state controlled milik konsumen.
-// Scope penuh (langkah bernomor, search, state matrix) di 011-05.
+// Draf showcase OrgChartStudio (011-03): tambah 1-klik inline-edit + panel
+// detail on-demand + pindah drag/dialog (M-007) + hapus (M-008) + undo/redo.
+// State controlled milik konsumen. Scope penuh (langkah bernomor, search,
+// state matrix) di 011-05.
 
 import * as React from 'react';
 import { Sparkles } from 'lucide-react';
@@ -26,7 +27,7 @@ export default function OrgChartStudioPage() {
         eyebrow="UX Recipe Scenario"
         eyebrowIcon={Sparkles}
         title="Org Chart Studio / Studio Organisasi"
-        description="Draf 011-02 (S-005.34): tambah bawahan/sejawat 1 klik via gagang + inline-edit tanpa membuka form, dan panel detail (S-005.34.01) sheet kanan yang hanya terbuka bila diminta — tombol [≡], double-click, klik avatar, atau Shift+Enter. Tiap commit memanggil onChange sekali; toast menyediakan Urungkan."
+        description="Draf 011-03 (S-005.34): tambah 1-klik + panel detail (S-005.34.01) + pindah via seret kartu atau dialog M-007 + hapus via Delete/dialog M-008 (root diproteksi) + toolbar Urungkan/Ulangi (Ctrl+Z/Y). Tiap commit memanggil onChange sekali; toast menyediakan Urungkan."
       />
 
       <div className="flex flex-wrap items-center gap-3">
@@ -34,8 +35,8 @@ export default function OrgChartStudioPage() {
           Reset demo
         </Button>
         <p className="text-sm text-muted-foreground">
-          Arahkan ke kartu untuk melihat gagang <span aria-hidden="true">+</span> bawah (bawahan) dan samping
-          (sejawat); Enter simpan, Esc batal.
+          Seret kartu ke target (hijau valid, merah invalid + snap-back) atau buka panel detail → Pindah…/Hapus;
+          Delete pada kartu fokus membuka hapus; Ctrl+Z/Y urungkan/ulangi.
         </p>
       </div>
 

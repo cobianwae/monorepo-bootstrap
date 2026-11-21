@@ -1,6 +1,6 @@
 # 011-03 — Pindah (drag + dialog), hapus, dan undo/redo
 
-Status: todo
+Status: review
 PRD: `docs/prd/011-org-chart-studio.md`
 Design: `docs/design/org-chart-studio.md`
 FR: `FR-007`, `FR-008`, `FR-009`, `FR-013`, `FR-019`
@@ -35,12 +35,12 @@ Goal: Pindah dua jalur setara (drag + dialog M-007), hapus aman via M-008, dan s
 
 ## Tasks
 
-- [ ] Drag antar kartu: deteksi target terdekat, ring + teks valid/invalid, preview path, snap-back, penolakan siklus/diri
-- [ ] Dialog `M-007`: select atasan + preview + validasi; fokus-trap + Esc
-- [ ] Dialog `M-008`: hitungan `descendantCount`, radio reparent-ke-kakek vs hapus-subtree, proteksi root
-- [ ] Undo/redo internal ≤ 50 + toolbar + shortcut + live region + toast wiring untuk semua mutasi
-- [ ] Test: drag valid/invalid, M-007 setara drag, M-008 kedua mode + root, round-trip undo semua mutasi + batas 50
-- [ ] Showcase: tambah pemicu pindah/hapus/undo ke draf route (final di 011-05)
+- [x] Drag antar kartu: deteksi target terdekat, ring + teks valid/invalid, preview path, snap-back, penolakan siklus/diri
+- [x] Dialog `M-007`: select atasan + preview + validasi; fokus-trap + Esc
+- [x] Dialog `M-008`: hitungan `descendantCount`, radio reparent-ke-kakek vs hapus-subtree, proteksi root
+- [x] Undo/redo internal ≤ 50 + toolbar + shortcut + live region + toast wiring untuk semua mutasi
+- [x] Test: drag valid/invalid, M-007 setara drag, M-008 kedua mode + root, round-trip undo semua mutasi + batas 50
+- [x] Showcase: tambah pemicu pindah/hapus/undo ke draf route (final di 011-05)
 
 ## Dependencies
 

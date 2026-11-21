@@ -27,7 +27,16 @@ import { Button } from '../base/button';
 import { Input } from '../base/input';
 import { Label } from '../base/label';
 import { Skeleton } from '../base/skeleton';
+import { RadioGroup, RadioGroupItem } from '../base/radio-group';
 import { EmptyState } from '../feedback/empty-state';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../feedback/dialog';
 import { ToastAction } from '../feedback/toast';
 import { toast } from '../feedback/use-toast';
 import {
@@ -287,6 +296,102 @@ export function getAncestors(nodes: OrgStudioNodeFlat[], id: string): string[] {
 }
 
 // ---------------------------------------------------------------------------
+// Mutasi pindah/hapus 011-03 (FR-007/FR-008, D7): pure helper agar mudah diuji.
+// ---------------------------------------------------------------------------
+
+/** Batas undo/redo internal (FR-009, D8). */
+export const STUDIO_UNDO_LIMIT = 50;
+
+export function pushHistoryCapped(
+  past: OrgStudioNodeFlat[][],
+  snapshot: OrgStudioNodeFlat[],
+  limit: number = STUDIO_UNDO_LIMIT,
+): OrgStudioNodeFlat[][] {
+  if (past.length >= limit) return [...past.slice(past.length - (limit - 1)), snapshot];
+  return [...past, snapshot];
+}
+
+/** Semua id turunan (langsung + tidak langsung) dari `id`. */
+export function getDescendants(nodes: OrgStudioNodeFlat[], id: string): string[] {
+  const byParent = new Map<string, string[]>();
+  for (const node of nodes) {
+    if (node.parentId !== null) {
+      const list = byParent.get(node.parentId) ?? [];
+      list.push(node.id);
+      byParent.set(node.parentId, list);
+    }
+  }
+  const result: string[] = [];
+  const stack = [...(byParent.get(id) ?? [])];
+  const seen = new Set<string>([id]);
+  while (stack.length > 0) {
+    const current = stack.pop() as string;
+    if (seen.has(current)) continue;
+    seen.add(current);
+    result.push(current);
+    for (const child of byParent.get(current) ?? []) stack.push(child);
+  }
+  return result;
+}
+
+export interface StudioMoveValidation {
+  valid: boolean;
+  reason: string | null;
+}
+
+/** Validasi pindah: tolak diri sendiri, turunan (siklus), dan no-op parent sama. */
+export function isValidMove(
+  nodes: OrgStudioNodeFlat[],
+  sourceId: string,
+  targetId: string,
+): StudioMoveValidation {
+  const byId = new Map(nodes.map((node) => [node.id, node]));
+  const source = byId.get(sourceId);
+  const target = byId.get(targetId);
+  if (!source || !target) return { valid: false, reason: 'Node tidak ditemukan.' };
+  if (sourceId === targetId) return { valid: false, reason: 'Tidak dapat memindahkan ke diri sendiri.' };
+  if (getDescendants(nodes, sourceId).includes(targetId)) {
+    return { valid: false, reason: 'Tidak dapat memindahkan ke turunannya (siklus).' };
+  }
+  if (source.parentId === targetId) return { valid: false, reason: 'Sudah berada di atasan ini.' };
+  return { valid: true, reason: null };
+}
+
+/** Pindahkan `sourceId` menjadi anak `newParentId` (tanpa validasi — panggil isValidMove dulu). */
+export function applyMove(
+  nodes: OrgStudioNodeFlat[],
+  sourceId: string,
+  newParentId: string,
+): OrgStudioNodeFlat[] {
+  return nodes.map((node) => (node.id === sourceId ? { ...node, parentId: newParentId } : node));
+}
+
+export type StudioDeleteMode = 'reparent' | 'subtree';
+
+/**
+ * Hapus `targetId`: `reparent` memindahkan anak ke kakek, `subtree` menghapus
+ * seluruh turunan. Root diproteksi (node root dikembalikan tanpa perubahan).
+ */
+export function applyDelete(
+  nodes: OrgStudioNodeFlat[],
+  targetId: string,
+  mode: StudioDeleteMode,
+): OrgStudioNodeFlat[] {
+  const byId = new Map(nodes.map((node) => [node.id, node]));
+  const target = byId.get(targetId);
+  if (!target || target.parentId === null) return nodes;
+  if (mode === 'subtree') {
+    const doomed = new Set([targetId, ...getDescendants(nodes, targetId)]);
+    return nodes.filter((node) => !doomed.has(node.id));
+  }
+  return nodes
+    .filter((node) => node.id !== targetId)
+    .map((node) =>
+      node.parentId === targetId ? { ...node, parentId: target.parentId } : node,
+    );
+}
+
+// ---------------------------------------------------------------------------
 // Layout balanced-tidy post-order (design §3 langkah 3, tanpa d3-hierarchy)
 // Jalur migrasi d3-hierarchy hanya mengganti langkah ini; langkah 4 (pemetaan
 // ke xyflow) tidak berubah.
@@ -350,6 +455,7 @@ export type StudioNodeData = {
   isHighlighted: boolean;
   isEditing: boolean; // kartu sedang mode inline-edit (FR-005)
   isNew: boolean; // kartu baru saja di-commit → sorotan (FR-005)
+  dropState: 'valid' | 'invalid' | null; // target drag-pindah 011-03 (FR-007)
   onToggle: (id: string) => void;
   onSelectNode: ((node: OrgStudioNodeNormalized) => void) | undefined;
   onAddChild: (parentId: string) => void; // gagang bawah "+" (FR-005)
@@ -357,6 +463,11 @@ export type StudioNodeData = {
   onOpenDetail: (node: OrgStudioNodeNormalized) => void; // panel S-005.34.01 (FR-006)
   onCommitInline: (nodeId: string, title: string) => void;
   onCancelInline: (nodeId: string) => void;
+  onDragStartNode: (nodeId: string) => void; // drag-pindah 011-03 (FR-007)
+  onDragOverNode: (nodeId: string) => void;
+  onDropOnNode: (nodeId: string) => void;
+  onDragEndNode: () => void;
+  onRequestDelete: (node: OrgStudioNodeNormalized) => void; // M-008 (FR-008)
 };
 
 export type StudioFlowNode = Node<StudioNodeData, 'studioNode'>;
@@ -378,7 +489,13 @@ export function toStudioFlowNodes(
     onOpenDetail: StudioNodeData['onOpenDetail'];
     onCommitInline: StudioNodeData['onCommitInline'];
     onCancelInline: StudioNodeData['onCancelInline'];
+    onDragStartNode: StudioNodeData['onDragStartNode'];
+    onDragOverNode: StudioNodeData['onDragOverNode'];
+    onDropOnNode: StudioNodeData['onDropOnNode'];
+    onDragEndNode: StudioNodeData['onDragEndNode'];
+    onRequestDelete: StudioNodeData['onRequestDelete'];
   },
+  dropTarget: { overId: string | null; state: 'valid' | 'invalid' | null },
 ): StudioFlowNode[] {
   const positionById = new Map(positions.map((position) => [position.id, position]));
   return normalized.nodes
@@ -399,6 +516,7 @@ export function toStudioFlowNodes(
           isHighlighted: highlightedSet.has(node.id),
           isEditing: editingId === node.id,
           isNew: newNodeId === node.id,
+          dropState: dropTarget.overId === node.id ? dropTarget.state : null,
           onToggle: handlers.onToggle,
           onSelectNode: handlers.onSelectNode,
           onAddChild: handlers.onAddChild,
@@ -406,6 +524,11 @@ export function toStudioFlowNodes(
           onOpenDetail: handlers.onOpenDetail,
           onCommitInline: handlers.onCommitInline,
           onCancelInline: handlers.onCancelInline,
+          onDragStartNode: handlers.onDragStartNode,
+          onDragOverNode: handlers.onDragOverNode,
+          onDropOnNode: handlers.onDropOnNode,
+          onDragEndNode: handlers.onDragEndNode,
+          onRequestDelete: handlers.onRequestDelete,
         },
         selected,
       };
@@ -505,6 +628,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
     isHighlighted,
     isEditing,
     isNew,
+    dropState,
     onToggle,
     onSelectNode,
     onAddChild,
@@ -512,6 +636,11 @@ function StudioNode({ data }: { data: StudioNodeData }) {
     onOpenDetail,
     onCommitInline,
     onCancelInline,
+    onDragStartNode,
+    onDragOverNode,
+    onDropOnNode,
+    onDragEndNode,
+    onRequestDelete,
   } = data;
   const badgeVariant = node.accent ? ACCENT_BADGE_VARIANT[node.accent] : 'secondary';
   const fullTitle = `${node.title}${node.subtitle ? ` — ${node.subtitle}` : ''}${node.badge ? ` (${node.badge})` : ''}`;
@@ -543,6 +672,12 @@ function StudioNode({ data }: { data: StudioNodeData }) {
     onCommitInline(node.id, title);
   }, [draft, node.id, onCommitInline]);
   const canAddSibling = node.parentId !== null;
+  const dropRing =
+    dropState === 'valid'
+      ? 'border-success ring-2 ring-success'
+      : dropState === 'invalid'
+        ? 'border-destructive ring-2 ring-destructive'
+        : null;
   return (
     <div
       data-testid="org-studio-node"
@@ -550,8 +685,33 @@ function StudioNode({ data }: { data: StudioNodeData }) {
       data-selected={isSelected ? 'true' : undefined}
       data-highlighted={isHighlighted ? 'true' : undefined}
       data-new={isNew ? 'true' : undefined}
+      data-drop={dropState ?? undefined}
       title={isEditing ? undefined : fullTitle}
       tabIndex={0}
+      draggable={!isEditing}
+      onDragStart={(event) => {
+        event.stopPropagation();
+        try {
+          event.dataTransfer.effectAllowed = 'move';
+          event.dataTransfer.setData('text/plain', node.id);
+        } catch {
+          // jsdom: dataTransfer opsional — id tetap disalurkan via state.
+        }
+        onDragStartNode(node.id);
+      }}
+      onDragOver={(event) => {
+        if (isEditing) return;
+        event.preventDefault();
+        event.stopPropagation();
+        onDragOverNode(node.id);
+      }}
+      onDrop={(event) => {
+        if (isEditing) return;
+        event.preventDefault();
+        event.stopPropagation();
+        onDropOnNode(node.id);
+      }}
+      onDragEnd={() => onDragEndNode()}
       onClick={() => {
         if (!isEditing) onSelectNode?.(node);
       }}
@@ -566,16 +726,31 @@ function StudioNode({ data }: { data: StudioNodeData }) {
         } else if (event.key === 'Enter') {
           event.preventDefault();
           onSelectNode?.(node);
+        } else if (event.key === 'Delete' || event.key === 'Backspace') {
+          event.preventDefault();
+          onRequestDelete(node);
         }
       }}
       className={cn(
         'group/studio-node relative flex h-[84px] w-[240px] items-center gap-2 rounded-md border bg-card pl-4 pr-2 text-card-foreground',
         'motion-safe:transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        isSelected || isHighlighted || isNew || isEditing
-          ? 'border-primary ring-2 ring-ring'
-          : 'border-border',
+        dropRing ??
+          (isSelected || isHighlighted || isNew || isEditing
+            ? 'border-primary ring-2 ring-ring'
+            : 'border-border'),
       )}
     >
+      {dropState !== null ? (
+        <span
+          data-testid="org-studio-drop-hint"
+          className={cn(
+            'absolute -top-2 right-2 z-10 rounded-sm px-1 text-[10px] leading-4',
+            dropState === 'valid' ? 'bg-success text-success-foreground' : 'bg-destructive text-destructive-foreground',
+          )}
+        >
+          {dropState === 'valid' ? 'Lepas untuk pindah' : 'Target tidak valid'}
+        </span>
+      ) : null}
       {isHighlighted ? (
         <span
           data-testid="org-studio-highlight-chip"
@@ -862,6 +1037,8 @@ function StudioDetailPanel({
   childTitles,
   pathTitles,
   onSave,
+  onMove,
+  onDelete,
 }: {
   node: OrgStudioNodeNormalized | null;
   open: boolean;
@@ -870,6 +1047,8 @@ function StudioDetailPanel({
   childTitles: string[];
   pathTitles: string[];
   onSave: (nodeId: string, draft: StudioDetailDraft) => void;
+  onMove: (node: OrgStudioNodeNormalized) => void;
+  onDelete: (node: OrgStudioNodeNormalized) => void;
 }) {
   const [draft, setDraft] = React.useState<StudioDetailDraft>({
     title: node?.title ?? '',
@@ -1004,8 +1183,7 @@ function StudioDetailPanel({
                   type="button"
                   variant="outline"
                   size="sm"
-                  disabled
-                  title="Dialog pindah tersedia di 011-03"
+                  onClick={() => onMove(node)}
                   data-testid="org-studio-detail-move"
                 >
                   Pindah…
@@ -1014,21 +1192,172 @@ function StudioDetailPanel({
                   type="button"
                   variant="destructive"
                   size="sm"
-                  disabled
-                  title={isRoot ? 'Root tidak dapat dihapus' : 'Dialog hapus tersedia di 011-03'}
+                  disabled={isRoot}
+                  title={isRoot ? 'Root tidak dapat dihapus' : undefined}
+                  onClick={() => onDelete(node)}
                   data-testid="org-studio-detail-delete"
                 >
                   Hapus
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Dialog pindah/hapus hadir di 011-03; tombol pindah/hapus dinonaktifkan untuk sekarang.
-              </p>
+              {isRoot ? (
+                <p className="text-xs text-muted-foreground">Root diproteksi — tidak dapat dihapus.</p>
+              ) : null}
             </form>
           </div>
         ) : null}
       </SheetContent>
     </Sheet>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Dialog M-007 pindah + M-008 hapus 011-03 (FR-007/FR-008, D7)
+// ---------------------------------------------------------------------------
+
+function StudioMoveDialog({
+  node,
+  nodes,
+  open,
+  onOpenChange,
+  onConfirm,
+}: {
+  node: OrgStudioNodeNormalized | null;
+  nodes: OrgStudioNodeNormalized[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: (sourceId: string, newParentId: string) => void;
+}) {
+  const [selection, setSelection] = React.useState<string | null>(null);
+  React.useEffect(() => {
+    if (open) setSelection(null);
+  }, [open, node?.id]);
+  if (!node) return null;
+  const flatLike: OrgStudioNodeFlat[] = nodes.map((n) => ({ ...n }));
+  const descendantIds = new Set(getDescendants(flatLike, node.id));
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const previewTitles =
+    selection && selection !== node.id && !descendantIds.has(selection)
+      ? [
+          ...getAncestors(flatLike, selection).map((id) => byId.get(id)?.title ?? id),
+          byId.get(selection)?.title ?? selection,
+          node.title,
+        ]
+      : [];
+  const canConfirm =
+    selection !== null && selection !== node.parentId && selection !== node.id && !descendantIds.has(selection);
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Pindah node</DialogTitle>
+          <DialogDescription>
+            Pindahkan &quot;{node.title}&quot; ke atasan baru. Node itu sendiri dan turunannya tidak dapat dipilih.
+          </DialogDescription>
+        </DialogHeader>
+        <RadioGroup value={selection ?? ''} onValueChange={setSelection}>
+          <div className="max-h-64 space-y-2 overflow-y-auto" data-testid="org-studio-move-options">
+            {nodes.map((candidate) => {
+              const isSelf = candidate.id === node.id;
+              const isDescendant = descendantIds.has(candidate.id);
+              const disabled = isSelf || isDescendant;
+              const reason = isSelf ? 'Node itu sendiri' : isDescendant ? 'Turunan node ini' : null;
+              return (
+                <div key={candidate.id} className="flex items-center gap-2">
+                  <RadioGroupItem value={candidate.id} id={`org-studio-move-${candidate.id}`} disabled={disabled} />
+                  <Label
+                    htmlFor={`org-studio-move-${candidate.id}`}
+                    className={disabled ? 'text-muted-foreground' : undefined}
+                  >
+                    {candidate.title}
+                    {reason ? <span className="ml-2 text-xs">({reason})</span> : null}
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
+        </RadioGroup>
+        {previewTitles.length > 0 ? (
+          <p className="text-sm text-foreground" data-testid="org-studio-move-preview">
+            <span className="text-muted-foreground">Path baru: </span>
+            <span className="break-words">{previewTitles.join(' / ')}</span>
+          </p>
+        ) : null}
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Batal
+          </Button>
+          <Button
+            type="button"
+            disabled={!canConfirm}
+            onClick={() => {
+              if (selection && canConfirm) onConfirm(node.id, selection);
+            }}
+            data-testid="org-studio-move-confirm"
+          >
+            Pindahkan
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function StudioDeleteDialog({
+  node,
+  open,
+  onOpenChange,
+  onConfirm,
+}: {
+  node: OrgStudioNodeNormalized | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: (nodeId: string, mode: StudioDeleteMode) => void;
+}) {
+  const [mode, setMode] = React.useState<StudioDeleteMode>('reparent');
+  React.useEffect(() => {
+    if (open) setMode('reparent');
+  }, [open, node?.id]);
+  if (!node) return null;
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Hapus node</DialogTitle>
+          <DialogDescription>
+            Hapus &quot;{node.title}&quot;
+            {node.descendantCount > 0 ? ` beserta ${node.descendantCount} turunan` : ''}?
+          </DialogDescription>
+        </DialogHeader>
+        {node.hasChildren ? (
+          <RadioGroup value={mode} onValueChange={(value) => setMode(value as StudioDeleteMode)}>
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="reparent" id="org-studio-delete-reparent" />
+              <Label htmlFor="org-studio-delete-reparent">
+                Pindahkan {node.descendantCount} turunan ke atasan di atasnya
+              </Label>
+            </div>
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="subtree" id="org-studio-delete-subtree" />
+              <Label htmlFor="org-studio-delete-subtree">Hapus subtree (node beserta semua anak)</Label>
+            </div>
+          </RadioGroup>
+        ) : null}
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Batal
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={() => onConfirm(node.id, mode)}
+            data-testid="org-studio-delete-confirm"
+          >
+            Hapus
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -1060,6 +1389,11 @@ export function OrgChartStudio({
   React.useEffect(() => {
     setInternalFlat(toFlatInput(data));
   }, [data]);
+  // Cermin ref agar callback undo/redo (dipakai closure toast) membaca flat terbaru.
+  const internalFlatRef = React.useRef(internalFlat);
+  React.useEffect(() => {
+    internalFlatRef.current = internalFlat;
+  }, [internalFlat]);
   // Semantik mengikuti OrgChartEditor: defaultExpandedIds = set id yang
   // awalnya COLLAPSED; default (kosong) = semua induk ter-expand.
   const [internalExpanded, setInternalExpanded] = React.useState<string[]>(() => {
@@ -1138,21 +1472,53 @@ export function OrgChartStudio({
   const highlightedSet = React.useMemo(() => new Set(highlightedIds), [highlightedIds]);
 
   // ---- 011-02: tambah 1-klik + panel detail + commit sekali (FR-005/006/013) ----
+  // ---- 011-03: pindah/hapus + undo/redo ≤50 + live region (FR-007/008/009/013/019) ----
+  // History undo/redo disimpan di ref (bukan state) agar callback toast yang
+  // dibuat saat commit selalu membaca snapshot terbaru, bukan closure lama.
+  // `historyLen` adalah cermin panjang stack untuk status toolbar (diperbarui
+  // di setiap mutasi; ref tidak dibaca saat render).
+  const [historyLen, setHistoryLen] = React.useState({ past: 0, future: 0 });
+  const [announcement, setAnnouncement] = React.useState('');
+  const futureRef = React.useRef<OrgStudioNodeFlat[][]>([]);
+  const canUndo = historyLen.past > 0;
+  const canRedo = historyLen.future > 0;
+  const syncHistoryLen = React.useCallback(() => {
+    setHistoryLen({ past: pastRef.current.length, future: futureRef.current.length });
+  }, []);
+
   const undo = React.useCallback(() => {
     const snapshot = pastRef.current[pastRef.current.length - 1];
     if (!snapshot) return;
+    futureRef.current = pushHistoryCapped(futureRef.current, internalFlatRef.current);
     pastRef.current = pastRef.current.slice(0, -1);
     setInternalFlat(snapshot);
     emitChange(snapshot);
     setEditingId(null);
     setNewNodeId(null);
-  }, [emitChange]);
+    setAnnouncement('Perubahan dibatalkan.');
+    syncHistoryLen();
+  }, [emitChange, syncHistoryLen]);
+
+  const redo = React.useCallback(() => {
+    const snapshot = futureRef.current[futureRef.current.length - 1];
+    if (!snapshot) return;
+    pastRef.current = pushHistoryCapped(pastRef.current, internalFlatRef.current);
+    futureRef.current = futureRef.current.slice(0, -1);
+    setInternalFlat(snapshot);
+    emitChange(snapshot);
+    setEditingId(null);
+    setNewNodeId(null);
+    setAnnouncement('Perubahan diulang.');
+    syncHistoryLen();
+  }, [emitChange, syncHistoryLen]);
 
   const commitWithUndo = React.useCallback(
     (snapshot: OrgStudioNodeFlat[], next: OrgStudioNodeFlat[], toastTitle: string) => {
-      pastRef.current = [...pastRef.current.slice(-49), snapshot];
+      pastRef.current = pushHistoryCapped(pastRef.current, snapshot);
+      futureRef.current = [];
       setInternalFlat(next);
       emitChange(next);
+      syncHistoryLen();
       toast({
         title: toastTitle,
         description: 'Urungkan bila salah.',
@@ -1164,7 +1530,7 @@ export function OrgChartStudio({
         ),
       });
     },
-    [emitChange, undo],
+    [emitChange, syncHistoryLen, undo],
   );
 
   const ensureExpanded = React.useCallback(
@@ -1260,6 +1626,135 @@ export function OrgChartStudio({
     onSelectRef.current?.(node);
   }, []);
 
+  // ---- 011-03: drag-pindah + M-007 + M-008 (FR-007/FR-008) ----
+  const [dragSourceId, setDragSourceId] = React.useState<string | null>(null);
+  const [dragOverId, setDragOverId] = React.useState<string | null>(null);
+  const [dragError, setDragError] = React.useState<string | null>(null);
+  const [moveNodeId, setMoveNodeId] = React.useState<string | null>(null);
+  const [deleteNodeId, setDeleteNodeId] = React.useState<string | null>(null);
+
+  const commitMove = React.useCallback(
+    (sourceId: string, newParentId: string, origin: 'drag' | 'dialog') => {
+      const flat = internalFlatRef.current;
+      const check = isValidMove(flat, sourceId, newParentId);
+      const source = flat.find((n) => n.id === sourceId);
+      const target = flat.find((n) => n.id === newParentId);
+      if (!check.valid) {
+        const message = check.reason ?? 'Target pindah tidak valid.';
+        if (origin === 'drag') setDragError(message);
+        setAnnouncement(message);
+        return;
+      }
+      const next = applyMove(flat, sourceId, newParentId);
+      commitWithUndo(flat, next, 'Dipindah');
+      setAnnouncement(`Node ${source?.title ?? sourceId} dipindah ke ${target?.title ?? newParentId}.`);
+      ensureExpanded(newParentId);
+      setDragSourceId(null);
+      setDragOverId(null);
+      setDragError(null);
+      setMoveNodeId(null);
+      setSelectedId(sourceId);
+      setFocusNodeId(sourceId);
+    },
+    [commitWithUndo, ensureExpanded],
+  );
+
+  const confirmDelete = React.useCallback(
+    (nodeId: string, mode: StudioDeleteMode) => {
+      const flat = internalFlatRef.current;
+      const target = flat.find((n) => n.id === nodeId);
+      if (!target || target.parentId === null) return; // root diproteksi
+      const next = applyDelete(flat, nodeId, mode);
+      commitWithUndo(flat, next, 'Dihapus');
+      setAnnouncement(
+        `Node ${target.title} dihapus (${mode === 'reparent' ? 'anak dipindah ke atasan' : 'subtree dihapus'}).`,
+      );
+      setDeleteNodeId(null);
+      if (target.parentId) {
+        setSelectedId(target.parentId);
+        setFocusNodeId(target.parentId);
+      }
+    },
+    [commitWithUndo],
+  );
+
+  const handleRequestMove = React.useCallback((node: OrgStudioNodeNormalized) => {
+    setSelectedId(node.id);
+    setMoveNodeId(node.id);
+  }, []);
+
+  const handleRequestDelete = React.useCallback((node: OrgStudioNodeNormalized) => {
+    if (node.parentId === null) return; // root diproteksi (FR-008)
+    setSelectedId(node.id);
+    setDeleteNodeId(node.id);
+  }, []);
+
+  const handleDragStartNode = React.useCallback((nodeId: string) => {
+    setDragSourceId(nodeId);
+    setDragOverId(null);
+    setDragError(null);
+  }, []);
+
+  const handleDragOverNode = React.useCallback((nodeId: string) => {
+    setDragOverId((current) => (current === nodeId ? current : nodeId));
+  }, []);
+
+  const handleDropOnNode = React.useCallback(
+    (nodeId: string) => {
+      if (dragSourceId) commitMove(dragSourceId, nodeId, 'drag');
+    },
+    [commitMove, dragSourceId],
+  );
+
+  const handleDragEndNode = React.useCallback(() => {
+    setDragSourceId(null);
+    setDragOverId(null);
+  }, []);
+
+  const dragDropState = React.useMemo(() => {
+    if (!dragSourceId || !dragOverId) return { overId: null, state: null } as const;
+    const check = isValidMove(internalFlat, dragSourceId, dragOverId);
+    return { overId: dragOverId, state: check.valid ? ('valid' as const) : ('invalid' as const) };
+  }, [dragSourceId, dragOverId, internalFlat]);
+
+  const dragPreviewTitles = React.useMemo(() => {
+    if (!dragSourceId || !dragOverId || dragDropState.state !== 'valid') return [];
+    const byId = new Map(normalized.nodes.map((n) => [n.id, n]));
+    const source = byId.get(dragSourceId);
+    if (!source) return [];
+    return [
+      ...getAncestors(internalFlat, dragOverId).map((id) => byId.get(id)?.title ?? id),
+      byId.get(dragOverId)?.title ?? dragOverId,
+      source.title,
+    ];
+  }, [dragSourceId, dragOverId, dragDropState.state, internalFlat, normalized]);
+
+  const moveNode = moveNodeId ? (normalized.byId.get(moveNodeId) ?? null) : null;
+  const deleteNode = deleteNodeId ? (normalized.byId.get(deleteNodeId) ?? null) : null;
+
+  // Shortcut global Ctrl+Z/Y (FR-009): abaikan saat fokus di input.
+  const handleRootKeyDown = React.useCallback(
+    (event: React.KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const tag = target?.tagName?.toLowerCase();
+      const inField =
+        tag === 'input' || tag === 'textarea' || tag === 'select' || target?.isContentEditable === true;
+      if (!inField && (event.ctrlKey || event.metaKey) && !event.altKey) {
+        const key = event.key.toLowerCase();
+        if (key === 'z' && !event.shiftKey) {
+          event.preventDefault();
+          undo();
+          return;
+        }
+        if (key === 'y' || (key === 'z' && event.shiftKey)) {
+          event.preventDefault();
+          redo();
+        }
+      }
+    },
+    [redo, undo],
+  );
+
   const flowNodes = React.useMemo(
     () =>
       toStudioFlowNodes(
@@ -1282,7 +1777,13 @@ export function OrgChartStudio({
           onOpenDetail: openDetail,
           onCommitInline: handleCommitInline,
           onCancelInline: handleCancelInline,
+          onDragStartNode: handleDragStartNode,
+          onDragOverNode: handleDragOverNode,
+          onDropOnNode: handleDropOnNode,
+          onDragEndNode: handleDragEndNode,
+          onRequestDelete: handleRequestDelete,
         },
+        dragDropState,
       ),
     [
       expandedSet,
@@ -1298,6 +1799,12 @@ export function OrgChartStudio({
       handleCommitInline,
       handleCancelInline,
       handleSelectNode,
+      handleDragStartNode,
+      handleDragOverNode,
+      handleDropOnNode,
+      handleDragEndNode,
+      handleRequestDelete,
+      dragDropState,
     ],
   );
 
@@ -1392,11 +1899,71 @@ export function OrgChartStudio({
       aria-label={ariaLabel}
       tabIndex={0}
       ref={rootRef}
+      onKeyDown={handleRootKeyDown}
       className={cn(
         'w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         className,
       )}
     >
+      <div className="mb-2 flex flex-wrap items-center gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!canUndo}
+          onClick={undo}
+          data-testid="org-studio-undo"
+        >
+          Urungkan
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={!canRedo}
+          onClick={redo}
+          data-testid="org-studio-redo"
+        >
+          Ulangi
+        </Button>
+        <span className="text-xs text-muted-foreground">Ctrl+Z urungkan · Ctrl+Y ulangi · Delete hapus kartu fokus</span>
+      </div>
+      <div aria-live="polite" role="status" className="sr-only" data-testid="org-studio-live">
+        {announcement}
+      </div>
+      {dragSourceId && dragOverId && dragDropState.state ? (
+        <p
+          role={dragDropState.state === 'invalid' ? 'alert' : 'status'}
+          data-testid="org-studio-drag-feedback"
+          className={cn(
+            'mb-2 rounded-md border p-2 text-sm',
+            dragDropState.state === 'valid'
+              ? 'border-success/40 bg-success/5 text-foreground'
+              : 'border-destructive/40 bg-destructive/5 text-foreground',
+          )}
+        >
+          {dragDropState.state === 'valid' ? (
+            <>
+              Lepas untuk pindah
+              {dragPreviewTitles.length > 0 ? (
+                <span className="ml-2 text-muted-foreground">Path baru: {dragPreviewTitles.join(' / ')}</span>
+              ) : null}
+            </>
+          ) : (
+            dragError ?? 'Target tidak valid.'
+          )}
+        </p>
+      ) : null}
+      {dragError && (!dragSourceId || !dragOverId) ? (
+        <p
+          key={dragError}
+          role="alert"
+          data-testid="org-studio-drag-feedback"
+          className="mb-2 rounded-md border border-destructive/40 bg-destructive/5 p-2 text-sm text-foreground"
+        >
+          {dragError}
+        </p>
+      ) : null}
       <ReactFlowProvider>
         <StudioCanvasInner
           nodes={flowNodes}
@@ -1418,6 +1985,25 @@ export function OrgChartStudio({
         childTitles={panelChildTitles}
         pathTitles={panelPathTitles}
         onSave={handlePanelSave}
+        onMove={handleRequestMove}
+        onDelete={handleRequestDelete}
+      />
+      <StudioMoveDialog
+        node={moveNode}
+        nodes={normalized.nodes}
+        open={moveNode !== null}
+        onOpenChange={(open) => {
+          if (!open) setMoveNodeId(null);
+        }}
+        onConfirm={(sourceId, newParentId) => commitMove(sourceId, newParentId, 'dialog')}
+      />
+      <StudioDeleteDialog
+        node={deleteNode}
+        open={deleteNode !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteNodeId(null);
+        }}
+        onConfirm={confirmDelete}
       />
     </div>
   );
