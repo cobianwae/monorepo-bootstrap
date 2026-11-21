@@ -3,8 +3,10 @@
 import * as React from 'react';
 import {
   addDays,
+  addMinutes,
   addMonths,
   addWeeks,
+  differenceInMinutes,
   endOfWeek,
   format,
   isSameDay,
@@ -18,7 +20,7 @@ import {
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { DayProps } from 'react-day-picker';
 import { cn } from '../../lib/utils';
-import { Badge, type badgeVariants } from '../base/badge';
+import { Badge, badgeVariants } from '../base/badge';
 import { Button } from '../base/button';
 import { Calendar } from '../form/date-picker';
 import { SegmentedControl, SegmentedControlItem } from '../form/segmented-control';
@@ -40,6 +42,17 @@ export interface CalendarEvent {
   description?: string;
 }
 
+export interface CalendarSlot {
+  start: Date;
+  end: Date;
+  allDay: boolean;
+}
+
+export interface WorkingHours {
+  start: string;
+  end: string;
+}
+
 export interface EventCalendarProps {
   events: CalendarEvent[];
   view?: CalendarView;
@@ -50,6 +63,10 @@ export interface EventCalendarProps {
   onDateChange?: (date: Date) => void;
   locale?: Locale;
   weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  workingHours?: WorkingHours;
+  slotIntervalMinutes?: number;
+  onSelectSlot?: (slot: CalendarSlot) => void;
+  onSelectEvent?: (event: CalendarEvent) => void;
   ariaLabel?: string;
   className?: string;
 }
@@ -78,16 +95,13 @@ const VIEW_LABELS: Record<CalendarView, string> = {
 };
 
 const MAX_VISIBLE = 3;
-
-function clampEnd(event: CalendarEvent): Date {
-  return event.end >= event.start ? event.end : event.start;
-}
-
-function eventTimeRange(event: CalendarEvent, locale?: Locale): string {
-  if (event.allDay) return 'All day';
-  const end = clampEnd(event);
-  return `${format(event.start, 'HH:mm', { locale })}–${format(end, 'HH:mm', { locale })}`;
-}
+const MINUTES_PER_DAY = 24 * 60;
+const MIN_SLOT_HEIGHT = 24;
+const HOUR_COLUMN_WIDTH = '3.5rem';
+const DEFAULT_WORKING_HOURS: WorkingHours = { start: '08:00', end: '18:00' };
+const DEFAULT_SLOT_INTERVAL = 30;
+const MIN_SLOT_INTERVAL = 5;
+const MAX_SLOT_INTERVAL = 120;
 
 const DOT_CLASSES: Record<EventCategory, string> = {
   primary: 'bg-primary',
@@ -96,6 +110,127 @@ const DOT_CLASSES: Record<EventCategory, string> = {
   info: 'bg-info',
   destructive: 'bg-destructive',
 };
+
+const BLOCK_CLASSES: Record<EventCategory, string> = {
+  primary: 'border-primary/50 bg-primary/10',
+  success: 'border-success/50 bg-success/10',
+  warning: 'border-warning/50 bg-warning/10',
+  info: 'border-info/50 bg-info/10',
+  destructive: 'border-destructive/50 bg-destructive/10',
+};
+
+function clampEnd(event: CalendarEvent): Date {
+  return event.end >= event.start ? event.end : event.start;
+}
+
+function eventTimeRange(event: CalendarEvent, locale?: Locale): string {
+  if (isAllDayEvent(event)) return 'All day';
+  const end = clampEnd(event);
+  return `${format(event.start, 'HH:mm', { locale })}–${format(end, 'HH:mm', { locale })}`;
+}
+
+function isAllDayEvent(event: CalendarEvent): boolean {
+  if (event.allDay) return true;
+  const end = clampEnd(event);
+  return differenceInMinutes(end, event.start) >= MINUTES_PER_DAY;
+}
+
+function parseTimeToMinutes(value: string): number | null {
+  const match = /^(\d{1,2}):(\d{2})$/.exec(value.trim());
+  if (!match) return null;
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (hours > 23 || minutes > 59) return null;
+  return hours * 60 + minutes;
+}
+
+function resolveWorkingMinutes(workingHours?: WorkingHours): { start: number; end: number } {
+  const start = parseTimeToMinutes(workingHours?.start ?? '') ?? parseTimeToMinutes(DEFAULT_WORKING_HOURS.start)!;
+  let end = parseTimeToMinutes(workingHours?.end ?? '') ?? parseTimeToMinutes(DEFAULT_WORKING_HOURS.end)!;
+  if (end <= start) end = Math.min(MINUTES_PER_DAY, start + 60);
+  return { start, end };
+}
+
+function resolveSlotInterval(slotIntervalMinutes?: number): number {
+  if (slotIntervalMinutes === undefined || !Number.isFinite(slotIntervalMinutes)) {
+    return DEFAULT_SLOT_INTERVAL;
+  }
+  return Math.min(MAX_SLOT_INTERVAL, Math.max(MIN_SLOT_INTERVAL, Math.round(slotIntervalMinutes)));
+}
+
+function dayKey(day: Date): string {
+  return format(day, 'yyyy-MM-dd');
+}
+
+interface DaySegment {
+  event: CalendarEvent;
+  startMinute: number;
+  endMinute: number;
+}
+
+function buildAllDayByDay(events: CalendarEvent[], days: Date[]): Map<string, CalendarEvent[]> {
+  const visible = new Set(days.map(dayKey));
+  const map = new Map<string, CalendarEvent[]>();
+  for (const event of events) {
+    if (!isAllDayEvent(event)) continue;
+    const end = clampEnd(event);
+    const lastMoment = end > event.start ? new Date(end.getTime() - 1) : event.start;
+    let cursor = startOfDay(event.start);
+    const lastDay = startOfDay(lastMoment);
+    while (cursor <= lastDay) {
+      const key = dayKey(cursor);
+      if (visible.has(key)) {
+        const list = map.get(key) ?? [];
+        list.push(event);
+        map.set(key, list);
+      }
+      cursor = addDays(cursor, 1);
+    }
+  }
+  for (const [key, list] of map) {
+    map.set(
+      key,
+      [...list].sort((a, b) => a.start.getTime() - b.start.getTime())
+    );
+  }
+  return map;
+}
+
+function buildSegmentsBySlot(
+  events: CalendarEvent[],
+  days: Date[],
+  interval: number
+): Map<string, DaySegment[]> {
+  const map = new Map<string, DaySegment[]>();
+  for (const day of days) {
+    const dayStart = startOfDay(day);
+    const dayEnd = addDays(dayStart, 1);
+    const key = dayKey(dayStart);
+    for (const event of events) {
+      if (isAllDayEvent(event)) continue;
+      const end = clampEnd(event);
+      if (end <= event.start) continue;
+      const clippedStart = event.start < dayStart ? dayStart : event.start;
+      const clippedEnd = end > dayEnd ? dayEnd : end;
+      if (clippedEnd <= clippedStart) continue;
+      const startMinute = Math.max(0, differenceInMinutes(clippedStart, dayStart));
+      const endMinute = Math.min(MINUTES_PER_DAY, differenceInMinutes(clippedEnd, dayStart));
+      if (endMinute <= startMinute) continue;
+      const slotMinute = Math.floor(startMinute / interval) * interval;
+      const slotKey = `${key}|${slotMinute}`;
+      const list = map.get(slotKey) ?? [];
+      list.push({ event, startMinute, endMinute });
+      map.set(slotKey, list);
+    }
+  }
+  for (const [key, list] of map) {
+    map.set(
+      key,
+      [...list].sort((a, b) => a.startMinute - b.startMinute)
+    );
+  }
+  return map;
+}
 
 function EventChip({ event, locale }: { event: CalendarEvent; locale?: Locale }) {
   const category = event.category ?? 'primary';
@@ -145,6 +280,240 @@ function DayOverflow({ events, day, locale }: { events: CalendarEvent[]; day: Da
         </ul>
       </PopoverContent>
     </Popover>
+  );
+}
+
+function AllDayChip({ event, onSelect }: { event: CalendarEvent; onSelect?: (event: CalendarEvent) => void }) {
+  const category = event.category ?? 'primary';
+  return (
+    <button
+      type="button"
+      data-event-id={event.id}
+      data-category={category}
+      title={`${event.title}, All day`}
+      aria-label={`${event.title}, all day`}
+      onClick={() => onSelect?.(event)}
+      className={cn(
+        badgeVariants({ variant: CATEGORY_VARIANTS[category], size: 'sm' }),
+        'flex w-full max-w-full min-w-0 justify-start overflow-hidden rounded px-1.5 py-0.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+      )}
+    >
+      <span className="truncate">{event.title}</span>
+    </button>
+  );
+}
+
+function TimeGrid({
+  days,
+  locale,
+  workingStart,
+  workingEnd,
+  interval,
+  allDayByDay,
+  segmentsBySlot,
+  onSelectSlot,
+  onSelectEvent,
+  ariaLabel,
+}: {
+  days: Date[];
+  locale?: Locale;
+  workingStart: number;
+  workingEnd: number;
+  interval: number;
+  allDayByDay: Map<string, CalendarEvent[]>;
+  segmentsBySlot: Map<string, DaySegment[]>;
+  onSelectSlot?: (slot: CalendarSlot) => void;
+  onSelectEvent?: (event: CalendarEvent) => void;
+  ariaLabel: string;
+}) {
+  const slotHeight = Math.max(MIN_SLOT_HEIGHT, interval);
+  const pixelsPerMinute = slotHeight / interval;
+  const columnTemplate = React.useMemo(
+    () => `${HOUR_COLUMN_WIDTH} repeat(${days.length}, minmax(0, 1fr))`,
+    [days.length]
+  );
+  const slotStarts = React.useMemo(() => {
+    const starts: number[] = [];
+    for (let minute = 0; minute < MINUTES_PER_DAY; minute += interval) starts.push(minute);
+    return starts;
+  }, [interval]);
+  const focusMinute = Math.min(
+    MINUTES_PER_DAY - interval,
+    Math.ceil(workingStart / interval) * interval
+  );
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const node = scrollRef.current;
+    if (node) node.scrollTop = workingStart * pixelsPerMinute;
+  }, [workingStart, pixelsPerMinute]);
+
+  const selectSlot = React.useCallback(
+    (day: Date, minute: number) => {
+      const start = addMinutes(startOfDay(day), minute);
+      const end = addMinutes(start, interval);
+      onSelectSlot?.({ start, end, allDay: false });
+    },
+    [interval, onSelectSlot]
+  );
+
+  const today = new Date();
+
+  return (
+    <div className="overflow-hidden rounded-lg border border-border bg-card">
+      <div
+        className="grid border-b border-border bg-muted/30"
+        style={{ gridTemplateColumns: columnTemplate }}
+      >
+        <div aria-hidden className="border-r border-border/50" />
+        {days.map((day, index) => {
+          const isToday = isSameDay(day, today);
+          return (
+            <div
+              key={dayKey(day)}
+              data-weekday={dayKey(day)}
+              className={cn(
+                'border-border/50 px-2 py-2 text-center text-xs font-medium text-muted-foreground',
+                index > 0 && 'border-l',
+                isToday && 'font-semibold text-primary'
+              )}
+            >
+              {format(day, 'EEE d', { locale })}
+            </div>
+          );
+        })}
+      </div>
+
+      <div
+        role="group"
+        aria-label="All day"
+        className="grid border-b border-border"
+        style={{ gridTemplateColumns: columnTemplate }}
+      >
+        <div className="flex items-start justify-end border-r border-border/50 px-2 py-1.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+          All day
+        </div>
+        {days.map((day, index) => {
+          const key = dayKey(day);
+          const dayAllDay = allDayByDay.get(key) ?? [];
+          return (
+            <div
+              key={key}
+              data-allday-date={key}
+              className={cn(
+                'min-h-10 space-y-1 border-border/50 p-1',
+                index > 0 && 'border-l',
+                isSameDay(day, today) && 'bg-accent/20'
+              )}
+            >
+              {dayAllDay.map((event) => (
+                <AllDayChip key={event.id} event={event} onSelect={onSelectEvent} />
+              ))}
+            </div>
+          );
+        })}
+      </div>
+
+      <div ref={scrollRef} className="max-h-[32rem] overflow-y-auto overscroll-contain">
+        <div role="grid" aria-label={ariaLabel} data-time-grid className="w-full">
+          {slotStarts.map((minute) => {
+            const isHour = minute % 60 === 0;
+            const isWorking = minute >= workingStart && minute < workingEnd;
+            const label = format(addMinutes(startOfDay(days[0]), minute), 'HH:mm');
+            return (
+              <div
+                key={minute}
+                role="row"
+                data-row-minute={minute}
+                className="grid"
+                style={{ gridTemplateColumns: columnTemplate }}
+              >
+                <div
+                  role="rowheader"
+                  className={cn(
+                    'relative border-r border-border/50 pr-2 text-right font-mono text-[10px] text-muted-foreground',
+                    !isWorking && 'opacity-60'
+                  )}
+                  style={{ height: slotHeight }}
+                >
+                  {isHour && (
+                    <span
+                      data-hour-label={label}
+                      className="absolute right-2 top-0 -translate-y-1/2 bg-card px-0.5"
+                    >
+                      {label}
+                    </span>
+                  )}
+                </div>
+                {days.map((day, index) => {
+                  const key = dayKey(day);
+                  const segments = segmentsBySlot.get(`${key}|${minute}`) ?? [];
+                  const dayStart = startOfDay(day);
+                  const slotStart = addMinutes(dayStart, minute);
+                  const slotEnd = addMinutes(dayStart, Math.min(MINUTES_PER_DAY, minute + interval));
+                  const slotLabel = `${format(day, 'EEEE', { locale })} ${format(slotStart, 'HH:mm')}–${format(slotEnd, 'HH:mm')}`;
+                  return (
+                    <div
+                      key={key}
+                      role="gridcell"
+                      tabIndex={minute === focusMinute && index === 0 ? 0 : -1}
+                      aria-label={slotLabel}
+                      data-date={key}
+                      data-slot-minute={minute}
+                      data-working={isWorking ? 'true' : 'false'}
+                      style={{ height: slotHeight }}
+                      onClick={() => selectSlot(day, minute)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          selectSlot(day, minute);
+                        }
+                      }}
+                      className={cn(
+                        'relative cursor-pointer border-border/50 border-t',
+                        index > 0 && 'border-l',
+                        !isWorking && 'bg-muted/40',
+                        'hover:bg-accent/40 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring'
+                      )}
+                    >
+                      {segments.map((segment) => {
+                        const category = segment.event.category ?? 'primary';
+                        const top = (segment.startMinute - minute) * pixelsPerMinute;
+                        const height = Math.max(18, (segment.endMinute - segment.startMinute) * pixelsPerMinute);
+                        return (
+                          <button
+                            key={`${segment.event.id}-${segment.startMinute}`}
+                            type="button"
+                            data-event-id={segment.event.id}
+                            data-category={category}
+                            aria-label={`${segment.event.title}, ${eventTimeRange(segment.event, locale)}`}
+                            title={`${segment.event.title}, ${eventTimeRange(segment.event, locale)}`}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              onSelectEvent?.(segment.event);
+                            }}
+                            style={{ top, height }}
+                            className={cn(
+                              'absolute left-0.5 right-0.5 z-10 overflow-hidden rounded border border-l-2 px-1 py-0.5 text-left text-[10px] leading-tight text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                              BLOCK_CLASSES[category]
+                            )}
+                          >
+                            <span className="block truncate font-medium">{segment.event.title}</span>
+                            <span className="block truncate font-mono text-muted-foreground">
+                              {eventTimeRange(segment.event, locale)}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -198,6 +567,10 @@ export function EventCalendar({
   onDateChange,
   locale,
   weekStartsOn = 1,
+  workingHours,
+  slotIntervalMinutes,
+  onSelectSlot,
+  onSelectEvent,
   ariaLabel = 'Event calendar',
   className,
 }: EventCalendarProps) {
@@ -264,10 +637,22 @@ export function EventCalendar({
 
   const monthComponents = React.useMemo(() => ({ Day: MonthDayCell }), [MonthDayCell]);
 
-  const weekStart = startOfWeek(activeDate, { weekStartsOn });
-  const weekDays = React.useMemo(
-    () => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)),
-    [weekStart]
+  const { start: workingStart, end: workingEnd } = React.useMemo(
+    () => resolveWorkingMinutes(workingHours),
+    [workingHours]
+  );
+  const interval = React.useMemo(() => resolveSlotInterval(slotIntervalMinutes), [slotIntervalMinutes]);
+
+  const days = React.useMemo(() => {
+    if (activeView === 'day') return [startOfDay(activeDate)];
+    const weekStart = startOfWeek(activeDate, { weekStartsOn });
+    return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+  }, [activeView, activeDate, weekStartsOn]);
+
+  const allDayByDay = React.useMemo(() => buildAllDayByDay(events, days), [events, days]);
+  const segmentsBySlot = React.useMemo(
+    () => buildSegmentsBySlot(events, days, interval),
+    [events, days, interval]
   );
 
   return (
@@ -360,49 +745,25 @@ export function EventCalendar({
         />
       )}
 
-      {activeView === 'week' && (
-        <div className="overflow-x-auto rounded-lg border border-border bg-card">
-          <div className="grid min-w-[640px] grid-cols-7">
-            {weekDays.map((day) => {
-              const dayEvents = eventsByDay.get(format(day, 'yyyy-MM-dd')) ?? [];
-              const isToday = isSameDay(day, new Date());
-              return (
-                <div
-                  key={format(day, 'yyyy-MM-dd')}
-                  data-date={format(day, 'yyyy-MM-dd')}
-                  className={cn(
-                    'min-h-48 border-r border-border/50 p-2 last:border-r-0',
-                    isToday && 'bg-accent/40'
-                  )}
-                >
-                  <p className={cn('mb-2 text-xs font-medium text-muted-foreground', isToday && 'font-semibold text-primary')}>
-                    {format(day, 'EEE d', { locale })}
-                  </p>
-                  <div className="flex flex-col gap-1">
-                    {dayEvents.slice(0, MAX_VISIBLE).map((e) => (
-                      <EventChip key={e.id} event={e} locale={locale} />
-                    ))}
-                    <DayOverflow events={dayEvents} day={day} locale={locale} />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+      {(activeView === 'week' || activeView === 'day') && (
+        <TimeGrid
+          days={days}
+          locale={locale}
+          workingStart={workingStart}
+          workingEnd={workingEnd}
+          interval={interval}
+          allDayByDay={allDayByDay}
+          segmentsBySlot={segmentsBySlot}
+          onSelectSlot={onSelectSlot}
+          onSelectEvent={onSelectEvent}
+          ariaLabel={`${VIEW_LABELS[activeView]} time grid`}
+        />
       )}
 
-      {(activeView === 'day' || activeView === 'agenda') && (
+      {activeView === 'agenda' && (
         <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-sm font-medium text-foreground">
-            {activeView === 'day'
-              ? format(activeDate, 'EEEE, d MMMM yyyy', { locale })
-              : format(activeDate, 'LLLL yyyy', { locale })}
-          </p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {activeView === 'day'
-              ? 'Time grid layout follows in the next iteration.'
-              : 'Agenda list layout follows in the next iteration.'}
-          </p>
+          <p className="text-sm font-medium text-foreground">{format(activeDate, 'LLLL yyyy', { locale })}</p>
+          <p className="mt-1 text-sm text-muted-foreground">Agenda list layout follows in the next iteration.</p>
         </div>
       )}
     </section>
