@@ -1,6 +1,6 @@
 # 017-01 — Fondasi wrapper + navigasi + callback
 
-Status: approved
+Status: done
 PRD: `docs/prd/017-product-tour.md` (approved, gate 1)
 Design: `docs/design/wireframes/product-tour.md` (approved, gate 2, K1/K3/K4/K6 + §2.1/§2.2/§2.4) + `docs/design/flows/product-tour.mmd` (diagram 1–2) + sitemap `S-005.20`
 FR: `FR-001`, `FR-002`, `FR-004`
@@ -29,11 +29,11 @@ Goal: Komponen `Tour` controlled berdiri tanpa showcase final: wrapper `driver.j
 
 ## Tasks
 
-- [ ] Tambah dependency `driver.js` ke `packages/ui` — butuh approval eksplisit per CONVENTIONS (konsep approved gate 1, K1/C1); isolasi CSS wrapper agar tidak menabrak token
-- [ ] Buat `packages/ui/src/components/overlay/tour-types.ts` (`TourTarget/TourStep/TourStepStatus/TourProps` §2.1 wireframe, `id` stabil, `ref` prioritas + selector fallback K4) + `tour.tsx` (named export, `open` controlled, `initialStep` default 0) + barrel export; tanpa token baru
-- [ ] Implementasi spotlight + popover (`overlay/popover` compose, `role=dialog` + progress `feedback/progress` + teks "N dari total") + footer `[Kembali][Lewati][Lanjut/Selesai]` + scroll + `position:auto` flip + microcopy ID (§2.1–§2.2)
-- [ ] Tulis test co-located (mock `driver.js` bila perlu di jsdom): 5 langkah ujung-ke-ujung, progress benar, Kembali disabled langkah 1, scroll/flip dipanggil, callback sekali dengan status lengkap, coach tunggal tanpa progress
-- [ ] Verifikasi `pnpm typecheck`, `lint`, `test` untuk file baru; catat default K1/K3/K4/K6 di story
+- [x] Tambah dependency `driver.js` ke `packages/ui` — butuh approval eksplisit per CONVENTIONS (konsep approved gate 1, K1/C1); isolasi CSS wrapper agar tidak menabrak token
+- [x] Buat `packages/ui/src/components/overlay/tour-types.ts` (`TourTarget/TourStep/TourStepStatus/TourProps` §2.1 wireframe, `id` stabil, `ref` prioritas + selector fallback K4) + `tour.tsx` (named export, `open` controlled, `initialStep` default 0) + barrel export; tanpa token baru
+- [x] Implementasi spotlight + popover (`overlay/popover` compose, `role=dialog` + progress `feedback/progress` + teks "N dari total") + footer `[Kembali][Lewati][Lanjut/Selesai]` + scroll + `position:auto` flip + microcopy ID (§2.1–§2.2)
+- [x] Tulis test co-located (mock `driver.js` bila perlu di jsdom): 5 langkah ujung-ke-ujung, progress benar, Kembali disabled langkah 1, scroll/flip dipanggil, callback sekali dengan status lengkap, coach tunggal tanpa progress
+- [x] Verifikasi `pnpm typecheck`, `lint`, `test` untuk file baru; catat default K1/K3/K4/K6 di story
 
 ## Dependencies
 
