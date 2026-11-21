@@ -19,11 +19,17 @@ import {
   Quote,
   Undo2,
   Redo2,
+  Link2,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { proseVariants } from '../layout/prose';
 import { Separator } from '../base/separator';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '../base/tooltip';
+import { Popover, PopoverAnchor, PopoverContent } from '../overlay/popover';
+import { Sheet, SheetContent, SheetTitle } from '../overlay/sheet';
+import { Input } from '../base/input';
+import { Label } from '../base/label';
+import { Button } from '../base/button';
 
 export interface RichTextEditorProps {
   value: string;
@@ -69,6 +75,107 @@ function ToolbarButton({ name, label, icon: Icon, isActive, action, disabled }: 
   );
 }
 
+function isValidLinkUrl(raw: string): boolean {
+  const value = raw.trim();
+  if (!value) return false;
+  return /^(https?:\/\/[^\s]+|\/[^\s]*)$/.test(value);
+}
+
+function linkErrorFor(raw: string): string | null {
+  if (!raw.trim()) return 'URL tautan wajib diisi';
+  if (!isValidLinkUrl(raw)) return 'Gunakan format https://… atau /path';
+  return null;
+}
+
+function useIsMobile(): boolean {
+  const [isMobile, setIsMobile] = React.useState(false);
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const query = window.matchMedia('(max-width: 767px)');
+    setIsMobile(query.matches);
+    const listener = (event: MediaQueryListEvent) => setIsMobile(event.matches);
+    query.addEventListener('change', listener);
+    return () => query.removeEventListener('change', listener);
+  }, []);
+  return isMobile;
+}
+
+interface LinkFormProps {
+  url: string;
+  error: string | null;
+  isEditing: boolean;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+  onUrlChange: (value: string) => void;
+  onSave: () => void;
+  onOpen: () => void;
+  onRemove: () => void;
+  onCancel: () => void;
+}
+
+function LinkForm({ url, error, isEditing, inputRef, onUrlChange, onSave, onOpen, onRemove, onCancel }: LinkFormProps) {
+  const saveDisabled = error !== null || url.trim().length === 0;
+  return (
+    <div className="space-y-3">
+      <div className="space-y-1.5">
+        <Label htmlFor="rte-link-input">URL tautan</Label>
+        <Input
+          id="rte-link-input"
+          ref={inputRef}
+          value={url}
+          onChange={(event) => onUrlChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              if (!saveDisabled) onSave();
+            } else if (event.key === 'Escape') {
+              event.preventDefault();
+              onCancel();
+            }
+          }}
+          placeholder="https://contoh.com atau /path"
+          autoComplete="off"
+          inputMode="url"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? 'rte-link-error' : undefined}
+          data-testid="rte-link-input"
+        />
+        {error ? (
+          <p role="alert" data-testid="rte-link-error" className="text-xs text-destructive">
+            {error}
+          </p>
+        ) : (
+          <p className="text-xs text-muted-foreground">Gunakan https://… atau /path.</p>
+        )}
+      </div>
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        {isEditing ? (
+          <Button type="button" variant="outline" size="sm" data-testid="rte-link-open" onClick={onOpen}>
+            Buka
+          </Button>
+        ) : null}
+        {isEditing ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="text-destructive hover:text-destructive"
+            data-testid="rte-link-remove"
+            onClick={onRemove}
+          >
+            Hapus
+          </Button>
+        ) : null}
+        <Button type="button" variant="ghost" size="sm" data-testid="rte-link-cancel" onClick={onCancel}>
+          Batal
+        </Button>
+        <Button type="button" variant="highlight" size="sm" data-testid="rte-link-save" disabled={saveDisabled} onClick={onSave}>
+          Simpan
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function RichTextEditor({
   value,
   onChange,
@@ -79,6 +186,13 @@ export function RichTextEditor({
 }: RichTextEditorProps) {
   const [, bump] = React.useReducer((x: number) => x + 1, 0);
   const [announce, setAnnounce] = React.useState('');
+  const [linkOpen, setLinkOpen] = React.useState(false);
+  const [linkUrl, setLinkUrl] = React.useState('');
+  const [linkError, setLinkError] = React.useState<string | null>(null);
+  const [isEditingLink, setIsEditingLink] = React.useState(false);
+  const linkInputRef = React.useRef<HTMLInputElement | null>(null);
+  const openedHrefRef = React.useRef('');
+  const isMobile = useIsMobile();
   const onChangeRef = React.useRef(onChange);
   const onTextChangeRef = React.useRef(onTextChange);
   React.useEffect(() => {
@@ -130,6 +244,135 @@ export function RichTextEditor({
     }
   }, [value, editor]);
 
+  const populateLinkState = React.useCallback(() => {
+    const href = (editor?.getAttributes('link')?.href as string | undefined) ?? '';
+    const editing = (editor?.isActive('link') ?? false) && href.length > 0;
+    openedHrefRef.current = href;
+    setIsEditingLink(editing);
+    setLinkUrl(href);
+    setLinkError(linkErrorFor(href));
+  }, [editor]);
+
+  const openLinkPopover = React.useCallback(
+    (presetHref?: string) => {
+      if (!editor) return;
+      if (presetHref !== undefined) {
+        openedHrefRef.current = presetHref;
+        setIsEditingLink(true);
+        setLinkUrl(presetHref);
+        setLinkError(linkErrorFor(presetHref));
+        setLinkOpen(true);
+        return;
+      }
+      populateLinkState();
+      setLinkOpen(true);
+    },
+    [editor, populateLinkState]
+  );
+
+  const handleLinkOpenChange = React.useCallback(
+    (next: boolean) => {
+      if (next) {
+        populateLinkState();
+        setLinkOpen(true);
+        return;
+      }
+      setLinkOpen(false);
+      setLinkError(null);
+    },
+    [populateLinkState]
+  );
+
+  const focusEditor = React.useCallback(() => {
+    try {
+      if (!editor || editor.isDestroyed) return;
+      editor.chain().focus().run();
+    } catch {
+      // Best-effort: editor may be tearing down while the popover closes.
+    }
+  }, [editor]);
+
+  const selectOpenedLink = React.useCallback(() => {
+    if (!editor) return;
+    const oldHref = openedHrefRef.current;
+    if (!oldHref) return;
+    let from = -1;
+    let to = -1;
+    editor.state.doc.descendants((node, pos) => {
+      if (from >= 0 || !node.isText) return true;
+      const mark = node.marks.find((m) => m.type.name === 'link');
+      if (mark && (mark.attrs.href as string | undefined) === oldHref) {
+        from = pos;
+        to = pos + (node.text?.length ?? 0);
+      }
+      return true;
+    });
+    if (from >= 0) editor.chain().focus().setTextSelection({ from, to }).run();
+  }, [editor]);
+
+  const handleLinkUrlChange = React.useCallback((next: string) => {
+    setLinkUrl(next);
+    setLinkError(linkErrorFor(next));
+  }, []);
+
+  const handleLinkSave = React.useCallback(() => {
+    const href = linkUrl.trim();
+    if (!isValidLinkUrl(href)) {
+      setLinkError(linkErrorFor(linkUrl));
+      return;
+    }
+    if (!editor) return;
+    if (isEditingLink) selectOpenedLink();
+    editor.chain().focus().extendMarkRange('link').setLink({ href }).run();
+    setAnnounce(isEditingLink ? 'Tautan diperbarui' : 'Tautan disisipkan');
+    setLinkOpen(false);
+    setLinkError(null);
+  }, [editor, isEditingLink, linkUrl, selectOpenedLink]);
+
+  const handleLinkRemove = React.useCallback(() => {
+    if (!editor) return;
+    if (isEditingLink) selectOpenedLink();
+    editor.chain().focus().unsetLink().run();
+    setAnnounce('Tautan dihapus');
+    setLinkOpen(false);
+    setLinkError(null);
+  }, [editor, isEditingLink, selectOpenedLink]);
+
+  const handleLinkOpenExternal = React.useCallback(() => {
+    const href = ((editor?.getAttributes('link')?.href as string | undefined) ?? linkUrl.trim()).trim();
+    if (href) window.open(href, '_blank', 'noopener,noreferrer');
+  }, [editor, linkUrl]);
+
+  const handleLinkCancel = React.useCallback(() => {
+    setLinkOpen(false);
+    setLinkError(null);
+  }, []);
+
+  React.useEffect(() => {
+    if (!editor) return;
+    const dom = editor.view.dom;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        openLinkPopover();
+      }
+    };
+    const onClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      const anchor = target?.closest?.('a');
+      if (anchor) {
+        event.preventDefault();
+        openLinkPopover(anchor.getAttribute('href') ?? '');
+      }
+    };
+    dom.addEventListener('keydown', onKeyDown);
+    dom.addEventListener('click', onClick);
+    return () => {
+      dom.removeEventListener('keydown', onKeyDown);
+      dom.removeEventListener('click', onClick);
+    };
+  }, [editor, openLinkPopover]);
+
   const canUndo = editor?.can().undo() ?? false;
   const canRedo = editor?.can().redo() ?? false;
 
@@ -142,6 +385,51 @@ export function RichTextEditor({
     editor?.chain().focus().redo().run();
     setAnnounce('Diulangi');
   };
+
+  const focusLinkInput = (event: Event) => {
+    event.preventDefault();
+    linkInputRef.current?.focus();
+    linkInputRef.current?.select();
+  };
+
+  const returnFocusToEditor = (event: Event) => {
+    event.preventDefault();
+    focusEditor();
+  };
+
+  const isLinkActive = editor?.isActive('link') ?? false;
+
+  const linkControl = editor ? (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          aria-label="Tautan (Ctrl+K)"
+          aria-pressed={isLinkActive}
+          onClick={() => openLinkPopover()}
+          data-testid="rte-button-link"
+          className={cn(TOOLBAR_BUTTON_CLASSES, isLinkActive ? TOOLBAR_ACTIVE_CLASSES : TOOLBAR_IDLE_CLASSES)}
+        >
+          <Link2 className="h-4 w-4" aria-hidden="true" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">Tautan (Ctrl+K)</TooltipContent>
+    </Tooltip>
+  ) : null;
+
+  const linkForm = (
+    <LinkForm
+      url={linkUrl}
+      error={linkError}
+      isEditing={isEditingLink}
+      inputRef={linkInputRef}
+      onUrlChange={handleLinkUrlChange}
+      onSave={handleLinkSave}
+      onOpen={handleLinkOpenExternal}
+      onRemove={handleLinkRemove}
+      onCancel={handleLinkCancel}
+    />
+  );
 
   const inlineTools: ToolbarToggle[] = editor
     ? [
@@ -244,6 +532,38 @@ export function RichTextEditor({
           ))}
         </div>
         <Separator orientation="vertical" className="mx-1 h-5" decorative />
+        {isMobile ? (
+          <Sheet open={linkOpen} onOpenChange={handleLinkOpenChange}>
+            {linkControl}
+            <SheetContent
+              side="bottom"
+              data-testid="rte-link-popover"
+              aria-label="Editor tautan"
+              onOpenAutoFocus={focusLinkInput}
+              onCloseAutoFocus={returnFocusToEditor}
+            >
+              <SheetTitle>Editor tautan</SheetTitle>
+              <div className="mt-4">{linkForm}</div>
+            </SheetContent>
+          </Sheet>
+        ) : (
+          <Popover open={linkOpen} onOpenChange={handleLinkOpenChange}>
+            <PopoverAnchor asChild>
+              <span className="inline-flex">{linkControl}</span>
+            </PopoverAnchor>
+            <PopoverContent
+              data-testid="rte-link-popover"
+              aria-label="Editor tautan"
+              side="bottom"
+              align="center"
+              className="w-80"
+              onOpenAutoFocus={focusLinkInput}
+              onCloseAutoFocus={returnFocusToEditor}
+            >
+              {linkForm}
+            </PopoverContent>
+          </Popover>
+        )}
         <div className="ml-auto flex items-center gap-0.5">
           <Tooltip>
             <TooltipTrigger asChild>
