@@ -1,6 +1,6 @@
 # 005 — Flow Editor / Node Canvas
 
-Status: draft (revisi review 2026-11-21 — butuh gate 1 ulang)
+Status: approved (gate 1 ulang 2026-11-21 — revisi review vs 011/010)
 Owner: —
 Tanggal: 2026-11-20
 Sumber: roadmap RM-09 (`docs/discussions/component-roadmap.md`)
@@ -129,3 +129,4 @@ Skenario utama:
 | 2026-11-20 | Draft awal dari roadmap RM-09; dependency `@xyflow/react` tercatat sudah disetujui prinsip user (2026-11-20) |
 | 2026-11-20 | **Approved (gate 1)** — OQ#1–#4 dijawab; dependency 13.0.2 (MIT), kategori `canvas`, styling token |
 | 2026-11-21 | Revisi review vs 011/010: FR-001 reset-vs-fit + batas zoom + scroll; FR-002 ukuran 220×88 deterministik + handle ≥44px + kontrak a11y; FR-003 invalid teks; FR-004 jalur keyboard [+]; FR-005 live region; FR-006 tambah tidak auto-buka sheet; FR-007 label + default 50 + toast; FR-010 tanpa token baru; FR-011 keyboard-connect; FR-012 onSelectionChange + defaultNodes/defaultEdges — status kembali draft, butuh gate 1 ulang |
+| 2026-11-21 | **Approved (gate 1 ulang)** — user 2026-11-21 |

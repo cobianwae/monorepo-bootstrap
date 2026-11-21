@@ -1,7 +1,7 @@
 # Wireframe — Flow Editor (S-005.29)
 
-Status: draft (gate 2 — rerun pasca revisi PRD 2026-11-21)
-Spec: `docs/design/flow-editor.md` · Flow: `docs/design/flows/flow-editor.mmd` · PRD: `docs/prd/005-flow-editor.md` (draft revisi)
+Status: approved (gate 2 — 2026-11-21)
+Spec: `docs/design/flow-editor.md` · Flow: `docs/design/flows/flow-editor.mmd` · PRD: `docs/prd/005-flow-editor.md` (approved gate 1 ulang)
 Layar: `S-005.29` Flow Editor (`/patterns/flow-editor`) + child `S-005.29.01` palette, `S-005.29.02` inspector
 
 ## 1. Shell (desktop ≥ lg)

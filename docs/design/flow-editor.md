@@ -1,7 +1,7 @@
 # Spec Desain — Flow Editor / Node Canvas
 
-Status: draft (gate 2 — rerun pasca revisi PRD 2026-11-21)
-PRD: `docs/prd/005-flow-editor.md` (draft revisi 2026-11-21 — butuh gate 1 ulang)
+Status: approved (gate 2 — 2026-11-21)
+PRD: `docs/prd/005-flow-editor.md` (approved gate 1 ulang 2026-11-21)
 Layar: `S-005.29` Flow Editor (`/patterns/flow-editor`) + child `S-005.29.01` palette, `S-005.29.02` inspector
 Flow: `docs/design/flows/flow-editor.mmd` · Wireframe: `docs/design/wireframes/flow-editor.md`
 Tanggal: 2026-11-21
