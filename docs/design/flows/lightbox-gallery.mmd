@@ -1,0 +1,61 @@
+<!-- Flow lightbox gallery — PRD 016, layar S-005.16 Media Gallery + M-012 Lightbox -->
+<!-- Job utama: pilih thumbnail di grid → jelajah multi-item di overlay → tutup dengan fokus kembali -->
+<!-- Constraint: yet-another-react-lightbox + wrapper DS token-first; microcopy Bahasa Indonesia; API terkontrol openIndex/onOpenChange -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman media gallery] --> B[Grid thumbnail + filter kategori + counter jumlah]
+  B --> C{User memilih item?}
+  C -- klik atau Enter pada thumbnail ke-N --> D[Buka lightbox di index N: overlay fullscreen + counter N dari total]
+  C -- daftar kosong sesudah filter --> E[Tampilkan empty state grid + CTA atur ulang filter]
+  D --> F2[Alur navigasi dan counter: flow 2]
+  F2 --> F3[Alur zoom video swipe dan state item: flow 3]
+```
+
+```mermaid
+flowchart TD
+  A[Lightbox terbuka di index N] --> B[Item N dimuat + preload 1 ke depan dan 1 ke belakang]
+  B --> C{Hasil muat item N?}
+  C -- masih memuat --> L[Tampilkan skeleton area + teks SR Memuat gambar + aria-busy]
+  L --> B
+  C -- gagal --> ERR[Tampilkan error item: pesan + Coba lagi + Lewati ke berikut]
+  ERR --> R{User memilih?}
+  R -- Coba lagi --> B
+  R -- Lewati --> N[Navigasi ke item berikut yang bisa dimuat]
+  C -- berhasil --> H[Tampilkan item + counter N dari total + caption + strip thumbnail sinkron]
+  H --> NX{User navigasi?}
+  NX -- tombol Sebelum / panah kiri / swipe kanan --> P[Mundur ke N-1; zoom reset ke 1x; hentikan video item lama]
+  NX -- tombol Berikut / panah kanan / swipe kiri --> Q[Maju ke N+1; zoom reset ke 1x; hentikan video item lama]
+  NX -- klik thumbnail strip / counter tetap --> J[Lompat ke index target; umumkan posisi via live region]
+  P --> B
+  Q --> B
+  J --> B
+  NX -- Esc / tombol Tutup / klik backdrop --> T[Tutup lightbox; fokus kembali ke thumbnail pemicu]
+```
+
+```mermaid
+flowchart TD
+  A[Item aktif tampil] --> B{Jenis item?}
+  B -- gambar --> Z[Zoom: tombol tambah kurang + keyboard + cubit opsional; 1x sampai 4x + geser saat diperbesar]
+  Z --> ZC{User pindah item?}
+  ZC -- ya --> ZR[Zoom reset ke pas; umumkan skala via live region]
+  ZR --> B
+  ZC -- tidak --> Z
+  B -- video --> V[Video native terkontrol: putar atau jeda tanpa autoplay bersuara]
+  V --> VN{Navigasi menjauh?}
+  VN -- ya --> VS[Hentikan playback item lama; fokus ke item baru]
+  VS --> B
+  VN -- tidak --> V
+  A --> M{Gerakan dan motion?}
+  M -- swipe horizontal sentuh --> S[Navigasi sebelum atau berikut; setara tombol panah]
+  M -- prefers-reduced-motion aktif --> RM[Transisi geser mati; ganti item instan; zoom tanpa animasi]
+```
+
+```mermaid
+flowchart TD
+  A[User membuka panel demo showcase] --> B[Dataset: 12 gambar + 1 video + 1 item rusak + filter hingga kosong]
+  B --> C[User memicu state: loading, empty grid, error item, success + toggle light dark]
+  C --> D[State tampil sesuai matrix; strip dan counter sinkron; caption teramati]
+  D --> E[User menguji keyboard penuh: Esc tutup, panah navigasi, tambah kurang zoom + fokus kembali tepat]
+  E --> F[Smoke build lolos; resep openIndex dan onOpenChange 15 baris disalin]
+```

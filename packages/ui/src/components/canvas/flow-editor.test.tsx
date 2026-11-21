@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Toaster } from '../feedback/toaster';
 import { TooltipProvider } from '../base/tooltip';
 import { FlowEditor, type FlowEdge, type FlowNode, type FlowPaletteItem, useFlowHistory } from './flow-editor';
-import type { Connection } from '@xyflow/react';
+import { EdgeChangeset, NodeChangeset, type Connection } from '@xyflow/react';
 
 const mockStf = vi.hoisted(() => vi.fn((pos: { x: number; y: number }) => pos));
 const mockGetViewport = vi.hoisted(() => vi.fn(() => ({ x: 0, y: 0, zoom: 1 })));
@@ -16,7 +16,9 @@ vi.mock('@xyflow/react', async (importOriginal) => {
     // ReactFlow test-friendly: render nodes via nodeTypes dan edges sebagai div,
     // tanpa memerlukan DOM kanvas xyflow asli di jsdom.
     ReactFlow: function MockReactFlow(props: Record<string, unknown>) {
-      const { nodes = [], edges = [], nodeTypes = {}, children, onInit, onViewportChange, onConnect, onSelectionChange, onNodeContextMenu, onEdgeContextMenu, onPaneContextMenu } = props as {
+      const { nodes = [], edges = [], nodeTypes = {}, children, onInit, onViewportChange, onConnect, onSelectionChange, onNodeContextMenu, onEdgeContextMenu, onPaneContextMenu, onNodesChange, onEdgesChange } = props as {
+        onNodesChange?: (changes: unknown) => void;
+        onEdgesChange?: (changes: unknown) => void;
         nodes?: Array<{ id: string; type: string; data: Record<string, unknown>; selected?: boolean; position?: { x: number; y: number } }>;
         edges?: Array<{ id: string; source: string; target: string }>;
         nodeTypes?: Record<string, React.ComponentType>;
@@ -37,7 +39,9 @@ vi.mock('@xyflow/react', async (importOriginal) => {
         ;(window as unknown as Record<string, unknown>).__flowNodeContextMenu = onNodeContextMenu;
         ;(window as unknown as Record<string, unknown>).__flowEdgeContextMenu = onEdgeContextMenu;
         ;(window as unknown as Record<string, unknown>).__flowPaneContextMenu = onPaneContextMenu;
-      }, [onInit, onViewportChange, onConnect, onSelectionChange, onNodeContextMenu, onEdgeContextMenu, onPaneContextMenu]);
+        ;(window as unknown as Record<string, unknown>).__flowOnNodesChange = onNodesChange;
+        ;(window as unknown as Record<string, unknown>).__flowOnEdgesChange = onEdgesChange;
+      }, [onInit, onViewportChange, onConnect, onSelectionChange, onNodeContextMenu, onEdgeContextMenu, onPaneContextMenu, onNodesChange, onEdgesChange]);
       return (
         <div data-testid="flow-canvas">
           {(nodes as Array<{ id: string; type: string; data: Record<string, unknown>; selected?: boolean; position?: { x: number; y: number } }>).map((node) => {
@@ -458,9 +462,9 @@ describe('FlowEditor edge + validasi + label (005-03)', () => {
     triggerSelect({ nodes: [], edges: [{ id: 'e1' } as FlowEdge] });
     const section = screen.getByTestId('flow-editor');
     fireEvent.keyDown(section, { key: 'Delete' });
-    expect(onEdgesChange).toHaveBeenCalledWith(
-      [{ id: 'e1', type: 'remove' }] as unknown as never,
-    );
+    // CR-016: xyflow mengirim EdgeChangeset asli (bukan Array); cek lewat toArray().
+    const received = onEdgesChange.mock.calls[0]?.[0] as EdgeChangeset<FlowEdge>;
+    expect(received.toArray()).toEqual([{ id: 'e1', type: 'remove' }]);
   });
 });
 
@@ -765,6 +769,44 @@ describe('FlowEditor undo/redo + toolbar (005-05)', () => {
 
     fireEvent.click(screen.getByTestId('flow-toolbar-redo'));
     expect(countNodes()).toBe(3);
+  });
+});
+
+// CR-016: xyflow 13 mengirim NodeChangeset/EdgeChangeset (class Changeset, bukan Array).
+// Test ini memakai instance asli agar regresi `changes.some is not a function` tertangkap.
+describe('FlowEditor changeset xyflow asli (CR-016)', () => {
+  const callChange = (name: '__flowOnNodesChange' | '__flowOnEdgesChange', changes: unknown) => {
+    const fn = (window as unknown as Record<string, unknown>)[name] as ((c: unknown) => void) | null | undefined;
+    expect(fn).toBeTypeOf('function');
+    act(() => {
+      fn!(changes);
+    });
+  };
+
+  it('EdgeChangeset remove (uncontrolled) menghapus edge tanpa crash', () => {
+    renderEditor({ defaultNodes: baseNodes, defaultEdges: baseEdges });
+    expect(screen.getByTestId('flow-edge-e1')).toBeTruthy();
+    callChange('__flowOnEdgesChange', new EdgeChangeset<FlowEdge>([{ id: 'e1', type: 'remove' }]));
+    expect(screen.queryByTestId('flow-edge-e1')).toBeNull();
+  });
+
+  it('NodeChangeset remove (uncontrolled) menghapus node tanpa crash', () => {
+    renderEditor({ defaultNodes: baseNodes, defaultEdges: baseEdges });
+    expect(screen.getAllByTestId(/^flow-node-n/).length).toBeGreaterThan(0);
+    callChange('__flowOnNodesChange', new NodeChangeset<FlowNode>([{ id: 'n1', type: 'remove' }]));
+    expect(screen.queryByTestId('flow-node-n1')).toBeNull();
+  });
+
+  it('controlled: onNodesChange/onEdgesChange menerima Changeset asli dengan toArray()', () => {
+    const onNodesChange = vi.fn();
+    const onEdgesChange = vi.fn();
+    renderEditor({ nodes: baseNodes, edges: baseEdges, onNodesChange, onEdgesChange });
+    const edgeCs = new EdgeChangeset<FlowEdge>([{ id: 'e1', type: 'remove' }]);
+    callChange('__flowOnEdgesChange', edgeCs);
+    expect(onEdgesChange).toHaveBeenCalledWith(edgeCs);
+    const nodeCs = new NodeChangeset<FlowNode>([{ id: 'n1', type: 'remove' }]);
+    callChange('__flowOnNodesChange', nodeCs);
+    expect(onNodesChange).toHaveBeenCalledWith(nodeCs);
   });
 });
 

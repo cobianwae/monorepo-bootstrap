@@ -40,7 +40,7 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 | `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart (legacy PRD 003, diganti 011), event-calendar (baru, PRD 004), diff-viewer (baru, PRD 013), permission-matrix (baru, PRD 018) |
 | `feedback` | Status dan respons sistem | dialog, alert, alert-dialog, toast, toaster, empty-state, use-toast |
 | `navigation` | Navigasi dan pencarian | dropdown-menu, breadcrumb, pagination, command-palette, context-menu, navigation-menu |
-| `overlay` | Lapisan di atas konten | sheet, popover, hover-card, tour (baru, PRD 017) |
+| `overlay` | Lapisan di atas konten | sheet, popover, hover-card, tour (baru, PRD 017), lightbox (baru, PRD 016) |
 | `layout` | Kerangka halaman | app-shell, page-header, page-shell, page-skeleton, container, section, prose, demo-section, resizable, skip-link |
 | `marketing` | Blok presentasi | hero, hero-band, feature-grid, faq, logo-cloud, carousel, cta-band, statement-card, art-background, grid-pattern, dot-pattern, glow-orb, stats-band, section-number, pricing, testimonial, gradient-text |
 | `dnd` | Drag and drop | sortable-list, tree-view, kanban |
@@ -70,7 +70,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Kanban | Kolom, drag, optimistic move |
 | Master Data | CRUD tabel + form |
 | Master Detail | List + panel detail |
-| Media Gallery | Grid, lightbox, keyboard |
+| Media Gallery | Grid, lightbox, keyboard (composed, upgrade basis `overlay/lightbox` reusable PRD 016); penyusun: lightbox (baru, wrapper yet-another-react-lightbox token-first), dialog (basis trap fokus), button, badge (counter), skeleton (loading item), empty-state, alert |
 | Notifications | Toast/inbox, read state |
 | Onboarding | Step, skip, progress |
 | Import Wizard | Impor CSV 4 langkah: upload → mapping → validasi → konfirmasi; pratinjau error per sel, template contoh, hasil via callback (composed, kategori `form` + `data-display`, tanpa komponen baru v1); penyusun: stepper, file-input/file-upload (compose), select/combobox, data-table/table, alert, badge, progress, skeleton, empty-state, button |

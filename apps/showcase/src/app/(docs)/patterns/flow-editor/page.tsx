@@ -123,9 +123,11 @@ export default function FlowEditorPage() {
   }, []);
 
   const handleNodesChange = React.useCallback((changes: NodeChangeParam) => {
+    // xyflow 13 mengirim Changeset (bukan Array) — normalisasi dengan toArray (CR-016).
+    const list = changes.toArray();
     setNodes((prev) => {
       let next = prev;
-      for (const change of (changes as unknown as { type: string; id: string; position?: { x: number; y: number }; selected?: boolean }[])) {
+      for (const change of list) {
         if (change.type === 'position') {
           next = next.map((n) =>
             n.id === change.id ? { ...n, position: { ...n.position, ...change.position } } : n,
@@ -141,9 +143,8 @@ export default function FlowEditorPage() {
   }, []);
 
   const handleEdgesChange = React.useCallback((changes: EdgeChangeParam) => {
-    setEdges((prev) =>
-      prev.filter((e) => !((changes as unknown as { type: string; id: string }[]).some((c) => c.type === 'remove' && c.id === e.id))),
-    );
+    const removedIds = new Set(changes.toArray().flatMap((c) => (c.type === 'remove' ? [c.id] : [])));
+    setEdges((prev) => prev.filter((e) => !removedIds.has(e.id)));
   }, []);
 
   const handleConnect = React.useCallback((connection: ConnectParam) => {

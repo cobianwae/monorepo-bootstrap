@@ -22,10 +22,10 @@ import {
   type Connection,
   type Edge,
   type EdgeChange,
-  type EdgeChangeset,
+  EdgeChangeset,
   type Node,
   type NodeChange,
-  type NodeChangeset,
+  NodeChangeset,
   type OnConnect,
   type OnEdgesChange,
   type OnNodesChange,
@@ -1088,7 +1088,9 @@ export function FlowEditor(props: FlowEditorProps) {
 
   const handleNodesChange = React.useCallback(
     (changes: NodeChangeset<FlowNode>) => {
-      const structural = (changes as unknown as NodeChange<FlowNode>[]).some(
+      // xyflow 13 mengirim Changeset (bukan Array): normalisasi sekali di batas (CR-016).
+      const list = changes.toArray();
+      const structural = list.some(
         (c) => c.type === 'position' || c.type === 'remove' || c.type === 'add',
       );
       if (structural && !historyApplying.current) {
@@ -1100,7 +1102,7 @@ export function FlowEditor(props: FlowEditorProps) {
       }
       setInternalNodes((prev) => {
         let next = prev;
-        for (const change of (changes as unknown as NodeChange[])) {
+        for (const change of list) {
           if (change.type === 'position') {
             next = next.map((n) =>
               n.id === change.id ? { ...n, position: { ...n.position, ...change.position } } : n,
@@ -1119,9 +1121,9 @@ export function FlowEditor(props: FlowEditorProps) {
 
   const handleEdgesChange = React.useCallback(
     (changes: EdgeChangeset<FlowEdge>) => {
-      const structural = (changes as unknown as Array<{ type: string }>).some(
-        (c) => c.type === 'add' || c.type === 'remove',
-      );
+      // xyflow 13 mengirim Changeset (bukan Array): normalisasi sekali di batas (CR-016).
+      const list = changes.toArray();
+      const structural = list.some((c) => c.type === 'add' || c.type === 'remove');
       if (structural && !historyApplying.current) {
         _history.push(nodes, edges);
       }
@@ -1129,9 +1131,8 @@ export function FlowEditor(props: FlowEditorProps) {
         void onEdgesChange?.(changes);
         return;
       }
-      setInternalEdges((prev) =>
-        prev.filter((e) => !((changes as unknown as { type: string; id: string }[]).some((c) => c.type === 'remove' && c.id === e.id))),
-      );
+      const removedIds = new Set(list.flatMap((c) => (c.type === 'remove' ? [c.id] : [])));
+      setInternalEdges((prev) => prev.filter((e) => !removedIds.has(e.id)));
     },
     [isControlled, onEdgesChange, nodes, edges, _history],
   );
@@ -1213,7 +1214,7 @@ function computeNodeChanges(current: FlowNode[], target: FlowNode[]): NodeChange
     if (!currentById.has(n.id)) changes.push({ id: n.id, type: 'add', item: n } as NodeChange<FlowNode>);
     else changes.push({ id: n.id, type: 'replace', item: n } as NodeChange<FlowNode>);
   }
-  return changes as unknown as NodeChangeset<FlowNode>;
+  return new NodeChangeset<FlowNode>(changes);
 }
 
 /**
@@ -1231,7 +1232,7 @@ function computeEdgeChanges(current: FlowEdge[], target: FlowEdge[]): EdgeChange
     if (!currentById.has(e.id)) changes.push({ id: e.id, type: 'add', item: e } as EdgeChange<FlowEdge>);
     else changes.push({ id: e.id, type: 'replace', item: e } as EdgeChange<FlowEdge>);
   }
-  return changes as unknown as EdgeChangeset<FlowEdge>;
+  return new EdgeChangeset<FlowEdge>(changes);
 }
 
 const handleConnect = React.useCallback(
@@ -1290,7 +1291,7 @@ React.useEffect(() => {
   const removeSelectedEdge = React.useCallback(() => {
     if (!selectedEdgeId) return;
     if (isControlled) {
-      void onEdgesChange?.([{ id: selectedEdgeId, type: 'remove' }] as unknown as EdgeChangeset<FlowEdge>);
+      void onEdgesChange?.(new EdgeChangeset<FlowEdge>([{ id: selectedEdgeId, type: 'remove' }]));
       if (!historyApplying.current) _history.push(nodes, edges);
     } else {
       setInternalEdges((prev) => prev.filter((e) => e.id !== selectedEdgeId));
@@ -1426,7 +1427,7 @@ React.useEffect(() => {
     const { id: edgeId } = contextMenu ?? {};
     if (!edgeId) return;
     if (isControlled) {
-      void onEdgesChange?.([{ id: edgeId, type: 'remove' }] as unknown as EdgeChangeset<FlowEdge>);
+      void onEdgesChange?.(new EdgeChangeset<FlowEdge>([{ id: edgeId, type: 'remove' }]));
       _history.push(nodes, edges);
     } else {
       setInternalEdges((prev) => prev.filter((e) => e.id !== edgeId));
