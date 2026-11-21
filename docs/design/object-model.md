@@ -44,7 +44,7 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 | `layout` | Kerangka halaman | app-shell, page-header, page-shell, page-skeleton, container, section, prose, demo-section, resizable, skip-link |
 | `marketing` | Blok presentasi | hero, hero-band, feature-grid, faq, logo-cloud, carousel, cta-band, statement-card, art-background, grid-pattern, dot-pattern, glow-orb, stats-band, section-number, pricing, testimonial, gradient-text |
 | `dnd` | Drag and drop | sortable-list, tree-view, kanban |
-| `canvas` | Kanvas interaktif (xyflow, token-mapped) | org-chart-editor (legacy PRD 010, diganti 011), org-chart-studio (baru, PRD 011), flow-editor (planned) |
+| `canvas` | Kanvas interaktif (xyflow, token-mapped) | org-chart-editor (legacy PRD 010, diganti 011), org-chart-studio (baru, PRD 011), flow-editor (baru, PRD 005) |
 
 ## 4. Pattern Inventory
 
@@ -63,6 +63,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Dynamic Form | Schema-driven, validasi |
 | File Upload | Upload queue: validasi batch per file, progres per item, cancel/retry, thumbnail; penyusun: file-upload (baru), file-input, progress, button, badge, alert |
 | File Manager | Hierarki folder + aksi file + quota + preview (composed, kategori `data-display`); penyusun: tree-view, data-table, breadcrumb, context-menu, bulk-action-bar, file-upload, dialog/sheet, progress, skeleton, empty-state |
+| Flow Editor | Editor node/canvas: palette drag-and-drop, edge + handle, inspector, undo/redo, minimap (composed, kategori `canvas` xyflow token-mapped); penyusun: flow-editor (baru), sortable-list/`@dnd-kit/*`, sheet, form, badge, button, context-menu, tooltip, skeleton, empty-state, alert |
 | Global Search | Query, result grouping, empty |
 | Infinite Scroll | Pagination berbasis viewport |
 | Kanban | Kolom, drag, optimistic move |

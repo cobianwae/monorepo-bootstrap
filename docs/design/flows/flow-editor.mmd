@@ -1,0 +1,105 @@
+<!-- Flow flow editor — PRD 005, layar S-005.29 (+ S-005.29.01 palette, S-005.29.02 inspector) -->
+<!-- Job utama: tarik node dari palette → sambung edge → edit di inspector → undo/redo -->
+<!-- Constraint: @xyflow/react 13.0.2 token-mapped (default CSS mati); palette via @dnd-kit/* + screenToFlowPosition -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman flow editor] --> B{Data graph siap?}
+  B -- masih dimuat --> L[Tampilkan skeleton canvas + teks SR]
+  L --> B
+  B -- gagal dimuat --> ERR[Tampilkan error + tombol coba lagi]
+  ERR --> R[User menekan coba lagi]
+  R --> A
+  B -- canvas kosong --> EMP[Tampilkan empty state + petunjuk mulai dari palette]
+  EMP --> P[User menarik node pertama dari palette]
+  P --> C
+  B -- siap --> C[Canvas dirender: node + edge + palette + toolbar + minimap]
+  C --> D{User memilih operasi?}
+  D -- tambah node --> P2[Alur palette: flow 2]
+  D -- sambung edge --> E2[Alur edge: flow 3]
+  D -- edit / hapus / undo --> E3[Alur seleksi-inspector: flow 4]
+  D -- navigasi / zoom --> E4[Alur viewport: flow 5]
+  P2 --> C
+  E2 --> C
+  E3 --> C
+  E4 --> C
+```
+
+```mermaid
+flowchart TD
+  A[User melihat palette di sisi kiri] --> B[User mulai drag jenis node: Kirim email / Tunggu / Cabang]
+  B --> C[User menyeret ke atas canvas; preview posisi mengikuti pointer]
+  C --> D{User melepas di dalam canvas?}
+  D -- tidak, di luar canvas --> X[Batal: tidak ada node baru; fokus tetap di palette]
+  X --> A
+  D -- ya --> E[Konversi koordinat layar ke koordinat flow]
+  E --> F{Posisi valid dengan snap grid?}
+  F -- snap aktif --> G[Jatuhkan ke kelipatan grid terdekat]
+  G --> H[Node baru muncul terseleksi + fokus ke node baru; inspector TIDAK otomatis terbuka]
+  F -- snap mati --> H
+  H --> I[Riwayat undo didorong; live region mengumumkan node baru: judul + posisi]
+  I --> J[User memilih eksplisit untuk edit (klik/Enter/rincian) ATAU lanjut menyambung edge]
+  J --> A
+```
+
+```mermaid
+flowchart TD
+  A[User menyeret dari handle output node sumber] --> B[Handle tersorot; target valid ditandai]
+  B --> C[User melepas di handle input node target]
+  C --> D{Koneksi valid?}
+  D -- arah salah / handle penuh / self-loop --> E[Tolak: edge tidak terbentuk + umpan balik visual dan teks]
+  E --> A
+  D -- duplikat edge --> E
+  D -- valid --> F[Edge terbentuk dengan label default; terpilih]
+  F --> G{User mengedit label?}
+  G -- ya --> H[User mengetik label di inspector atau langsung di edge]
+  H --> I[Label tersimpan; riwayat undo didorong]
+  G -- tidak --> I
+  I --> J{User menghapus edge?}
+  J -- Delete / menu konteks --> K[Edge terhapus; urungkan via toolbar atau Ctrl+Z]
+  K --> A
+  J -- tidak --> A
+```
+
+```mermaid
+flowchart TD
+  A[User memilih node atau edge secara eksplisit: klik, Enter, tombol rincian, Shift-klik, atau rubber band] --> B{Mode seleksi?}
+  B -- tunggal --> C[Sorot satu elemen; inspector properti terbuka on-demand untuk node]
+  B -- multi --> D[Sorot banyak elemen; inspector menampilkan hitungan + aksi massal]
+  D --> E[User menekan Delete atau menu hapus]
+  E --> F{Elemen termasuk node?}
+  F -- ya --> G[Hapus node + semua edge terkait sekaligus]
+  F -- tidak, edge saja --> H[Hapus edge terpilih saja]
+  G --> I[Dorong riwayat; toast Urungkan tersedia]
+  H --> I
+  C --> J[User mengubah properti di inspector sheet]
+  J --> K{Form valid?}
+  K -- tidak --> L[Tampilkan pesan inline; node tidak berubah]
+  L --> J
+  K -- ya --> M[Label node diperbarui live di canvas; dorong riwayat]
+  M --> N[User menekan undo atau redo]
+  N --> O[State nodes dan edges kembali persis; inspector mengikuti seleksi baru]
+  O --> A
+  I --> N
+```
+
+```mermaid
+flowchart TD
+  A[User fokus ke canvas] --> B{Ingin navigasi?}
+  B -- geser --> C[Drag background / panah keyboard / seret minimap]
+  C --> D[Viewport berpindah; minimap sinkron; scroll halaman tidak terganggu]
+  D --> A
+  B -- zoom --> E[Tombol controls / Ctrl+scroll / pinch / keyboard plus minus]
+  E --> F{Batas zoom tercapai?}
+  F -- ya --> G[Hentikan di batas; umumkan level via live region]
+  G --> A
+  F -- belum --> H[Skala berubah; grid dan edge tetap rapi]
+  H --> A
+  B -- reset --> I[Atur 100 persen (ikon 1:1) ATAU selaras tampilan (ikon bingkai) — dua aksi berbeda]
+  I --> A
+  B -- grid --> J{Snap grid aktif?}
+  J -- ya --> K[Node baru dan geseran jatuh ke kelipatan grid]
+  K --> A
+  J -- tidak --> L[Posisi bebas presisi piksel]
+  L --> A
+```

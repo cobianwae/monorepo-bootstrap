@@ -1,9 +1,10 @@
 # 005 — Flow Editor / Node Canvas
 
-Status: approved
+Status: draft (revisi review 2026-11-21 — butuh gate 1 ulang)
 Owner: —
 Tanggal: 2026-11-20
 Sumber: roadmap RM-09 (`docs/discussions/component-roadmap.md`)
+Revisi: pelajaran profesional 011 vs sampah 010 (CR-009) — tambah tidak auto-buka sheet, node deterministik, handle ≥44px, kontrak seleksi eksplisit
 
 ## Problem
 
@@ -58,10 +59,11 @@ JTBD:
 
 Skenario utama:
 
-1. Tarik node "Kirim email" dari palette ke canvas → muncul dengan handle; sambungkan
-   ke node "Tunggu 1 hari" dengan edge berlabel.
-2. Pilih node → inspector (sheet) membuka form properti; ubah judul → label node ikut
-   berubah.
+1. Tarik node "Kirim email" dari palette ke canvas → muncul dengan handle di posisi drop
+   dengan judul default; sambungkan ke node "Tunggu 1 hari" dengan edge berlabel.
+   Tambah node TIDAK otomatis membuka inspector penuh (pelajaran 011 vs 010).
+2. Pilih node secara eksplisit → inspector (sheet) on-demand membuka form properti;
+   ubah judul → label node ikut berubah.
 3. Hapus node terpilih via keyboard Delete → edge terkait ikut terputus; undo
    mengembalikan node dan edge-nya.
 4. Canvas besar: minimap menunjukkan posisi viewport; controls zoom in/out/fit.
@@ -70,18 +72,18 @@ Skenario utama:
 
 | ID | Requirement | Priority | Acceptance signal |
 |---|---|---|---|
-| FR-001 | Canvas dengan pan dan zoom yang halus, batas zoom wajar, dan controls (zoom in/out, fit view). | must | Scenario menunjukkan pan/zoom + controls; interaksi tidak mengganggu scroll halaman. |
-| FR-002 | Custom node dapat didefinisikan konsumen memakai komponen DS (konten bebas, tinggi/lebar terukur); node punya handle input/output yang dapat disambung. | must | Story demo mendefinisikan 2 jenis node; sambungan antar handle terbentuk valid (test). |
-| FR-003 | Edge menghubungkan handle, dapat berlabel, dan dapat dihapus; edge invalid (arah salah, handle penuh) ditolak dengan umpan balik visual. | must | Sambungan valid terbentuk; sambungan invalid ditolak dengan state visual yang jelas. |
-| FR-004 | Palette node: daftar jenis node di sisi kiri; drag memakai `@dnd-kit/*` (sudah ada) dan drop dikonversi ke koordinat kanvas xyflow (`screenToFlowPosition`) untuk menambah node. | must | Drag dari palette menghasilkan node baru di posisi drop (test interaksi). |
-| FR-005 | Seleksi node/edge tunggal dan multi (shift/rubber band), dengan aksi delete via keyboard dan menu konteks. | must | Seleksi ganda + delete menghapus elemen terpilih dan edge terkait (test). |
-| FR-006 | Node inspector: memilih node membuka panel (basis `overlay/sheet.tsx`) berisi form properti yang disediakan konsumen. | must | Pilih node → sheet terbuka; perubahan form memperbarui node secara live. |
-| FR-007 | Undo/redo operasi struktural (tambah/hapus/pindah node, tambah/hapus edge) dengan batas riwayat. | must | Rangkaian aksi + undo berulang mengembalikan state persis (test). |
+| FR-001 | Canvas dengan pan dan zoom yang halus, batas zoom eksplisit (default 0.25–2), dan controls terpisah dari toolbar (zoom in/out, reset 100% dengan ikon berbeda dari fit view). | must | Scenario menunjukkan pan/zoom + controls; reset 100% mengembalikan ke zoom 1 (bukan zoomOut); wheel polos tidak mencuri scroll halaman (hanya Ctrl+scroll untuk zoom); pan/zoom keyboard tersedia. |
+| FR-002 | Custom node dapat didefinisikan konsumen memakai komponen DS dengan satu ukuran deterministik default 220×88 v1 (tanpa varian compact; konten: judul 1 baris + deskripsi maks 2 baris + badge tanpa truncate ganda); node punya handle input/output yang dapat disambung dengan hit-area ≥44px dan kontrak a11y (forward ref, role button, aria-selected/label). | must | Story demo mendefinisikan 2 jenis node; sambungan antar handle terbentuk valid (test); audit judul 40+ karakter tanpa truncate; handle focusable keyboard dengan target sentuh ≥44px. |
+| FR-003 | Edge menghubungkan handle, dapat berlabel, dan dapat dihapus; edge invalid (arah salah, handle penuh, self-loop, duplikat) ditolak dengan umpan balik visual + teks (bukan warna saja). | must | Sambungan valid terbentuk; sambungan invalid ditolak dengan pesan teks yang jelas + live region. |
+| FR-004 | Palette node: daftar jenis node di sisi kiri; drag memakai `@dnd-kit/*` (sudah ada) dan drop dikonversi ke koordinat kanvas xyflow (`screenToFlowPosition`) untuk menambah node; tambah keyboard via tombol [+] per item (tambah di tengah viewport + fokus pindah ke node baru). | must | Drag dari palette menghasilkan node baru di posisi drop (test interaksi); Enter/Space pada tombol [+] menambah node di tengah + fokus ke node baru. |
+| FR-005 | Seleksi node/edge tunggal dan multi (shift/rubber band), dengan aksi delete via keyboard dan menu konteks; jumlah seleksi diumumkan via live region. | must | Seleksi ganda + delete menghapus elemen terpilih dan edge terkait (test); live region mengumumkan jumlah terpilih. |
+| FR-006 | Node inspector: memilih node secara eksplisit membuka panel on-demand (basis `overlay/sheet.tsx`) berisi form properti yang disediakan konsumen; tambah node TIDAK otomatis membuka panel penuh. | must | Pilih eksplisit → sheet terbuka; perubahan form memperbarui node secara live; tambah dari palette tidak membuka sheet penuh. |
+| FR-007 | Undo/redo operasi struktural (tambah/hapus/geser node, tambah/hapus/geser edge, edit label) dengan batas riwayat default 50, via toolbar + Ctrl+Z/Y dan toast Urungkan. | must | Rangkaian aksi + undo berulang mengembalikan state persis (test); toast Urungkan muncul tiap undo/redo. |
 | FR-008 | Minimap yang menunjukkan posisi node dan viewport, dapat diklik untuk berpindah. | should | Minimap sinkron dengan canvas; klik minimap memindah viewport. |
 | FR-009 | Grid halus + snapping ke grid dapat diaktifkan konsumen. | should | Snap aktif → posisi node jatuh ke kelipatan grid (test). |
-| FR-010 | Dark mode: canvas, node, edge, minimap memakai token dan lolos kontras light & dark tanpa styling khusus konsumen. | must | Screenshot scenario light & dark lolos audit kontras. |
-| FR-011 | Aksesibilitas dasar: controls dan inspector terjangkau keyboard; graph punya representasi alternatif (daftar node+edge) yang terbaca screen reader; fitur pointer-only punya jalur alternatif (menu/keyboard) untuk operasi inti. | must | Audit a11y: semua operasi inti bisa dilakukan tanpa mouse; daftar alternatif terbaca. |
-| FR-012 | Kontrak state deklaratif: nodes/edges/posisi dikontrol konsumen (controlled atau onChange), tanpa persistensi internal. | must | Story demo mengelola state di luar komponen tanpa API tambahan. |
+| FR-010 | Dark mode: canvas, node, edge, minimap memakai token existing (tanpa token baru, tanpa default CSS xyflow mentah) dan lolos kontras light & dark. | must | Screenshot scenario light & dark lolos audit kontras; tanpa token baru. |
+| FR-011 | Aksesibilitas dasar: controls dan inspector terjangkau keyboard; sambung edge via keyboard (fokus handle sumber → Enter → Tab ke target → Enter); tambah via tombol [+]; hapus via Delete; handle hit-area ≥44px; graph punya representasi alternatif (daftar node+edge) yang terbaca screen reader; fitur pointer-only punya jalur alternatif (menu/keyboard) untuk operasi inti. | must | Audit a11y: semua operasi inti bisa dilakukan tanpa mouse (tambah/sambung/hapus/inspector); daftar alternatif terbaca; handle terjangkau keyboard dengan target ≥44px. |
+| FR-012 | Kontrak state deklaratif: nodes/edges/posisi dikontrol konsumen (controlled nodes/edges + onNodesChange/onEdgesChange/onConnect + onSelectionChange untuk inspector; uncontrolled via defaultNodes/defaultEdges untuk demo), tanpa persistensi internal. | must | Story demo mengelola state di luar komponen tanpa API tambahan; onSelectionChange memicu inspector. |
 | FR-013 | State matrix: loading (skeleton canvas), empty (canvas kosong dengan petunjuk mulai), error (handler gagal, pesan retry). | must | Tiga state teramati di scenario showcase. |
 | FR-014 | Showcase scenario flow editor end-to-end (palette → canvas → edge → inspector → undo/redo) dalam light & dark. | must | Route scenario tersedia dan lolos smoke build. |
 | FR-015 | Auto-layout graph satu klik (memerlukan library layout — dependency tambahan). | could | Tidak termasuk v1 — tidak ada kontrol auto-layout di showcase; penambahan lewat CR dependency terpisah. |
@@ -126,3 +128,4 @@ Skenario utama:
 |---|---|
 | 2026-11-20 | Draft awal dari roadmap RM-09; dependency `@xyflow/react` tercatat sudah disetujui prinsip user (2026-11-20) |
 | 2026-11-20 | **Approved (gate 1)** — OQ#1–#4 dijawab; dependency 13.0.2 (MIT), kategori `canvas`, styling token |
+| 2026-11-21 | Revisi review vs 011/010: FR-001 reset-vs-fit + batas zoom + scroll; FR-002 ukuran 220×88 deterministik + handle ≥44px + kontrak a11y; FR-003 invalid teks; FR-004 jalur keyboard [+]; FR-005 live region; FR-006 tambah tidak auto-buka sheet; FR-007 label + default 50 + toast; FR-010 tanpa token baru; FR-011 keyboard-connect; FR-012 onSelectionChange + defaultNodes/defaultEdges — status kembali draft, butuh gate 1 ulang |
