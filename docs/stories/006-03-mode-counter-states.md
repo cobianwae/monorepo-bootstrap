@@ -1,6 +1,6 @@
 # 006-03 — Mode + counter + state matrix
 
-Status: review
+Status: done
 PRD: `docs/prd/006-rich-text-editor.md`
 Design: `docs/design/rich-text-editor.md`
 FR: `FR-007`, `FR-008`, `FR-011`

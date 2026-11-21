@@ -101,3 +101,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Story 006-02 link M-009 + shortcut + keyboard selesai (M-009 Popover/Sheet + validasi live + Ctrl/Cmd+K + klik anchor, 10 test baru hijau; typecheck/lint/test/test:tokens/showcase build hijau), status `review` — `006-02`.
 - 2026-11-21 — Story 006-02 `done` (approved oleh user) dan di-merge ke `dev` — `006-02`.
 - 2026-11-21 — Story 006-03 mode + counter + state matrix selesai (props mode/loading/error/onRetry/maxLength/showCounter, counter getText + ambang 90%/100% warning/destructive tanpa blokir, skeleton + alert + empty placeholder, describedby/status/aria-busy, showcase draf + panel pemicu; 5 test baru hijau; typecheck/lint/test/test:tokens/showcase build hijau), status `review` — `006-03`.
+- 2026-11-21 — Story 006-03 `done` (approved oleh user), siap merge ke `dev` — `006-03`.
