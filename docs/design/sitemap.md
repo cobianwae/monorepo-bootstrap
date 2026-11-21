@@ -60,7 +60,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.17 | Notifications | `/patterns/notifications` | implemented |
 | S-005.18 | Onboarding | `/patterns/onboarding` | implemented |
 | S-005.19 | Optimistic Updates | `/patterns/optimistic-updates` | implemented |
-| S-005.20 | Product Tour | `/patterns/product-tour` | implemented |
+| S-005.20 | Product Tour (upgrade basis `overlay/tour` reusable, PRD 017) | `/patterns/product-tour` | in-design |
 | S-005.21 | Results | `/patterns/results` | implemented |
 | S-005.22 | Rich Text Editor (upgrade basis `form/rich-text-editor` reusable, PRD 006) | `/patterns/rich-text-editor` | in-design |
 | S-005.23 | Settings | `/patterns/settings` | implemented |

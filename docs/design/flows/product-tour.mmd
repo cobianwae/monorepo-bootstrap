@@ -1,0 +1,59 @@
+<!-- Flow product tour — PRD 017, layar S-005.20 -->
+<!-- Job utama: mulai tur 5 langkah → ikuti spotlight + popover + progress → lewati/Esc anggun → simpan status via callback -->
+<!-- Constraint: driver.js + wrapper DS token-first; microcopy Bahasa Indonesia; persistence milik konsumen (callback saja); satu alur SPA -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman product tour] --> B[Halaman dashboard contoh tampil + tombol Mulai tur]
+  B --> C{User memulai tur?}
+  C -- klik Mulai tur --> S[Simpan pemicu fokus + umumkan Tur dimulai langkah 1 dari N]
+  C -- tidak mulai --> E[Tetap di dashboard; tur tidak mengganggu]
+  S --> D[Cari target langkah 1]
+  D --> T{Target ditemukan?}
+  T -- ya --> H[Tampilkan spotlight + popover judul isi progress + scroll ke viewport + penempatan adaptif]
+  T -- tidak --> M[Alur target hilang: flow 2]
+  H --> N[User di langkah aktif: flow 2 lanjutan]
+```
+
+```mermaid
+flowchart TD
+  A[User di langkah tur aktif] --> B{User memilih aksi?}
+  B -- Lanjut --> NX[Validasi target langkah berikut ada]
+  B -- Kembali --> PV[Kembali ke langkah sebelumnya + spotlight pindah + fokus ke popover]
+  B -- Lewati atau Esc --> SK[Alur lewati: flow 3]
+  NX --> T{Target berikut ditemukan?}
+  T -- ya --> H[Scroll target ke viewport + spotlight pindah + popover adaptif + progress N dari total + umumkan ke SR]
+  T -- tidak --> M[Lewati langkah ini + tampilkan pemberitahuan Langkah dilewati target tidak ditemukan + lanjut ke berikut]
+  M --> Q{Masih ada langkah tersisa?}
+  Q -- ya --> H
+  Q -- tidak semua hilang --> ERR[Tampilkan error semua target hilang + tombol Tutup tur]
+  H --> C{Ini langkah terakhir?}
+  C -- belum --> A
+  C -- ya Lanjut di terakhir --> F[Panggil onFinish dengan status per langkah + tutup tur + kembalikan fokus ke pemicu + umumkan Tur selesai]
+  F --> E[Selesai]
+  PV --> A
+  ERR --> E
+```
+
+```mermaid
+flowchart TD
+  A[User menekan Lewati atau Esc] --> B{Progres lebih dari 1 langkah?}
+  B -- ya sudah melihat 2 langkah atau lebih --> K[Tampilkan dialog konfirmasi Lewati tur + pilihan Lanjut tur atau Ya lewati]
+  B -- tidak baru langkah 1 --> S[Langsung lewati tanpa konfirmasi]
+  K --> D{User memilih apa?}
+  D -- Lanjut tur --> R[Tutup dialog + kembali ke langkah aktif + fokus ke popover]
+  D -- Ya lewati --> S
+  R --> E[Tetap di tur]
+  S --> O[Panggil onSkip dengan status per langkah + indeks berhenti + tutup tur + kembalikan fokus ke tombol pemicu + umumkan Tur dilewati]
+  O --> E2[Selesai]
+```
+
+```mermaid
+flowchart TD
+  A[User membuka panel demo showcase] --> B[Dataset: dashboard contoh 5 target + varian target hilang 1 + semua hilang + langkah kosong]
+  B --> C[User memicu state: empty belum mulai + antar-langkah + target dilewati + error semua hilang + sukses selesai]
+  C --> D[User menguji keyboard penuh: Tab ke kontrol + Enter Lanjut Kembali + Esc + fokus kembali ke pemicu]
+  D --> E[SR mengumumkan judul + progress N dari total + langkah dilewati; reduced-motion mematikan animasi spotlight dan scroll halus]
+  E --> F[Toggle light dark: spotlight popover progress lolos kontras]
+  F --> G[Smoke build lolos; resep callback onFinish onSkip 15 baris disalin]
+```

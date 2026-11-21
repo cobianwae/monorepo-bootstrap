@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, Fragment } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
@@ -60,6 +60,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from '@ds/ui';
 
 interface NavItem {
@@ -213,6 +214,8 @@ interface ShowcaseNavContentProps {
 
 export function ShowcaseNavContent({ onNavigate }: ShowcaseNavContentProps) {
   const pathname = usePathname();
+  const { state, isMobile } = useSidebar();
+  const isCollapsed = !isMobile && state === 'collapsed';
 
   const allItems = useMemo(
     () =>
@@ -260,33 +263,63 @@ export function ShowcaseNavContent({ onNavigate }: ShowcaseNavContentProps) {
               );
             })}
 
-            {section.subsections?.map((subsection) => (
-              <SidebarMenuItem key={subsection.label}>
-                <div
-                  className="flex h-7 w-full items-center gap-2 rounded-md px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 select-none"
-                  aria-hidden="true"
-                >
-                  {subsection.label}
-                </div>
-                <SidebarMenuSub>
-                  {subsection.items.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = activeHref === item.href;
+            {section.subsections?.map((subsection) => {
+              if (isCollapsed) {
+                return (
+                  <Fragment key={subsection.label}>
+                    {subsection.items.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = activeHref === item.href;
 
-                    return (
-                      <SidebarMenuSubItem key={item.href}>
-                        <SidebarMenuSubButton asChild isActive={isActive}>
-                          <Link href={item.href} onClick={onNavigate}>
-                            <Icon />
-                            <span className="min-w-0 flex-1 truncate">{item.title}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    );
-                  })}
-                </SidebarMenuSub>
-              </SidebarMenuItem>
-            ))}
+                      return (
+                        <SidebarMenuItem key={item.href}>
+                          <SidebarMenuButton
+                            asChild
+                            isActive={isActive}
+                            tooltip={item.title}
+                          >
+                            <Link href={item.href} onClick={onNavigate}>
+                              <Icon />
+                              <span className="min-w-0 flex-1 truncate">
+                                {item.title}
+                              </span>
+                            </Link>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
+                  </Fragment>
+                );
+              }
+
+              return (
+                <SidebarMenuItem key={subsection.label}>
+                  <div
+                    className="flex h-7 w-full items-center gap-2 rounded-md px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 select-none group-data-[collapsible=icon]:hidden"
+                    aria-hidden="true"
+                  >
+                    {subsection.label}
+                  </div>
+                  <SidebarMenuSub>
+                    {subsection.items.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = activeHref === item.href;
+
+                      return (
+                        <SidebarMenuSubItem key={item.href}>
+                          <SidebarMenuSubButton asChild isActive={isActive}>
+                            <Link href={item.href} onClick={onNavigate}>
+                              <Icon />
+                              <span className="min-w-0 flex-1 truncate">{item.title}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      );
+                    })}
+                  </SidebarMenuSub>
+                </SidebarMenuItem>
+              );
+            })}
           </SidebarMenu>
         </SidebarGroup>
       ))}

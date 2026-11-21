@@ -40,7 +40,7 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 | `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart (legacy PRD 003, diganti 011), event-calendar (baru, PRD 004), diff-viewer (baru, PRD 013), permission-matrix (baru, PRD 018) |
 | `feedback` | Status dan respons sistem | dialog, alert, alert-dialog, toast, toaster, empty-state, use-toast |
 | `navigation` | Navigasi dan pencarian | dropdown-menu, breadcrumb, pagination, command-palette, context-menu, navigation-menu |
-| `overlay` | Lapisan di atas konten | sheet, popover, hover-card |
+| `overlay` | Lapisan di atas konten | sheet, popover, hover-card, tour (baru, PRD 017) |
 | `layout` | Kerangka halaman | app-shell, page-header, page-shell, page-skeleton, container, section, prose, demo-section, resizable, skip-link |
 | `marketing` | Blok presentasi | hero, hero-band, feature-grid, faq, logo-cloud, carousel, cta-band, statement-card, art-background, grid-pattern, dot-pattern, glow-orb, stats-band, section-number, pricing, testimonial, gradient-text |
 | `dnd` | Drag and drop | sortable-list, tree-view, kanban |
@@ -81,7 +81,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Org Chart Studio | Editor + visualisasi hierarki satu komponen: kartu lega inline-edit via gagang `+`, drag reparent + dialog setara, undo/redo 50, search + auto-expand, pohon SR internal, state matrix 6 demo (composed, kategori `canvas` xyflow token-mapped); penyusun: org-chart-studio (baru), sheet, context-menu, tooltip, form, input, badge, avatar, skeleton, empty-state, alert, button, toast |
 | Mind Map | Peta ide radial ringan turunan org chart studio: root sentral + cabang dua sisi seimbang, tambah inline 1-klik, lipat cabang + hitungan tersembunyi (composed, kategori `canvas` xyflow token-mapped); penyusun: mind-map (baru), button, tooltip, skeleton, empty-state, alert, badge |
 | Permission Matrix | Grid otorisasi role × resource: toggle massal baris/kolom + indeterminate, sel terkunci beralasan, dirty + ringkasan (composed, kategori `data-display`); penyusun: permission-matrix (baru), checkbox (`base`), badge, skeleton, empty-state, alert, button, tooltip |
-| Product Tour | Highlight, step, dismiss |
+| Product Tour | Panduan langkah interaktif: spotlight + popover + progress, lewati anggun saat target hilang, keyboard + SR + reduced-motion (composed, kategori `overlay`); penyusun: tour (baru, wrapper driver.js token-first), popover, button, progress, alert-dialog (konfirmasi lewati), skeleton, empty-state, alert |
 | Results | Sukses/gagal, next action |
 | Rich Text Editor | Toolbar format + konten Prose + link popover + counter (composed, kategori `form`); penyusun: rich-text-editor (baru), button, tooltip, popover, dialog, input, badge, skeleton, empty-state, alert, kbd |
 | Settings | Section, form, save state |
