@@ -1,6 +1,6 @@
 # 017-03 — Showcase + audit + smoke
 
-Status: review
+Status: done
 PRD: `docs/prd/017-product-tour.md` (approved, gate 1)
 Design: `docs/design/wireframes/product-tour.md` (approved, gate 2, §1, §5–§7) + `docs/design/flows/product-tour.mmd` (diagram 4) + sitemap `S-005.20`
 FR: `FR-007`, `FR-008`, `FR-009`
