@@ -1,6 +1,6 @@
 # 011-04 — Cari, keyboard penuh, pohon SR, dan motion/sentuh
 
-Status: review
+Status: done
 PRD: `docs/prd/011-org-chart-studio.md`
 Design: `docs/design/org-chart-studio.md`
 FR: `FR-010`, `FR-011`, `FR-016`
