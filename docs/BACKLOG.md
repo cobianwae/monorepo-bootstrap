@@ -93,6 +93,9 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-031 | Mind Map: pakai Kbd dan Timeline, restyle resep (logika salin dipertahankan) | done | `docs/cr/cr-031-mind-map-komponen-ds-kbd-timeline-resep.md` |
 | CR-032 | Mind Map: section "Kapan dipakai" (opsional, konten baru) | done | `docs/cr/cr-032-mind-map-kapan-dipakai.md` |
 | CR-033 | Token: scope tema bersarang tidak me-resolve ulang `--color-*` (dark mode kanvas mind-map; dikerjakan lebih dulu) | done | `docs/cr/cr-033-token-scope-tema-bersarang.md` |
+| CR-034 | Aturan visual docs showcase (`visual-language.md`) + penyambungan ke AI (`instructions`, AGENTS, ARCHITECTURE, CONVENTIONS) + pagar guard | draft | `docs/cr/cr-034-aturan-visual-dan-penyambungan-ai.md` |
+| CR-035 | Seragamkan 7 halaman `foundations`: `SectionHeading`, teks mikro → `text-xs`, `primary` dekoratif → `highlight`, `SegmentedControl` | draft | `docs/cr/cr-035-seragamkan-halaman-foundations.md` |
+| CR-036 | Bug konten `foundations`: klaim WCAG dihitung, "3-step", demo durasi satu easing, label arah, "Play All", badge Ratio dark mode | draft | `docs/cr/cr-036-bug-konten-halaman-foundations.md` |
 
 ## Catatan
 
