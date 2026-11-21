@@ -84,6 +84,8 @@ export * from './components/data-display/bulk-action-bar';
 export * from './components/dnd/tree-view';
 export * from './components/data-display/timeline';
 export * from './components/data-display/description-list';
+export * from './components/data-display/permission-matrix-types';
+export * from './components/data-display/permission-matrix';
 export * from './components/form/segmented-control';
 export * from './components/overlay/hover-card';
 export * from './components/navigation/context-menu';
