@@ -63,7 +63,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 015-02 | Image cropper kontrol + pratinjau + keyboard + states | approved | `docs/stories/015-02-kontrol-pratinjau-keyboard-states.md` |
 | 015-03 | Image cropper showcase avatar + cover + audit + smoke | approved | `docs/stories/015-03-showcase-audit-smoke.md` |
 | 018-01 | Permission matrix fondasi grid + toggle + kunci | done | `docs/stories/018-01-fondasi-grid-toggle-kunci.md` |
-| 018-02 | Permission matrix keyboard + banner + states | review | `docs/stories/018-02-keyboard-banner-states.md` |
+| 018-02 | Permission matrix keyboard + banner + states | done | `docs/stories/018-02-keyboard-banner-states.md` |
 | 018-03 | Permission matrix showcase + audit + smoke | approved | `docs/stories/018-03-showcase-audit-smoke.md` |
 
 ## Change Requests

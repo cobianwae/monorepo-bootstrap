@@ -1,6 +1,6 @@
 # 018-02 — Keyboard + banner dirty + state matrix
 
-Status: review
+Status: done
 PRD: `docs/prd/018-permission-matrix.md` (approved, gate 1)
 Design: `docs/design/wireframes/permission-matrix.md` (approved, gate 2) + `docs/design/flows/permission-matrix.mmd` (diagram 3–4) + sitemap `S-005.41`
 FR: `FR-003`, `FR-005`, `FR-006`, `FR-007`
@@ -75,4 +75,4 @@ Goal: Grid bisa dipakai penuh tanpa mouse: navigasi roving + shortcut massal, ba
 
 - Audit kode/DOM meliputi role/label, live region, fokus, urutan DOM, sticky, token semantik, dan reduced motion.
 - Browser automation tidak tersedia (tool browser serta Playwright/Puppeteer tidak terpasang). Walkthrough Tab nyata, screen reader, sticky saat scroll, tampilan mobile/light/dark dan kontras permukaan komposit belum diverifikasi secara visual; test jsdom bukan penggantinya. Cek manual AC-01/AC-04 tetap menjadi catatan review, selaras audit showcase final 018-03.
-- Status tetap `review`; penetapan `done` hanya oleh user. Kegagalan baseline tidak diperbaiki di story ini.
+- User menyetujui dan menetapkan `done` pada 2026-11-21; keterbatasan audit manual di atas tetap dicatat untuk 018-03. Kegagalan baseline tidak diperbaiki di story ini.
