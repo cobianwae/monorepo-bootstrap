@@ -1,6 +1,6 @@
 # 005-05 — Undo/redo + toolbar pola
 
-Status: review
+Status: done
 PRD: `docs/prd/005-flow-editor.md`
 Design: `docs/design/flow-editor.md`
 FR: `FR-007`
