@@ -7,11 +7,19 @@ import { RECIPE } from './mind-map-demo-data';
 
 export function MindMapRecipe() {
   const [copied, setCopied] = React.useState('');
+  const resetTimeout = React.useRef<number | null>(null);
+
+  React.useEffect(() => () => {
+    if (resetTimeout.current !== null) window.clearTimeout(resetTimeout.current);
+  }, []);
 
   const copyRecipe = async () => {
+    if (resetTimeout.current !== null) window.clearTimeout(resetTimeout.current);
+    setCopied('');
     try {
       await navigator.clipboard.writeText(RECIPE);
       setCopied('Resep disalin');
+      resetTimeout.current = window.setTimeout(() => setCopied(''), 2000);
     } catch {
       setCopied('Tidak dapat menyalin. Pilih teks resep secara manual.');
     }
@@ -20,9 +28,14 @@ export function MindMapRecipe() {
   return (
     <section aria-labelledby="mind-recipe" className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 id="mind-recipe" className="text-lg font-semibold text-foreground">
-          Resep integrasi
-        </h2>
+        <div className="space-y-1">
+          <h2 id="mind-recipe" className="text-lg font-semibold text-foreground">
+            Resep integrasi
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Salin contoh ini untuk menghubungkan data dan pencarian di aplikasi konsumen.
+          </p>
+        </div>
         <Button type="button" variant="outline" size="sm" className="min-h-11" onClick={copyRecipe}>
           {copied === 'Resep disalin' ? (
             <Check className="h-4 w-4" aria-hidden="true" />
@@ -32,16 +45,18 @@ export function MindMapRecipe() {
           Salin resep
         </Button>
       </div>
-      <pre
-        tabIndex={0}
-        aria-label="Contoh kode integrasi MindMap"
-        className="overflow-x-auto rounded-lg border border-border bg-muted/40 p-4 font-mono text-xs leading-relaxed text-foreground"
-      >
-        <code>{RECIPE}</code>
-      </pre>
-      <p role="status" className="text-sm text-muted-foreground">
-        {copied}
-      </p>
+      <div>
+        <pre
+          tabIndex={0}
+          aria-label="Contoh kode integrasi MindMap"
+          className="overflow-x-auto rounded-lg border border-border bg-muted/40 p-4 font-mono text-xs leading-relaxed text-foreground"
+        >
+          <code>{RECIPE}</code>
+        </pre>
+        <p role="status" className={copied ? 'mt-2 text-sm text-muted-foreground' : 'sr-only'}>
+          {copied}
+        </p>
+      </div>
     </section>
   );
 }

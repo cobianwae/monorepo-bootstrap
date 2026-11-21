@@ -11,9 +11,14 @@ const SHORTCUTS: Array<{ keys: string; action: string }> = [
 export function MindMapShortcuts() {
   return (
     <section aria-labelledby="mind-keyboard" className="space-y-3">
-      <h2 id="mind-keyboard" className="text-lg font-semibold text-foreground">
-        Papan keyboard
-      </h2>
+      <div className="space-y-1">
+        <h2 id="mind-keyboard" className="text-lg font-semibold text-foreground">
+          Papan keyboard
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Fokuskan ide atau kanvas untuk menelusuri dan mengelola peta tanpa mouse.
+        </p>
+      </div>
       <dl className="grid gap-2 sm:grid-cols-2">
         {SHORTCUTS.map((row) => (
           <div key={row.keys} className="rounded-md border border-border bg-card p-3">

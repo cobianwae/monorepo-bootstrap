@@ -92,19 +92,6 @@ export default function MindMapPatternPage() {
         description="Ubah curah pendapat menjadi peta ide yang bisa dicari, dilipat, dan dikelola langsung di kanvas."
       />
 
-      <section aria-labelledby="mind-steps" className="space-y-2">
-        <h2 id="mind-steps" className="text-lg font-semibold text-foreground">
-          Alur brainstorming
-        </h2>
-        <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground marker:font-medium marker:text-foreground">
-          {STEPS.map((step) => (
-            <li key={step.title}>
-              <span className="font-medium text-foreground">{step.title}:</span> {step.detail}
-            </li>
-          ))}
-        </ol>
-      </section>
-
       <section
         aria-labelledby="mind-demo"
         data-theme="pulse"
@@ -143,6 +130,29 @@ export default function MindMapPatternPage() {
           minimap={minimap}
           searchSlot={searchSlot}
         />
+      </section>
+
+      <section aria-labelledby="mind-steps" className="space-y-3">
+        <div className="space-y-1">
+          <h2 id="mind-steps" className="text-lg font-semibold text-foreground">
+            Alur brainstorming
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Ikuti enam langkah ini untuk mengembangkan ide pusat menjadi rencana yang terstruktur.
+          </p>
+        </div>
+        <ol className="space-y-3">
+          {STEPS.map((step, index) => (
+            <li key={step.title} className="flex items-start gap-3 text-sm">
+              <span aria-hidden="true" className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium text-foreground">
+                {index + 1}
+              </span>
+              <p className="pt-0.5 text-muted-foreground">
+                <span className="font-medium text-foreground">{step.title}:</span> {step.detail}
+              </p>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <MindMapShortcuts />

@@ -14,6 +14,21 @@ beforeAll(() => {
 });
 
 describe('MindMapPatternPage (012-03)', () => {
+  it('menempatkan demo sebelum panduan dan menjaga label status saat memakai ikon', () => {
+    render(<MindMapPatternPage />);
+    expect(screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent)).toEqual([
+      'Demo interaktif', 'Alur brainstorming', 'Papan keyboard', 'Resep integrasi',
+    ]);
+    const panel = screen.getByRole('group', { name: 'Panel demo' });
+    expect(panel.className).toContain('divide-y');
+    expect(panel.className).not.toContain('bg-card');
+    const states = within(screen.getByRole('group', { name: 'Status demo' })).getAllByRole('button');
+    expect(states).toHaveLength(6);
+    for (const button of states) {
+      expect(button.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+    }
+  });
+
   it('enam langkah dan enam state demo, loading/empty/invalid/error tetap terjangkau', () => {
     const { container } = render(<MindMapPatternPage />);
     expect(container.querySelectorAll('ol > li')).toHaveLength(6);
