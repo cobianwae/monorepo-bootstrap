@@ -1,6 +1,6 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
-import { Tour } from './tour';
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, act, fireEvent } from '@testing-library/react';
+import { Tour, isTargetVisible } from './tour';
 
 const drive = vi.fn();
 const setSteps = vi.fn();
@@ -22,6 +22,19 @@ function fiveSteps() {
   }));
 }
 
+/** Target DOM nyata agar lolos cek visibilitas K4; lewati id yang ingin disembunyikan. */
+function renderTargets(ids: number[] = [1, 2, 3, 4, 5]) {
+  render(
+    <>
+      {ids.map((n) => (
+        <button key={n} id={`target-${n}`} type="button">
+          Target {n}
+        </button>
+      ))}
+    </>
+  );
+}
+
 function getPassedSteps() {
   return (setSteps.mock.calls[0] as unknown[])[0] as Array<{
     scrollIntoView?: unknown;
@@ -33,15 +46,39 @@ function getDriverConfig() {
   return (mockDriver.mock.calls[0] as unknown[])[0] as Record<string, unknown>;
 }
 
-describe('Tour (017-01)', () => {
+function nextAt(passedSteps: ReturnType<typeof getPassedSteps>, i: number) {
+  return passedSteps[i].popover?.onNextClick as (() => void) | undefined;
+}
+
+function closeAt(passedSteps: ReturnType<typeof getPassedSteps>, i: number) {
+  return passedSteps[i].popover?.onCloseClick as (() => void) | undefined;
+}
+
+const settle = () => act(async () => { await new Promise((r) => setTimeout(r, 250)); });
+
+function mockReducedMotion(matches: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: vi.fn().mockReturnValue({
+      matches,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }),
+  });
+}
+
+describe('Tour (017-01 fondasi)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     document.body.innerHTML = '';
   });
 
-  it('empty: tidak memanggil drive saat steps kosong', () => {
-    const { container } = render(<Tour steps={[]} open={true} />);
-    expect(container.firstChild).toBeNull();
+  it('empty: status + Mulai tur disabled, tanpa drive', () => {
+    render(<Tour steps={[]} open={true} />);
+    expect(screen.getByTestId('tour-empty').getAttribute('role')).toBe('status');
+    expect(screen.getByTestId('tour-empty').textContent).toContain('Belum ada langkah');
+    expect(screen.getByText('Mulai tur').hasAttribute('disabled')).toBe(true);
     expect(mockDriver).not.toHaveBeenCalled();
   });
 
@@ -51,7 +88,8 @@ describe('Tour (017-01)', () => {
     expect(mockDriver).not.toHaveBeenCalled();
   });
 
-  it('AC-01: 5 langkah dikirim ke driver + progress + microcopy Indonesia', () => {
+  it('AC-01: 5 langkah dikirim ke driver + progress + microcopy Indonesia', async () => {
+    renderTargets();
     render(<Tour steps={fiveSteps()} open={true} />);
     expect(mockDriver).toHaveBeenCalledTimes(1);
     expect(setSteps).toHaveBeenCalledTimes(1);
@@ -65,47 +103,46 @@ describe('Tour (017-01)', () => {
     expect(passedSteps[0].popover?.prevBtnText).toBe('Kembali');
     expect(passedSteps[0].popover?.showProgress).toBe(true);
     expect(drive).toHaveBeenCalledWith(0);
-    // Announcer SR menampilkan progress
+    await settle();
     expect(screen.getByTestId('tour-announcer').textContent).toContain('Langkah 1 dari 5');
   });
 
-  it('AC-01 coach tunggal: progress disembunyikan + primer Selesai', () => {
+  it('AC-01 coach tunggal: progress disembunyikan + primer Selesai', async () => {
+    renderTargets([1]);
     render(
-      <Tour steps={[{ id: 'solo', target: '#x', title: 'Solo', content: 'Satu' }]} open={true} />
+      <Tour steps={[{ id: 'solo', target: '#target-1', title: 'Solo', content: 'Satu' }]} open={true} />
     );
     const passedSteps = getPassedSteps();
     expect(passedSteps[0].popover?.showProgress).toBe(false);
     expect(passedSteps[0].popover?.nextBtnText).toBe('Selesai');
+    await settle();
     expect(screen.getByTestId('tour-announcer').textContent).not.toContain('dari');
   });
 
   it('AC-02: Kembali disabled di langkah 1 + scroll + flip config', () => {
+    renderTargets();
     render(<Tour steps={fiveSteps()} open={true} />);
     const passedSteps = getPassedSteps();
     expect(passedSteps[0].popover?.disableButtons).toContain('previous');
     expect(passedSteps[1].popover?.disableButtons).not.toContain('previous');
-    // scrollIntoView per langkah + smoothScroll config (flip via side undefined = auto)
     expect(passedSteps[0].scrollIntoView).toBeTruthy();
     expect(getDriverConfig().smoothScroll).toBe(true);
   });
 
-  it('AC-03: onFinish dipanggil tepat sekali dengan status lengkap', () => {
+  it('AC-03 lama: onFinish dipanggil tepat sekali dengan status lengkap', async () => {
     const onFinish = vi.fn();
+    renderTargets();
     render(<Tour steps={fiveSteps()} open={true} onFinish={onFinish} />);
     const passedSteps = getPassedSteps();
-    const nextAt = (i: number) =>
-      (passedSteps[i].popover?.onNextClick as (() => void) | undefined)?.bind(null);
-    // Maju 1→4
     act(() => {
-      nextAt(0)?.();
-      nextAt(1)?.();
-      nextAt(2)?.();
-      nextAt(3)?.();
+      nextAt(passedSteps, 0)?.();
+      nextAt(passedSteps, 1)?.();
+      nextAt(passedSteps, 2)?.();
+      nextAt(passedSteps, 3)?.();
     });
     expect(onFinish).not.toHaveBeenCalled();
-    // Selesai di langkah terakhir
     act(() => {
-      nextAt(4)?.();
+      nextAt(passedSteps, 4)?.();
     });
     expect(onFinish).toHaveBeenCalledTimes(1);
     const status = (onFinish.mock.calls[0] as unknown[])[0] as Array<{
@@ -115,25 +152,198 @@ describe('Tour (017-01)', () => {
     }>;
     expect(status).toHaveLength(5);
     expect(status.map((s) => s.id)).toEqual(['s1', 's2', 's3', 's4', 's5']);
-    // Panggil ulang tidak ganda (exactly-once)
     act(() => {
-      nextAt(4)?.();
+      nextAt(passedSteps, 4)?.();
     });
     expect(onFinish).toHaveBeenCalledTimes(1);
+    await settle();
+  });
+});
+
+describe('Tour 017-02 (target hilang + keyboard + motion + states)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    document.body.innerHTML = '';
   });
 
-  it('AC-03: onSkip dipanggil tepat sekali dengan atIndex', () => {
+  afterEach(() => {
+    // @ts-expect-error kembalikan default jsdom
+    delete window.matchMedia;
+  });
+
+  it('isTargetVisible: hilang, hidden, display-none vs terlihat', () => {
+    renderTargets([1, 2]);
+    expect(isTargetVisible('#tak-ada')).toBe(false);
+    expect(isTargetVisible('#target-1')).toBe(true);
+    const el = document.querySelector('#target-2') as HTMLElement;
+    el.setAttribute('hidden', '');
+    expect(isTargetVisible('#target-2')).toBe(false);
+    el.removeAttribute('hidden');
+    el.style.display = 'none';
+    expect(isTargetVisible('#target-2')).toBe(false);
+  });
+
+  it('AC-01: satu target hilang dilewati anggun + pemberitahuan', async () => {
+    const onStepChange = vi.fn();
+    renderTargets([1, 2, 4, 5]); // target-3 hilang
+    render(<Tour steps={fiveSteps()} open={true} onStepChange={onStepChange} />);
+    const passedSteps = getPassedSteps();
+    act(() => {
+      nextAt(passedSteps, 1)?.(); // Lanjut dari langkah 2 → lewati 3
+    });
+    expect(drive).toHaveBeenCalledWith(3);
+    await settle();
+    expect(screen.getByTestId('tour-announcer').textContent).toContain('Langkah 4 dari 5');
+    expect(screen.getByTestId('tour-announcer').textContent).toContain(
+      'Langkah 3 dilewati: target tidak ditemukan.'
+    );
+    const lastStatus = (onStepChange.mock.calls.at(-1) as unknown[])[1] as Array<{ id: string; result: string }>;
+    expect(lastStatus.find((s) => s.id === 's3')?.result).toBe('skipped-missing');
+  });
+
+  it('AC-01: semua target hilang → alert + fokus + Tutup tur', async () => {
     const onSkip = vi.fn();
+    const { container } = render(<Tour steps={fiveSteps()} open={true} onSkip={onSkip} />);
+    expect(mockDriver).not.toHaveBeenCalled();
+    const alert = screen.getByTestId('tour-error');
+    expect(alert.getAttribute('role')).toBe('alert');
+    expect(alert.textContent).toContain('Semua target tidak ditemukan');
+    expect(document.activeElement).toBe(alert);
+    expect(container.textContent).toContain('5 dari 5 target hilang');
+    act(() => {
+      fireEvent.click(screen.getByText('Tutup tur'));
+    });
+    expect(onSkip).toHaveBeenCalledTimes(1);
+    const status = (onSkip.mock.calls[0] as unknown[])[0] as Array<{ result: string }>;
+    expect(status.every((s) => s.result === 'skipped-missing')).toBe(true);
+    expect(screen.getByTestId('tour-success').getAttribute('role')).toBe('status');
+  });
+
+  it('AC-02: langkah 1 langsung lewati tanpa dialog', async () => {
+    const onSkip = vi.fn();
+    renderTargets();
     render(<Tour steps={fiveSteps()} open={true} onSkip={onSkip} />);
     const passedSteps = getPassedSteps();
     act(() => {
-      (passedSteps[0].popover?.onNextClick as (() => void) | undefined)?.();
-    });
-    act(() => {
-      (passedSteps[1].popover?.onCloseClick as (() => void) | undefined)?.();
+      closeAt(passedSteps, 0)?.();
     });
     expect(onSkip).toHaveBeenCalledTimes(1);
-    expect((onSkip.mock.calls[0] as unknown[])[1]).toBe(1);
-    expect((onSkip.mock.calls[0] as unknown[])[0] as unknown[]).toHaveLength(5);
+    expect((onSkip.mock.calls[0] as unknown[])[1]).toBe(0);
+    expect(screen.queryByTestId('tour-skip-dialog')).toBeNull();
+    await settle();
+  });
+
+  it('AC-02: progres > 1 → dialog; Esc kembali; Ya lewati sekali', async () => {
+    const onSkip = vi.fn();
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} onSkip={onSkip} />);
+    const passedSteps = getPassedSteps();
+    act(() => {
+      nextAt(passedSteps, 0)?.();
+      nextAt(passedSteps, 1)?.();
+    });
+    await settle();
+    act(() => {
+      closeAt(passedSteps, 2)?.();
+    });
+    expect(screen.getByTestId('tour-skip-dialog').textContent).toContain('Lewati tur?');
+    expect(onSkip).not.toHaveBeenCalled();
+    // Esc di dialog → kembali ke tur, tanpa lewati
+    act(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+    });
+    expect(onSkip).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('tour-skip-dialog')).toBeNull();
+    // Minta lewati lagi → konfirmasi → Ya, lewati
+    act(() => {
+      closeAt(passedSteps, 2)?.();
+    });
+    act(() => {
+      fireEvent.click(screen.getByText('Ya, lewati'));
+    });
+    expect(onSkip).toHaveBeenCalledTimes(1);
+    expect((onSkip.mock.calls[0] as unknown[])[1]).toBe(2);
+    await settle();
+  });
+
+  it('AC-03: Esc di langkah 1 → lewati + fokus kembali ke pemicu + success', async () => {
+    const onSkip = vi.fn();
+    render(<button data-testid="trigger" type="button">Mulai tur</button>);
+    renderTargets();
+    (screen.getByTestId('trigger') as HTMLElement).focus();
+    render(<Tour steps={fiveSteps()} open={true} onSkip={onSkip} />);
+    act(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+    });
+    expect(onSkip).toHaveBeenCalledTimes(1);
+    expect(document.activeElement).toBe(screen.getByTestId('trigger'));
+    expect(screen.getByTestId('tour-success').textContent).toContain('Tur dilewati.');
+    await settle();
+  });
+
+  it('AC-03: konten belakang inert saat tur aktif, pulih saat tutup', () => {
+    render(<div data-testid="bg">latar</div>);
+    renderTargets();
+    const tour = render(<Tour steps={fiveSteps()} open={true} />);
+    const bg = screen.getByTestId('bg').parentElement as HTMLElement;
+    expect(bg.getAttribute('inert')).not.toBeNull();
+    expect(bg.getAttribute('aria-hidden')).toBe('true');
+    tour.unmount();
+    expect(bg.getAttribute('inert')).toBeNull();
+  });
+
+  it('AC-03: Tab cycling di footer popover', async () => {
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} />);
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<div class="driver-popover"><div class="driver-popover-footer">' +
+        '<button id="pk" type="button">Kembali</button>' +
+        '<button id="pl" type="button">Lewati</button>' +
+        '<button id="pn" type="button">Lanjut</button></div></div>'
+    );
+    const first = document.querySelector('#pk') as HTMLElement;
+    const last = document.querySelector('#pn') as HTMLElement;
+    last.focus();
+    act(() => {
+      fireEvent.keyDown(last, { key: 'Tab' });
+    });
+    expect(document.activeElement).toBe(first);
+    first.focus();
+    act(() => {
+      fireEvent.keyDown(first, { key: 'Tab', shiftKey: true });
+    });
+    expect(document.activeElement).toBe(last);
+    await settle();
+  });
+
+  it('AC-04: reduced-motion → scroll auto + tanpa smooth', () => {
+    mockReducedMotion(true);
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} />);
+    expect(getDriverConfig().smoothScroll).toBe(false);
+    expect(getPassedSteps()[0].scrollIntoView).toEqual({ behavior: 'auto', block: 'center' });
+  });
+
+  it('AC-05: loading antar-langkah aria-busy + kontrol disabled singkat', async () => {
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} />);
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<div class="driver-popover"><div class="driver-popover-footer">' +
+        '<button id="qk" type="button">Kembali</button>' +
+        '<button id="qn" type="button">Lanjut</button></div></div>'
+    );
+    const passedSteps = getPassedSteps();
+    act(() => {
+      nextAt(passedSteps, 0)?.();
+    });
+    const announcer = screen.getByTestId('tour-announcer');
+    expect(announcer.getAttribute('aria-busy')).toBe('true');
+    expect(announcer.textContent).toContain('Memuat langkah…');
+    expect(document.querySelector('#qn')?.getAttribute('disabled')).not.toBeNull();
+    await settle();
+    expect(screen.getByTestId('tour-announcer').getAttribute('aria-busy')).toBeNull();
+    expect(document.querySelector('#qn')?.getAttribute('disabled')).toBeNull();
   });
 });
