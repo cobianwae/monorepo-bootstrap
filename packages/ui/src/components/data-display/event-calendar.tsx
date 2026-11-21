@@ -17,14 +17,15 @@ import {
   subWeeks,
   type Locale,
 } from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import type { DayProps } from 'react-day-picker';
 import { cn } from '../../lib/utils';
 import { Badge, badgeVariants } from '../base/badge';
 import { Button } from '../base/button';
 import { Calendar } from '../form/date-picker';
 import { SegmentedControl, SegmentedControlItem } from '../form/segmented-control';
-import { Popover, PopoverContent, PopoverTrigger } from '../overlay/popover';
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../overlay/popover';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../overlay/sheet';
 import type { VariantProps } from 'class-variance-authority';
 
 export type CalendarView = 'month' | 'week' | 'day' | 'agenda';
@@ -48,6 +49,12 @@ export interface CalendarSlot {
   allDay: boolean;
 }
 
+export interface EventDropInfo {
+  id: string;
+  start: Date;
+  end: Date;
+}
+
 export interface WorkingHours {
   start: string;
   end: string;
@@ -67,6 +74,11 @@ export interface EventCalendarProps {
   slotIntervalMinutes?: number;
   onSelectSlot?: (slot: CalendarSlot) => void;
   onSelectEvent?: (event: CalendarEvent) => void;
+  editable?: boolean;
+  onEventDrop?: (info: EventDropInfo) => void;
+  renderEvent?: (event: CalendarEvent) => React.ReactNode;
+  onAction?: (action: 'edit' | 'delete', event: CalendarEvent) => void;
+  renderEventActions?: (event: CalendarEvent) => React.ReactNode;
   ariaLabel?: string;
   className?: string;
 }
@@ -102,6 +114,7 @@ const DEFAULT_WORKING_HOURS: WorkingHours = { start: '08:00', end: '18:00' };
 const DEFAULT_SLOT_INTERVAL = 30;
 const MIN_SLOT_INTERVAL = 5;
 const MAX_SLOT_INTERVAL = 120;
+const MOVE_DAY_COUNT = 14;
 
 const DOT_CLASSES: Record<EventCategory, string> = {
   primary: 'bg-primary',
@@ -162,26 +175,88 @@ function dayKey(day: Date): string {
   return format(day, 'yyyy-MM-dd');
 }
 
-interface DaySegment {
-  event: CalendarEvent;
-  startMinute: number;
-  endMinute: number;
+function dateFromDayKey(key: string): Date {
+  const [year, month, day] = key.split('-').map(Number);
+  return new Date(year, month - 1, day);
 }
 
-function buildAllDayByDay(events: CalendarEvent[], days: Date[]): Map<string, CalendarEvent[]> {
+interface EventSegment {
+  event: CalendarEvent;
+  continuesBefore: boolean;
+  continuesAfter: boolean;
+}
+
+interface DaySegment extends EventSegment {
+  startMinute: number;
+  endMinute: number;
+  column: number;
+  columns: number;
+  conflictCount: number;
+}
+
+interface DragState {
+  event: CalendarEvent;
+  durationMinutes: number;
+}
+
+interface DragPreview {
+  key: string;
+  start: Date;
+  end: Date;
+}
+
+/** Pecah event menjadi satu segmen per hari kalender dengan penanda lanjutan. */
+function buildMonthSegments(events: CalendarEvent[]): Map<string, EventSegment[]> {
+  const map = new Map<string, EventSegment[]>();
+  for (const event of events) {
+    const end = clampEnd(event);
+    const lastMoment = end > event.start ? new Date(end.getTime() - 1) : event.start;
+    const firstDay = startOfDay(event.start);
+    const lastDay = startOfDay(lastMoment);
+    let cursor = firstDay;
+    while (cursor <= lastDay) {
+      const key = dayKey(cursor);
+      const list = map.get(key) ?? [];
+      list.push({
+        event,
+        continuesBefore: cursor.getTime() > firstDay.getTime(),
+        continuesAfter: cursor.getTime() < lastDay.getTime(),
+      });
+      map.set(key, list);
+      cursor = addDays(cursor, 1);
+    }
+  }
+  for (const [key, list] of map) {
+    map.set(
+      key,
+      [...list].sort((a, b) => {
+        if (Boolean(b.event.allDay) !== Boolean(a.event.allDay)) return b.event.allDay ? 1 : -1;
+        return a.event.start.getTime() - b.event.start.getTime();
+      })
+    );
+  }
+  return map;
+}
+
+function buildAllDayByDay(events: CalendarEvent[], days: Date[]): Map<string, EventSegment[]> {
   const visible = new Set(days.map(dayKey));
-  const map = new Map<string, CalendarEvent[]>();
+  const map = new Map<string, EventSegment[]>();
   for (const event of events) {
     if (!isAllDayEvent(event)) continue;
     const end = clampEnd(event);
     const lastMoment = end > event.start ? new Date(end.getTime() - 1) : event.start;
-    let cursor = startOfDay(event.start);
+    const firstDay = startOfDay(event.start);
     const lastDay = startOfDay(lastMoment);
+    let cursor = firstDay;
     while (cursor <= lastDay) {
       const key = dayKey(cursor);
       if (visible.has(key)) {
         const list = map.get(key) ?? [];
-        list.push(event);
+        list.push({
+          event,
+          continuesBefore: cursor.getTime() > firstDay.getTime(),
+          continuesAfter: cursor.getTime() < lastDay.getTime(),
+        });
         map.set(key, list);
       }
       cursor = addDays(cursor, 1);
@@ -190,10 +265,79 @@ function buildAllDayByDay(events: CalendarEvent[], days: Date[]): Map<string, Ca
   for (const [key, list] of map) {
     map.set(
       key,
-      [...list].sort((a, b) => a.start.getTime() - b.start.getTime())
+      [...list].sort((a, b) => a.event.start.getTime() - b.event.start.getTime())
     );
   }
   return map;
+}
+
+/**
+ * Layout interval-column: cluster event yang saling tumpang lalu bagi kolom sama lebar
+ * agar tidak ada event yang tertutup penuh.
+ */
+function layoutDaySegments(
+  segments: Omit<DaySegment, 'column' | 'columns' | 'conflictCount'>[]
+): DaySegment[] {
+  const sorted = [...segments].sort(
+    (a, b) => a.startMinute - b.startMinute || a.endMinute - b.endMinute
+  );
+  const result: DaySegment[] = [];
+  let cluster: typeof sorted = [];
+  let clusterEnd = -1;
+
+  const flush = () => {
+    if (cluster.length === 0) return;
+    const columnEnds: number[] = [];
+    const placed = cluster.map((segment) => {
+      let column = columnEnds.findIndex((end) => end <= segment.startMinute);
+      if (column === -1) {
+        columnEnds.push(segment.endMinute);
+        column = columnEnds.length - 1;
+      } else {
+        columnEnds[column] = segment.endMinute;
+      }
+      return { segment, column };
+    });
+    const columns = Math.max(1, columnEnds.length);
+    for (const { segment, column } of placed) {
+      result.push({ ...segment, column, columns, conflictCount: columns });
+    }
+    cluster = [];
+    clusterEnd = -1;
+  };
+
+  for (const segment of sorted) {
+    if (cluster.length > 0 && segment.startMinute >= clusterEnd) flush();
+    cluster.push(segment);
+    clusterEnd = Math.max(clusterEnd, segment.endMinute);
+  }
+  flush();
+  return result;
+}
+
+function buildDaySegments(events: CalendarEvent[], day: Date): DaySegment[] {
+  const dayStart = startOfDay(day);
+  const dayEnd = addDays(dayStart, 1);
+  const segments: Omit<DaySegment, 'column' | 'columns' | 'conflictCount'>[] = [];
+  for (const event of events) {
+    if (isAllDayEvent(event)) continue;
+    const end = clampEnd(event);
+    if (end <= event.start) continue;
+    const clippedStart = event.start < dayStart ? dayStart : event.start;
+    const clippedEnd = end > dayEnd ? dayEnd : end;
+    if (clippedEnd <= clippedStart) continue;
+    const startMinute = Math.max(0, differenceInMinutes(clippedStart, dayStart));
+    const endMinute = Math.min(MINUTES_PER_DAY, differenceInMinutes(clippedEnd, dayStart));
+    if (endMinute <= startMinute) continue;
+    segments.push({
+      event,
+      startMinute,
+      endMinute,
+      continuesBefore: event.start < dayStart,
+      continuesAfter: end > dayEnd,
+    });
+  }
+  return layoutDaySegments(segments);
 }
 
 function buildSegmentsBySlot(
@@ -203,57 +347,264 @@ function buildSegmentsBySlot(
 ): Map<string, DaySegment[]> {
   const map = new Map<string, DaySegment[]>();
   for (const day of days) {
-    const dayStart = startOfDay(day);
-    const dayEnd = addDays(dayStart, 1);
-    const key = dayKey(dayStart);
-    for (const event of events) {
-      if (isAllDayEvent(event)) continue;
-      const end = clampEnd(event);
-      if (end <= event.start) continue;
-      const clippedStart = event.start < dayStart ? dayStart : event.start;
-      const clippedEnd = end > dayEnd ? dayEnd : end;
-      if (clippedEnd <= clippedStart) continue;
-      const startMinute = Math.max(0, differenceInMinutes(clippedStart, dayStart));
-      const endMinute = Math.min(MINUTES_PER_DAY, differenceInMinutes(clippedEnd, dayStart));
-      if (endMinute <= startMinute) continue;
-      const slotMinute = Math.floor(startMinute / interval) * interval;
+    const key = dayKey(startOfDay(day));
+    for (const segment of buildDaySegments(events, day)) {
+      const slotMinute = Math.floor(segment.startMinute / interval) * interval;
       const slotKey = `${key}|${slotMinute}`;
       const list = map.get(slotKey) ?? [];
-      list.push({ event, startMinute, endMinute });
+      list.push(segment);
       map.set(slotKey, list);
     }
   }
   for (const [key, list] of map) {
     map.set(
       key,
-      [...list].sort((a, b) => a.startMinute - b.startMinute)
+      [...list].sort((a, b) => a.startMinute - b.startMinute || a.column - b.column)
     );
   }
   return map;
 }
 
-function EventChip({ event, locale }: { event: CalendarEvent; locale?: Locale }) {
-  const category = event.category ?? 'primary';
-  const detail = `${event.title}, ${eventTimeRange(event, locale)}`;
+function continuationLabel(segment: EventSegment): string {
+  const parts: string[] = [];
+  if (segment.continuesBefore) parts.push('berlanjut dari hari sebelumnya');
+  if (segment.continuesAfter) parts.push('berlanjut ke hari berikutnya');
+  return parts.length > 0 ? `, ${parts.join(', ')}` : '';
+}
+
+function continuationAttr(segment: EventSegment): string | undefined {
+  if (segment.continuesBefore && segment.continuesAfter) return 'both';
+  if (segment.continuesBefore) return 'before';
+  if (segment.continuesAfter) return 'after';
+  return undefined;
+}
+
+function ContinuationMarker({ direction, compact = false }: { direction: 'before' | 'after'; compact?: boolean }) {
   return (
-    <Badge
-      size="sm"
-      variant={CATEGORY_VARIANTS[category]}
-      data-category={category}
-      title={detail}
-      className="block w-full max-w-full min-w-0 justify-start gap-1.5 overflow-hidden rounded px-1.5 py-0.5 text-left"
-    >
-      <span className="shrink-0 font-mono text-[10px] opacity-90">{eventTimeRange(event, locale)}</span>
-      <span className="min-w-0 flex-1 truncate">{event.title}</span>
-    </Badge>
+    <span className={cn('inline-flex shrink-0 items-center gap-0.5', compact ? 'text-[9px]' : 'text-[10px]')}>
+      <span aria-hidden>{direction === 'before' ? '◂' : '▸'}</span>
+      {!compact && <span className="font-medium">lanjutan</span>}
+    </span>
   );
 }
 
-function DayOverflow({ events, day, locale }: { events: CalendarEvent[]; day: Date; locale?: Locale }) {
-  const extra = events.length - MAX_VISIBLE;
+function formatDetailRange(event: CalendarEvent, locale?: Locale): string {
+  if (isAllDayEvent(event)) {
+    return `${format(event.start, 'EEE d MMM yyyy', { locale })} · All day`;
+  }
+  const end = clampEnd(event);
+  if (isSameDay(event.start, end)) {
+    return `${format(event.start, 'EEE d MMM yyyy, HH:mm', { locale })}–${format(end, 'HH:mm', { locale })}`;
+  }
+  return `${format(event.start, 'd MMM yyyy, HH:mm', { locale })}–${format(end, 'd MMM yyyy, HH:mm', { locale })}`;
+}
+
+function useIsMobileDetail(): boolean {
+  const [isMobile, setIsMobile] = React.useState(false);
+  React.useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+    const query = window.matchMedia('(max-width: 767px)');
+    setIsMobile(query.matches);
+    const listener = (event: MediaQueryListEvent) => setIsMobile(event.matches);
+    query.addEventListener('change', listener);
+    return () => query.removeEventListener('change', listener);
+  }, []);
+  return isMobile;
+}
+
+function EventDetailBody({
+  event,
+  locale,
+  interval,
+  editable,
+  onAction,
+  renderEventActions,
+  onEventDrop,
+  onClose,
+}: {
+  event: CalendarEvent;
+  locale?: Locale;
+  interval: number;
+  editable?: boolean;
+  onAction?: (action: 'edit' | 'delete', event: CalendarEvent) => void;
+  renderEventActions?: (event: CalendarEvent) => React.ReactNode;
+  onEventDrop?: (info: EventDropInfo) => void;
+  onClose: () => void;
+}) {
+  const category = event.category ?? 'primary';
+  const durationMinutes = Math.max(interval, differenceInMinutes(clampEnd(event), event.start));
+  const [moveDay, setMoveDay] = React.useState<Date>(() => startOfDay(event.start));
+  const [moveMinute, setMoveMinute] = React.useState<number>(() =>
+    differenceInMinutes(event.start, startOfDay(event.start))
+  );
+
+  const dayOptions = React.useMemo(
+    () => Array.from({ length: MOVE_DAY_COUNT }, (_, index) => addDays(startOfDay(event.start), index)),
+    [event.start]
+  );
+  const minuteOptions = React.useMemo(() => {
+    const options: number[] = [];
+    for (let minute = 0; minute < MINUTES_PER_DAY; minute += interval) options.push(minute);
+    return options;
+  }, [interval]);
+
+  const canMove = Boolean(editable && onEventDrop);
+  const showActions = Boolean(renderEventActions || (editable && onAction));
+
+  const handleMove = () => {
+    if (!onEventDrop) return;
+    const start = addMinutes(startOfDay(moveDay), moveMinute);
+    onEventDrop({ id: event.id, start, end: addMinutes(start, durationMinutes) });
+    onClose();
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-foreground">{event.title}</p>
+          <p className="text-xs text-muted-foreground">{formatDetailRange(event, locale)}</p>
+        </div>
+        <Badge size="sm" variant={CATEGORY_VARIANTS[category]} data-category={category}>
+          {CATEGORY_LABELS[category]}
+        </Badge>
+      </div>
+
+      {event.location && (
+        <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+          <MapPin aria-hidden className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+          <span>{event.location}</span>
+        </p>
+      )}
+
+      {event.description && <p className="text-xs text-muted-foreground">{event.description}</p>}
+
+      {showActions && (
+        <div className="flex flex-wrap items-center gap-2">
+          {editable && onAction && (
+            <>
+              <Button type="button" size="sm" variant="outline" onClick={() => onAction('edit', event)}>
+                Edit
+              </Button>
+              <Button type="button" size="sm" variant="destructive" onClick={() => onAction('delete', event)}>
+                Delete
+              </Button>
+            </>
+          )}
+          {renderEventActions?.(event)}
+        </div>
+      )}
+
+      {canMove && (
+        <div className="space-y-2 border-t border-border pt-3">
+          <p className="text-xs font-semibold text-foreground">Move event</p>
+          <div role="group" aria-label="Move day" className="flex flex-wrap gap-1">
+            {dayOptions.map((day) => {
+              const selected = isSameDay(day, moveDay);
+              return (
+                <Button
+                  key={dayKey(day)}
+                  type="button"
+                  size="sm"
+                  variant={selected ? 'default' : 'outline'}
+                  aria-pressed={selected}
+                  className="h-7 px-2 text-[11px]"
+                  onClick={() => setMoveDay(day)}
+                >
+                  {format(day, 'EEE d', { locale })}
+                </Button>
+              );
+            })}
+          </div>
+          <div
+            role="group"
+            aria-label="Move time"
+            className="flex max-h-24 flex-wrap gap-1 overflow-y-auto pr-1"
+          >
+            {minuteOptions.map((minute) => {
+              const selected = minute === moveMinute;
+              return (
+                <Button
+                  key={minute}
+                  type="button"
+                  size="sm"
+                  variant={selected ? 'default' : 'outline'}
+                  aria-pressed={selected}
+                  className="h-6 px-1.5 font-mono text-[10px]"
+                  onClick={() => setMoveMinute(minute)}
+                >
+                  {format(addMinutes(startOfDay(event.start), minute), 'HH:mm')}
+                </Button>
+              );
+            })}
+          </div>
+          <Button type="button" size="sm" onClick={handleMove}>
+            Move to selected slot
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EventChip({
+  segment,
+  locale,
+  renderEvent,
+  onOpen,
+}: {
+  segment: EventSegment;
+  locale?: Locale;
+  renderEvent?: (event: CalendarEvent) => React.ReactNode;
+  onOpen: (event: CalendarEvent, anchor: HTMLElement | null) => void;
+}) {
+  const { event } = segment;
+  const category = event.category ?? 'primary';
+  const detail = `${event.title}, ${eventTimeRange(event, locale)}${continuationLabel(segment)}`;
+  return (
+    <button
+      type="button"
+      data-event-id={event.id}
+      data-category={category}
+      data-continuation={continuationAttr(segment)}
+      title={detail}
+      aria-label={detail}
+      onClick={(domEvent) => onOpen(event, domEvent.currentTarget)}
+      className={cn(
+        badgeVariants({ variant: CATEGORY_VARIANTS[category], size: 'sm' }),
+        'flex w-full max-w-full min-w-0 items-center justify-start gap-1 overflow-hidden rounded px-1.5 py-0.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+      )}
+    >
+      {segment.continuesBefore && <ContinuationMarker direction="before" compact />}
+      {renderEvent ? (
+        <span className="min-w-0 flex-1">{renderEvent(event)}</span>
+      ) : (
+        <>
+          <span className="shrink-0 font-mono text-[10px] opacity-90">{eventTimeRange(event, locale)}</span>
+          <span className="min-w-0 flex-1 truncate">{event.title}</span>
+        </>
+      )}
+      {segment.continuesAfter && <ContinuationMarker direction="after" compact />}
+    </button>
+  );
+}
+
+function DayOverflow({
+  segments,
+  day,
+  locale,
+  onOpen,
+}: {
+  segments: EventSegment[];
+  day: Date;
+  locale?: Locale;
+  onOpen: (event: CalendarEvent, anchor: HTMLElement | null) => void;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const extra = segments.length - MAX_VISIBLE;
   if (extra <= 0) return null;
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           type="button"
@@ -270,11 +621,29 @@ function DayOverflow({ events, day, locale }: { events: CalendarEvent[]; day: Da
           {format(day, 'EEEE, d MMMM yyyy', { locale })}
         </p>
         <ul className="space-y-1.5">
-          {events.map((e) => (
-            <li key={e.id} className="text-xs">
-              <span className={cn('mr-1.5 inline-block h-2 w-2 rounded-full align-middle', DOT_CLASSES[e.category ?? 'primary'])} />
-              <span className="font-mono text-[10px] text-muted-foreground">{eventTimeRange(e, locale)}</span>{' '}
-              <span className="text-foreground">{e.title}</span>
+          {segments.map((segment) => (
+            <li key={segment.event.id} className="text-xs">
+              <button
+                type="button"
+                className="inline-flex w-full items-center gap-1.5 rounded px-1 py-0.5 text-left hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                onClick={(domEvent) => {
+                  setOpen(false);
+                  onOpen(segment.event, domEvent.currentTarget);
+                }}
+              >
+                <span
+                  aria-hidden
+                  className={cn(
+                    'inline-block h-2 w-2 shrink-0 rounded-full',
+                    DOT_CLASSES[segment.event.category ?? 'primary']
+                  )}
+                />
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  {eventTimeRange(segment.event, locale)}
+                </span>{' '}
+                <span className="text-foreground">{segment.event.title}</span>
+                {segment.continuesAfter && <ContinuationMarker direction="after" compact />}
+              </button>
             </li>
           ))}
         </ul>
@@ -283,22 +652,39 @@ function DayOverflow({ events, day, locale }: { events: CalendarEvent[]; day: Da
   );
 }
 
-function AllDayChip({ event, onSelect }: { event: CalendarEvent; onSelect?: (event: CalendarEvent) => void }) {
+function AllDayChip({
+  segment,
+  renderEvent,
+  onOpen,
+}: {
+  segment: EventSegment;
+  renderEvent?: (event: CalendarEvent) => React.ReactNode;
+  onOpen: (event: CalendarEvent, anchor: HTMLElement | null) => void;
+}) {
+  const { event } = segment;
   const category = event.category ?? 'primary';
+  const label = `${event.title}, all day${continuationLabel(segment)}`;
   return (
     <button
       type="button"
       data-event-id={event.id}
       data-category={category}
-      title={`${event.title}, All day`}
-      aria-label={`${event.title}, all day`}
-      onClick={() => onSelect?.(event)}
+      data-continuation={continuationAttr(segment)}
+      title={label}
+      aria-label={label}
+      onClick={(domEvent) => onOpen(event, domEvent.currentTarget)}
       className={cn(
         badgeVariants({ variant: CATEGORY_VARIANTS[category], size: 'sm' }),
-        'flex w-full max-w-full min-w-0 justify-start overflow-hidden rounded px-1.5 py-0.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+        'flex w-full max-w-full min-w-0 items-center justify-start gap-1 overflow-hidden rounded px-1.5 py-0.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
       )}
     >
-      <span className="truncate">{event.title}</span>
+      {segment.continuesBefore && <ContinuationMarker direction="before" compact />}
+      {renderEvent ? (
+        <span className="min-w-0 flex-1">{renderEvent(event)}</span>
+      ) : (
+        <span className="truncate">{event.title}</span>
+      )}
+      {segment.continuesAfter && <ContinuationMarker direction="after" compact />}
     </button>
   );
 }
@@ -312,7 +698,11 @@ function TimeGrid({
   allDayByDay,
   segmentsBySlot,
   onSelectSlot,
-  onSelectEvent,
+  onOpen,
+  renderEvent,
+  editable,
+  dragPreview,
+  onEventPointerDown,
   ariaLabel,
 }: {
   days: Date[];
@@ -320,10 +710,14 @@ function TimeGrid({
   workingStart: number;
   workingEnd: number;
   interval: number;
-  allDayByDay: Map<string, CalendarEvent[]>;
+  allDayByDay: Map<string, EventSegment[]>;
   segmentsBySlot: Map<string, DaySegment[]>;
   onSelectSlot?: (slot: CalendarSlot) => void;
-  onSelectEvent?: (event: CalendarEvent) => void;
+  onOpen: (event: CalendarEvent, anchor: HTMLElement | null) => void;
+  renderEvent?: (event: CalendarEvent) => React.ReactNode;
+  editable?: boolean;
+  dragPreview: DragPreview | null;
+  onEventPointerDown: (event: CalendarEvent, domEvent: React.PointerEvent<HTMLElement>) => void;
   ariaLabel: string;
 }) {
   const slotHeight = Math.max(MIN_SLOT_HEIGHT, interval);
@@ -406,8 +800,13 @@ function TimeGrid({
                 isSameDay(day, today) && 'bg-accent/20'
               )}
             >
-              {dayAllDay.map((event) => (
-                <AllDayChip key={event.id} event={event} onSelect={onSelectEvent} />
+              {dayAllDay.map((segment) => (
+                <AllDayChip
+                  key={segment.event.id}
+                  segment={segment}
+                  renderEvent={renderEvent}
+                  onOpen={onOpen}
+                />
               ))}
             </div>
           );
@@ -452,6 +851,8 @@ function TimeGrid({
                   const slotStart = addMinutes(dayStart, minute);
                   const slotEnd = addMinutes(dayStart, Math.min(MINUTES_PER_DAY, minute + interval));
                   const slotLabel = `${format(day, 'EEEE', { locale })} ${format(slotStart, 'HH:mm')}–${format(slotEnd, 'HH:mm')}`;
+                  const conflictCount = segments.reduce((max, segment) => Math.max(max, segment.conflictCount), 1);
+                  const preview = dragPreview?.key === `${key}|${minute}` ? dragPreview : null;
                   return (
                     <div
                       key={key}
@@ -463,9 +864,9 @@ function TimeGrid({
                       data-working={isWorking ? 'true' : 'false'}
                       style={{ height: slotHeight }}
                       onClick={() => selectSlot(day, minute)}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
+                      onKeyDown={(domEvent) => {
+                        if (domEvent.key === 'Enter' || domEvent.key === ' ') {
+                          domEvent.preventDefault();
                           selectSlot(day, minute);
                         }
                       }}
@@ -476,35 +877,78 @@ function TimeGrid({
                         'hover:bg-accent/40 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring'
                       )}
                     >
+                      {conflictCount > 1 && (
+                        <span
+                          data-conflict-count={conflictCount}
+                          className="pointer-events-none absolute right-1 top-0.5 z-20 rounded bg-background/90 px-1 text-[9px] font-medium text-muted-foreground"
+                        >
+                          {conflictCount} bentrok
+                        </span>
+                      )}
                       {segments.map((segment) => {
                         const category = segment.event.category ?? 'primary';
                         const top = (segment.startMinute - minute) * pixelsPerMinute;
                         const height = Math.max(18, (segment.endMinute - segment.startMinute) * pixelsPerMinute);
+                        const widthPercent = 100 / segment.columns;
+                        const leftPercent = segment.column * widthPercent;
+                        const label = `${segment.event.title}, ${eventTimeRange(segment.event, locale)}${
+                          segment.conflictCount > 1 ? `, ${segment.conflictCount} bentrok` : ''
+                        }${continuationLabel(segment)}`;
                         return (
                           <button
                             key={`${segment.event.id}-${segment.startMinute}`}
                             type="button"
                             data-event-id={segment.event.id}
                             data-category={category}
-                            aria-label={`${segment.event.title}, ${eventTimeRange(segment.event, locale)}`}
-                            title={`${segment.event.title}, ${eventTimeRange(segment.event, locale)}`}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              onSelectEvent?.(segment.event);
+                            data-continuation={continuationAttr(segment)}
+                            data-conflict-count={segment.conflictCount > 1 ? segment.conflictCount : undefined}
+                            aria-label={label}
+                            title={label}
+                            onPointerDown={(domEvent) => onEventPointerDown(segment.event, domEvent)}
+                            onClick={(domEvent) => {
+                              domEvent.stopPropagation();
+                              onOpen(segment.event, domEvent.currentTarget);
                             }}
-                            style={{ top, height }}
+                            style={{
+                              top,
+                              height,
+                              left: `calc(${leftPercent}% + 2px)`,
+                              width: `calc(${widthPercent}% - 4px)`,
+                            }}
                             className={cn(
-                              'absolute left-0.5 right-0.5 z-10 overflow-hidden rounded border border-l-2 px-1 py-0.5 text-left text-[10px] leading-tight text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                              'absolute z-10 overflow-hidden rounded border border-l-2 px-1 py-0.5 text-left text-[10px] leading-tight text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                              editable && 'cursor-grab touch-none active:cursor-grabbing',
                               BLOCK_CLASSES[category]
                             )}
                           >
-                            <span className="block truncate font-medium">{segment.event.title}</span>
-                            <span className="block truncate font-mono text-muted-foreground">
-                              {eventTimeRange(segment.event, locale)}
-                            </span>
+                            {segment.continuesBefore && <ContinuationMarker direction="before" />}
+                            {renderEvent ? (
+                              <span className="block min-w-0">{renderEvent(segment.event)}</span>
+                            ) : (
+                              <>
+                                <span className="block truncate font-medium">{segment.event.title}</span>
+                                <span className="block truncate font-mono text-muted-foreground">
+                                  {eventTimeRange(segment.event, locale)}
+                                </span>
+                              </>
+                            )}
+                            {segment.continuesAfter && <ContinuationMarker direction="after" />}
                           </button>
                         );
                       })}
+                      {preview && (
+                        <div
+                          data-drag-preview
+                          aria-hidden
+                          style={{
+                            top: (differenceInMinutes(preview.start, dayStart) - minute) * pixelsPerMinute,
+                            height: Math.max(18, differenceInMinutes(preview.end, preview.start) * pixelsPerMinute),
+                          }}
+                          className="pointer-events-none absolute inset-x-1 z-20 rounded border-2 border-dashed border-primary bg-primary/20 px-1 py-0.5 font-mono text-[10px] text-primary"
+                        >
+                          {format(preview.start, 'HH:mm')}–{format(preview.end, 'HH:mm')}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -517,31 +961,12 @@ function TimeGrid({
   );
 }
 
-function buildEventsByDay(events: CalendarEvent[]): Map<string, CalendarEvent[]> {
-  const map = new Map<string, CalendarEvent[]>();
-  for (const event of events) {
-    const end = clampEnd(event);
-    const lastMoment = end > event.start ? new Date(end.getTime() - 1) : event.start;
-    let cursor = startOfDay(event.start);
-    const lastDay = startOfDay(lastMoment);
-    while (cursor <= lastDay) {
-      const key = format(cursor, 'yyyy-MM-dd');
-      const list = map.get(key) ?? [];
-      list.push(event);
-      map.set(key, list);
-      cursor = addDays(cursor, 1);
-    }
-  }
-  for (const [key, list] of map) {
-    map.set(key, [...list].sort((a, b) => {
-      if (Boolean(b.allDay) !== Boolean(a.allDay)) return b.allDay ? 1 : -1;
-      return a.start.getTime() - b.start.getTime();
-    }));
-  }
-  return map;
-}
-
-function periodLabel(view: CalendarView, date: Date, weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6, locale?: Locale): string {
+function periodLabel(
+  view: CalendarView,
+  date: Date,
+  weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6,
+  locale?: Locale
+): string {
   if (view === 'month' || view === 'agenda') return format(date, 'LLLL yyyy', { locale });
   if (view === 'week') {
     const start = startOfWeek(date, { weekStartsOn });
@@ -571,6 +996,11 @@ export function EventCalendar({
   slotIntervalMinutes,
   onSelectSlot,
   onSelectEvent,
+  editable = false,
+  onEventDrop,
+  renderEvent,
+  onAction,
+  renderEventActions,
   ariaLabel = 'Event calendar',
   className,
 }: EventCalendarProps) {
@@ -582,7 +1012,17 @@ export function EventCalendar({
   const [internalDate, setInternalDate] = React.useState<Date>(defaultDate ?? new Date());
   const activeDate = currentDate ?? internalDate;
 
-  const eventsByDay = React.useMemo(() => buildEventsByDay(events), [events]);
+  const monthSegments = React.useMemo(() => buildMonthSegments(events), [events]);
+  const isMobile = useIsMobileDetail();
+
+  const [selectedEvent, setSelectedEvent] = React.useState<CalendarEvent | null>(null);
+  const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
+  const anchorRef = React.useRef<HTMLElement | null>(null);
+
+  const [dragState, setDragState] = React.useState<DragState | null>(null);
+  const [dragPreview, setDragPreview] = React.useState<DragPreview | null>(null);
+  const dragPreviewRef = React.useRef<DragPreview | null>(null);
+  const suppressClickRef = React.useRef(false);
 
   const changeView = React.useCallback(
     (next: CalendarView) => {
@@ -600,17 +1040,106 @@ export function EventCalendar({
     [isDateControlled, onDateChange]
   );
 
+  const closeDetail = React.useCallback(() => {
+    const anchor = anchorRef.current;
+    setSelectedEvent(null);
+    setAnchorEl(null);
+    if (anchor) window.setTimeout(() => anchor.focus(), 0);
+  }, []);
+
+  const openDetail = React.useCallback(
+    (event: CalendarEvent, anchor: HTMLElement | null) => {
+      anchorRef.current = anchor;
+      setAnchorEl(anchor);
+      setSelectedEvent(event);
+      onSelectEvent?.(event);
+    },
+    [onSelectEvent]
+  );
+
+  const handleEventClick = React.useCallback(
+    (event: CalendarEvent, anchor: HTMLElement | null) => {
+      if (suppressClickRef.current) {
+        suppressClickRef.current = false;
+        return;
+      }
+      openDetail(event, anchor);
+    },
+    [openDetail]
+  );
+
+  const interval = React.useMemo(() => resolveSlotInterval(slotIntervalMinutes), [slotIntervalMinutes]);
+
+  const handleEventPointerDown = React.useCallback(
+    (event: CalendarEvent, domEvent: React.PointerEvent<HTMLElement>) => {
+      if (!editable || !onEventDrop || domEvent.button !== 0) return;
+      suppressClickRef.current = false;
+      const durationMinutes = Math.max(
+        interval,
+        differenceInMinutes(clampEnd(event), event.start)
+      );
+      setDragState({ event, durationMinutes });
+      dragPreviewRef.current = null;
+      setDragPreview(null);
+    },
+    [editable, onEventDrop, interval]
+  );
+
+  React.useEffect(() => {
+    if (!dragState) return;
+    const previewFor = (target: EventTarget | null): DragPreview | null => {
+      const element = target instanceof Element ? target : null;
+      const cell = element?.closest<HTMLElement>('[data-slot-minute][data-date]') ?? null;
+      if (!cell) return null;
+      const dateAttr = cell.getAttribute('data-date');
+      const minuteAttr = Number(cell.getAttribute('data-slot-minute'));
+      if (!dateAttr || !Number.isFinite(minuteAttr)) return null;
+      const start = addMinutes(dateFromDayKey(dateAttr), minuteAttr);
+      return {
+        key: `${dateAttr}|${minuteAttr}`,
+        start,
+        end: addMinutes(start, dragState.durationMinutes),
+      };
+    };
+
+    const handlePointerMove = (domEvent: PointerEvent) => {
+      const preview = previewFor(domEvent.target);
+      dragPreviewRef.current = preview;
+      setDragPreview(preview);
+    };
+
+    const finishDrag = () => {
+      const preview = dragPreviewRef.current;
+      if (preview && onEventDrop) {
+        suppressClickRef.current = true;
+        onEventDrop({ id: dragState.event.id, start: preview.start, end: preview.end });
+      }
+      dragPreviewRef.current = null;
+      setDragPreview(null);
+      setDragState(null);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', finishDrag);
+    window.addEventListener('pointercancel', finishDrag);
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', finishDrag);
+      window.removeEventListener('pointercancel', finishDrag);
+    };
+  }, [dragState, onEventDrop]);
+
   const MonthDayCell = React.useCallback(
     (props: DayProps) => {
       const { day, modifiers, children, className: cellClassName, ...rest } = props;
-      const dateKey = format(day.date, 'yyyy-MM-dd');
-      const dayEvents = eventsByDay.get(dateKey) ?? [];
-      const visible = dayEvents.slice(0, MAX_VISIBLE);
+      const dateKeyValue = format(day.date, 'yyyy-MM-dd');
+      const daySegments = monthSegments.get(dateKeyValue) ?? [];
+      const visible = daySegments.slice(0, MAX_VISIBLE);
       const isToday = isSameDay(day.date, new Date());
       return (
         <td
           {...rest}
-          data-date={dateKey}
+          data-date={dateKeyValue}
           className={cn(
             'min-h-24 min-w-0 flex-1 border-r border-t border-border/50 p-1 align-top last:border-r-0',
             modifiers.outside && 'bg-muted/20',
@@ -621,18 +1150,24 @@ export function EventCalendar({
           <div className="flex min-h-24 flex-col gap-1">
             <div className="flex items-start justify-between gap-1">
               <span className={cn('inline-flex', modifiers.outside && 'opacity-50')}>{children}</span>
-              <DayOverflow events={dayEvents} day={day.date} locale={locale} />
+              <DayOverflow segments={daySegments} day={day.date} locale={locale} onOpen={handleEventClick} />
             </div>
             <div className="flex flex-col gap-1">
-              {visible.map((e) => (
-                <EventChip key={e.id} event={e} locale={locale} />
+              {visible.map((segment) => (
+                <EventChip
+                  key={segment.event.id}
+                  segment={segment}
+                  locale={locale}
+                  renderEvent={renderEvent}
+                  onOpen={handleEventClick}
+                />
               ))}
             </div>
           </div>
         </td>
       );
     },
-    [eventsByDay, locale]
+    [monthSegments, locale, renderEvent, handleEventClick]
   );
 
   const monthComponents = React.useMemo(() => ({ Day: MonthDayCell }), [MonthDayCell]);
@@ -641,7 +1176,6 @@ export function EventCalendar({
     () => resolveWorkingMinutes(workingHours),
     [workingHours]
   );
-  const interval = React.useMemo(() => resolveSlotInterval(slotIntervalMinutes), [slotIntervalMinutes]);
 
   const days = React.useMemo(() => {
     if (activeView === 'day') return [startOfDay(activeDate)];
@@ -653,6 +1187,11 @@ export function EventCalendar({
   const segmentsBySlot = React.useMemo(
     () => buildSegmentsBySlot(events, days, interval),
     [events, days, interval]
+  );
+
+  const virtualAnchor = React.useMemo<React.RefObject<HTMLElement | null>>(
+    () => ({ current: anchorEl }),
+    [anchorEl]
   );
 
   return (
@@ -668,12 +1207,7 @@ export function EventCalendar({
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => changeDate(new Date())}
-          >
+          <Button type="button" variant="outline" size="sm" onClick={() => changeDate(new Date())}>
             Today
           </Button>
           <Button
@@ -755,8 +1289,12 @@ export function EventCalendar({
           allDayByDay={allDayByDay}
           segmentsBySlot={segmentsBySlot}
           onSelectSlot={onSelectSlot}
-          onSelectEvent={onSelectEvent}
-          ariaLabel={`${VIEW_LABELS[activeView]} time grid`}
+          onOpen={handleEventClick}
+          renderEvent={renderEvent}
+          editable={editable}
+          dragPreview={dragPreview}
+          onEventPointerDown={handleEventPointerDown}
+          ariaLabel={periodLabel(activeView, activeDate, weekStartsOn, locale)}
         />
       )}
 
@@ -765,6 +1303,52 @@ export function EventCalendar({
           <p className="text-sm font-medium text-foreground">{format(activeDate, 'LLLL yyyy', { locale })}</p>
           <p className="mt-1 text-sm text-muted-foreground">Agenda list layout follows in the next iteration.</p>
         </div>
+      )}
+
+      {selectedEvent && !isMobile && (
+        <Popover open onOpenChange={(next) => { if (!next) closeDetail(); }}>
+          <PopoverAnchor virtualRef={virtualAnchor} />
+          <PopoverContent
+            role="dialog"
+            aria-label={`Event detail: ${selectedEvent.title}`}
+            align="start"
+            className="w-80 space-y-3"
+          >
+            <EventDetailBody
+              key={selectedEvent.id}
+              event={selectedEvent}
+              locale={locale}
+              interval={interval}
+              editable={editable}
+              onAction={onAction}
+              renderEventActions={renderEventActions}
+              onEventDrop={onEventDrop}
+              onClose={closeDetail}
+            />
+          </PopoverContent>
+        </Popover>
+      )}
+
+      {selectedEvent && isMobile && (
+        <Sheet open onOpenChange={(next) => { if (!next) closeDetail(); }}>
+          <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle>Event detail</SheetTitle>
+              <SheetDescription>{selectedEvent.title}</SheetDescription>
+            </SheetHeader>
+            <EventDetailBody
+              key={selectedEvent.id}
+              event={selectedEvent}
+              locale={locale}
+              interval={interval}
+              editable={editable}
+              onAction={onAction}
+              renderEventActions={renderEventActions}
+              onEventDrop={onEventDrop}
+              onClose={closeDetail}
+            />
+          </SheetContent>
+        </Sheet>
       )}
     </section>
   );

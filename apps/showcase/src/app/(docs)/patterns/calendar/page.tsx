@@ -2,12 +2,13 @@
 
 import * as React from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight, FileText, MousePointerClick, UserRound } from 'lucide-react';
-import { PageHeader, Button, Card, CardContent } from '@ds/ui';
+import { PageHeader, Button, Card, CardContent, Switch } from '@ds/ui';
 import {
   EventCalendar,
   type CalendarEvent,
   type CalendarSlot,
   type CalendarView,
+  type EventDropInfo,
   type WorkingHours,
 } from '@ds/ui';
 import { format } from 'date-fns';
@@ -37,6 +38,14 @@ const DEMO_EVENTS: CalendarEvent[] = [
     start: new Date(2026, 10, 21, 10),
     end: new Date(2026, 10, 21, 11),
     category: 'info',
+  },
+  {
+    id: 'ops-sync',
+    title: 'Ops Sync',
+    start: new Date(2026, 10, 21, 10, 30),
+    end: new Date(2026, 10, 21, 11, 30),
+    category: 'warning',
+    location: 'Ruang 2',
   },
   {
     id: 'panel',
@@ -82,8 +91,12 @@ export default function CalendarPage() {
   const [date, setDate] = React.useState<Date>(DEMO_DATE);
   const [workingHours, setWorkingHours] = React.useState<WorkingHours>(WORKING_HOUR_OPTIONS[0].value);
   const [slotInterval, setSlotInterval] = React.useState(30);
+  const [events, setEvents] = React.useState<CalendarEvent[]>(DEMO_EVENTS);
+  const [editable, setEditable] = React.useState(true);
   const [lastSlot, setLastSlot] = React.useState<string | null>(null);
   const [lastEvent, setLastEvent] = React.useState<string | null>(null);
+  const [lastDrop, setLastDrop] = React.useState<string | null>(null);
+  const [lastAction, setLastAction] = React.useState<string | null>(null);
 
   const handleSelectSlot = (slot: CalendarSlot) => {
     setLastSlot(`${format(slot.start, 'EEE d MMM HH:mm')}–${format(slot.end, 'HH:mm')}`);
@@ -93,13 +106,28 @@ export default function CalendarPage() {
     setLastEvent(event.title);
   };
 
+  const handleEventDrop = ({ id, start, end }: EventDropInfo) => {
+    setEvents((previous) =>
+      previous.map((event) => (event.id === id ? { ...event, start, end } : event))
+    );
+    setLastDrop(`${id} → ${format(start, 'EEE d MMM HH:mm')}–${format(end, 'HH:mm')}`);
+  };
+
+  const handleAction = (action: 'edit' | 'delete', event: CalendarEvent) => {
+    setLastAction(`${action}: ${event.title}`);
+    if (action === 'delete') {
+      setEvents((previous) => previous.filter((item) => item.id !== event.id));
+      setLastEvent(null);
+    }
+  };
+
   return (
     <div className="animate-in fade-in-50 space-y-10 duration-200">
       <PageHeader
         eyebrow="UX Recipe Scenario"
         eyebrowIcon={CalendarDays}
         title="Calendar & Event Scheduling"
-        description="Declarative EventCalendar with toolbar navigation, month view, and a week/day time grid with all-day strip, configurable working hours, and empty-slot booking. Data is supplied by the scenario; the component never fetches on its own."
+        description="Declarative EventCalendar with toolbar navigation, month view, multi-day continuation segments, overlap columns, event detail (M-006), and pointer-based drag-and-drop. Data is supplied by the scenario; the component never fetches on its own."
       />
 
       <section className="space-y-3">
@@ -140,6 +168,18 @@ export default function CalendarPage() {
               ))}
             </div>
 
+            <div className="flex items-center gap-2">
+              <Switch
+                id="calendar-editable"
+                checked={editable}
+                onCheckedChange={setEditable}
+                aria-describedby="calendar-editable-hint"
+              />
+              <label htmlFor="calendar-editable" className="text-xs font-medium text-muted-foreground">
+                Editable
+              </label>
+            </div>
+
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-medium text-muted-foreground">Slot interval</span>
               {[30, 60].map((minutes) => (
@@ -157,15 +197,21 @@ export default function CalendarPage() {
 
             <p className="w-full text-sm text-muted-foreground">
               Demo state — view: {view} · date: {format(date, 'EEEE, d MMMM yyyy')} · working hours:{' '}
-              {workingHours.start}–{workingHours.end} · interval: {slotInterval} min
+              {workingHours.start}–{workingHours.end} · interval: {slotInterval} min · editable:{' '}
+              {editable ? 'on' : 'off'}
+            </p>
+            <p id="calendar-editable-hint" className="w-full text-xs text-muted-foreground">
+              Editable menyalakan drag-and-drop blok waktu dan aksi Edit/Delete di detail event. Matikan untuk
+              mode baca-saja; detail tetap dapat dibuka.
             </p>
             <p className="w-full text-sm text-muted-foreground" aria-live="polite">
-              Selected slot: {lastSlot ?? 'none yet'} · selected all-day event: {lastEvent ?? 'none yet'}
+              Selected slot: {lastSlot ?? 'none yet'} · selected event: {lastEvent ?? 'none yet'} · drop:{' '}
+              {lastDrop ?? 'none yet'} · action: {lastAction ?? 'none yet'}
             </p>
           </CardContent>
         </Card>
         <EventCalendar
-          events={DEMO_EVENTS}
+          events={events}
           view={view}
           onViewChange={setView}
           currentDate={date}
@@ -174,6 +220,9 @@ export default function CalendarPage() {
           slotIntervalMinutes={slotInterval}
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectEvent}
+          editable={editable}
+          onEventDrop={handleEventDrop}
+          onAction={handleAction}
         />
       </section>
 
@@ -195,7 +244,22 @@ export default function CalendarPage() {
             </li>
             <li>Working hours shade the off-hours area; slots stay visible and selectable so consumers can validate bookings.</li>
             <li>All-day events and full 24-hour events live in the strip above the time grid, never mixed with timed blocks.</li>
-            <li>Multi-day continuation markers, overlap columns, and event detail (M-006) arrive in the next iteration.</li>
+            <li>
+              Multi-day events render one segment per day in month cells and the all-day strip, with ▸/◂ glyphs and
+              screen-reader text instead of color alone.
+            </li>
+            <li>
+              Overlapping timed events share the column width equally and show an &quot;n bentrok&quot; indicator on the
+              slot; keyboard users can Tab to each event.
+            </li>
+            <li>
+              Event detail (M-006) opens as a desktop popover or mobile sheet. Escape closes it and returns focus to the
+              originating event.
+            </li>
+            <li>
+              With Editable on, drag a timed block to another slot for a live preview, or use the keyboard &quot;Move
+              to selected slot&quot; controls inside the detail panel. Both emit the same onEventDrop payload.
+            </li>
           </ul>
         </CardContent>
       </Card>

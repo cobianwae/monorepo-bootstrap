@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { addMonths } from 'date-fns';
 import { EventCalendar, type CalendarEvent } from './event-calendar';
 
@@ -293,5 +293,280 @@ describe('EventCalendar time grid', () => {
     fireEvent.click(chip);
     expect(onSelectEvent).toHaveBeenCalledTimes(1);
     expect((onSelectEvent.mock.calls[0][0] as CalendarEvent).id).toBe('off');
+  });
+});
+
+describe('EventCalendar multi-day segments', () => {
+  it('AC-01: event 3 hari tampil berurutan dengan penanda lanjutan di month', () => {
+    const { container } = render(
+      <EventCalendar events={EVENTS} defaultDate={CONTEXT_DATE} defaultView="month" />
+    );
+
+    const day19 = container.querySelector<HTMLElement>('[data-date="2026-11-19"]');
+    const day20 = container.querySelector<HTMLElement>('[data-date="2026-11-20"]');
+    const day21 = container.querySelector<HTMLElement>('[data-date="2026-11-21"]');
+
+    const first = within(day19 as HTMLElement).getByRole('button', { name: /Design Conference/ });
+    const middle = within(day20 as HTMLElement).getByRole('button', { name: /Design Conference/ });
+    const last = within(day21 as HTMLElement).getByRole('button', { name: /Design Conference/ });
+
+    expect(first.getAttribute('data-continuation')).toBe('after');
+    expect(middle.getAttribute('data-continuation')).toBe('both');
+    expect(last.getAttribute('data-continuation')).toBe('before');
+    expect(first.getAttribute('aria-label')).toContain('berlanjut ke hari berikutnya');
+    expect(middle.getAttribute('aria-label')).toContain('berlanjut dari hari sebelumnya');
+  });
+
+  it('AC-01: klik segmen mana pun mengirim payload event utuh', () => {
+    const onSelectEvent = vi.fn();
+    const { container } = render(
+      <EventCalendar
+        events={EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="month"
+        onSelectEvent={onSelectEvent}
+      />
+    );
+
+    const day20 = container.querySelector<HTMLElement>('[data-date="2026-11-20"]');
+    fireEvent.click(within(day20 as HTMLElement).getByRole('button', { name: /Design Conference/ }));
+
+    expect(onSelectEvent).toHaveBeenCalledTimes(1);
+    const payload = onSelectEvent.mock.calls[0][0] as CalendarEvent;
+    expect(payload.id).toBe('conf');
+    expect(payload.start.getDate()).toBe(19);
+    expect(payload.end.getDate()).toBe(21);
+    expect(payload.title).toBe('Design Conference');
+  });
+
+  it('AC-01: week dan day menampilkan segmen lanjutan bertanda teks', () => {
+    const week = render(<EventCalendar events={EVENTS} defaultDate={CONTEXT_DATE} defaultView="week" />);
+    const weekSegments = week.container.querySelectorAll('[data-allday-date] [data-event-id="conf"]');
+    expect(weekSegments.length).toBe(3);
+    expect(weekSegments[0].getAttribute('data-continuation')).toBe('after');
+    expect(weekSegments[1].getAttribute('data-continuation')).toBe('both');
+    expect(weekSegments[2].getAttribute('data-continuation')).toBe('before');
+    expect(weekSegments[0].getAttribute('aria-label')).toContain('berlanjut ke hari berikutnya');
+    expect(weekSegments[1].getAttribute('aria-label')).toContain('berlanjut dari hari sebelumnya');
+    week.unmount();
+
+    const day = render(<EventCalendar events={EVENTS} defaultDate={CONTEXT_DATE} defaultView="day" />);
+    const daySegment = day.container.querySelector('[data-allday-date] [data-event-id="conf"]');
+    expect(daySegment?.getAttribute('data-continuation')).toBe('before');
+  });
+});
+
+describe('EventCalendar overlap columns', () => {
+  const CONFLICT_EVENTS: CalendarEvent[] = [
+    { id: 'a', title: 'Rapat A', start: dayDate(21, 9), end: dayDate(21, 10), category: 'primary' },
+    { id: 'b', title: 'Rapat B', start: dayDate(21, 9), end: dayDate(21, 10), category: 'warning' },
+  ];
+
+  it('AC-02: dua event tumpang tampil berdampingan dengan indikator n bentrok', () => {
+    const { container } = render(
+      <EventCalendar events={CONFLICT_EVENTS} defaultDate={CONTEXT_DATE} defaultView="week" />
+    );
+
+    const a = container.querySelector<HTMLElement>('[data-event-id="a"]');
+    const b = container.querySelector<HTMLElement>('[data-event-id="b"]');
+    expect(a).not.toBeNull();
+    expect(b).not.toBeNull();
+    expect(a?.style.width).toBe('calc(50% - 4px)');
+    expect(b?.style.width).toBe('calc(50% - 4px)');
+    expect(a?.style.left).not.toBe(b?.style.left);
+    expect(container.querySelector('[data-conflict-count="2"]')).not.toBeNull();
+    expect(screen.getAllByText('2 bentrok').length).toBeGreaterThan(0);
+  });
+
+  it('AC-02: kedua event bentrok tetap fokusable dan membuka detail masing-masing', () => {
+    const onSelectEvent = vi.fn();
+    render(
+      <EventCalendar
+        events={CONFLICT_EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="week"
+        onSelectEvent={onSelectEvent}
+      />
+    );
+
+    const first = screen.getByRole('button', { name: /Rapat A/ });
+    const second = screen.getByRole('button', { name: /Rapat B/ });
+    expect(first.tabIndex).toBe(0);
+    expect(second.tabIndex).toBe(0);
+    first.focus();
+    expect(document.activeElement).toBe(first);
+
+    fireEvent.click(second);
+    expect(onSelectEvent).toHaveBeenCalledTimes(1);
+    expect((onSelectEvent.mock.calls[0][0] as CalendarEvent).id).toBe('b');
+  });
+});
+
+describe('EventCalendar event detail M-006', () => {
+  const DETAIL_EVENTS: CalendarEvent[] = [
+    {
+      id: 'review',
+      title: 'Design Review',
+      start: dayDate(21, 9),
+      end: dayDate(21, 10),
+      category: 'success',
+      location: 'Ruang A',
+      description: 'Review komponen calendar.',
+    },
+  ];
+
+  it('AC-03: klik event memanggil onSelectEvent dan membuka detail lengkap', async () => {
+    const onSelectEvent = vi.fn();
+    const { container } = render(
+      <EventCalendar
+        events={DETAIL_EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="month"
+        onSelectEvent={onSelectEvent}
+      />
+    );
+
+    const cell = container.querySelector<HTMLElement>('[data-date="2026-11-21"]') as HTMLElement;
+    const chip = within(cell).getByRole('button', { name: /Design Review/ });
+    fireEvent.click(chip);
+
+    expect(onSelectEvent).toHaveBeenCalledTimes(1);
+    const dialog = await screen.findByRole('dialog', { name: /Design Review/ });
+    expect(within(dialog).getByText('Ruang A')).toBeDefined();
+    expect(within(dialog).getByText('Review komponen calendar.')).toBeDefined();
+    expect(within(dialog).getByText('Success')).toBeDefined();
+    expect(within(dialog).getByText(/Sat 21 Nov 2026, 09:00–10:00/)).toBeDefined();
+  });
+
+  it('AC-03: aksi sekunder dipanggil dengan event yang benar dan Esc mengembalikan fokus', async () => {
+    const onAction = vi.fn();
+    const { container } = render(
+      <EventCalendar
+        events={DETAIL_EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="month"
+        editable
+        onAction={onAction}
+      />
+    );
+
+    const cell = container.querySelector<HTMLElement>('[data-date="2026-11-21"]') as HTMLElement;
+    const chip = within(cell).getByRole('button', { name: /Design Review/ });
+    fireEvent.click(chip);
+
+    const dialog = await screen.findByRole('dialog', { name: /Design Review/ });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Edit' }));
+    expect(onAction).toHaveBeenCalledWith('edit', expect.objectContaining({ id: 'review' }));
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Delete' }));
+    expect(onAction).toHaveBeenCalledWith('delete', expect.objectContaining({ id: 'review' }));
+
+    fireEvent.keyDown(dialog, { key: 'Escape', code: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    await waitFor(() => expect(document.activeElement).toBe(chip));
+  });
+
+  it('AC-03: renderEventActions menampilkan aksi custom konsumen', async () => {
+    const { container } = render(
+      <EventCalendar
+        events={DETAIL_EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="month"
+        renderEventActions={(event) => (
+          <button type="button">Custom action {event.id}</button>
+        )}
+      />
+    );
+
+    const cell = container.querySelector<HTMLElement>('[data-date="2026-11-21"]') as HTMLElement;
+    fireEvent.click(within(cell).getByRole('button', { name: /Design Review/ }));
+
+    const dialog = await screen.findByRole('dialog', { name: /Design Review/ });
+    expect(within(dialog).getByRole('button', { name: 'Custom action review' })).toBeDefined();
+  });
+});
+
+describe('EventCalendar drag and drop', () => {
+  function cell(container: HTMLElement, date: string, minute: number): HTMLElement {
+    return container.querySelector<HTMLElement>(
+      `[data-date="${date}"][data-slot-minute="${minute}"]`
+    ) as HTMLElement;
+  }
+
+  it('AC-04: drag menampilkan preview dan memanggil onEventDrop dengan rentang baru', async () => {
+    const onEventDrop = vi.fn();
+    const { container } = render(
+      <EventCalendar
+        events={EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="week"
+        editable
+        onEventDrop={onEventDrop}
+      />
+    );
+
+    const block = container.querySelector<HTMLElement>('[data-event-id="keynote"]') as HTMLElement;
+    const target = cell(container, '2026-11-20', 600);
+
+    fireEvent.pointerDown(block, { button: 0 });
+    fireEvent.pointerMove(target);
+    await waitFor(() => expect(target.querySelector('[data-drag-preview]')).not.toBeNull());
+
+    fireEvent.pointerUp(target);
+    expect(onEventDrop).toHaveBeenCalledTimes(1);
+    const info = onEventDrop.mock.calls[0][0] as { id: string; start: Date; end: Date };
+    expect(info.id).toBe('keynote');
+    expect(info.start.getDate()).toBe(20);
+    expect(info.start.getHours()).toBe(10);
+    expect(info.end.getHours()).toBe(11);
+  });
+
+  it('AC-04: tanpa editable drag tidak aktif', () => {
+    const onEventDrop = vi.fn();
+    const { container } = render(
+      <EventCalendar
+        events={EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="week"
+        onEventDrop={onEventDrop}
+      />
+    );
+
+    const block = container.querySelector<HTMLElement>('[data-event-id="keynote"]') as HTMLElement;
+    const target = cell(container, '2026-11-20', 600);
+
+    fireEvent.pointerDown(block, { button: 0 });
+    fireEvent.pointerMove(target);
+    fireEvent.pointerUp(target);
+    expect(onEventDrop).not.toHaveBeenCalled();
+    expect(target.querySelector('[data-drag-preview]')).toBeNull();
+  });
+
+  it('AC-04: menu Pindah… via keyboard menghasilkan onEventDrop yang sama', async () => {
+    const onEventDrop = vi.fn();
+    const { container } = render(
+      <EventCalendar
+        events={EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="week"
+        editable
+        onEventDrop={onEventDrop}
+      />
+    );
+
+    const block = container.querySelector<HTMLElement>('[data-event-id="keynote"]') as HTMLElement;
+    fireEvent.click(block);
+
+    const dialog = await screen.findByRole('dialog', { name: /Event detail: Keynote/ });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Sun 22' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: '10:00' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Move to selected slot' }));
+
+    expect(onEventDrop).toHaveBeenCalledTimes(1);
+    const info = onEventDrop.mock.calls[0][0] as { id: string; start: Date; end: Date };
+    expect(info.id).toBe('keynote');
+    expect(info.start.getDate()).toBe(22);
+    expect(info.start.getHours()).toBe(10);
+    expect(info.end.getHours()).toBe(11);
   });
 });

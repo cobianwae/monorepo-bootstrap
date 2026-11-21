@@ -1,6 +1,6 @@
 # 004-03 — Multi-hari + konflik overlap + detail event + DnD
 
-Status: todo
+Status: review
 PRD: `docs/prd/004-calendar-scheduler.md`
 Design: `docs/design/calendar-scheduler.md` (approved, gate 2)
 FR: `FR-003` (multi-hari), `FR-004`, `FR-005`, `FR-013` (could)
@@ -35,13 +35,13 @@ Goal: Menyelesaikan interaksi event — konferensi 3 hari berlanjut antar sel, b
 
 ## Tasks
 
-- [ ] Segmen multi-hari per hari kalender + penanda lanjutan (month chip, week/day blok absolut)
-- [ ] Algoritma interval-column konflik + indikator "n bentrok" + urutan Tab logis
-- [ ] M-006: popover desktop / dialog-sheet mobile + `renderEvent` + `onAction('edit'|'delete')` + focus-return
-- [ ] DnD internal (Pointer Events, gate `editable`) + menu "Pindah…" (dialog pilih hari + jam) + `onEventDrop`
-- [ ] Demo scenario: dataset konferensi 3 hari + 2 bentrok, toggle editable, mock handler log/toast
-- [ ] Test co-located: segmen multi-hari + payload utuh, overlap berdampingan + keduanya fokusable, `onSelectEvent`/`onAction`, `onEventDrop` drag + keyboard
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
+- [x] Segmen multi-hari per hari kalender + penanda lanjutan (month chip, week/day blok absolut)
+- [x] Algoritma interval-column konflik + indikator "n bentrok" + urutan Tab logis
+- [x] M-006: popover desktop / dialog-sheet mobile + `renderEvent` + `onAction('edit'|'delete')` + focus-return
+- [x] DnD internal (Pointer Events, gate `editable`) + menu "Pindah…" (dialog pilih hari + jam) + `onEventDrop`
+- [x] Demo scenario: dataset konferensi 3 hari + 2 bentrok, toggle editable, mock handler log/toast
+- [x] Test co-located: segmen multi-hari + payload utuh, overlap berdampingan + keduanya fokusable, `onSelectEvent`/`onAction`, `onEventDrop` drag + keyboard
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test`
 
 ## Dependencies
 
