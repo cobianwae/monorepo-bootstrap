@@ -10,7 +10,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
   FlowEditor,
@@ -22,7 +21,6 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-  SheetClose,
   Input,
   Label,
   Switch,
@@ -33,6 +31,7 @@ import {
   type FlowNode,
   type FlowEditorProps,
   type FlowPaletteItem,
+  type FlowStatus,
 } from '@ds/ui';
 
 type NodeChangeParam = NonNullable<FlowEditorProps['onNodesChange']> extends (changes: infer C) => void ? C : never;
@@ -70,6 +69,8 @@ export default function FlowEditorPage() {
   const gridSize = 16;
   const [draftTitle, setDraftTitle] = React.useState('');
   const [titleError, setTitleError] = React.useState(false);
+  // Id node hasil tambah (palet/drag/[+]); seleksi programatik dari id ini tidak membuka sheet (CR-019 #2).
+  const pendingAddIdRef = React.useRef<string | null>(null);
 
   // Deteksi layar kecil secara inline (pola existing di monorepo; matchMedia di-mock di test).
   const [isMobile, setIsMobile] = React.useState(false);
@@ -161,11 +162,78 @@ export default function FlowEditorPage() {
   }, [edges]);
 
   const handleSelectionChange = React.useCallback((selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => {
+    const total = selection.nodes.length + selection.edges.length;
+    // Seleksi eksplisit (klik/Enter/rincian/menu) membuka sheet; seleksi node hasil tambah tidak (FR-006, D7).
+    const isAddedNodeSelection =
+      selection.nodes.length === 1 && selection.edges.length === 0 && selection.nodes[0].id === pendingAddIdRef.current;
+    pendingAddIdRef.current = null;
+    if (total === 0 || isAddedNodeSelection) {
+      setSelected(null);
+      setDraftTitle('');
+      setTitleError(false);
+      return;
+    }
     setSelected(selection);
     if (selection.nodes.length === 1) setDraftTitle(selection.nodes[0].data.label);
     else setDraftTitle('');
     setTitleError(false);
   }, []);
+
+  // Tambah node dikendalikan halaman (controlled); id disimpan agar seleksi awalnya tidak membuka sheet.
+  const handleAddFromPalette = React.useCallback((item: FlowPaletteItem, position: { x: number; y: number }) => {
+    const id = `node-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    pendingAddIdRef.current = id;
+    setNodes((prev) => [
+      ...prev,
+      {
+        id,
+        type: item.type,
+        position,
+        data: { label: item.title, description: item.description, kind: item.type },
+        selected: true,
+      },
+    ]);
+  }, []);
+
+  // Perubahan node/edge dari inspector langsung ke canvas (live), tanpa menunggu tombol simpan.
+  const handlePatchNode = React.useCallback((id: string, patch: Partial<FlowNode['data']>) => {
+    setNodes((prev) => prev.map((n) => (n.id === id ? { ...n, data: { ...n.data, ...patch } } : n)));
+  }, []);
+
+  const handleEdgeLabel = React.useCallback((id: string, label: string) => {
+    setEdges((prev) => prev.map((e) => (e.id === id ? { ...e, label } : e)));
+  }, []);
+
+  const handleDuplicate = React.useCallback((node: FlowNode) => {
+    const copy: FlowNode = {
+      ...node,
+      id: `${node.id}-copy-${Date.now()}`,
+      position: { x: node.position.x + 40, y: node.position.y + 40 },
+      selected: false,
+      data: { ...node.data, label: `${node.data.label} (salinan)` },
+    };
+    setNodes((prev) => [...prev, copy]);
+    setSelected(null);
+    setDraftTitle('');
+    setTitleError(false);
+    void toast({ title: 'Diduplikasi', description: `${copy.data.label} ditambahkan ke kanvas.`, duration: 4000 });
+  }, []);
+
+  // Seleksi dibaca ulang dari state terbaru agar isi inspector tidak stale setelah diedit.
+  const liveSelection = React.useMemo(() => {
+    if (!selected) return null;
+    return {
+      nodes: selected.nodes.flatMap((n) => {
+        const live = nodes.find((x) => x.id === n.id);
+        return live ? [live] : [];
+      }),
+      edges: selected.edges.flatMap((e) => {
+        const live = edges.find((x) => x.id === e.id);
+        return live ? [live] : [];
+      }),
+    };
+  }, [selected, nodes, edges]);
+  const selectedCount = liveSelection ? liveSelection.nodes.length + liveSelection.edges.length : 0;
 
   const handleResetDemo = React.useCallback(() => {
     setNodes(initialNodes);
@@ -273,6 +341,7 @@ export default function FlowEditorPage() {
                 onConnect={handleConnect}
                 onSelectionChange={handleSelectionChange}
                 onDelete={handleDelete}
+                onAddFromPalette={handleAddFromPalette}
                 paletteItems={paletteItems}
                 loading={isLoading}
                 error={isError ? 'Gagal memuat flow dari server.' : null}
@@ -286,18 +355,17 @@ export default function FlowEditorPage() {
                 ariaLabel="Editor alur demonstrasi"
               />
             </CardContent>
-            {selected && (
-              <CardFooter className="flex flex-col gap-2 pt-2 border-t">
-                <CardTitle className="text-sm">Inspector (onSelectionChange)</CardTitle>
-                <InspectorSummary selection={selected} />
-              </CardFooter>
-            )}
+            {/* Satu sumber visual: panel inspector ada di sheet; di kartu hanya live region hitungan (CR-019 #5). */}
+            <div role="status" aria-live="polite" className="sr-only" data-testid="flow-selection-count">
+              {selectedCount > 0 ? `${selectedCount} terpilih` : ''}
+            </div>
           </Card>
         </section>
       </div>
 
       {/* Inspector on-demand — bottom-sheet di layar kecil (AC-05), sheet kanan di desktop. */}
-      <Sheet open={!!selected}>
+      {/* Tutup via X/Esc/overlay meng-clear seleksi dan mengembalikan fokus (CR-019 #1). */}
+      <Sheet open={!!liveSelection && selectedCount > 0} onOpenChange={(open) => { if (!open) handleCancel(); }}>
         <SheetTrigger asChild>
           {selected && (
             <Button variant="outline" size="sm" data-testid="flow-inspector-trigger">
@@ -310,19 +378,21 @@ export default function FlowEditorPage() {
           className={isMobile ? 'h-[60vh] max-h-[60vh]' : 'w-80'}
           data-testid="flow-inspector"
         >
-          {selected ? (
+          {liveSelection && selectedCount > 0 ? (
             <InspectorPanel
-              selection={selected}
+              selection={liveSelection}
               draftTitle={draftTitle}
               titleError={titleError}
               onChangeTitle={setDraftTitle}
               onBlurTitle={onBlurTitle}
               onSaveTitle={handleSaveTitle}
+              onPatchNode={handlePatchNode}
+              onChangeEdgeLabel={handleEdgeLabel}
+              onDuplicate={handleDuplicate}
               onDelete={handleDelete}
               onCancel={handleCancel}
             />
           ) : null}
-          <SheetClose />
         </SheetContent>
       </Sheet>
     </div>
@@ -333,29 +403,6 @@ export default function FlowEditorPage() {
 // InspectorSummary + InspectorPanel — komposisi inspector on-demand (story 005-04)
 // ---------------------------------------------------------------------------
 
-function InspectorSummary({ selection }: { selection: { nodes: FlowNode[]; edges: FlowEdge[] } }) {
-  const total = selection.nodes.length + selection.edges.length;
-  return (
-    <div className="text-xs text-muted-foreground space-y-1">
-      <div>
-        {selection.nodes.length > 0 || selection.edges.length > 0
-          ? `${total} terpilih (${selection.nodes.length} node, ${selection.edges.length} edge)`
-          : '—'}
-      </div>
-      {selection.nodes.length > 0 && (
-        <div className="truncate" title={selection.nodes.map((n) => n.data.label).join(', ')}>
-          Node: {selection.nodes.map((n) => n.data.label).join(', ')}
-        </div>
-      )}
-      {selection.edges.length > 0 && (
-        <div className="truncate" title={selection.edges.map((e) => `${e.source}→${e.target}`).join(', ')}>
-          Edge: {selection.edges.map((e) => `${e.source}→${e.target}`).join(', ')}
-        </div>
-      )}
-    </div>
-  );
-}
-
 type InspectorPanelProps = {
   selection: { nodes: FlowNode[]; edges: FlowEdge[] };
   draftTitle: string;
@@ -363,9 +410,20 @@ type InspectorPanelProps = {
   onChangeTitle: (value: string) => void;
   onBlurTitle: (value: string) => void;
   onSaveTitle: () => void;
+  onPatchNode: (id: string, patch: Partial<FlowNode['data']>) => void;
+  onChangeEdgeLabel: (id: string, label: string) => void;
+  onDuplicate: (node: FlowNode) => void;
   onDelete: (selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => void;
   onCancel: () => void;
 };
+
+const STATUS_OPTIONS: Array<{ value: FlowStatus; label: string }> = [
+  { value: 'default', label: 'Default' },
+  { value: 'running', label: 'Berjalan' },
+  { value: 'success', label: 'Sukses' },
+  { value: 'warning', label: 'Peringatan' },
+  { value: 'error', label: 'Gagal' },
+];
 
 function InspectorPanel({
   selection,
@@ -374,10 +432,13 @@ function InspectorPanel({
   onChangeTitle,
   onBlurTitle,
   onSaveTitle,
+  onPatchNode,
+  onChangeEdgeLabel,
+  onDuplicate,
   onDelete,
   onCancel,
 }: InspectorPanelProps) {
-  const isMulti = selection.nodes.length > 1 || selection.edges.length > 0;
+  const isMulti = selection.nodes.length + selection.edges.length > 1;
   const isSingleNode = selection.nodes.length === 1 && selection.edges.length === 0;
   const node = selection.nodes[0];
   const edge = selection.edges[0];
@@ -402,7 +463,7 @@ function InspectorPanel({
             ? 'Gunakan [Hapus semua] untuk menghapus atomik, atau [Batalkan seleksi].'
             : isSingleNode
               ? 'Ubah judul node. Judul tidak boleh kosong.'
-              : 'Properti edge (baca saja).'}
+              : 'Ubah label edge, atau hapus edge dari kanvas.'}
         </SheetDescription>
       </SheetHeader>
       <Separator />
@@ -441,6 +502,35 @@ function InspectorPanel({
               {titleError && <p className="text-xs text-destructive">Judul tidak boleh kosong.</p>}
             </div>
             <div className="space-y-1">
+              <Label htmlFor="flow-node-description" className="text-xs font-medium">Deskripsi</Label>
+              <Input
+                id="flow-node-description"
+                value={node?.data.description ?? ''}
+                onChange={(e) => node && onPatchNode(node.id, { description: e.target.value })}
+                className="text-xs"
+              />
+            </div>
+            <fieldset className="space-y-1">
+              <legend className="text-xs font-medium">Status</legend>
+              <div className="flex flex-wrap gap-1">
+                {STATUS_OPTIONS.map((opt) => {
+                  const active = (node?.data.status ?? 'default') === opt.value;
+                  return (
+                    <Button
+                      key={opt.value}
+                      type="button"
+                      variant={active ? 'default' : 'outline'}
+                      size="sm"
+                      aria-pressed={active}
+                      onClick={() => node && onPatchNode(node.id, { status: opt.value })}
+                    >
+                      {opt.label}
+                    </Button>
+                  );
+                })}
+              </div>
+            </fieldset>
+            <div className="space-y-1">
               <div className="text-xs font-medium">Posisi</div>
               <Input
                 readOnly
@@ -455,6 +545,9 @@ function InspectorPanel({
             <div className="flex items-center gap-2">
               <Button size="sm" onClick={onSaveTitle} disabled={titleError || draftTitle.trim().length === 0}>
                 Simpan
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => node && onDuplicate(node)}>
+                Duplikat
               </Button>
               <Button
                 variant="destructive"
@@ -485,8 +578,25 @@ function InspectorPanel({
               <Input readOnly value={`${edge?.source ?? '—'} → ${edge?.target ?? '—'}`} className="text-xs" />
             </div>
             <div className="space-y-1">
-              <div className="text-xs font-medium">Label</div>
-              <Input readOnly value={edge?.label ?? ''} className="text-xs" />
+              <Label htmlFor="flow-edge-label" className="text-xs font-medium">Label</Label>
+              <Input
+                id="flow-edge-label"
+                value={edge?.label ?? ''}
+                onChange={(e) => edge && onChangeEdgeLabel(edge.id, e.target.value)}
+                className="text-xs"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  if (edge) onDelete({ nodes: [], edges: [edge] });
+                  onCancel();
+                }}
+              >
+                Hapus edge
+              </Button>
             </div>
           </>
         )}
