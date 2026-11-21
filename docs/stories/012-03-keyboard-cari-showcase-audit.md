@@ -1,6 +1,6 @@
 # 012-03 — Keyboard + cari + states + showcase audit
 
-Status: review
+Status: done
 PRD: `docs/prd/012-mind-map.md` (revisi OQ#2/OQ#3 2026-11-21)
 Design: `docs/design/wireframes/mind-map.md` + `docs/design/flows/mind-map.mmd`
 FR: `FR-005`, `FR-007`, `FR-008`, `FR-009`
@@ -39,7 +39,7 @@ Goal: Mind map layak-pakai — keyboard penuh + pohon SR, search auto-expand, st
 - [x] Search presentasional (`highlightedIds` + reuse `getAncestors` + auto-expand via `onExpandedChange`)
 - [x] State matrix §4 (loading skeleton, empty CTA, invalid + salin detail, eksternal alert)
 - [x] Showcase `/patterns/mind-map` S-005.35: contoh Q1 + 50 node, `ol` 6 langkah, panel 6 state, resep integrasi 15 baris, papan keyboard + catatan a11y
-- [ ] Audit kontras light & dark + smoke build; catat tabel audit
+- [x] Audit kontras light & dark + smoke build; catat tabel audit
 - [x] Test co-located (keyboard map, SR roles, search expand, 6 states)
 
 ## Dependencies
@@ -86,6 +86,7 @@ di `@ds/tokens`; nilai warna mengikuti definisi tema, bukan warna inline kompone
 - `pnpm test`: default paralel menghasilkan 7 timeout (FlowEditor, OrgChartEditor, FileManager, PermissionMatrix) + satu timeout RPC worker. Tanpa perubahan konfigurasi, `pnpm --filter @ds/ui exec vitest run --maxWorkers=2 --testTimeout=30000` hijau **674/674** termasuk **43 MindMap**; batas undo MindMap juga lulus ulang (2.16 detik). Smoke RTE yang sebelumnya tercatat gagal kini lulus pada run ini, tidak diubah.
 - `pnpm --filter @ds/showcase exec vitest run --maxWorkers=2 --testTimeout=30000`: **64/64**, termasuk tiga scenario MindMap (six states, pencarian/ekspansi/toggle, 50 node/mode/minimap).
 - `pnpm test:tokens`: **8/8** hijau. Audit Pulse juga diuji co-located pada test MindMap.
-- `pnpm -C apps/showcase build`: **terblokir**, error `next/font` Google loader (`Cannot read properties of null (reading '1')`, `loader.js:122`) pada IBM Plex di `src/app/layout.tsx` yang tidak disentuh. Tidak mengganti font/config/dependency di luar scope. Task audit/smoke dibiarkan belum tercentang karena build produksi belum hijau; perlu verifikasi ulang sebelum acceptance final.
+- `pnpm -C apps/showcase build`: run awal terblokir error `next/font` Google loader (`Cannot read properties of null (reading '1')`, `loader.js:122`) pada IBM Plex di layout yang tidak disentuh. Run ulang setelah sinkron dengan `origin/dev` `3e4a2a7` **hijau**, 76 halaman termasuk `/patterns/mind-map`. Tanpa mengganti font/config/dependency; task audit/smoke sudah lengkap.
 - Warning test non-fatal: `act(...)` saat penutupan dialog MindMap/RTE, ukuran chart jsdom nol, posisi ContextMenu sebelum interaksi.
-- Status `review`, bukan `done`; persetujuan akhir user, smoke build, dan validasi browser/SR masih terbuka. Sitemap tetap `in-design`, PRD tidak diubah menjadi shipped.
+- Status `done` atas approval user (2026-11-21), termasuk izin push branch, merge ke `dev`, dan push `dev`. Smoke build lulus ulang; validasi browser/SR tetap catatan review, bukan diklaim lulus. Sitemap tetap `in-design`, PRD tidak diubah menjadi shipped.
+- Verifikasi integrasi `origin/dev` `3e4a2a7`: lint hijau; root typecheck tetap 12 error FlowEditor (lokasi bergeser ke 706–753). Suite UI dua worker: **695/696** termasuk **43 MindMap** lulus; smoke RTE `rte-link-save` baris 543 kembali gagal (known issue, file RTE tidak disentuh). Showcase **64/64** lulus. Konflik hanya docs status/log, kedua riwayat dipertahankan.

@@ -56,7 +56,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.13 | Kanban | `/patterns/kanban` | implemented |
 | S-005.14 | Master Data | `/patterns/master-data` | implemented |
 | S-005.15 | Master Detail | `/patterns/master-detail` | implemented |
-| S-005.16 | Media Gallery | `/patterns/media-gallery` | implemented |
+| S-005.16 | Media Gallery (upgrade basis `overlay/lightbox` reusable, PRD 016) | `/patterns/media-gallery` | in-design |
 | S-005.17 | Notifications | `/patterns/notifications` | implemented |
 | S-005.18 | Onboarding | `/patterns/onboarding` | implemented |
 | S-005.19 | Optimistic Updates | `/patterns/optimistic-updates` | implemented |
@@ -76,7 +76,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.29.02 | Flow Editor — inspector properti (panel kanan/sheet) | `/patterns/flow-editor` (panel kanan) | implemented |
 | S-005.30 | Transfer List | `/patterns/transfer-list` | implemented |
 | S-005.31 | Cascader & Tree Select | `/patterns/cascader-tree-select` | implemented |
-| S-005.32 | Mention & Emoji | `/patterns/mention-emoji` | planned |
+| S-005.32 | Mention & Emoji | `/patterns/mention-emoji` | implemented |
 | S-005.33 | Org Chart Editor (legacy, diganti 011) | `/patterns/org-chart-editor` | deprecated |
 | S-005.34 | Org Chart Studio (PRD 011) | `/patterns/org-chart-studio` | implemented |
 | S-005.34.01 | Org Chart Studio — panel detail (inspector + tab pohon SR) | `/patterns/org-chart-studio` (panel kanan) | implemented |
@@ -122,6 +122,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | M-009 | Link editor (popover di desktop, dialog/sheet di mobile; sisip/edit/hapus + validasi URL) | S-005.22 | in-design |
 | M-010 | Sisip gambar via URL + alt text wajib (dialog; tanpa alt ditolak dengan pesan) | S-005.22 | in-design |
 | M-011 | Konfirmasi hapus mind map (hitungan turunan + proteksi root) | S-005.35 | in-design |
+| M-012 | Lightbox Gallery (overlay fullscreen prev/next + counter + strip thumbnail + zoom, basis `overlay/lightbox` reusable PRD 016) | S-005.16 | in-design |
 
 ## Route Groups
 

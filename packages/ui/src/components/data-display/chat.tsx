@@ -7,6 +7,17 @@ import { cn } from '../../lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../base/avatar';
 import { Button } from '../base/button';
 import { Textarea } from '../base/textarea';
+import { PopoverAnchor, Popover, PopoverContent } from '../overlay/popover';
+import {
+  ChatEmojiPicker,
+  ChatMentionList,
+  filterMentionCandidates,
+  getMentionQuery,
+  type ChatMentionCandidate,
+  type ChatMentionStatus,
+  type ChatMentionToken,
+  type MentionQuery,
+} from './chat-composer-tools';
 
 export const ChatContainer = React.forwardRef<
   HTMLDivElement,
@@ -266,11 +277,22 @@ ChatSuggestionList.displayName = 'ChatSuggestionList';
 export interface ChatComposerProps extends Omit<React.HTMLAttributes<HTMLFormElement>, 'onChange'> {
   value: string;
   onChange: (value: string) => void;
-  onSend: () => void;
+  /** Dipanggil saat kirim; `mentions` berisi token mention yang masih ada di teks. */
+  onSend: (mentions: ChatMentionToken[]) => void;
   placeholder?: string;
   disabled?: boolean;
   cannedResponses?: Array<{ label: string; text: string }>;
   onSelectCanned?: (text: string) => void;
+  /** Kandidat mention. Bila diisi, mengetik `@` membuka popover kandidat. */
+  candidates?: ChatMentionCandidate[];
+  /** Status kandidat: `loading`, `error`, atau `ready` (default). */
+  candidatesStatus?: ChatMentionStatus;
+  /** Dipanggil setiap query mention berubah; konsumen bisa mengambil kandidat. */
+  onMentionQuery?: (query: string) => void;
+  /** Dipanggil saat kandidat dipilih. */
+  onMention?: (token: ChatMentionToken) => void;
+  /** Tampilkan tombol emoji picker yang menyisip di posisi kursor. */
+  emojiPicker?: boolean;
 }
 
 export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>(
@@ -284,14 +306,130 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
       disabled = false,
       cannedResponses,
       onSelectCanned,
+      candidates,
+      candidatesStatus = 'ready',
+      onMentionQuery,
+      onMention,
+      emojiPicker = false,
       ...props
     },
     ref
   ) => {
+    const mentionsEnabled = candidates !== undefined;
+    const listId = React.useId();
+    const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+    const pendingCaret = React.useRef<number | null>(null);
+    const [mention, setMention] = React.useState<MentionQuery | null>(null);
+    const [closed, setClosed] = React.useState(false);
+    const [activeIndex, setActiveIndex] = React.useState(0);
+    const [mentionTokens, setMentionTokens] = React.useState<ChatMentionToken[]>([]);
+
+    const visibleCandidates = React.useMemo(
+      () => (mentionsEnabled ? filterMentionCandidates(candidates ?? [], mention?.query ?? '') : []),
+      [candidates, mention, mentionsEnabled]
+    );
+    const open = mentionsEnabled && mention !== null && !closed;
+    const hasOptions = open && candidatesStatus === 'ready' && visibleCandidates.length > 0;
+    const safeActiveIndex = Math.min(activeIndex, Math.max(visibleCandidates.length - 1, 0));
+    const activeDescendant = hasOptions
+      ? `${listId}-opt-${safeActiveIndex}`
+      : undefined;
+
+    // Pindahkan kursor setelah value berubah dari mention/emoji.
+    React.useLayoutEffect(() => {
+      const el = textareaRef.current;
+      const pos = pendingCaret.current;
+      if (el && pos !== null) {
+        el.setSelectionRange(pos, pos);
+        pendingCaret.current = null;
+      }
+    }, [value]);
+
+    // Buang token yang teksnya sudah dihapus (termasuk perubahan value dari konsumen).
+    React.useEffect(() => {
+      setMentionTokens((prev) => {
+        const next = prev.filter((t) => value.includes(`@${t.label}`));
+        return next.length === prev.length ? prev : next;
+      });
+    }, [value]);
+
+    const syncMention = (el: HTMLTextAreaElement, reopen: boolean) => {
+      if (!mentionsEnabled) return;
+      const found = getMentionQuery(el.value, el.selectionStart);
+      setMention(found);
+      if (reopen) setClosed(false);
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      onChange(e.target.value);
+      if (!mentionsEnabled) return;
+      const found = getMentionQuery(e.target.value, e.target.selectionStart);
+      setMention(found);
+      setClosed(false);
+      setActiveIndex(0);
+      if (found) onMentionQuery?.(found.query);
+    };
+
+    const selectCandidate = (candidate: ChatMentionCandidate) => {
+      if (!mention) return;
+      const next =
+        value.slice(0, mention.start) + `@${candidate.label} ` + value.slice(mention.end);
+      pendingCaret.current = mention.start + candidate.label.length + 2;
+      onChange(next);
+      setMention(null);
+      setMentionTokens((prev) =>
+        prev.some((t) => t.id === candidate.id)
+          ? prev
+          : [...prev, { id: candidate.id, label: candidate.label }]
+      );
+      onMention?.({ id: candidate.id, label: candidate.label });
+      textareaRef.current?.focus();
+    };
+
+    const insertEmoji = (emoji: string) => {
+      const el = textareaRef.current;
+      const start = el ? el.selectionStart : value.length;
+      const end = el ? el.selectionEnd : value.length;
+      onChange(value.slice(0, start) + emoji + value.slice(end));
+      pendingCaret.current = start + emoji.length;
+      el?.focus();
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       if (!value.trim() || disabled) return;
-      onSend();
+      onSend(mentionTokens);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (open && hasOptions) {
+        const count = visibleCandidates.length;
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          setActiveIndex((safeActiveIndex + 1) % count);
+          return;
+        }
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          setActiveIndex((safeActiveIndex - 1 + count) % count);
+          return;
+        }
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          const picked = visibleCandidates[safeActiveIndex];
+          if (picked) selectCandidate(picked);
+          return;
+        }
+      }
+      if (open && e.key === 'Escape') {
+        e.preventDefault();
+        setClosed(true);
+        return;
+      }
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSubmit(e);
+      }
     };
 
     return (
@@ -317,20 +455,68 @@ export const ChatComposer = React.forwardRef<HTMLFormElement, ChatComposerProps>
         )}
 
         <div className="flex gap-2 items-end">
-          <Textarea
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={placeholder}
-            rows={2}
-            disabled={disabled}
-            className="text-sm resize-none"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
+          {emojiPicker && (
+            <ChatEmojiPicker
+              disabled={disabled}
+              onPick={insertEmoji}
+              onRequestFocus={() => textareaRef.current?.focus()}
+            />
+          )}
+          <Popover
+            open={open}
+            onOpenChange={(next) => {
+              if (!next) setClosed(true);
             }}
-          />
+          >
+            <PopoverAnchor asChild>
+              <div className="relative flex-1 min-w-0">
+                <Textarea
+                  ref={textareaRef}
+                  value={value}
+                  onChange={handleChange}
+                  onClick={(e) => syncMention(e.currentTarget, false)}
+                  onKeyUp={(e) => {
+                    if (!['ArrowUp', 'ArrowDown', 'Enter', 'Escape'].includes(e.key)) {
+                      syncMention(e.currentTarget, false);
+                    }
+                  }}
+                  placeholder={placeholder}
+                  rows={2}
+                  disabled={disabled}
+                  className="text-sm resize-none"
+                  role={mentionsEnabled ? 'combobox' : undefined}
+                  aria-autocomplete={mentionsEnabled ? 'list' : undefined}
+                  aria-haspopup={mentionsEnabled ? 'listbox' : undefined}
+                  aria-expanded={mentionsEnabled ? open : undefined}
+                  aria-controls={hasOptions ? listId : undefined}
+                  aria-activedescendant={activeDescendant}
+                  onKeyDown={handleKeyDown}
+                />
+              </div>
+            </PopoverAnchor>
+            {mentionsEnabled && (
+              <PopoverContent
+                align="start"
+                side="top"
+                className="w-72 p-1"
+                onOpenAutoFocus={(e) => e.preventDefault()}
+                onCloseAutoFocus={(e) => e.preventDefault()}
+                onInteractOutside={(e) => {
+                  if (e.target === textareaRef.current) e.preventDefault();
+                }}
+              >
+                <ChatMentionList
+                  listId={listId}
+                  candidates={visibleCandidates}
+                  status={candidatesStatus}
+                  query={mention?.query ?? ''}
+                  activeIndex={safeActiveIndex}
+                  onActiveChange={setActiveIndex}
+                  onSelect={selectCandidate}
+                />
+              </PopoverContent>
+            )}
+          </Popover>
           <Button
             type="submit"
             size="sm"
