@@ -43,7 +43,10 @@ import {
   TooltipContent,
   Separator,
   toast,
+  RichTextEditor,
 } from '@ds/ui';
+
+const DRAFT_CONTENT = `<h2>Komponen baru RichTextEditor</h2><p>Draf 006-01: toolbar milik komponen dengan <strong>bold</strong>, <em>miring</em>, <u>garis bawah</u>, heading, list, dan kutipan.</p><ul><li>Satu tingkat bullet</li><li>Round-trip controlled</li></ul><blockquote><p>Undo/redo bawaan framework.</p></blockquote>`;
 
 const INITIAL_CONTENT = `<h2>Ship interfaces you're proud of</h2>
 <p>This document is rendered by a <strong>Tiptap</strong> editor styled with the design-system tokens. Everything you type here supports real-time formatting — try it.</p>
@@ -112,6 +115,8 @@ export default function RichTextEditorPage() {
   const [isMounted, setIsMounted] = React.useState(false);
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const [wordCount, setWordCount] = React.useState(0);
+  const [draftValue, setDraftValue] = React.useState(DRAFT_CONTENT);
+  const [draftWords, setDraftWords] = React.useState(0);
 
   React.useEffect(() => {
     const t = setTimeout(() => setIsMounted(true), 400);
@@ -198,6 +203,22 @@ export default function RichTextEditorPage() {
           </div>
         }
       />
+
+      <Card className="border-border">
+        <CardHeader className="pb-3 border-b border-border/60 bg-muted/10">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <FileText className="h-4 w-4 text-highlight" />
+            Draf komponen 006-01 — {draftWords} kata
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <RichTextEditor
+            value={draftValue}
+            onChange={setDraftValue}
+            onTextChange={(_text, stats) => setDraftWords(stats.words)}
+          />
+        </CardContent>
+      </Card>
 
       <Card className="border-border">
         <CardHeader className="pb-3 border-b border-border/60 bg-muted/10">

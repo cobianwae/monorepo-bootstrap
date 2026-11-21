@@ -91,4 +91,9 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 
 - 2026-11-21 — Story 005-04 seleksi + inspector on-demand + hapus atomik `done` (approved oleh user) dan di-merge ke `dev` — `005-04`.
 
-2026-11-21 — Story 005-04 seleksi + inspector on-demand + hapus atomik selesai verifikasi (typecheck, lint, test 32/32, test:tokens, showcase build hijau); flow-editor.tsx tambah prop `onDelete`, menu konteks node/edge/canvas label Indonesia via contextmenu event (Radix), hapus atomik node + edge menyentuh + toast 'Dihapus', live region hitungan seleksi, perbaiki stale-selection closure pada `handleDeleteMenuNode`; showcase inspector sheet multi/single + validasi judul; status `review` — `005-04`.
+- 2026-11-21 — Story 006-01 fondasi controlled + toolbar inline/blok + undo selesai (TipTap 3.30.1 promosi ke @ds/ui, 6 test hijau; typecheck/lint/test/test:tokens/showcase build hijau), status `review` — `006-01`.
+- 2026-11-21 — Story 006-01 `done` (approved oleh user) dan di-merge ke `dev` — `006-01`.
+- 2026-11-21 — Approve PRD 012–019 Wave 5 + RM-07 (gate 1): mind map, diff viewer, import wizard CSV, image cropper, lightbox/gallery, tour/coach marks, permission matrix, signature pad; semua tanpa dependency baru, screen S-005.35–S-005.42 diusulkan, OQ dibawa ke gate 2 — `012`, `013`, `014`, `015`, `016`, `017`, `018`, `019`.
+- 2026-11-21 — Nomor PRD 007–009 didokumentasikan sebagai reservasi seri story lightweight track (007-01, 008-01/008-02, 009-01); ID artefak imutabel, lubang tidak diisi ulang — `BACKLOG`.
+- 2026-11-21 — Approve story lightweight 007-01, 008-01, 008-02, 009-01 (gate 3): transfer list, cascader, tree select, mention + emoji; siap implementasi satu per satu — `007-01`, `008-01`, `008-02`, `009-01`.
+- 2026-11-21 — Revisi dependency PRD 012–019 ke pilihan pro/common (approved oleh user): 012 reuse `@xyflow/react`, 013 `diff` (jsdiff), 014 papaparse, 015 react-easy-crop, 016 yet-another-react-lightbox, 017 driver.js, 018 tetap custom disengaja, 019 signature_pad; OQ terkait dijawab, sisa OQ ke gate 2 — `012`, `013`, `014`, `015`, `016`, `017`, `018`, `019`.

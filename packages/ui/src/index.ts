@@ -75,6 +75,7 @@ export type {
 export * from './components/data-display/file-manager';
 export * from './components/data-display/data-table';
 export * from './components/form/filter-builder';
+export * from './components/form/rich-text-editor';
 export * from './components/data-display/bulk-action-bar';
 export * from './components/dnd/tree-view';
 export * from './components/data-display/timeline';

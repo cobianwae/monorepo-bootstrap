@@ -26,6 +26,14 @@ Hanya user yang boleh menetapkan `approved` dan `done`.
 | 006 | Rich text editor (roadmap RM-11) | approved | `docs/prd/006-rich-text-editor.md` |
 | 010 | Org chart editor — editable v2 reuse xyflow (revisi PRD 003) | approved (legacy, diganti 011) | `docs/prd/010-org-chart-editor.md` |
 | 011 | Org Chart Studio — bangun ulang profesional satu fitur (pengganti 003 + 010) | approved (gate 2) | `docs/prd/011-org-chart-studio.md` |
+| 012 | Mind map — turunan ringan kanvas org chart (roadmap RM-07) | approved | `docs/prd/012-mind-map.md` |
+| 013 | Diff viewer — code review & audit (roadmap RM-12) | approved | `docs/prd/013-diff-viewer.md` |
+| 014 | Import wizard CSV — column mapping + validasi (roadmap RM-13) | approved | `docs/prd/014-import-wizard.md` |
+| 015 | Image cropper — avatar/cover flow (roadmap RM-14) | approved | `docs/prd/015-image-cropper.md` |
+| 016 | Lightbox/gallery — melengkapi preview (roadmap RM-15) | approved | `docs/prd/016-lightbox-gallery.md` |
+| 017 | Tour/coach marks — onboarding reusable (roadmap RM-16) | approved | `docs/prd/017-product-tour.md` |
+| 018 | Permission/role matrix — grid role × resource (roadmap RM-17) | approved | `docs/prd/018-permission-matrix.md` |
+| 019 | Signature pad — persetujuan & consent (roadmap RM-18) | approved | `docs/prd/019-signature-pad.md` |
 
 ## Specs (lightweight track)
 
@@ -77,11 +85,15 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 005-04 | Flow editor seleksi + inspector on-demand + hapus | done | `docs/stories/005-04-seleksi-inspector-hapus.md` |
 | 005-05 | Flow editor undo/redo + toolbar pola | approved | `docs/stories/005-05-undo-redo-toolbar.md` |
 | 005-06 | Flow editor minimap + showcase + audit | approved | `docs/stories/005-06-minimap-showcase-audit.md` |
-| 006-01 | RTE fondasi controlled + toolbar inline/blok + undo | approved | `docs/stories/006-01-fondasi-toolbar-controlled.md` |
+| 006-01 | RTE fondasi controlled + toolbar inline/blok + undo | done | `docs/stories/006-01-fondasi-toolbar-controlled.md` |
 | 006-02 | RTE link M-009 + shortcut + keyboard penuh | approved | `docs/stories/006-02-link-shortcut-keyboard.md` |
 | 006-03 | RTE mode + counter + state matrix | approved | `docs/stories/006-03-mode-counter-states.md` |
 | 006-04 | RTE gambar M-010 + serializer markdown + slot mention | approved | `docs/stories/006-04-gambar-markdown-mention.md` |
 | 006-05 | RTE showcase final + audit kontras + smoke | approved | `docs/stories/006-05-showcase-audit-smoke.md` |
+| 007-01 | Transfer list assign role + showcase | approved | `docs/stories/007-01-transfer-list.md` |
+| 008-01 | Cascader alamat/kategori + showcase | approved | `docs/stories/008-01-cascader.md` |
+| 008-02 | Tree select compose tree-view + showcase | approved | `docs/stories/008-02-tree-select.md` |
+| 009-01 | Mention + emoji picker untuk chat + showcase | approved | `docs/stories/009-01-mention-emoji.md` |
 
 ## Change Requests
 
@@ -95,6 +107,9 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 
 ## Catatan
 
+- Nomor PRD 007–009 **sengaja tidak dipakai** — sudah direservasi sebagai ID seri
+  story lightweight track (007-01, 008-01/008-02, 009-01, lihat registry di bawah).
+  ID artefak bersifat imutabel; lubang penomoran tidak diisi ulang.
 - Jangan memuat `BACKLOG-ARCHIVE.md` secara penuh saat sesi; grep hanya baris aktif.
 - Setiap story/CR yang selesai di-tick di file, lalu status di tabel ini diperbarui.
 - Jika pekerjaan keluar dari scope story/CR, berhenti dan minta konfirmasi.

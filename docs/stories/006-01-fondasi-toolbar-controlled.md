@@ -1,6 +1,6 @@
 # 006-01 — Fondasi controlled + toolbar inline/blok + undo
 
-Status: approved
+Status: done
 PRD: `docs/prd/006-rich-text-editor.md`
 Design: `docs/design/rich-text-editor.md`
 FR: `FR-001`, `FR-002`, `FR-005`, `FR-010`, `FR-006`
@@ -41,11 +41,11 @@ Goal: `RichTextEditor` controlled hidup di `packages/ui` dengan toolbar inline/b
 
 ## Tasks
 
-- [ ] `RichTextEditor` di `packages/ui/src/components/form/rich-text-editor.tsx` + export `index.ts` (named): TipTap 3.30.1 (`StarterKit` heading 1–3 + `Underline` + `Link(openOnClick:false)` + `Placeholder`), tanpa `Highlight` v1
-- [ ] Toolbar milik komponen: `role=toolbar`, grup inline/blok/undo, `button` + `tooltip` + `separator`, `aria-pressed` live, `data-testid=rte-toolbar/rte-button-*/rte-content`
-- [ ] Kontrak `value/onChange/onTextChange/ariaLabel/className`; `useEditor` + `EditorContent`; sync luar→dalam hanya bila berbeda
-- [ ] Test: toggle inline aktif, transformasi blok, round-trip HTML, undo/redo, Tab + shortcut Ctrl+B/I/U, render SSR-safe
-- [ ] Showcase draf `/patterns/rich-text-editor` (final di 006-05): render komponen baru dengan dataset Prose minimal
+- [x] `RichTextEditor` di `packages/ui/src/components/form/rich-text-editor.tsx` + export `index.ts` (named): TipTap 3.30.1 (`StarterKit` heading 1–3 + `Underline` + `Link(openOnClick:false)` + `Placeholder`), tanpa `Highlight` v1
+- [x] Toolbar milik komponen: `role=toolbar`, grup inline/blok/undo, `button` + `tooltip` + `separator`, `aria-pressed` live, `data-testid=rte-toolbar/rte-button-*/rte-content`
+- [x] Kontrak `value/onChange/onTextChange/ariaLabel/className`; `useEditor` + `EditorContent`; sync luar→dalam hanya bila berbeda
+- [x] Test: toggle inline aktif, transformasi blok, round-trip HTML, undo/redo, Tab + shortcut Ctrl+B/I/U, render SSR-safe
+- [x] Showcase draf `/patterns/rich-text-editor` (final di 006-05): render komponen baru dengan dataset Prose minimal
 
 ## Dependencies
 
