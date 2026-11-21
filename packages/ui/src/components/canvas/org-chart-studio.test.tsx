@@ -162,7 +162,8 @@ describe('OrgChartStudio fondasi (011-01)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
     expect(mockZoomIn).toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Fit view' }));
-    expect(mockFitView).toHaveBeenCalledWith({ padding: 0.2 });
+    // 011-04: durasi zoom eksplisit (200 default; 0 saat reduced-motion).
+    expect(mockFitView).toHaveBeenCalledWith({ padding: 0.2, duration: 200 });
   });
 
   it('AC-04: keyboard + - 0 F memicu zoom yang sesuai', () => {
@@ -177,7 +178,7 @@ describe('OrgChartStudio fondasi (011-01)', () => {
     fireEvent.keyDown(canvasBox, { key: '0' });
     expect(mockSetViewport).toHaveBeenCalledWith({ x: 0, y: 0, zoom: 1 });
     fireEvent.keyDown(canvasBox, { key: 'f' });
-    expect(mockFitView).toHaveBeenCalledWith({ padding: 0.2 });
+    expect(mockFitView).toHaveBeenCalledWith({ padding: 0.2, duration: 200 });
   });
 
   it('AC-04: expand uncontrolled menyembunyikan subtree', () => {
@@ -611,5 +612,190 @@ describe('OrgChartStudio pindah/hapus/undo (011-03)', () => {
     expect(onChangeSpy).toHaveBeenCalledTimes(2);
     fireEvent.keyDown(app, { key: 'y', ctrlKey: true });
     expect(onChangeSpy).toHaveBeenCalledTimes(3);
+  });
+});
+
+describe('OrgChartStudio cari/keyboard/pohon SR/motion (011-04)', () => {
+  function SearchStudio({
+    highlight,
+    onExpandedChange,
+  }: {
+    highlight: string[];
+    onExpandedChange?: (ids: string[]) => void;
+  }) {
+    return (
+      <OrgChartStudio
+        data={flatData}
+        defaultExpandedIds={['cto']}
+        highlightedIds={highlight}
+        onExpandedChange={onExpandedChange}
+      />
+    );
+  }
+
+  it('AC-01: highlightedIds auto-expand ancestor + ring/ badge Cocok + garis putus + live region', () => {
+    const onExpandedChange = vi.fn();
+    const { container, rerender } = render(<SearchStudio highlight={['eng']} onExpandedChange={onExpandedChange} />);
+    // Ancestor cto yang collapsed otomatis dibuka.
+    expect(container.querySelector('[data-node-id="eng"]')).not.toBeNull();
+    expect(onExpandedChange).toHaveBeenCalledWith(expect.arrayContaining(['cto']));
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('1 hasil pencarian ditemukan.');
+    // Sorotan non-warna-saja: ring + badge Cocok + garis putus.
+    const eng = container.querySelector('[data-node-id="eng"]') as HTMLElement;
+    expect(eng.className).toContain('border-dashed');
+    expect(eng.querySelector('[data-testid="org-studio-highlight-chip"]')?.textContent).toBe('Cocok');
+    expect(screen.getByTestId('org-studio-sr-tree').textContent).toContain('Engineer (cocok)');
+    // Hapus query menghilangkan sorotan (collapse yang sudah terbuka tetap) + mengumumkan.
+    rerender(<SearchStudio highlight={[]} onExpandedChange={onExpandedChange} />);
+    expect(container.querySelector('[data-node-id="eng"]')).not.toBeNull();
+    expect(container.querySelector('[data-testid="org-studio-highlight-chip"]')).toBeNull();
+    expect((container.querySelector('[data-node-id="eng"]') as HTMLElement).className).not.toContain('border-dashed');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('Sorotan pencarian dihapus.');
+  });
+
+  it('AC-01: jumlah jamak diumumkan + edge ke node cocok bergaris putus primary', () => {
+    const { container } = render(<SearchStudio highlight={['cto', 'cfo', 'eng']} />);
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('3 hasil pencarian ditemukan.');
+    expect(container.querySelectorAll('[data-testid="org-studio-highlight-chip"]')).toHaveLength(3);
+    const normalized = normalizeStudioInput(flatData);
+    const edges = toStudioFlowEdges(
+      normalized,
+      new Set(['ceo', 'cto', 'cfo', 'eng']),
+      new Set(['eng']),
+    );
+    expect(edges.find((edge) => edge.id === 'cto>eng')?.style).toEqual({
+      strokeWidth: 1.5,
+      stroke: 'var(--primary)',
+      strokeDasharray: '5 4',
+    });
+    expect(edges.find((edge) => edge.id === 'ceo>cto')?.style).toEqual({
+      strokeWidth: 1,
+      stroke: 'var(--border)',
+    });
+  });
+
+  it('AC-02: F2 dan Ctrl+Enter memulai inline-edit + commit mengumumkan Diperbarui', () => {
+    const { container } = render(<OrgChartStudio data={flatData} />);
+    const ctoCard = container.querySelector('[data-node-id="cto"]') as HTMLElement;
+    fireEvent.keyDown(ctoCard, { key: 'F2' });
+    const input = container.querySelector('[data-testid="org-studio-inline-input-cto"]') as HTMLInputElement;
+    expect(input).not.toBeNull();
+    fireEvent.change(input, { target: { value: 'CTO Baru' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(container.querySelector('[data-node-id="cto"]')?.textContent).toContain('CTO Baru');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('Diperbarui');
+    const cfoCard = container.querySelector('[data-node-id="cfo"]') as HTMLElement;
+    fireEvent.keyDown(cfoCard, { key: 'Enter', ctrlKey: true });
+    expect(container.querySelector('[data-testid="org-studio-inline-input-cfo"]')).not.toBeNull();
+  });
+
+  it('AC-02: Space expand/collapse kartu + panah menggeser kanvas 40px (bukan dari kartu)', () => {
+    const { container } = render(<OrgChartStudio data={flatData} />);
+    expect(container.querySelector('[data-node-id="eng"]')).not.toBeNull();
+    const ctoCard = container.querySelector('[data-node-id="cto"]') as HTMLElement;
+    fireEvent.keyDown(ctoCard, { key: ' ' });
+    expect(container.querySelector('[data-node-id="eng"]')).toBeNull();
+    fireEvent.keyDown(ctoCard, { key: ' ' });
+    expect(container.querySelector('[data-node-id="eng"]')).not.toBeNull();
+    mockSetViewport.mockClear();
+    const viewport = screen.getByTestId('org-studio-viewport') as HTMLElement;
+    fireEvent.keyDown(viewport, { key: 'ArrowRight' });
+    expect(mockSetViewport).toHaveBeenCalledWith({ x: -40, y: 0, zoom: 1 });
+    fireEvent.keyDown(viewport, { key: 'ArrowUp' });
+    expect(mockSetViewport).toHaveBeenCalledWith({ x: 0, y: 40, zoom: 1 });
+    // Panah dari dalam kartu tidak menggeser kanvas.
+    fireEvent.keyDown(ctoCard, { key: 'ArrowRight' });
+    expect(mockSetViewport).toHaveBeenCalledTimes(2);
+  });
+
+  it('AC-02: ring fokus primary + hit-area kontrol/expand 44px', () => {
+    const { container } = render(<OrgChartStudio data={flatData} />);
+    const card = container.querySelector('[data-node-id="ceo"]') as HTMLElement;
+    expect(card.className).toContain('focus-visible:ring-primary');
+    const expandToggle = container.querySelector('[aria-label="Collapse CTO"]') as HTMLElement;
+    expect(expandToggle.className).toContain('h-11');
+    expect(expandToggle.className).toContain('w-11');
+    const controls = container.querySelector('[data-testid="org-studio-controls"]') as HTMLElement;
+    for (const button of Array.from(controls.querySelectorAll('button'))) {
+      expect(button.className).toContain('h-11');
+      expect(button.className).toContain('w-11');
+    }
+  });
+
+  it('AC-03: pohon SR internal setara visual — tree/treeitem/group + roving tabindex', () => {
+    const { container } = render(<OrgChartStudio data={flatData} />);
+    const tree = screen.getByTestId('org-studio-sr-tree');
+    expect(tree.getAttribute('role')).toBe('tree');
+    expect(container.querySelectorAll('[role="group"]')).not.toHaveLength(0);
+    const items = screen.getAllByTestId('org-studio-sr-item');
+    expect(items).toHaveLength(4);
+    expect(items.filter((el) => el.getAttribute('tabindex') === '0')).toHaveLength(1);
+    expect(container.querySelector('[data-sr-node-id="ceo"]')?.getAttribute('aria-level')).toBe('1');
+    expect(container.querySelector('[data-sr-node-id="eng"]')?.getAttribute('aria-level')).toBe('3');
+    // Navigasi panah memindahkan fokus, Home/End ke ujung.
+    (items[0] as HTMLElement).focus();
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'ArrowDown' });
+    expect(document.activeElement?.getAttribute('data-sr-node-id')).toBe('cto');
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'End' });
+    expect(document.activeElement?.getAttribute('data-sr-node-id')).toBe('cfo');
+    fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'Home' });
+    expect(document.activeElement?.getAttribute('data-sr-node-id')).toBe('ceo');
+    // Skip-link menuju pohon aksesibel.
+    const skip = screen.getByRole('link', { name: 'Lewati kanvas ke pohon aksesibel' });
+    expect(skip.getAttribute('href')).toBe(`#${tree.getAttribute('id')}`);
+  });
+
+  it('AC-03: semua operasi visual tersedia via tombol pohon SR', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(
+      <OrgChartStudio
+        data={flatData}
+        onChange={(next) => {
+          onChangeSpy(next);
+        }}
+      />,
+    );
+    // Perluas/ciutkan.
+    fireEvent.click(screen.getByTestId('org-studio-sr-toggle-cto'));
+    expect(container.querySelector('[data-node-id="eng"]')).toBeNull();
+    fireEvent.click(screen.getByTestId('org-studio-sr-toggle-cto'));
+    expect(container.querySelector('[data-node-id="eng"]')).not.toBeNull();
+    // Tambah bawahan + edit via SR.
+    fireEvent.click(screen.getByTestId('org-studio-sr-add-child-cfo'));
+    expect(container.querySelector('[data-testid="org-studio-inline-input-studio-baru-1"]')).not.toBeNull();
+    fireEvent.keyDown(
+      container.querySelector('[data-testid="org-studio-inline-input-studio-baru-1"]') as HTMLElement,
+      { key: 'Escape' },
+    );
+    fireEvent.click(screen.getByTestId('org-studio-sr-edit-cto'));
+    expect(container.querySelector('[data-testid="org-studio-inline-input-cto"]')).not.toBeNull();
+    fireEvent.keyDown(container.querySelector('[data-testid="org-studio-inline-input-cto"]') as HTMLElement, {
+      key: 'Escape',
+    });
+    // Pindah + hapus via SR membuka dialog setara keyboard.
+    fireEvent.click(screen.getByTestId('org-studio-sr-move-cfo'));
+    expect(screen.getByTestId('org-studio-move-confirm')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Batal' }));
+    fireEvent.click(screen.getByTestId('org-studio-sr-delete-cfo'));
+    expect(screen.getByTestId('org-studio-delete-confirm')).not.toBeNull();
+    expect(onChangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('AC-04: reduced-motion menolkan durasi zoom', () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })) as unknown as typeof window.matchMedia;
+    try {
+      render(<OrgChartStudio data={flatData} />);
+      const canvasBox = screen.getByTestId('org-studio-viewport') as HTMLElement;
+      fireEvent.keyDown(canvasBox, { key: 'f' });
+      expect(mockFitView).toHaveBeenCalledWith({ padding: 0.2, duration: 0 });
+    } finally {
+      window.matchMedia = originalMatchMedia;
+    }
   });
 });

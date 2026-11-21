@@ -463,6 +463,7 @@ export type StudioNodeData = {
   onOpenDetail: (node: OrgStudioNodeNormalized) => void; // panel S-005.34.01 (FR-006)
   onCommitInline: (nodeId: string, title: string) => void;
   onCancelInline: (nodeId: string) => void;
+  onEditNode: (node: OrgStudioNodeNormalized) => void; // mulai inline-edit via keyboard 011-04 (FR-011)
   onDragStartNode: (nodeId: string) => void; // drag-pindah 011-03 (FR-007)
   onDragOverNode: (nodeId: string) => void;
   onDropOnNode: (nodeId: string) => void;
@@ -489,6 +490,7 @@ export function toStudioFlowNodes(
     onOpenDetail: StudioNodeData['onOpenDetail'];
     onCommitInline: StudioNodeData['onCommitInline'];
     onCancelInline: StudioNodeData['onCancelInline'];
+    onEditNode: StudioNodeData['onEditNode'];
     onDragStartNode: StudioNodeData['onDragStartNode'];
     onDragOverNode: StudioNodeData['onDragOverNode'];
     onDropOnNode: StudioNodeData['onDropOnNode'];
@@ -524,6 +526,7 @@ export function toStudioFlowNodes(
           onOpenDetail: handlers.onOpenDetail,
           onCommitInline: handlers.onCommitInline,
           onCancelInline: handlers.onCancelInline,
+          onEditNode: handlers.onEditNode,
           onDragStartNode: handlers.onDragStartNode,
           onDragOverNode: handlers.onDragOverNode,
           onDropOnNode: handlers.onDropOnNode,
@@ -538,18 +541,24 @@ export function toStudioFlowNodes(
 export function toStudioFlowEdges(
   normalized: StudioNormalizedResult,
   visibleIds: Set<string>,
+  highlightedSet: Set<string> = new Set(),
 ): StudioFlowEdge[] {
   const edges: StudioFlowEdge[] = [];
   for (const node of normalized.nodes) {
     if (!visibleIds.has(node.id)) continue;
     for (const childId of node.childIds) {
       if (!visibleIds.has(childId)) continue;
+      // 011-04 (FR-010): edge menuju node cocok memakai garis putus primary
+      // (non-warna-saja bersama badge "Cocok" di kartu).
+      const isMatch = highlightedSet.has(childId);
       edges.push({
         id: `${node.id}>${childId}`,
         source: node.id,
         target: childId,
         type: 'smoothstep',
-        style: { strokeWidth: 1, stroke: 'var(--border)' },
+        style: isMatch
+          ? { strokeWidth: 1.5, stroke: 'var(--primary)', strokeDasharray: '5 4' }
+          : { strokeWidth: 1, stroke: 'var(--border)' },
       });
     }
   }
@@ -609,7 +618,7 @@ function StudioAddHandle({
       className={cn(
         'absolute z-20 flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground',
         'opacity-0 transition-opacity duration-200 group-hover/studio-node:opacity-100 group-focus-within/studio-node:opacity-100 focus:opacity-100 motion-reduce:transition-none',
-        'hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        'hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
         className,
       )}
     >
@@ -636,6 +645,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
     onOpenDetail,
     onCommitInline,
     onCancelInline,
+    onEditNode,
     onDragStartNode,
     onDragOverNode,
     onDropOnNode,
@@ -723,9 +733,22 @@ function StudioNode({ data }: { data: StudioNodeData }) {
         if (event.key === 'Enter' && event.shiftKey) {
           event.preventDefault();
           onOpenDetail(node);
+        } else if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+          // 011-04 (FR-011): Ctrl/Cmd+Enter mulai inline-edit tanpa mouse.
+          event.preventDefault();
+          onEditNode(node);
         } else if (event.key === 'Enter') {
           event.preventDefault();
           onSelectNode?.(node);
+        } else if (event.key === 'F2') {
+          // 011-04 (FR-011): F2 mulai inline-edit tanpa mouse.
+          event.preventDefault();
+          onEditNode(node);
+        } else if (event.key === ' ') {
+          // 011-04 (FR-011): Space expand/collapse; daun tanpa anak = pilih.
+          event.preventDefault();
+          if (node.hasChildren) onToggle(node.id);
+          else onSelectNode?.(node);
         } else if (event.key === 'Delete' || event.key === 'Backspace') {
           event.preventDefault();
           onRequestDelete(node);
@@ -733,11 +756,14 @@ function StudioNode({ data }: { data: StudioNodeData }) {
       }}
       className={cn(
         'group/studio-node relative flex h-[84px] w-[240px] items-center gap-2 rounded-md border bg-card pl-4 pr-2 text-card-foreground',
-        'motion-safe:transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'motion-safe:transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
         dropRing ??
-          (isSelected || isHighlighted || isNew || isEditing
-            ? 'border-primary ring-2 ring-ring'
-            : 'border-border'),
+          (isHighlighted
+            ? // 011-04 (FR-010): sorotan non-warna-saja — ring + badge "Cocok" + garis putus.
+              'border-dashed border-primary ring-2 ring-primary'
+            : isSelected || isNew || isEditing
+              ? 'border-primary ring-2 ring-primary'
+              : 'border-border'),
       )}
     >
       {dropState !== null ? (
@@ -775,7 +801,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
             event.stopPropagation();
             onToggle(node.id);
           }}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           {isExpanded ? (
             <ChevronDown className="h-4 w-4" aria-hidden="true" />
@@ -888,22 +914,23 @@ const studioNodeTypes = { studioNode: StudioNode };
 // Controls + kanvas (design D1/D11, FR-004)
 // ---------------------------------------------------------------------------
 
-function StudioControls({ zoomLabel }: { zoomLabel: string }) {
+function StudioControls({ zoomLabel, zoomDuration }: { zoomLabel: string; zoomDuration: number }) {
   const { zoomIn, zoomOut, fitView, setViewport } = useReactFlow();
+  // 011-04 (FR-016): hit-area kontrol ≥ 44px; durasi 0 saat reduced-motion.
   const buttonClass =
-    'flex h-8 w-8 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
+    'flex h-11 w-11 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2';
   return (
     <div
       data-testid="org-studio-controls"
       className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-md border border-border bg-card p-1 shadow-sm"
     >
-      <button type="button" aria-label="Zoom out" onClick={() => void zoomOut()} className={buttonClass}>
+      <button type="button" aria-label="Zoom out" onClick={() => void zoomOut({ duration: zoomDuration })} className={buttonClass}>
         <Minus className="h-4 w-4" aria-hidden="true" />
       </button>
       <span aria-live="polite" data-testid="org-studio-zoom-level" className="min-w-12 text-center text-sm text-foreground">
         {zoomLabel}
       </span>
-      <button type="button" aria-label="Zoom in" onClick={() => void zoomIn()} className={buttonClass}>
+      <button type="button" aria-label="Zoom in" onClick={() => void zoomIn({ duration: zoomDuration })} className={buttonClass}>
         <Plus className="h-4 w-4" aria-hidden="true" />
       </button>
       <button
@@ -914,7 +941,7 @@ function StudioControls({ zoomLabel }: { zoomLabel: string }) {
       >
         <Maximize className="h-4 w-4" aria-hidden="true" />
       </button>
-      <button type="button" aria-label="Fit view" onClick={() => void fitView({ padding: 0.2 })} className={buttonClass}>
+      <button type="button" aria-label="Fit view" onClick={() => void fitView({ padding: 0.2, duration: zoomDuration })} className={buttonClass}>
         <Maximize className="h-4 w-4" aria-hidden="true" />
       </button>
     </div>
@@ -927,6 +954,8 @@ function StudioCanvas({
   ariaLabel,
   minimap,
   zoomLabel,
+  zoomDuration,
+  reducedMotion,
   keyboardZoom,
   onZoomLevel,
 }: {
@@ -935,27 +964,51 @@ function StudioCanvas({
   ariaLabel: string;
   minimap: boolean;
   zoomLabel: string;
+  zoomDuration: number;
+  reducedMotion: boolean;
   keyboardZoom: (action: 'in' | 'out' | 'reset' | 'fit') => void;
   onZoomLevel: (zoom: number) => void;
 }) {
-  const { zoomIn, zoomOut } = useReactFlow();
+  const { zoomIn, zoomOut, getViewport, setViewport } = useReactFlow();
   // Ctrl/Cmd+wheel = zoom; wheel polos tidak mencegat scroll halaman (AC-04).
+  // 011-04 (FR-016): pinch dimatikan saat reduced-motion.
   const handleWheel = React.useCallback(
     (event: React.WheelEvent) => {
       if (!event.ctrlKey && !event.metaKey) return;
       event.preventDefault();
-      if (event.deltaY < 0) void zoomIn();
-      else void zoomOut();
+      if (event.deltaY < 0) void zoomIn({ duration: zoomDuration });
+      else void zoomOut({ duration: zoomDuration });
     },
-    [zoomIn, zoomOut],
+    [zoomIn, zoomOut, zoomDuration],
   );
 
-  return (
-    <div
-      className="relative h-[480px] w-full overflow-hidden rounded-md border border-border bg-background"
-      onWheel={handleWheel}
-      onKeyDown={(event) => {
-        if (event.metaKey || event.ctrlKey || event.altKey) return;
+  // 011-04 (FR-011): panah menggeser kanvas 40px saat fokus di viewport
+  // (bukan di dalam kartu — kartu memakai keyboard sendiri).
+  const handleCanvasKeyDown = React.useCallback(
+    (event: React.KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest?.('[data-node-id]')) return;
+      const tag = target?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select' || target?.isContentEditable === true) return;
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const PAN_STEP = 40;
+      const panViewport = (dx: number, dy: number): void => {
+        const viewport = getViewport();
+        void setViewport({ x: viewport.x + dx, y: viewport.y + dy, zoom: viewport.zoom });
+      };
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        panViewport(0, PAN_STEP);
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        panViewport(0, -PAN_STEP);
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        panViewport(PAN_STEP, 0);
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        panViewport(-PAN_STEP, 0);
+      } else {
         const key = event.key.toLowerCase();
         if (key === '+' || key === '=') {
           event.preventDefault();
@@ -970,7 +1023,17 @@ function StudioCanvas({
           event.preventDefault();
           keyboardZoom('fit');
         }
-      }}
+      }
+    },
+    [getViewport, setViewport, keyboardZoom],
+  );
+
+  return (
+    <div
+      data-testid="org-studio-viewport"
+      className="relative h-[480px] w-full overflow-hidden rounded-md border border-border bg-background"
+      onWheel={handleWheel}
+      onKeyDown={handleCanvasKeyDown}
     >
       <ReactFlow
         nodes={nodes}
@@ -982,7 +1045,7 @@ function StudioCanvas({
         // Double-click dipakai untuk buka panel detail kartu (FR-006, D6);
         // zoom-on-double-click xyflow memakan event tersebut.
         zoomOnDoubleClick={false}
-        zoomOnPinch
+        zoomOnPinch={!reducedMotion}
         panOnDrag
         nodesDraggable={false}
         nodesConnectable={false}
@@ -1002,7 +1065,7 @@ function StudioCanvas({
             nodeColor="var(--primary)"
           />
         ) : null}
-        <StudioControls zoomLabel={zoomLabel} />
+        <StudioControls zoomLabel={zoomLabel} zoomDuration={zoomDuration} />
       </ReactFlow>
     </div>
   );
@@ -1362,6 +1425,278 @@ function StudioDeleteDialog({
 }
 
 // ---------------------------------------------------------------------------
+// Reduced-motion + pohon SR internal 011-04 (FR-011/FR-016, D10)
+// ---------------------------------------------------------------------------
+
+function useStudioReducedMotion(): boolean {
+  const [reduced, setReduced] = React.useState(false);
+  React.useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduced(query.matches);
+    const onChange = (event: MediaQueryListEvent) => setReduced(event.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
+  return reduced;
+}
+
+function StudioSrTree({
+  id,
+  ariaLabel,
+  nodes,
+  rootId,
+  expandedSet,
+  selectedId,
+  highlightedSet,
+  onToggle,
+  onSelectNode,
+  onAddChild,
+  onAddSibling,
+  onEditNode,
+  onOpenDetail,
+  onRequestMove,
+  onRequestDelete,
+}: {
+  id: string;
+  ariaLabel: string;
+  nodes: OrgStudioNodeNormalized[];
+  rootId: string | null;
+  expandedSet: Set<string>;
+  selectedId: string | null;
+  highlightedSet: Set<string>;
+  onToggle: (id: string) => void;
+  onSelectNode: ((node: OrgStudioNodeNormalized) => void) | undefined;
+  onAddChild: (parentId: string) => void;
+  onAddSibling: (nodeId: string) => void;
+  onEditNode: (node: OrgStudioNodeNormalized) => void;
+  onOpenDetail: (node: OrgStudioNodeNormalized) => void;
+  onRequestMove: (node: OrgStudioNodeNormalized) => void;
+  onRequestDelete: (node: OrgStudioNodeNormalized) => void;
+}) {
+  const byId = React.useMemo(() => new Map(nodes.map((node) => [node.id, node])), [nodes]);
+  // Urutan DFS penuh (reuse pola 003) — seluruh hierarki terjangkau SR.
+  const dfsIds = React.useMemo(() => {
+    const ids: string[] = [];
+    const walk = (nodeId: string): void => {
+      ids.push(nodeId);
+      for (const childId of byId.get(nodeId)?.childIds ?? []) walk(childId);
+    };
+    if (rootId) walk(rootId);
+    return ids;
+  }, [byId, rootId]);
+  // Node disabled dilewati fokus keyboard dan roving tabindex (pola 003).
+  const focusableIds = React.useMemo(
+    () => dfsIds.filter((nodeId) => !byId.get(nodeId)?.disabled),
+    [byId, dfsIds],
+  );
+  const [activeId, setActiveId] = React.useState<string | null>(null);
+  const effectiveActiveId =
+    activeId !== null && focusableIds.includes(activeId) ? activeId : (focusableIds[0] ?? null);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const focusSrNode = React.useCallback((nodeId: string | null | undefined) => {
+    if (!nodeId) return;
+    setActiveId(nodeId);
+    containerRef.current?.querySelector<HTMLElement>(`[data-sr-node-id="${nodeId}"]`)?.focus();
+  }, []);
+
+  const onItemKeyDown = React.useCallback(
+    (event: React.KeyboardEvent, node: OrgStudioNodeNormalized) => {
+      if (node.disabled) return;
+      const focusIdx = focusableIds.indexOf(node.id);
+      switch (event.key) {
+        case 'ArrowDown':
+          event.preventDefault();
+          event.stopPropagation();
+          focusSrNode(focusableIds[Math.min(focusIdx + 1, focusableIds.length - 1)] ?? null);
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          event.stopPropagation();
+          focusSrNode(focusIdx > 0 ? focusableIds[focusIdx - 1] : (focusableIds[0] ?? null));
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          event.stopPropagation();
+          if (node.hasChildren && !expandedSet.has(node.id)) {
+            onToggle(node.id);
+            setActiveId(node.id);
+          } else if (node.hasChildren) {
+            const firstChildId = node.childIds[0];
+            if (firstChildId) focusSrNode(firstChildId);
+          }
+          break;
+        case 'ArrowLeft':
+          event.preventDefault();
+          event.stopPropagation();
+          if (node.hasChildren && expandedSet.has(node.id)) {
+            onToggle(node.id);
+            setActiveId(node.id);
+          } else if (node.parentId) {
+            focusSrNode(node.parentId);
+          }
+          break;
+        case 'Home':
+          event.preventDefault();
+          event.stopPropagation();
+          focusSrNode(focusableIds[0] ?? null);
+          break;
+        case 'End':
+          event.preventDefault();
+          event.stopPropagation();
+          focusSrNode(focusableIds[focusableIds.length - 1] ?? null);
+          break;
+        case 'Enter':
+          event.preventDefault();
+          event.stopPropagation();
+          onSelectNode?.(node);
+          break;
+      }
+    },
+    [expandedSet, focusSrNode, focusableIds, onSelectNode, onToggle],
+  );
+
+  const renderBranch = (nodeId: string): React.ReactNode => {
+    const node = byId.get(nodeId);
+    if (!node) return null;
+    const isActive = effectiveActiveId === node.id;
+    const isExpanded = expandedSet.has(node.id);
+    const isHighlighted = highlightedSet.has(node.id);
+    return (
+      <div
+        key={node.id}
+        role="treeitem"
+        aria-level={node.depth + 1}
+        aria-expanded={node.hasChildren ? isExpanded : undefined}
+        aria-selected={selectedId === node.id}
+        aria-disabled={node.disabled || undefined}
+        tabIndex={isActive ? 0 : -1}
+        data-sr-node-id={node.id}
+        data-testid="org-studio-sr-item"
+        onKeyDown={(event) => onItemKeyDown(event, node)}
+        onClick={() => setActiveId(node.id)}
+        className="rounded-sm py-1 pr-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+      >
+        <span>
+          {node.title}
+          {node.subtitle ? ` — ${node.subtitle}` : ''}
+          {isHighlighted ? ' (cocok)' : ''}
+        </span>{' '}
+        {node.hasChildren ? (
+          <button
+            type="button"
+            aria-label={isExpanded ? `Ciutkan ${node.title} (pohon aksesibel)` : `Perluas ${node.title} (pohon aksesibel)`}
+            aria-expanded={isExpanded}
+            data-testid={`org-studio-sr-toggle-${node.id}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              onToggle(node.id);
+            }}
+          >
+            {isExpanded ? 'Ciutkan' : 'Perluas'}
+          </button>
+        ) : null}{' '}
+        <button
+          type="button"
+          aria-label={`Tambah bawahan untuk ${node.title} (pohon aksesibel)`}
+          data-testid={`org-studio-sr-add-child-${node.id}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onAddChild(node.id);
+          }}
+        >
+          Tambah bawahan
+        </button>{' '}
+        {node.parentId !== null ? (
+          <>
+            <button
+              type="button"
+              aria-label={`Tambah sejawat untuk ${node.title} (pohon aksesibel)`}
+              data-testid={`org-studio-sr-add-sibling-${node.id}`}
+              onClick={(event) => {
+                event.stopPropagation();
+                onAddSibling(node.id);
+              }}
+            >
+              Tambah sejawat
+            </button>{' '}
+          </>
+        ) : null}
+        <button
+          type="button"
+          aria-label={`Ubah ${node.title} (pohon aksesibel)`}
+          data-testid={`org-studio-sr-edit-${node.id}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onEditNode(node);
+          }}
+        >
+          Ubah
+        </button>{' '}
+        {node.parentId !== null ? (
+          <>
+            <button
+              type="button"
+              aria-label={`Pindah ${node.title} (pohon aksesibel)`}
+              data-testid={`org-studio-sr-move-${node.id}`}
+              onClick={(event) => {
+                event.stopPropagation();
+                onRequestMove(node);
+              }}
+            >
+              Pindah
+            </button>{' '}
+            <button
+              type="button"
+              aria-label={`Hapus ${node.title} (pohon aksesibel)`}
+              data-testid={`org-studio-sr-delete-${node.id}`}
+              onClick={(event) => {
+                event.stopPropagation();
+                onRequestDelete(node);
+              }}
+            >
+              Hapus
+            </button>{' '}
+          </>
+        ) : null}
+        <button
+          type="button"
+          aria-label={`Detail ${node.title} (pohon aksesibel)`}
+          data-testid={`org-studio-sr-detail-${node.id}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onOpenDetail(node);
+          }}
+        >
+          Detail
+        </button>
+        {node.hasChildren && node.childIds.length > 0 ? (
+          <div role="group" aria-label={`Anak ${node.title}`}>
+            {node.childIds.map((childId) => renderBranch(childId))}
+          </div>
+        ) : null}
+      </div>
+    );
+  };
+
+  if (!rootId) return null;
+  return (
+    <div className="sr-only">
+      <div
+        ref={containerRef}
+        id={id}
+        tabIndex={-1}
+        role="tree"
+        aria-label={`${ariaLabel} pohon aksesibel`}
+        data-testid="org-studio-sr-tree"
+      >
+        {renderBranch(rootId)}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Komponen utama
 // ---------------------------------------------------------------------------
 
@@ -1519,6 +1854,8 @@ export function OrgChartStudio({
       setInternalFlat(next);
       emitChange(next);
       syncHistoryLen();
+      // 011-04 (FR-011): tiap mutasi diumumkan via live region (toast memuat Urungkan).
+      setAnnouncement(`${toastTitle}.`);
       toast({
         title: toastTitle,
         description: 'Urungkan bila salah.',
@@ -1532,6 +1869,37 @@ export function OrgChartStudio({
     },
     [emitChange, syncHistoryLen, undo],
   );
+
+  // ---- 011-04: cari presentasional + auto-expand + live region (FR-010) ----
+  // Komponen tidak memegang query (design D9): konsumen memasang `highlightedIds`,
+  // komponen membuka path ancestor via `getAncestors` + `onExpandedChange` dan
+  // mengumumkan jumlah via live region.
+  const highlightKey = highlightedIds.join('\u0000');
+  const prevHighlightKeyRef = React.useRef<string>("");
+  React.useEffect(() => {
+    if (prevHighlightKeyRef.current === highlightKey) return;
+    const hadPrev = prevHighlightKeyRef.current !== '';
+    prevHighlightKeyRef.current = highlightKey;
+    if (highlightedIds.length === 0) {
+      if (hadPrev) setAnnouncement('Sorotan pencarian dihapus.');
+      return;
+    }
+    const path = new Set<string>();
+    for (const id of highlightedIds) {
+      for (const ancestorId of getAncestors(internalFlat, id)) path.add(ancestorId);
+    }
+    const missing = [...path].filter((id) => !expandedSet.has(id));
+    if (missing.length > 0) {
+      const nextIds = [...expandedSet, ...missing];
+      if (!controlledExpanded) setInternalExpanded(nextIds);
+      onExpandedChangeRef.current?.(nextIds);
+    }
+    setAnnouncement(
+      highlightedIds.length === 1 ? '1 hasil pencarian ditemukan.' : `${highlightedIds.length} hasil pencarian ditemukan.`,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- highlightKey adalah kunci stabil; highlightedIds dibaca sinkron.
+  }, [highlightKey, internalFlat, expandedSet, controlledExpanded]);
+
 
   const ensureExpanded = React.useCallback(
     (parentId: string | null) => {
@@ -1576,11 +1944,19 @@ export function OrgChartStudio({
       pendingIdsRef.current.delete(nodeId);
       setEditingId(null);
       setNewNodeId(nodeId);
-      commitWithUndo(snapshot, next, 'Ditambah');
+      // 011-04: commit edit node lama memakai judul "Diperbarui".
+      commitWithUndo(snapshot, next, isPending ? 'Ditambah' : 'Diperbarui');
       setFocusNodeId(nodeId);
     },
     [commitWithUndo, internalFlat],
   );
+
+  // 011-04 (FR-011): mulai inline-edit node lama via keyboard (F2/Ctrl+Enter/SR).
+  const handleEditNode = React.useCallback((node: OrgStudioNodeNormalized) => {
+    setSelectedId(node.id);
+    onSelectRef.current?.(node);
+    setEditingId(node.id);
+  }, []);
 
   const handleCancelInline = React.useCallback(
     (nodeId: string) => {
@@ -1777,6 +2153,7 @@ export function OrgChartStudio({
           onOpenDetail: openDetail,
           onCommitInline: handleCommitInline,
           onCancelInline: handleCancelInline,
+          onEditNode: handleEditNode,
           onDragStartNode: handleDragStartNode,
           onDragOverNode: handleDragOverNode,
           onDropOnNode: handleDropOnNode,
@@ -1798,6 +2175,7 @@ export function OrgChartStudio({
       openDetail,
       handleCommitInline,
       handleCancelInline,
+      handleEditNode,
       handleSelectNode,
       handleDragStartNode,
       handleDragOverNode,
@@ -1824,7 +2202,15 @@ export function OrgChartStudio({
     if (target instanceof HTMLElement) target.focus();
     setFocusNodeId(null);
   }, [focusNodeId, flowNodes]);
-  const flowEdges = React.useMemo(() => toStudioFlowEdges(normalized, visibleIds), [normalized, visibleIds]);
+  const flowEdges = React.useMemo(
+    () => toStudioFlowEdges(normalized, visibleIds, highlightedSet),
+    [normalized, visibleIds, highlightedSet],
+  );
+
+  // 011-04 (FR-016): hormati prefers-reduced-motion — durasi animasi 0 + pinch mati.
+  const reducedMotion = useStudioReducedMotion();
+  const zoomDuration = reducedMotion ? 0 : 200;
+  const srTreeId = React.useId();
 
   if (loading) {
     return (
@@ -1972,8 +2358,37 @@ export function OrgChartStudio({
           minimap={minimap}
           zoomLevel={zoomLevel}
           setZoomLevel={setZoomLevel}
+          zoomDuration={zoomDuration}
+          reducedMotion={reducedMotion}
         />
       </ReactFlowProvider>
+      {/* 011-04 (FR-011): skip-link + pohon SR internal sebagai jalur utama SR. */}
+      <a
+        href={`#${srTreeId}`}
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:rounded-sm focus:bg-card focus:px-3 focus:py-2 focus:text-sm focus:text-foreground focus:ring-2 focus:ring-primary"
+      >
+        Lewati kanvas ke pohon aksesibel
+      </a>
+      <StudioSrTree
+        id={srTreeId}
+        ariaLabel={ariaLabel}
+        nodes={normalized.nodes}
+        rootId={normalized.rootId}
+        expandedSet={expandedSet}
+        selectedId={selectedId}
+        highlightedSet={highlightedSet}
+        onToggle={toggleExpanded}
+        onSelectNode={handleSelectNode}
+        onAddChild={spawnPending}
+        onAddSibling={(nodeId) => {
+          const target = normalized.byId.get(nodeId);
+          if (target?.parentId) spawnPending(target.parentId);
+        }}
+        onEditNode={handleEditNode}
+        onOpenDetail={openDetail}
+        onRequestMove={handleRequestMove}
+        onRequestDelete={handleRequestDelete}
+      />
       <StudioDetailPanel
         key={panelNode?.id ?? 'closed'}
         node={panelNode}
@@ -2016,6 +2431,8 @@ function StudioCanvasInner({
   minimap,
   zoomLevel,
   setZoomLevel,
+  zoomDuration,
+  reducedMotion,
 }: {
   nodes: StudioFlowNode[];
   edges: StudioFlowEdge[];
@@ -2023,16 +2440,18 @@ function StudioCanvasInner({
   minimap: boolean;
   zoomLevel: number;
   setZoomLevel: (zoom: number) => void;
+  zoomDuration: number;
+  reducedMotion: boolean;
 }) {
   const { zoomIn, zoomOut, fitView, setViewport } = useReactFlow();
   const keyboardZoom = React.useCallback(
     (action: 'in' | 'out' | 'reset' | 'fit') => {
-      if (action === 'in') void zoomIn();
-      else if (action === 'out') void zoomOut();
+      if (action === 'in') void zoomIn({ duration: zoomDuration });
+      else if (action === 'out') void zoomOut({ duration: zoomDuration });
       else if (action === 'reset') void setViewport({ x: 0, y: 0, zoom: 1 });
-      else void fitView({ padding: 0.2 });
+      else void fitView({ padding: 0.2, duration: zoomDuration });
     },
-    [fitView, setViewport, zoomIn, zoomOut],
+    [fitView, setViewport, zoomDuration, zoomIn, zoomOut],
   );
   return (
     <StudioCanvas
@@ -2041,6 +2460,8 @@ function StudioCanvasInner({
       ariaLabel={ariaLabel}
       minimap={minimap}
       zoomLabel={`${Math.round(zoomLevel * 100)}%`}
+      zoomDuration={zoomDuration}
+      reducedMotion={reducedMotion}
       keyboardZoom={keyboardZoom}
       onZoomLevel={setZoomLevel}
     />
