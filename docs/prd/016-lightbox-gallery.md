@@ -72,8 +72,9 @@ Skenario utama:
 
 ## Design Refs
 
-- Screen: `S-005.39` Lightbox (`/patterns/lightbox`) — baru, diusulkan di PRD ini;
-  berhubungan dengan `S-005.16` Media Gallery (upgrade scenario galeri).
+- Screen: upgrade `S-005.16` Media Gallery (`/patterns/media-gallery`) — lightbox
+  Dialog rakitan di page tersebut dipromosikan menjadi komponen reusable;
+  tidak ada route baru.
 - Komponen terkait: `overlay/dialog.tsx` (basis overlay + trap fokus),
   `base/button.tsx` (kontrol), `data-display/badge.tsx` (counter),
   preview `M-001` file manager (komplemen, bukan duplikat),
