@@ -1,6 +1,6 @@
 # 004-04 — Locale + agenda + state matrix + showcase final + a11y
 
-Status: review
+Status: done
 PRD: `docs/prd/004-calendar-scheduler.md`
 Design: `docs/design/calendar-scheduler.md` (approved, gate 2)
 FR: `FR-008`, `FR-009`, `FR-010`, `FR-014` (could), `FR-015`
