@@ -1,6 +1,6 @@
 # 012-01 — Fondasi kanvas dua sisi + node pill + pan/zoom
 
-Status: review
+Status: done
 PRD: `docs/prd/012-mind-map.md` (revisi OQ#2/OQ#3 2026-11-21)
 Design: `docs/design/wireframes/mind-map.md` + `docs/design/flows/mind-map.mmd`
 FR: `FR-001`, `FR-003`, `FR-004`, `FR-008`
