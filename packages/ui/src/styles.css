@@ -88,3 +88,61 @@
     color: var(--primary-foreground);
   }
 }
+
+@layer components {
+  /* xyflow 13.0.2 — default CSS tidak diimpor; semua permukaan dipetakan ke token (design D1/D11).
+   * border-strong sengaja TIDAK dipakai (tidak ada di @ds/tokens); edge pakai muted-foreground. */
+  .xyflow__panel,
+  .xyflow__viewport {
+    background-color: var(--background);
+  }
+  .xyflow__node {
+    border-color: var(--border);
+    background-color: var(--card);
+    color: var(--foreground);
+    border-radius: var(--radius, 0.5rem);
+    border-width: 1px;
+    border-style: solid;
+  }
+  .xyflow__node.selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary);
+  }
+  .xyflow__handle {
+    border-color: var(--border);
+    background-color: var(--background);
+    border-width: 2px;
+    border-style: solid;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  .xyflow__handle.connected {
+    background-color: var(--primary);
+    border-color: var(--primary);
+  }
+  .xyflow__edge {
+    stroke: var(--muted-foreground);
+    stroke-width: 1.5px;
+  }
+  .xyflow__edge.selected {
+    stroke: var(--primary);
+    stroke-width: 2px;
+  }
+  .xyflow__controls {
+    background-color: var(--card);
+    border-color: var(--border);
+  }
+  .xyflow__minimap {
+    border-color: var(--border);
+    background-color: var(--card);
+  }
+  .xyflow__selection {
+    fill: color-mix(in oklch, var(--primary) 20%, transparent);
+    stroke: var(--primary);
+  }
+  .xyflow__selection__handle {
+    fill: var(--primary);
+    stroke: var(--primary);
+  }
+}

@@ -45,6 +45,7 @@ export * from './components/form/number-input';
 export * from './components/form/time-picker';
 export * from './components/data-display/org-chart';
 export * from './components/canvas/org-chart-editor';
+export * from './components/canvas/flow-editor';
 // org-chart-studio mengekspor getAncestors sendiri (FR-001 self-contained);
 // dialias di barrel agar tidak tabrakan dengan org-chart (TS2308).
 export {
