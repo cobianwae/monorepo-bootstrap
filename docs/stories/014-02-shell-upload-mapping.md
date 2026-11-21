@@ -1,6 +1,6 @@
 # 014-02 — Shell stepper + upload + mapping
 
-Status: review
+Status: done
 PRD: `docs/prd/014-import-wizard.md` (approved, gate 1)
 Design: `docs/design/import-wizard.md` (approved, gate 2) + `docs/design/flows/import-wizard.mmd` (flow 1–2) + `docs/design/wireframes/import-wizard.md` (§2.1–2.2, §4)
 FR: `FR-001`, `FR-002`, `FR-005`, `FR-007`, `FR-008`, `FR-009`
