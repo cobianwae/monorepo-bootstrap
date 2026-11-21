@@ -67,6 +67,24 @@ describe('WCAG 2.1 Contrast Calculation Engine', () => {
     }
   });
 
+  it('destructive text on tinted error cell (bg-destructive/10) satisfies WCAG AA (>= 4.5:1) and error graphic >= 3:1 in light & dark (014-03)', () => {
+    const mix = (base: string, tint: string, t: number): string => {
+      const a = hexToRgb(base);
+      const b = hexToRgb(tint);
+      const toHex = (v: number) => Math.round(v).toString(16).padStart(2, '0');
+      return `#${toHex(a.r * (1 - t) + b.r * t)}${toHex(a.g * (1 - t) + b.g * t)}${toHex(a.b * (1 - t) + b.b * t)}`;
+    };
+    // Light: text-destructive (#B91C1C) on bg-destructive/10 over card (#FFFFFF)
+    const lightCell = mix('#FFFFFF', '#DC2626', 0.1);
+    expect(getContrastRatio('#B91C1C', lightCell)).toBeGreaterThanOrEqual(4.5);
+    // Dark: text-destructive (#F87171) on bg-destructive/10 over card (#141620)
+    const darkCell = mix('#141620', '#F87171', 0.1);
+    expect(getContrastRatio('#F87171', darkCell)).toBeGreaterThanOrEqual(4.5);
+    // Graphic (border/ikon error) >= 3:1 on surface
+    expect(getContrastRatio('#DC2626', '#FFFFFF')).toBeGreaterThanOrEqual(3);
+    expect(getContrastRatio('#F87171', '#141620')).toBeGreaterThanOrEqual(3);
+  });
+
   it('critical text pairs satisfy WCAG AAA (>= 7.0:1) across all themes', () => {
     for (const theme of THEMES) {
       const themeAudited = auditThemeTokenPairs(theme.id);
