@@ -21,6 +21,7 @@ import {
   useReactFlow,
   type Connection,
   type Edge,
+  type EdgeChange,
   type EdgeChangeset,
   type Node,
   type NodeChange,
@@ -141,35 +142,107 @@ const FlowConnectContext = React.createContext<FlowConnectContextValue | null>(n
 // useFlowHistory — kontrak untuk story 005-02–04 (implementasi penuh di 005-05)
 // ---------------------------------------------------------------------------
 
+export interface FlowSnapshot {
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+}
+
 export interface UseFlowHistory {
   push: (nodes: FlowNode[], edges: FlowEdge[]) => void;
-  undo: () => void;
-  redo: () => void;
+  undo: (current: FlowSnapshot) => FlowSnapshot | null;
+  redo: (current: FlowSnapshot) => FlowSnapshot | null;
   canUndo: boolean;
   canRedo: boolean;
   historyLimit: number;
 }
 
+function cloneFlowNode(node: FlowNode): FlowNode {
+  return { ...node, position: { ...node.position }, data: { ...node.data } };
+}
+
+function cloneFlowEdge(edge: FlowEdge): FlowEdge {
+  return { ...edge };
+}
+
+function cloneFlowSnapshot(snapshot: FlowSnapshot): FlowSnapshot {
+  return {
+    nodes: snapshot.nodes.map(cloneFlowNode),
+    edges: snapshot.edges.map(cloneFlowEdge),
+  };
+}
+
 /**
- * Stub/kontrak useFlowHistory. Story 005-02–04 boleh mock kontrak ini;
- * implementasi penuh (snapshot klon struktural, batas historyLimit, undo/redo
- * tanpa push-balik) dikerjakan di story 005-05.
+ * Riwayat terbatas (bounded) default `historyLimit` 50.
+ * - `push(nodes, edges)` menyimpan snapshot SEBELUM mutasi pengguna.
+ * - `undo(current)`/`redo(current)` mengembalikan snapshot yang akan dipulihkan;
+ *   `current` adalah state yang sedang aktif sehingga bisa dipindahkan ke stack
+ *   lawan (redo/undo). FlowEditor yang menerapkannya melalui
+ *   onNodesChange/onEdgesChange (controlled) atau state internal (uncontrolled).
+ * - Flag `applying` mencegah push-balik saat undo/redo menerapkan snapshot
+ *   (avoid loop). Cabang baru (push setelah undo) membersihkan redo stack.
  */
 export function useFlowHistory({ historyLimit = 50 }: { historyLimit?: number } = {}): UseFlowHistory {
-  return {
-    push: React.useCallback((_nodes: FlowNode[], _edges: FlowEdge[]) => {
-      // no-op stub — diimplementasi penuh di 005-05
-    }, []),
-    undo: React.useCallback(() => {
-      // no-op stub
-    }, []),
-    redo: React.useCallback(() => {
-      // no-op stub
-    }, []),
-    canUndo: false,
-    canRedo: false,
-    historyLimit,
-  };
+  const [undoStack, setUndoStack] = React.useState<FlowSnapshot[]>([]);
+  const [redoStack, setRedoStack] = React.useState<FlowSnapshot[]>([]);
+  const applying = React.useRef(false);
+
+  const push = React.useCallback(
+    (nodes: FlowNode[], edges: FlowEdge[]) => {
+      if (applying.current) return;
+      const snap: FlowSnapshot = {
+        nodes: nodes.map(cloneFlowNode),
+        edges: edges.map(cloneFlowEdge),
+      };
+      setUndoStack((prev) => {
+        const next = [...prev, snap];
+        if (next.length > historyLimit) next.shift();
+        return next;
+      });
+      setRedoStack([]); // cabang baru membersihkan redo
+    },
+    [historyLimit],
+  );
+
+  const undo = React.useCallback(
+    (current: FlowSnapshot): FlowSnapshot | null => {
+      if (undoStack.length === 0) return null;
+      applying.current = true;
+      try {
+        const restore = undoStack[undoStack.length - 1];
+        setRedoStack((prev) => [...prev, cloneFlowSnapshot(current)]);
+        setUndoStack((prev) => prev.slice(0, -1));
+        return restore;
+      } finally {
+        applying.current = false;
+      }
+    },
+    [undoStack],
+  );
+
+  const redo = React.useCallback(
+    (current: FlowSnapshot): FlowSnapshot | null => {
+      if (redoStack.length === 0) return null;
+      applying.current = true;
+      try {
+        const restore = redoStack[redoStack.length - 1];
+        setUndoStack((prev) => {
+          const next = [...prev, cloneFlowSnapshot(current)];
+          if (next.length > historyLimit) next.shift();
+          return next;
+        });
+        setRedoStack((prev) => prev.slice(0, -1));
+        return restore;
+      } finally {
+        applying.current = false;
+      }
+    },
+    [redoStack, historyLimit],
+  );
+
+  const canUndo = undoStack.length > 0;
+  const canRedo = redoStack.length > 0;
+
+  return { push, undo, redo, canUndo, canRedo, historyLimit };
 }
 
 // ---------------------------------------------------------------------------
@@ -522,6 +595,84 @@ function FlowControls({
 }
 
 // ---------------------------------------------------------------------------
+// FlowToolbar — pola undo/redo + toggle snap/grid (story 005-05 AC-03/AC-05).
+// Zoom tetap milik FlowControls (tidak ada di sini).
+// ---------------------------------------------------------------------------
+
+interface FlowToolbarProps {
+  canUndo: boolean;
+  canRedo: boolean;
+  onUndo: () => void;
+  onRedo: () => void;
+  snapToGrid: boolean;
+  onToggleSnap: () => void;
+  showGrid: boolean;
+  onToggleGrid: () => void;
+}
+
+function FlowToolbar({
+  canUndo,
+  canRedo,
+  onUndo,
+  onRedo,
+  snapToGrid,
+  onToggleSnap,
+  showGrid,
+  onToggleGrid,
+}: FlowToolbarProps) {
+  const buttonClass =
+    'flex h-8 w-8 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+  return (
+    <div
+      data-testid="flow-toolbar"
+      className="absolute left-3 top-3 z-20 flex flex-col items-start gap-1 rounded-md border border-border bg-card p-1 shadow-sm"
+    >
+      <button
+        type="button"
+        aria-label="Urungkan"
+        disabled={!canUndo}
+        onClick={onUndo}
+        className={buttonClass}
+        data-testid="flow-toolbar-undo"
+      >
+        Urungkan
+      </button>
+      <button
+        type="button"
+        aria-label="Ulangi"
+        disabled={!canRedo}
+        onClick={onRedo}
+        className={buttonClass}
+        data-testid="flow-toolbar-redo"
+      >
+        Ulangi
+      </button>
+      <div aria-hidden="true" className="h-5 w-px bg-border mx-1" />
+      <button
+        type="button"
+        aria-pressed={snapToGrid}
+        aria-label={snapToGrid ? 'Matikan snap ke grid' : 'Nyalakan snap ke grid'}
+        onClick={onToggleSnap}
+        className={cn(buttonClass, snapToGrid ? 'bg-primary text-primary-foreground' : '')}
+        data-testid="flow-toolbar-snap"
+      >
+        Snap
+      </button>
+      <button
+        type="button"
+        aria-pressed={showGrid}
+        aria-label={showGrid ? 'Sembunyikan grid' : 'Tampilkan grid'}
+        onClick={onToggleGrid}
+        className={cn(buttonClass, showGrid ? '' : 'opacity-50')}
+        data-testid="flow-toolbar-grid"
+      >
+        Grid
+      </button>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // FlowCanvasHost — ReactFlow + DndContext + drop ke canvas (story 005-02)
 // useReactFlow valid karena berada di dalam ReactFlowProvider.
 // ---------------------------------------------------------------------------
@@ -552,6 +703,7 @@ interface FlowCanvasHostProps {
   snapToGrid: boolean;
   gridSize: number;
   minimap: boolean;
+  showGrid: boolean;
   isInteractionLocked: boolean;
   onToggleLock: () => void;
   zoomLevel: number;
@@ -606,6 +758,7 @@ function FlowCanvasHost({
   snapToGrid,
   gridSize,
   minimap,
+  showGrid,
   isInteractionLocked,
   onToggleLock,
   zoomLevel,
@@ -726,7 +879,9 @@ function FlowCanvasHost({
                 void onPaneContextMenu?.(event as unknown as React.MouseEvent);
               }}
             >
-              <Background variant={('dots' as unknown as BackgroundVariant)} gap={gridSize * 4} />
+              {showGrid && (
+                <Background variant={('dots' as unknown as BackgroundVariant)} gap={gridSize * 4} />
+              )}
               {minimap ? (
                 <MiniMap
                   data-testid="flow-minimap"
@@ -826,12 +981,61 @@ export function FlowEditor(props: FlowEditorProps) {
   const edges = isControlled ? edgesProp : internalEdges;
   const empty = nodes.length === 0 && edges.length === 0;
 
-  // useFlowHistory dikaitkan untuk menarik batas history (kontrak untuk 005-02–04; full di 005-05).
+  // useFlowHistory — implementasi penuh (story 005-05).
   const _history = useFlowHistory({ historyLimit });
-  void _history;
+
+  // Flag mencegah riwayat mencatat hasil penerapan undo/redo (loop mitigasi).
+  const historyApplying = React.useRef(false);
+  const [historyAnnounce, setHistoryAnnounce] = React.useState('');
+  const [isSnapToGrid, setIsSnapToGrid] = React.useState(snapToGrid ?? false);
+  const [showGrid, setShowGrid] = React.useState(true);
+
+  const handleUndo = React.useCallback(() => {
+    const snap = _history.undo({ nodes, edges });
+    if (!snap) return;
+    historyApplying.current = true;
+    try {
+      if (isControlled) {
+        void onNodesChange?.(computeNodeChanges(nodes, snap.nodes));
+        void onEdgesChange?.(computeEdgeChanges(edges, snap.edges));
+      } else {
+        setInternalNodes(snap.nodes);
+        setInternalEdges(snap.edges);
+      }
+      setHistoryAnnounce('Perubahan dibatalkan');
+      void toast({ title: 'Dibatalkan', description: 'Langkah sebelumnya dikembalikan.', duration: 3000 });
+    } finally {
+      historyApplying.current = false;
+    }
+  }, [_history, isControlled, nodes, edges, onNodesChange, onEdgesChange]);
+
+  const handleRedo = React.useCallback(() => {
+    const snap = _history.redo({ nodes, edges });
+    if (!snap) return;
+    historyApplying.current = true;
+    try {
+      if (isControlled) {
+        void onNodesChange?.(computeNodeChanges(nodes, snap.nodes));
+        void onEdgesChange?.(computeEdgeChanges(edges, snap.edges));
+      } else {
+        setInternalNodes(snap.nodes);
+        setInternalEdges(snap.edges);
+      }
+      setHistoryAnnounce('Perubahan diulang');
+      void toast({ title: 'Dilakukan Ulang', description: 'Langkah sebelumnya diterapkan kembali.', duration: 3000 });
+    } finally {
+      historyApplying.current = false;
+    }
+  }, [_history, isControlled, nodes, edges, onNodesChange, onEdgesChange]);
 
   const handleNodesChange = React.useCallback(
     (changes: NodeChangeset<FlowNode>) => {
+      const structural = (changes as unknown as NodeChange<FlowNode>[]).some(
+        (c) => c.type === 'position' || c.type === 'remove' || c.type === 'add',
+      );
+      if (structural && !historyApplying.current) {
+        _history.push(nodes, edges);
+      }
       if (isControlled) {
         void onNodesChange?.(changes);
         return;
@@ -852,11 +1056,17 @@ export function FlowEditor(props: FlowEditorProps) {
         return next;
       });
     },
-    [isControlled, onNodesChange],
+    [isControlled, onNodesChange, nodes, edges, _history],
   );
 
   const handleEdgesChange = React.useCallback(
     (changes: EdgeChangeset<FlowEdge>) => {
+      const structural = (changes as unknown as Array<{ type: string }>).some(
+        (c) => c.type === 'add' || c.type === 'remove',
+      );
+      if (structural && !historyApplying.current) {
+        _history.push(nodes, edges);
+      }
       if (isControlled) {
         void onEdgesChange?.(changes);
         return;
@@ -865,7 +1075,7 @@ export function FlowEditor(props: FlowEditorProps) {
         prev.filter((e) => !((changes as unknown as { type: string; id: string }[]).some((c) => c.type === 'remove' && c.id === e.id))),
       );
     },
-    [isControlled, onEdgesChange],
+    [isControlled, onEdgesChange, nodes, edges, _history],
   );
 
 // ---------------------------------------------------------------------------
@@ -928,6 +1138,44 @@ function validateConnection(
   return { ok: true };
 }
 
+/**
+ * Menghasilkan changeset node yang mengubah `current` menjadi `target` (full
+ * replace per node, add untuk id baru, remove untuk id yang hilang). Digunakan
+ * oleh undo/redo pada mode controlled agar state konsumen kembali persis.
+ */
+function computeNodeChanges(current: FlowNode[], target: FlowNode[]): NodeChangeset<FlowNode> {
+  const currentById = new Map(current.map((n) => [n.id, n]));
+  const targetById = new Map(target.map((n) => [n.id, n]));
+  const changes: Array<NodeChange<FlowNode>> = [];
+
+  for (const n of current) {
+    if (!targetById.has(n.id)) changes.push({ id: n.id, type: 'remove' });
+  }
+  for (const n of target) {
+    if (!currentById.has(n.id)) changes.push({ id: n.id, type: 'add', item: n } as NodeChange<FlowNode>);
+    else changes.push({ id: n.id, type: 'replace', item: n } as NodeChange<FlowNode>);
+  }
+  return changes as unknown as NodeChangeset<FlowNode>;
+}
+
+/**
+ * Menghasilkan changeset edge yang mengubah `current` menjadi `target`.
+ */
+function computeEdgeChanges(current: FlowEdge[], target: FlowEdge[]): EdgeChangeset<FlowEdge> {
+  const currentById = new Map(current.map((e) => [e.id, e]));
+  const targetById = new Map(target.map((e) => [e.id, e]));
+  const changes: Array<EdgeChange<FlowEdge>> = [];
+
+  for (const e of current) {
+    if (!targetById.has(e.id)) changes.push({ id: e.id, type: 'remove' });
+  }
+  for (const e of target) {
+    if (!currentById.has(e.id)) changes.push({ id: e.id, type: 'add', item: e } as EdgeChange<FlowEdge>);
+    else changes.push({ id: e.id, type: 'replace', item: e } as EdgeChange<FlowEdge>);
+  }
+  return changes as unknown as EdgeChangeset<FlowEdge>;
+}
+
 const handleConnect = React.useCallback(
   (connection: Connection): boolean => {
     const { source, target } = connection;
@@ -957,7 +1205,7 @@ const handleConnect = React.useCallback(
       animated: false,
     };
     setInternalEdges((prev) => [...prev, newEdge]);
-    _history.push(nodes, edges);
+    if (!historyApplying.current) _history.push(nodes, edges);
     return true;
   },
   // validateConnection dan connectionRejectMessage adalah konstanta modul-level (stabil), tidak perlu dalam daftar dependensi.
@@ -985,10 +1233,10 @@ React.useEffect(() => {
     if (!selectedEdgeId) return;
     if (isControlled) {
       void onEdgesChange?.([{ id: selectedEdgeId, type: 'remove' }] as unknown as EdgeChangeset<FlowEdge>);
-      _history.push(nodes, edges);
+      if (!historyApplying.current) _history.push(nodes, edges);
     } else {
       setInternalEdges((prev) => prev.filter((e) => e.id !== selectedEdgeId));
-      _history.push(nodes, edges);
+      if (!historyApplying.current) _history.push(nodes, edges);
     }
     setSelectedEdgeId(null);
   }, [selectedEdgeId, isControlled, onEdgesChange, nodes, edges, _history]);
@@ -1122,6 +1370,25 @@ React.useEffect(() => {
 
   const handleEditorKeyDown = React.useCallback(
     (event: React.KeyboardEvent) => {
+      if (event.key === 'z' && (event.ctrlKey || event.metaKey)) {
+        if (event.shiftKey) {
+          if (_history.canRedo) {
+            event.preventDefault();
+            handleRedo();
+            return;
+          }
+        } else if (_history.canUndo) {
+          event.preventDefault();
+          handleUndo();
+          return;
+        }
+      }
+      // Ctrl+Y alias redo.
+      if (event.key === 'y' && (event.ctrlKey || event.metaKey) && _history.canRedo) {
+        event.preventDefault();
+        handleRedo();
+        return;
+      }
       if (event.key === 'Delete' || event.key === 'Backspace') {
         if (selectedEdgeId) {
           event.preventDefault();
@@ -1136,7 +1403,7 @@ React.useEffect(() => {
         }
       }
     },
-    [selectedEdgeId, removeSelectedEdge, selection.nodes.length, handleDeleteSelected],
+    [selectedEdgeId, removeSelectedEdge, selection.nodes.length, handleDeleteSelected, _history, handleUndo, handleRedo],
   );
 
   const handleAddFromPalette = React.useCallback(
@@ -1153,10 +1420,13 @@ React.useEffect(() => {
         return;
       }
       setInternalNodes((prev) => [...prev, node]);
-      _history.push(nodes, edges);
+      if (!historyApplying.current) _history.push(nodes, edges);
     },
     [_history, onAddFromPalette, nodes, edges],
   );
+
+  const toggleSnap = React.useCallback(() => setIsSnapToGrid((prev) => !prev), []);
+  const toggleGrid = React.useCallback(() => setShowGrid((prev) => !prev), []);
 
   const zoomIn = React.useCallback(() => setZoomLevel((z) => Math.min(z + 0.25, 2)), []);
   const zoomOut = React.useCallback(() => setZoomLevel((z) => Math.max(z - 0.25, 0.25)), []);
@@ -1178,6 +1448,18 @@ React.useEffect(() => {
       role="application"
       onKeyDown={handleEditorKeyDown}
     >
+      {/* Toolbar pola — undo/redo + snap/grid (story 005-05 AC-03/AC-05). */}
+      <FlowToolbar
+        canUndo={_history.canUndo}
+        canRedo={_history.canRedo}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        snapToGrid={isSnapToGrid}
+        onToggleSnap={toggleSnap}
+        showGrid={showGrid}
+        onToggleGrid={toggleGrid}
+      />
+
       {/* State matrix — loading */}
       {loading && (
         <div
@@ -1233,9 +1515,10 @@ React.useEffect(() => {
           isValidConnection={isValidConnection}
           nodeTypes={nodeTypes}
           onAddFromPalette={handleAddFromPalette}
-          snapToGrid={snapToGrid}
+          snapToGrid={isSnapToGrid}
           gridSize={gridSize}
           minimap={minimap}
+          showGrid={showGrid}
           isInteractionLocked={isInteractionLocked}
           onToggleLock={() => setIsInteractionLocked((prev) => !prev)}
           zoomLevel={zoomLevel}
@@ -1256,6 +1539,13 @@ React.useEffect(() => {
       <div aria-live="polite" aria-atomic="true" className="sr-only">
         {zoomLabel}
       </div>
+
+      {/* Live region undo/redo (AC-03). */}
+      {historyAnnounce && (
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
+          {historyAnnounce}
+        </div>
+      )}
 
       {/* Live region sukses sambung edge (AC-01) */}
       {connectionSuccess && (

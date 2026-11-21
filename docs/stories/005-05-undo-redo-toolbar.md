@@ -1,6 +1,6 @@
 # 005-05 — Undo/redo + toolbar pola
 
-Status: approved
+Status: review
 PRD: `docs/prd/005-flow-editor.md`
 Design: `docs/design/flow-editor.md`
 FR: `FR-007`
@@ -41,11 +41,11 @@ Goal: Semua mutasi struktural bisa dibatalkan/diulang via toolbar, shortcut, dan
 
 ## Tasks
 
-- [ ] History internal bounded (`historyLimit` default 50) + push saat commit pengguna saja
-- [ ] Toolbar pola: [urungkan] [ulangi] [snap] [grid] (zoom milik controls — temuan #6)
-- [ ] Shortcut + live region + disabled state + toast wiring final
-- [ ] Test: round-trip 6 jenis mutasi + batas 50 + cabang + 3 jalur + data non-serialisable
-- [ ] Showcase: toolbar tampil di draf route (final di 005-06)
+- [x] History internal bounded (`historyLimit` default 50) + push saat commit pengguna saja
+- [x] Toolbar pola: [urungkan] [ulangi] [snap] [grid] (zoom milik controls — temuan #6)
+- [x] Shortcut + live region + disabled state + toast wiring final
+- [x] Test: round-trip 6 jenis mutasi + batas 50 + cabang + 3 jalur + data non-serialisable
+- [x] Showcase: toolbar tampil di draf route (final di 005-06)
 
 ## Dependencies
 
