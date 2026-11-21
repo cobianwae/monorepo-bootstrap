@@ -37,14 +37,14 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 |---|---|---|
 | `base` | Primitive visual dan kontrol dasar | button, badge, card, input, textarea, label, separator, skeleton, avatar, tabs, checkbox, switch, tooltip, progress, spinner, radio-group, slider, accordion, collapsible, kbd, toggle, aspect-ratio, scroll-area, palette-switcher, theme-provider |
 | `form` | Input dan validasi | form, select, combobox, tag-input, date-picker, input-otp, number-input, time-picker, filter-builder, stepper, segmented-control, file-input, file-upload |
-| `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart, event-calendar (baru, PRD 004) |
+| `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart (legacy PRD 003, diganti 011), event-calendar (baru, PRD 004) |
 | `feedback` | Status dan respons sistem | dialog, alert, alert-dialog, toast, toaster, empty-state, use-toast |
 | `navigation` | Navigasi dan pencarian | dropdown-menu, breadcrumb, pagination, command-palette, context-menu, navigation-menu |
 | `overlay` | Lapisan di atas konten | sheet, popover, hover-card |
 | `layout` | Kerangka halaman | app-shell, page-header, page-shell, page-skeleton, container, section, prose, demo-section, resizable, skip-link |
 | `marketing` | Blok presentasi | hero, hero-band, feature-grid, faq, logo-cloud, carousel, cta-band, statement-card, art-background, grid-pattern, dot-pattern, glow-orb, stats-band, section-number, pricing, testimonial, gradient-text |
 | `dnd` | Drag and drop | sortable-list, tree-view, kanban |
-| `canvas` | Kanvas interaktif (xyflow, token-mapped) | org-chart-editor, flow-editor (planned) |
+| `canvas` | Kanvas interaktif (xyflow, token-mapped) | org-chart-editor (legacy PRD 010, diganti 011), org-chart-studio (baru, PRD 011), flow-editor (planned) |
 
 ## 4. Pattern Inventory
 
@@ -72,8 +72,9 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Notifications | Toast/inbox, read state |
 | Onboarding | Step, skip, progress |
 | Optimistic Updates | Perubahan langsung + rollback |
-| Org Chart | Diagram hierarki organisasi read-only: node kaya (avatar/jabatan/badge), collapse/expand, pan/zoom, orientasi top-down/left-right, highlight pencarian (composed, kategori `data-display`); penyusun: org-chart (baru), avatar, badge, skeleton, empty-state, alert, search-input, button |
-| Org Chart Editor | Editor hierarki organisasi: tambah/pindah/hapus node via kanvas + inspector, drag reparent tervalidasi, undo/redo, minimap/fit-view, tooltip + inspector anti-truncate (composed, kategori `canvas` xyflow token-mapped); penyusun: org-chart-editor (baru), sheet, context-menu, tooltip, form, badge, avatar, skeleton, empty-state, button |
+| Org Chart | Diagram hierarki organisasi read-only (legacy PRD 003, diganti 011 — lihat Org Chart Studio) |
+| Org Chart Editor | Editor hierarki organisasi v1 (legacy PRD 010, diganti 011 — lihat Org Chart Studio) |
+| Org Chart Studio | Editor + visualisasi hierarki satu komponen: kartu lega inline-edit via gagang `+`, drag reparent + dialog setara, undo/redo 50, search + auto-expand, pohon SR internal, state matrix 6 demo (composed, kategori `canvas` xyflow token-mapped); penyusun: org-chart-studio (baru), sheet, context-menu, tooltip, form, input, badge, avatar, skeleton, empty-state, alert, button, toast |
 | Product Tour | Highlight, step, dismiss |
 | Results | Sukses/gagal, next action |
 | Rich Text Editor | Toolbar, konten, a11y |

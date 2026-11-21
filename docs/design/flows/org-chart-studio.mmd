@@ -1,0 +1,92 @@
+<!-- Flow org chart studio — PRD 011, layar S-005.34 (+ S-005.34.01 panel, M-007 pindah, M-008 hapus) -->
+<!-- Job utama: tambah bawahan 1-klik inline-edit; pendukung: pindah/hapus/undo, cari, pan/zoom -->
+<!-- Legacy S-005.28 / S-005.33 deprecated; flow di bawah menggantikan org-chart.mmd + org-chart-editor.mmd -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman org chart studio] --> B{Data organisasi siap?}
+  B -- masih dimuat --> L[Tampilkan skeleton kartu + teks SR]
+  L --> B
+  B -- gagal fetch / data tidak valid --> ERR[Tampilkan error: penyebab + id pelanggar pertama + salin detail]
+  ERR --> E2[User memperbaiki data / memuat contoh / coba lagi]
+  E2 --> A
+  B -- tanpa data --> EMP[Tampilkan empty state + CTA buat root]
+  EMP --> E3[User membuat root; kartu root langsung inline-edit]
+  E3 --> A
+  B -- siap --> C[Diagram dirender: kartu lega + konektor halus + toolbar + minimap]
+  C --> D{User melipat atau membuka cabang?}
+  D -- ya --> E[Subtree + edge ikut muncul / hilang; layout seimbang dihitung ulang]
+  E --> D
+  D -- tidak --> F[User memilih node; panel detail tersedia bila diminta]
+  F --> D
+```
+
+```mermaid
+flowchart TD
+  A[User hover atau fokus kartu] --> B{Gagang tambah terlihat?}
+  B -- bawah --> C[User klik gagang + bawah: tambah bawahan]
+  B -- samping --> D[User klik gagang + samping: tambah sejawat]
+  C --> E[Kartu baru muncul tersorot di bawah parent; mode inline-edit aktif]
+  D --> E
+  E --> F{User mengetik nama?}
+  F -- Enter / blur valid --> G[Simpan: onChange sekali + dorong undo + toast Urungkan + fokus ke kartu baru]
+  F -- Esc --> H[Batal: kartu baru dibuang; fokus kembali ke parent]
+  F -- blur kosong --> I[Tolak simpan: pesan nama wajib + tetap edit]
+  I --> F
+  G --> J[Panel detail TIDAK terbuka otomatis]
+  H --> A
+  J --> A
+```
+
+```mermaid
+flowchart TD
+  A[User memindah atau menghapus node] --> B{Jenis operasi?}
+  B -- pindah via drag --> C[Seret kartu ke target; garis valid/invalid + preview path]
+  C --> D{Target valid: bukan diri atau turunan?}
+  D -- tidak --> E[Tolak: pesan + snap-back; umumkan via alert]
+  D -- ya --> F[Parent berubah; layout dihitung ulang; onChange sekali + dorong undo + toast]
+  B -- pindah via dialog M-007 --> G[Pilih atasan baru; preview path; validasi siklus]
+  G --> D
+  B -- hapus via Delete/menu --> H{Node root?}
+  H -- ya --> I[Tolak: root diproteksi + penjelasan]
+  H -- tidak --> J[M-008: sebut N turunan; pilih pindahkan anak ke kakek atau hapus subtree]
+  J -- batal --> A
+  J -- konfirmasi --> K[Hapus; onChange sekali + dorong undo + toast]
+  F --> L[Undo/redo tersedia: toolbar + Ctrl+Z/Y + live region]
+  K --> L
+  E --> A
+  I --> A
+  L --> A
+```
+
+```mermaid
+flowchart TD
+  A[User mengetik nama atau jabatan di pencarian] --> B{Ada node yang cocok?}
+  B -- tidak --> C[Umumkan tidak ada hasil via live region; diagram tetap]
+  C --> A
+  B -- ya --> D[Sorot non-warna-saja: ring + badge Cocok; buka path ancestor otomatis]
+  D --> E[Umumkan jumlah cocok via live region]
+  E --> F{User memilih hasil?}
+  F -- ya --> G[Fokus ke kartu; panel detail opsional menampilkan info penuh]
+  G --> A
+  F -- tidak --> H[User menghapus query; sorotan hilang]
+  H --> A
+```
+
+```mermaid
+flowchart TD
+  A[User fokus ke kanvas] --> B{Ingin melihat lebih luas atau dekat?}
+  B -- lebih dekat --> C[Perbesar via tombol / Ctrl+scroll / pinch / keyboard]
+  B -- lebih luas --> D[Perkecil dengan cara yang sama]
+  B -- reset --> E[Reset 100 persen; fit view opsional seluruh diagram]
+  C --> F{Batas tercapai?}
+  D --> F
+  F -- ya --> G[Hentikan di batas; umumkan level via live region]
+  F -- belum --> H[Skalakan kanvas + minimap; konektor tetap rapi]
+  A --> I[Geser via drag / panah / klik minimap]
+  I --> J[Viewport mengikuti; scroll halaman aman]
+  E --> I
+  G --> I
+  H --> I
+  J --> A
+```

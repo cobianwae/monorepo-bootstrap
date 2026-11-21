@@ -24,7 +24,8 @@ Hanya user yang boleh menetapkan `approved` dan `done`.
 | 004 | Calendar & scheduler (roadmap RM-08) | approved | `docs/prd/004-calendar-scheduler.md` |
 | 005 | Flow editor / node canvas (roadmap RM-09) | approved | `docs/prd/005-flow-editor.md` |
 | 006 | Rich text editor (roadmap RM-11) | approved | `docs/prd/006-rich-text-editor.md` |
-| 010 | Org chart editor — editable v2 reuse xyflow (revisi PRD 003) | approved | `docs/prd/010-org-chart-editor.md` |
+| 010 | Org chart editor — editable v2 reuse xyflow (revisi PRD 003) | approved (legacy, diganti 011) | `docs/prd/010-org-chart-editor.md` |
+| 011 | Org Chart Studio — bangun ulang profesional satu fitur (pengganti 003 + 010) | approved (gate 2) | `docs/prd/011-org-chart-studio.md` |
 
 ## Specs (lightweight track)
 
@@ -65,12 +66,19 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 004-02 | Time grid week/day + all-day + jam kerja + slot booking | done | `docs/stories/004-02-week-day-slot-allday.md` |
 | 004-03 | Multi-hari + konflik overlap + detail event + DnD | todo | `docs/stories/004-03-multiday-overlap-detail-dnd.md` |
 | 004-04 | Locale + agenda + state matrix + showcase final + a11y | todo | `docs/stories/004-04-locale-agenda-states-showcase.md` |
+| 011-01 | Studio fondasi kanvas + kartu lega + layout seimbang | todo | `docs/stories/011-01-fondasi-kanvas-kartu-layout.md` |
+| 011-02 | Studio tambah 1-klik inline-edit + panel detail on-demand | todo | `docs/stories/011-02-tambah-inline-panel-detail.md` |
+| 011-03 | Studio pindah drag/dialog + hapus + undo/redo | todo | `docs/stories/011-03-pindah-hapus-undo.md` |
+| 011-04 | Studio cari + keyboard + pohon SR + motion/sentuh | todo | `docs/stories/011-04-cari-keyboard-pohon-sr.md` |
+| 011-05 | Studio states + showcase + audit kontras + legacy deprecated | todo | `docs/stories/011-05-states-showcase-audit-legacy.md` |
 
 ## Change Requests
 
 | ID | Judul | Status | File |
 |---|---|---|---|
 | CR-008 | Perapian dokumen PRD 001 & design upload-queue | approved | `docs/cr/cr-008-prd001-cleanup.md` |
+| CR-009 | OrgChartEditor layak total (fondasi + visual + a11y + showcase) | in-progress | `docs/cr/cr-009-org-chart-editor-layak.md` |
+| CR-010 | Org Chart Studio gate-2 follow-up (tutup OQ + perapian approved) | approved | `docs/cr/cr-010-org-chart-studio-gate2-followup.md` |
 
 ## Catatan
 
