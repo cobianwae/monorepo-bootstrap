@@ -1,8 +1,7 @@
 /**
  * tour.css — override terisolasi driver.js agar mengikuti token DS (K1).
- * Konsumen mengimpor bersama driver.css:
- *   import 'driver.js/dist/driver.css';
- *   import '@ds/ui/src/components/overlay/tour.css';
+ * Dimuat global via `@ds/ui/styles.css` (preseden xyflow);
+ * konsumen cukup memakai `Tour` tanpa impor CSS tambahan.
  * Semua warna dari token semantik; tanpa hex hardcode.
  */
 

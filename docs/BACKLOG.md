@@ -51,7 +51,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 |---|---|---|---|
 | 009-01 | Mention + emoji picker untuk chat + showcase | approved | `docs/stories/009-01-mention-emoji.md` |
 | 012-01 | Mind map fondasi dua sisi + pill + pan/zoom | done | `docs/stories/012-01-fondasi-dua-sisi-pill-panzoom.md` |
-| 012-02 | Mind map tambah inline + hapus M-011 + undo/redo | approved | `docs/stories/012-02-tambah-hapus-undo.md` |
+| 012-02 | Mind map tambah inline + hapus M-011 + undo/redo | done | `docs/stories/012-02-tambah-hapus-undo.md` |
 | 012-03 | Mind map keyboard + cari + states + showcase audit | approved | `docs/stories/012-03-keyboard-cari-showcase-audit.md` |
 | 013-01 | Diff viewer parser + unified + header + states | approved | `docs/stories/013-01-parser-unified-header-states.md` |
 | 013-02 | Diff viewer split + navigasi hunk + slot komentar | approved | `docs/stories/013-02-split-navigasi-komentar.md` |
@@ -64,7 +64,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 015-03 | Image cropper showcase avatar + cover + audit + smoke | approved | `docs/stories/015-03-showcase-audit-smoke.md` |
 | 017-01 | Product tour fondasi wrapper + navigasi + callback | done | `docs/stories/017-01-fondasi-wrapper-navigasi-callback.md` |
 | 017-02 | Product tour target hilang + keyboard + motion + states | done | `docs/stories/017-02-target-hilang-keyboard-motion-states.md` |
-| 017-03 | Product tour showcase + audit + smoke | approved | `docs/stories/017-03-showcase-audit-smoke.md` |
+| 017-03 | Product tour showcase + audit + smoke | done | `docs/stories/017-03-showcase-audit-smoke.md` |
 | 018-01 | Permission matrix fondasi grid + toggle + kunci | done | `docs/stories/018-01-fondasi-grid-toggle-kunci.md` |
 | 018-02 | Permission matrix keyboard + banner + states | done | `docs/stories/018-02-keyboard-banner-states.md` |
 | 018-03 | Permission matrix showcase + audit + smoke | approved | `docs/stories/018-03-showcase-audit-smoke.md` |
