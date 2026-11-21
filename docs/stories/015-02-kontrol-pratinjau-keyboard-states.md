@@ -1,6 +1,6 @@
 # 015-02 — Kontrol + pratinjau + keyboard + state matrix
 
-Status: approved
+Status: review
 PRD: `docs/prd/015-image-cropper.md` (approved, gate 1)
 Design: `docs/design/wireframes/image-cropper.md` (approved, gate 2, §2.2–§2.3, §3–§4) + `docs/design/flows/image-cropper.mmd` (diagram 2–3)
 FR: `FR-003`, `FR-004`, `FR-006`, `FR-007`
@@ -41,11 +41,11 @@ Goal: Cropper bisa dipakai penuh tanpa mouse: rotasi preset + reset, pratinjau l
 
 ## Tasks
 
-- [ ] Tambah kontrol (§2.2): `slider` Zoom berlabel + tombol −/+ + Putar 90° (`R`) + Atur ulang (`0`), wiring ke state 015-01 tanpa duplikasi mesin crop
-- [ ] Tambah pratinjau (§2.3): mini canvas/img throttled + `avatar` lingkaran + label dimensi; `aria-live=polite` + `aria-label "Pratinjau hasil"`
-- [ ] Implementasi keyboard (§4): `role=application` + handler panah/`+-`/`R`/`0` + live region + `aria-describedby` dimensi target; semua teks Bahasa Indonesia
-- [ ] Implementasi state matrix (§3): empty/loading(`skeleton` + `aria-busy`)/error(`alert` + fokus)/success(`status` + fokus) di dalam komponen
-- [ ] Test co-located: rotasi/reset, pratinjau update, handler keyboard, tiap state + peran ARIA; `test:tokens` awal tanpa token baru
+- [x] Tambah kontrol (§2.2): `slider` Zoom berlabel + tombol −/+ + Putar 90° (`R`) + Atur ulang (`0`), wiring ke state 015-01 tanpa duplikasi mesin crop
+- [x] Tambah pratinjau (§2.3): mini canvas/img throttled + `avatar` lingkaran + label dimensi; `aria-live=polite` + `aria-label "Pratinjau hasil"`
+- [x] Implementasi keyboard (§4): `role=application` + handler panah/`+-`/`R`/`0` + live region + `aria-describedby` dimensi target; semua teks Bahasa Indonesia
+- [x] Implementasi state matrix (§3): empty/loading(`skeleton` + `aria-busy`)/error(`alert` + fokus)/success(`status` + fokus) di dalam komponen
+- [x] Test co-located: rotasi/reset, pratinjau update, handler keyboard, tiap state + peran ARIA; `test:tokens` awal tanpa token baru
 
 ## Dependencies
 

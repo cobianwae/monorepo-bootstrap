@@ -186,4 +186,72 @@ describe('ImageCropper', () => {
     await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(1));
     expect(onComplete.mock.calls[0][0]).toMatchObject({ width: 1280, height: 720 });
   });
+
+  it('menampilkan kontrol zoom, putar, dan atur ulang dengan label Indonesia', async () => {
+    render(<ImageCropper />);
+    dropFile(makeFile('avatar.png', 'image/png', 1_000));
+    await screen.findByTestId('mock-cropper');
+    fireEvent.click(screen.getByText('mock-media-loaded'));
+    fireEvent.click(screen.getByText('mock-crop-complete'));
+
+    expect(screen.getByText('Zoom')).toBeTruthy();
+    expect(screen.getByRole('slider')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Perkecil' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Perbesar' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /Putar 90 derajat/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /Atur ulang/ })).toBeTruthy();
+  });
+
+  it('mengatur ulang ke crop 0,0 + zoom 1 tanpa upload ulang', async () => {
+    render(<ImageCropper />);
+    dropFile(makeFile('avatar.png', 'image/png', 1_000));
+    await screen.findByTestId('mock-cropper');
+    fireEvent.click(screen.getByText('mock-media-loaded'));
+    fireEvent.click(screen.getByText('mock-crop-complete'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Perbesar' }));
+    expect(screen.getByText('120%')).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: /Atur ulang/ }));
+    await waitFor(() => expect(screen.getByText('100%')).toBeTruthy());
+    // Tanpa upload ulang: cropper tetap tampil, bukan kembali ke empty.
+    expect(screen.getByTestId('mock-cropper')).toBeTruthy();
+  });
+
+  it('menampilkan pratinjau live dengan label dimensi target', async () => {
+    render(<ImageCropper />);
+    dropFile(makeFile('avatar.png', 'image/png', 1_000));
+    await screen.findByTestId('mock-cropper');
+    fireEvent.click(screen.getByText('mock-media-loaded'));
+    fireEvent.click(screen.getByText('mock-crop-complete'));
+
+    const preview = screen.getByTestId('crop-preview');
+    expect(preview.getAttribute('aria-label')).toBe('Pratinjau hasil');
+    expect(preview.textContent).toContain('512×512');
+  });
+
+  it('mendukung keyboard panah dan zoom di area crop', async () => {
+    render(<ImageCropper />);
+    dropFile(makeFile('avatar.png', 'image/png', 1_000));
+    await screen.findByTestId('mock-cropper');
+    fireEvent.click(screen.getByText('mock-media-loaded'));
+    fireEvent.click(screen.getByText('mock-crop-complete'));
+
+    const area = screen.getByRole('application');
+    expect(area.getAttribute('aria-label')).toContain('Area crop');
+    area.focus();
+    fireEvent.keyDown(area, { key: 'ArrowRight' });
+    fireEvent.keyDown(area, { key: '+' });
+    expect(screen.getByText('110%')).toBeTruthy();
+    fireEvent.keyDown(area, { key: '0' });
+    await waitFor(() => expect(screen.getByText('100%')).toBeTruthy());
+  });
+
+  it('menampilkan error format dengan role alert dan fokus ke alert', async () => {
+    render(<ImageCropper />);
+    dropFile(makeFile('dokumen.pdf', 'application/pdf', 1_000));
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toContain('Format tidak didukung');
+    await waitFor(() => expect(document.activeElement?.contains(alert) || document.activeElement === alert || alert.parentElement === document.activeElement).toBeTruthy());
+  });
 });

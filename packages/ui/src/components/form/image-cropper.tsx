@@ -4,6 +4,7 @@ import * as React from 'react';
 import Cropper, { type Area } from 'react-easy-crop';
 import { cn } from '../../lib/utils';
 import { Button } from '../base/button';
+import { Slider } from '../base/slider';
 import { Alert, AlertDescription } from '../feedback/alert';
 import { FileInput } from './file-input';
 import {
@@ -16,6 +17,7 @@ import {
   clampZoom,
   createCropResult,
   formatMegabytes,
+  normalizeRotation,
   validateImageFile,
   type CropOutputSize,
   type CropResult,
@@ -67,6 +69,10 @@ const CORNER_CURSOR: Record<Corner, string> = {
   sw: 'nesw-resize',
 };
 
+const ZOOM_STEP = 0.1;
+const PAN_STEP = 10;
+const PAN_STEP_PRECISE = 1;
+
 function resolveOutputSize(aspect: number | 'free', outputSize?: CropOutputSize): CropOutputSize {
   if (outputSize) return outputSize;
   return aspect === 16 / 9 ? COVER_OUTPUT_SIZE : AVATAR_OUTPUT_SIZE;
@@ -91,13 +97,19 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
     const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
     const [crop, setCrop] = React.useState({ x: 0, y: 0 });
     const [zoom, setZoom] = React.useState(1);
+    const [rotation, setRotation] = React.useState<0 | 90 | 180 | 270>(0);
     const [mediaRatio, setMediaRatio] = React.useState<number | null>(null);
     const [croppedAreaPixels, setCroppedAreaPixels] = React.useState<Area | null>(null);
     const [containerSize, setContainerSize] = React.useState<CropSizePx | null>(null);
     const [cropSize, setCropSize] = React.useState<CropSizePx | null>(null);
+    const [liveMessage, setLiveMessage] = React.useState('');
 
     const containerRef = React.useRef<HTMLDivElement | null>(null);
     const dragCenterRef = React.useRef<PointPx | null>(null);
+    const liveTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+    const alertRef = React.useRef<HTMLDivElement | null>(null);
+    const successRef = React.useRef<HTMLParagraphElement | null>(null);
+    const resetButtonRef = React.useRef<HTMLButtonElement | null>(null);
 
     const srcRef = React.useRef<string | null>(null);
     srcRef.current = src;
@@ -108,12 +120,31 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
 
     React.useEffect(() => revokeSrc, [revokeSrc]);
 
+    React.useEffect(() => {
+      if (status === 'error') alertRef.current?.focus();
+      if (status === 'success') successRef.current?.focus();
+    }, [status]);
+
+    React.useEffect(
+      () => () => {
+        if (liveTimerRef.current) clearTimeout(liveTimerRef.current);
+      },
+      []
+    );
+
     const effectiveAspect = aspect === 'free' ? (mediaRatio ?? 1) : aspect;
     const target = resolveOutputSize(aspect, outputSize);
     const formattedTarget = `${target.width}×${target.height}`;
+    const targetDescId = React.useId();
+    const isAvatar = cropShape === 'round';
 
     const activeCropSize: CropSizePx | null =
       cropSize ?? (containerSize ? defaultCropSize(containerSize, effectiveAspect) : null);
+
+    const announce = React.useCallback((message: string) => {
+      if (liveTimerRef.current) clearTimeout(liveTimerRef.current);
+      liveTimerRef.current = setTimeout(() => setLiveMessage(message), 300);
+    }, []);
 
     const measureContainer = React.useCallback(() => {
       const el = containerRef.current;
@@ -187,6 +218,7 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
       setErrorMessage(null);
       setCrop({ x: 0, y: 0 });
       setZoom(1);
+      setRotation(0);
       setMediaRatio(null);
       setCroppedAreaPixels(null);
       setCropSize(null);
@@ -195,7 +227,7 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
     const handleSave = async () => {
       if (!src || !croppedAreaPixels) return;
       try {
-        const result = await createCropResult(src, croppedAreaPixels, 0, target);
+        const result = await createCropResult(src, croppedAreaPixels, rotation, target);
         onComplete?.(result);
         setStatus('success');
       } catch (error) {
@@ -203,56 +235,160 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
       }
     };
 
-    const handleReset = () => {
+    /** AC-01: reset kembali ke crop 0,0 + zoom 1 + rotation 0 file ini tanpa upload ulang. */
+    const handleResetTransforms = () => {
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setRotation(0);
+      announce('Diaturn ulang');
+      resetButtonRef.current?.focus();
+    };
+
+    const handleRotate = (direction: 1 | -1 = 1) => {
+      setRotation((current) => {
+        const next = normalizeRotation(current + direction * 90);
+        announce(`Diputar ${next} derajat`);
+        return next;
+      });
+    };
+
+    const handleClear = () => {
       revokeSrc();
       setSrc(null);
       setStatus('empty');
       setErrorMessage(null);
       setCroppedAreaPixels(null);
+      setRotation(0);
+    };
+
+    const handleZoomDelta = (delta: number) => {
+      setZoom((current) => {
+        const next = clampZoom(Math.round((current + delta) * 10) / 10);
+        announce(`Zoom ${Math.round(next * 100)} persen`);
+        return next;
+      });
+    };
+
+    const handleCropKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const precise = event.shiftKey && ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key);
+      const step = precise ? PAN_STEP_PRECISE : PAN_STEP;
+      switch (event.key) {
+        case 'ArrowLeft':
+          event.preventDefault();
+          setCrop((c) => ({ x: c.x - step, y: c.y }));
+          announce(`Area ${Math.round(crop.x - step)}, ${Math.round(crop.y)}`);
+          break;
+        case 'ArrowRight':
+          event.preventDefault();
+          setCrop((c) => ({ x: c.x + step, y: c.y }));
+          announce(`Area ${Math.round(crop.x + step)}, ${Math.round(crop.y)}`);
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          setCrop((c) => ({ x: c.x, y: c.y - step }));
+          announce(`Area ${Math.round(crop.x)}, ${Math.round(crop.y - step)}`);
+          break;
+        case 'ArrowDown':
+          event.preventDefault();
+          setCrop((c) => ({ x: c.x, y: c.y + step }));
+          announce(`Area ${Math.round(crop.x)}, ${Math.round(crop.y + step)}`);
+          break;
+        case '+':
+        case '=':
+          event.preventDefault();
+          handleZoomDelta(ZOOM_STEP);
+          break;
+        case '-':
+        case '_':
+          event.preventDefault();
+          handleZoomDelta(-ZOOM_STEP);
+          break;
+        case 'R':
+        case 'r':
+          event.preventDefault();
+          handleRotate(event.shiftKey ? -1 : 1);
+          break;
+        case '0':
+          event.preventDefault();
+          handleResetTransforms();
+          break;
+        default:
+          break;
+      }
     };
 
     const showCropper = status === 'loading' || status === 'ready';
 
     return (
       <div ref={ref} className={cn('w-full space-y-4', className)}>
-        {status === 'empty' || status === 'error' ? (
-          <FileInput
-            value={[]}
-            onChange={handleFiles}
-            maxFiles={1}
-            accept={accept}
-            showFileList={false}
-            helperText={`PNG, JPG, atau WebP · Maks ${formatMegabytes(maxBytes)}`}
-            errorMessage={undefined}
-            aria-label="Pilih foto"
-          />
+        {status === 'empty' ? (
+          <>
+            <p role="status" className="text-sm text-muted-foreground">
+              Belum ada gambar. Pilih foto untuk mulai memotong.
+            </p>
+            <FileInput
+              value={[]}
+              onChange={handleFiles}
+              maxFiles={1}
+              accept={accept}
+              showFileList={false}
+              helperText={`PNG, JPG, atau WebP · Maks ${formatMegabytes(maxBytes)}`}
+              errorMessage={undefined}
+              aria-label="Pilih foto"
+            />
+          </>
         ) : null}
 
         {status === 'error' && errorMessage ? (
-          <Alert variant="destructive" role="alert">
-            <AlertDescription>{errorMessage}</AlertDescription>
-          </Alert>
+          <>
+            <div ref={alertRef} tabIndex={-1} className="focus-visible:outline-none">
+              <Alert variant="destructive" role="alert">
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
+            </div>
+            <FileInput
+              value={[]}
+              onChange={handleFiles}
+              maxFiles={1}
+              accept={accept}
+              showFileList={false}
+              helperText={`PNG, JPG, atau WebP · Maks ${formatMegabytes(maxBytes)}`}
+              errorMessage={undefined}
+              aria-label="Pilih foto lain"
+            />
+          </>
         ) : null}
 
         {showCropper && src ? (
           <div
             ref={containerRef}
+            role="application"
+            aria-roledescription="pemotong gambar"
+            aria-label="Area crop. Panah geser, tambah kurang zoom, R putar, nol reset."
+            aria-describedby={targetDescId}
             aria-busy={status === 'loading'}
+            tabIndex={0}
+            onKeyDown={handleCropKeyDown}
             className={cn(
               'relative w-full overflow-hidden rounded-xl bg-muted',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+              'motion-reduce:transition-none',
               CROPPER_HEIGHT_CLASS
             )}
           >
             {status === 'loading' ? (
-              <p role="status" className="sr-only">
-                Memuat gambar…
-              </p>
+              <>
+                <div aria-hidden="true" className="absolute inset-0 animate-pulse bg-muted" />
+                <p role="status" className="sr-only">
+                  Memuat gambar…
+                </p>
+              </>
             ) : null}
             <Cropper
               image={src}
               crop={crop}
               zoom={zoom}
-              rotation={0}
+              rotation={rotation}
               aspect={effectiveAspect}
               minZoom={MIN_ZOOM}
               maxZoom={MAX_ZOOM}
@@ -289,7 +425,7 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
                       onPointerMove={handleHandlePointerMove}
                       onPointerUp={handleHandlePointerUp}
                       onPointerCancel={handleHandlePointerUp}
-                      className="absolute z-10 flex touch-none items-center justify-center rounded-full"
+                      className="absolute z-10 flex touch-none items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-reduce:transition-none"
                       style={{
                         left: pos.x,
                         top: pos.y,
@@ -312,10 +448,12 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
 
         {showCropper || status === 'success' ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">Hasil {formattedTarget}</p>
+            <p id={targetDescId} className="text-sm text-muted-foreground">
+              Hasil {formattedTarget}
+            </p>
             <div className="flex gap-2">
               {status === 'success' ? (
-                <Button type="button" variant="outline" onClick={handleReset}>
+                <Button type="button" variant="outline" onClick={handleClear} className="min-h-11 min-w-11">
                   Pilih foto lain
                 </Button>
               ) : (
@@ -323,6 +461,7 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
                   type="button"
                   onClick={handleSave}
                   disabled={status !== 'ready' || !croppedAreaPixels}
+                  className="min-h-11 min-w-11"
                 >
                   Simpan hasil
                 </Button>
@@ -331,8 +470,106 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
           </div>
         ) : null}
 
+        {showCropper && src ? (
+          <div className="grid gap-4 md:grid-cols-[160px_1fr]">
+            <div
+              role="region"
+              aria-live="polite"
+              aria-label="Pratinjau hasil"
+              data-testid="crop-preview"
+              className="flex items-center gap-3"
+            >
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'block h-20 w-20 shrink-0 overflow-hidden border border-border bg-muted',
+                  isAvatar ? 'rounded-full' : 'rounded-lg'
+                )}
+              >
+                {/* Pratinjau live: gambar sumber diskala mengikuti area (diperbarui tiap onCropComplete). */}
+                <img src={src} alt="" className="h-full w-full object-cover motion-reduce:transition-none" />
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {isAvatar ? 'Pratinjau avatar' : 'Pratinjau cover'} · {formattedTarget}
+              </span>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  aria-label="Perkecil"
+                  onClick={() => handleZoomDelta(-0.2)}
+                  disabled={status !== 'ready'}
+                  className="min-h-11 min-w-11"
+                >
+                  −
+                </Button>
+                <label htmlFor="cropper-zoom" className="text-sm text-muted-foreground">
+                  Zoom
+                </label>
+                <Slider
+                  id="cropper-zoom"
+                  aria-label="Zoom"
+                  min={MIN_ZOOM}
+                  max={MAX_ZOOM}
+                  step={ZOOM_STEP}
+                  value={[zoom]}
+                  onValueChange={([next]) => {
+                    if (next !== undefined) {
+                      setZoom(clampZoom(next));
+                      announce(`Zoom ${Math.round(clampZoom(next) * 100)} persen`);
+                    }
+                  }}
+                  disabled={status !== 'ready'}
+                  className="min-h-12 flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  aria-label="Perbesar"
+                  onClick={() => handleZoomDelta(0.2)}
+                  disabled={status !== 'ready'}
+                  className="min-h-11 min-w-11"
+                >
+                  +
+                </Button>
+                <span aria-hidden="true" className="w-14 text-right text-sm text-muted-foreground">
+                  {Math.round(zoom * 100)}%
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleRotate(1)}
+                  disabled={status !== 'ready'}
+                  className="min-h-11"
+                >
+                  Putar 90° <kbd aria-hidden="true" className="ml-1 text-xs">R</kbd>
+                  <span className="sr-only">Putar 90 derajat</span>
+                </Button>
+                <Button
+                  ref={resetButtonRef}
+                  type="button"
+                  variant="ghost"
+                  onClick={handleResetTransforms}
+                  disabled={status !== 'ready'}
+                  className="min-h-11"
+                >
+                  Atur ulang <kbd aria-hidden="true" className="ml-1 text-xs">0</kbd>
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        <p aria-live="polite" className="sr-only">
+          {liveMessage}
+        </p>
+
         {status === 'success' ? (
-          <p role="status" className="text-sm text-foreground">
+          <p ref={successRef} tabIndex={-1} role="status" className="text-sm text-foreground focus-visible:outline-none">
             {formattedTarget} tersimpan.
           </p>
         ) : null}
