@@ -1,6 +1,6 @@
 # CR-021 — Flow Editor: kanvas rusak secara visual dan layout
 
-**Status:** approved
+**Status:** done
 **Sumber:** review artefak 005 atas laporan user (“secara UX ancur banget”) — diverifikasi di browser (Chrome headless 157, showcase `localhost:4000/patterns/flow-editor`, viewport 1440×1000, tema Pulse gelap + terang) dengan pengukuran DOM via CDP
 **Ref:** `docs/prd/005-flow-editor.md` (FR-001, FR-002, FR-010, FR-011, FR-013), `docs/design/flow-editor.md`, `docs/stories/005-01-canvas-node-foundation.md`, `005-02`, `005-05`, `005-06`, `packages/ui/src/components/canvas/flow-editor.tsx`, `packages/ui/src/styles.css`, `apps/showcase/src/app/(docs)/patterns/flow-editor/page.tsx`
 
