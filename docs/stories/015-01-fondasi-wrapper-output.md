@@ -1,6 +1,6 @@
 # 015-01 — Fondasi wrapper + aspek + output blob
 
-Status: in-progress
+Status: done
 PRD: `docs/prd/015-image-cropper.md` (approved, gate 1)
 Design: `docs/design/wireframes/image-cropper.md` (approved, gate 2) + `docs/design/flows/image-cropper.mmd` (diagram 1–2) + sitemap `S-005.38`
 FR: `FR-001`, `FR-002`, `FR-005`, `FR-010`
@@ -43,7 +43,7 @@ Goal: Mesin crop berdiri tanpa showcase final: wrapper `react-easy-crop` token-f
 
 - [x] Tambah dependency `react-easy-crop` (+ `@types` bila perlu) ke `packages/ui` — butuh approval eksplisit per CONVENTIONS (konsep approved gate 1, K1/C1); isolasi CSS di wrapper
 - [x] Buat `packages/ui/src/components/form/image-cropper.tsx` (named export, props §2.4 wireframe) + `image-cropper-utils.ts` (decode/resize/EXIF/`getCroppedBlob`) + `index` barrel; tanpa token baru
-- [ ] Implementasi viewport + overlay token (`background/80`, garis `primary`), gagang hit ≥44px, clamp zoom + `restrictPosition`, preset aspek + `cropShape rect/round`
+- [x] Implementasi viewport + overlay token (`background/80`, garis `primary`), gagang hit ≥44px, clamp zoom + `restrictPosition`, preset aspek + `cropShape rect/round`
 - [x] Tulis test co-located (mock canvas/`createImageBitmap`): aspek 4 preset, clamp zoom + tidak-lepas, output dimensi avatar/cover + rotasi, tolak non-gambar/besar, EXIF bila feasible
 - [x] Verifikasi `pnpm typecheck`, `lint`, `test` untuk file baru; catat OQ/K2–K3 default di story
 
@@ -78,5 +78,5 @@ Goal: Mesin crop berdiri tanpa showcase final: wrapper `react-easy-crop` token-f
 
 - `pnpm typecheck`: 12 error baseline di `flow-editor.test.tsx:702–749` (known issue, tidak berubah); tidak ada error dari file 015-01.
 - `pnpm --filter @ds/ui lint`: hijau.
-- `packages/ui` test (`--maxWorkers=2 --testTimeout=30000`): 57 file, 637 test lulus; 21 test baru (14 util + 7 komponen).
+- `packages/ui` test (`--maxWorkers=2 --testTimeout=30000`): 57 file, 637 test lulus; 29 test baru (14 util + 8 geometri + 7 komponen); suite penuh 663/664 lulus, satu kegagalan smoke `RichTextEditor` (`rte-link-save`) yang sudah tercatat sebagai baseline.
 - `pnpm test:tokens` dan `pnpm -C apps/showcase build` tidak dijalankan: tidak ada perubahan token atau showcase.
