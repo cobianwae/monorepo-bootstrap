@@ -80,7 +80,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.33 | Org Chart Editor (legacy, diganti 011) | `/patterns/org-chart-editor` | deprecated |
 | S-005.34 | Org Chart Studio (PRD 011) | `/patterns/org-chart-studio` | implemented |
 | S-005.34.01 | Org Chart Studio — panel detail (inspector + tab pohon SR) | `/patterns/org-chart-studio` (panel kanan) | implemented |
-| S-005.35 | Mind Map (PRD 012) | `/patterns/mind-map` | in-design |
+| S-005.35 | Mind Map (PRD 012) | `/patterns/mind-map` | implemented |
 | S-005.36 | Diff Viewer (PRD 013) | `/patterns/diff-viewer` | in-design |
 | S-005.37 | Import Wizard (PRD 014) | `/patterns/import-wizard` | implemented |
 | S-005.37.01 | Import Wizard — langkah upload | `/patterns/import-wizard` (langkah 1) | implemented |
@@ -121,7 +121,7 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | M-008 | Konfirmasi hapus Org Chart Studio (hitungan turunan + pilihan reparent/hapus subtree + proteksi root) | S-005.34 | implemented |
 | M-009 | Link editor (popover di desktop, dialog/sheet di mobile; sisip/edit/hapus + validasi URL) | S-005.22 | in-design |
 | M-010 | Sisip gambar via URL + alt text wajib (dialog; tanpa alt ditolak dengan pesan) | S-005.22 | in-design |
-| M-011 | Konfirmasi hapus mind map (hitungan turunan + proteksi root) | S-005.35 | in-design |
+| M-011 | Konfirmasi hapus mind map (hitungan turunan + proteksi root) | S-005.35 | implemented |
 | M-012 | Lightbox Gallery (overlay fullscreen prev/next + counter + strip thumbnail + zoom, basis `overlay/lightbox` reusable PRD 016) | S-005.16 | in-design |
 
 ## Route Groups

@@ -29,6 +29,7 @@ const mockZoomIn = vi.fn();
 const mockZoomOut = vi.fn();
 const mockSetViewport = vi.fn();
 const mockSetCenter = vi.fn();
+let mockViewport = { x: 0, y: 0, zoom: 1 };
 
 vi.mock('@xyflow/react', async (importOriginal) => {
   const xyflow = (await importOriginal()) as Record<string, unknown>;
@@ -40,7 +41,7 @@ vi.mock('@xyflow/react', async (importOriginal) => {
       fitView: mockFitView,
       setViewport: mockSetViewport,
       setCenter: mockSetCenter,
-      getViewport: () => ({ x: 0, y: 0, zoom: 1 }),
+      getViewport: () => mockViewport,
     }),
   };
 });
@@ -99,6 +100,56 @@ function ControlledMind({ onChangeSpy }: { onChangeSpy?: (next: MindNodeFlat[]) 
 }
 
 describe('MindMap keyboard, SR dan states (012-03)', () => {
+  it('CR-020: edit memusatkan cabang/root sesuai ukuran dan menjaga zoom nontrivial', () => {
+    mockViewport = { x: -420, y: 175, zoom: 0.65 };
+    try {
+      const { container } = render(<MindMap data={flatData} />);
+      const normalized = normalizeMindInput(flatData);
+      const positions = computeMindMapPositions(normalized, new Set(normalized.nodes.map((node) => node.id)));
+      fireEvent.keyDown(container.querySelector('[data-node-id="produk"]')!, { key: 'F2' });
+      const position = positions.find((item) => item.id === 'produk')!;
+      expect(mockSetCenter).toHaveBeenCalledWith(position.x + 80, position.y + 24, {
+        zoom: 0.65, duration: expect.any(Number),
+      });
+      fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Escape' });
+      fireEvent.keyDown(container.querySelector('[data-node-id="q1"]')!, { key: 'F2' });
+      const root = positions.find((item) => item.id === 'q1')!;
+      expect(mockSetCenter).toHaveBeenCalledWith(root.x + 100, root.y + 32, {
+        zoom: 0.65, duration: expect.any(Number),
+      });
+      fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Escape' });
+      fireEvent.keyDown(screen.getByTestId('mind-map-viewport'), { key: 'ArrowRight' });
+      expect(mockSetViewport).toHaveBeenCalledWith({ x: -460, y: 175, zoom: 0.65 });
+      fireEvent.keyDown(screen.getByTestId('mind-map-viewport'), { key: '0' });
+      expect(mockSetViewport).toHaveBeenCalledWith({ x: -420, y: 175, zoom: 1 }, { duration: expect.any(Number) });
+    } finally {
+      mockViewport = { x: 0, y: 0, zoom: 1 };
+    }
+  });
+
+  it('CR-020: fokus keyboard dipusatkan; reduced-motion menghapus animasi', () => {
+    const matchMedia = vi.spyOn(window, 'matchMedia').mockReturnValue({
+      matches: true, media: '(prefers-reduced-motion: reduce)', onchange: null,
+      addListener: vi.fn(), removeListener: vi.fn(),
+      addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: () => false,
+    });
+    try {
+      const { container, rerender } = render(<MindMap data={flatData} />);
+      const root = container.querySelector('[data-node-id="q1"]')!;
+      mockSetCenter.mockClear();
+      fireEvent.keyDown(root, { key: 'ArrowDown' });
+      expect(mockSetCenter).toHaveBeenCalledWith(expect.any(Number), expect.any(Number), { zoom: 1, duration: 0 });
+      const calls = mockSetCenter.mock.calls.length;
+      rerender(<MindMap data={flatData} className="w-full" />);
+      expect(mockSetCenter.mock.calls.length).toBe(calls);
+      fireEvent.keyDown(container.querySelector('[data-node-id="riset"]')!, { key: 'F2' });
+      expect(mockSetCenter.mock.calls.length).toBeGreaterThan(calls);
+      expect(mockSetCenter).toHaveBeenLastCalledWith(expect.any(Number), expect.any(Number), { zoom: 1, duration: 0 });
+    } finally {
+      matchMedia.mockRestore();
+    }
+  });
+
   it('kiri/kanan mengunjungi saudara di sisi sama dan melewati node disabled', () => {
     const data: MindNodeFlat[] = [
       { id: 'root', parentId: null, label: 'Root' },

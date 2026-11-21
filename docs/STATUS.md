@@ -15,14 +15,15 @@ Story 012-01 (`done`, ter-merge ke `dev`) — fondasi `MindMap` di `packages/ui`
 Story 018-02 keyboard/banner/states `done` atas persetujuan user, ter-merge ke `dev`; audit browser manual tercatat untuk 018-03.
 Story 012-02 `done` (disetujui user, ter-merge ke `dev` dari branch `012-02-tambah-hapus-undo` di worktree `arah-cr`): tambah anak/saudara + edit inline, hapus subtree M-011, undo/redo 50 + toolbar/shortcut/live region/toast; lint dan test hijau (635 UI termasuk 33 MindMap, 56 showcase, 8 token), typecheck hanya baseline FlowEditor; tanpa token/dependency/showcase baru.
 Story 012-03 `done` atas approval user di worktree `arah-cr`, branch `012-03-keyboard-cari-showcase-audit`: keyboard/pohon SR, search dan enam states, showcase `/patterns/mind-map`, audit Pulse. Integrasi dev `3e4a2a7`: lint dan build showcase hijau, 695/696 UI (43 MindMap lulus) + 64 showcase; baseline FlowEditor/RTE tetap, browser/SR manual belum dilakukan. Blocker font run awal tidak muncul saat build ulang; detail di story.
+CR-020 diimplementasikan di `arah-story`, branch `cr-020-mind-map-canvas-parity` dari `origin/dev` `6871ce8`: pointer node pulih, pemusatan edit/fokus menjaga zoom, minimap mobile bertoggle; 48 tes MindMap + Chrome Q1/50 node/light-dark/390px/zoom browser 200% terverifikasi. Build/lint hijau, typecheck hanya 12 error baseline FlowEditor; run test awal hijau, run final 705/706 UI (baseline RTE), 68 showcase/8 token lulus. S-005.35/M-011 `implemented`; CR tetap `approved`, menunggu review user; SR bersuara native belum diuji.
 
 ## Next
 
 1. Eksekusi CR-015 (`approved`) — verifikasi baseline dev + bersihkan entri stale.
 2. Antrean implementasi satu per sesi: 013-01, 015-03.
 3. Sinkron sitemap: S-005.30/S-005.31 `planned` → `implemented` (007-01/008-01/02 live); S-005.41 `in-design` (018).
-4. Mind Map: 012-03 `done` atas approval user; walkthrough browser/SR tetap tindak lanjut catatan review (smoke build sudah hijau).
-5. Review canvas 012 vs 011: CR-020 `approved` oleh user (di-amend: akar keluhan = node MindMap `pointer-events: none` karena `elementsSelectable={false}`; blocker dikerjakan dulu) + pemusatan node baru/edit/fokus belum diturunkan dari Studio; siap implementasi, kode belum diubah.
+4. Mind Map: review hasil CR-020; walkthrough Chrome sudah lulus, pembaca layar bersuara native tetap tindak lanjut.
+5. CR-020 tetap `approved`; hanya user boleh menetapkan `done`. Belum push/PR/merge.
 
 ## Known Issues
 
