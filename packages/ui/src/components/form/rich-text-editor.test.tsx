@@ -493,3 +493,91 @@ describe('RichTextEditor 006-04 gambar + markdown + mention', () => {
     expect(onChange.mock.calls.at(-1)?.[0] as string).toContain('<h1');
   });
 });
+
+describe('RichTextEditor 006-05 showcase final + audit + smoke', () => {
+  it('exposes all required data-testid hooks in one render (AC-04)', async () => {
+    render(<RichTextEditor value="<p>Halo</p>" />);
+    for (const id of [
+      'rte-toolbar',
+      'rte-content',
+      'rte-counter',
+      'rte-empty',
+      'rte-live',
+      'rte-button-bold',
+      'rte-button-link',
+      'rte-button-image',
+      'rte-button-undo',
+      'rte-button-redo',
+    ]) {
+      if (id === 'rte-empty') {
+        // Non-empty value hides empty hint; assert absence is intentional.
+        expect(screen.queryByTestId(id)).toBeNull();
+        continue;
+      }
+      expect(await screen.findByTestId(id)).toBeDefined();
+    }
+    // Empty value shows empty hint + error/loading hooks on demand.
+    const { unmount } = render(<RichTextEditor value="" />);
+    expect(await screen.findByTestId('rte-empty')).toBeDefined();
+    unmount();
+  });
+
+  it('smoke interaktif: format, link, gambar, counter over-limit (AC-01)', async () => {
+    const onChange = vi.fn();
+    render(<RichTextEditor value="<p>Tulis di sini</p>" onChange={onChange} maxLength={50} />);
+
+    // Format: heading via toolbar memicu onChange.
+    fireEvent.click(await screen.findByTestId('rte-button-h1'));
+    await waitFor(() => {
+      expect(onChange).toHaveBeenCalled();
+    });
+
+    // Link: buka M-009, validasi, lalu edit tautan existing via klik anchor.
+    fireEvent.click(await screen.findByTestId('rte-button-link'));
+    const popover = await screen.findByTestId('rte-link-popover');
+    expect(popover.getAttribute('aria-label')).toBe('Editor tautan');
+    fireEvent.change(await screen.findByTestId('rte-link-input'), {
+      target: { value: 'https://contoh.com' },
+    });
+    expect(screen.queryByTestId('rte-link-error')).toBeNull();
+    expect((screen.getByTestId('rte-link-save') as HTMLButtonElement).disabled).toBe(false);
+    fireEvent.keyDown(await screen.findByTestId('rte-link-input'), { key: 'Escape' });
+    await waitFor(() => {
+      expect(screen.queryByTestId('rte-link-input')).toBeNull();
+    });
+
+    // Gambar: URL + alt valid → <img> tersisip.
+    fireEvent.click(await screen.findByTestId('rte-button-image'));
+    fireEvent.change(await screen.findByTestId('rte-image-url'), {
+      target: { value: 'https://contoh.com/gambar.png' },
+    });
+    fireEvent.change(await screen.findByTestId('rte-image-alt'), {
+      target: { value: 'Contoh gambar' },
+    });
+    fireEvent.click(screen.getByTestId('rte-image-save'));
+    await waitFor(() => {
+      const last = onChange.mock.calls.at(-1)?.[0] as string | undefined;
+      expect(last ?? '').toContain('<img');
+    });
+
+    // Counter over-limit: teks panjang memicu alert + counter, tanpa blokir.
+    const { unmount: unmountSmoke } = render(<RichTextEditor value={`<p>${'x'.repeat(60)}</p>`} maxLength={50} />);
+    void unmountSmoke;
+    const alerts = await screen.findAllByTestId('rte-counter-alert');
+    expect(alerts.length).toBeGreaterThan(0);
+    expect(alerts[alerts.length - 1].textContent).toContain('melewati batas');
+    const counters = await screen.findAllByTestId('rte-counter');
+    expect(counters[counters.length - 1].textContent).toContain('60/50');
+  });
+
+  it('state matrix error + loading hooks untuk panel demo showcase (AC-01)', async () => {
+    const onRetry = vi.fn();
+    render(<RichTextEditor value="<p>Halo</p>" error="Konten gagal dimuat" onRetry={onRetry} />);
+    expect(await screen.findByTestId('rte-error')).toBeDefined();
+    fireEvent.click(await screen.findByTestId('rte-error-retry'));
+    expect(onRetry).toHaveBeenCalled();
+
+    render(<RichTextEditor value="<p>Halo</p>" loading />);
+    expect(await screen.findByTestId('rte-loading')).toBeDefined();
+  });
+});

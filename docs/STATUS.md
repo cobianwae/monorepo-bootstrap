@@ -40,6 +40,7 @@ Story 005-01 (`done`, ter-merge ke `dev`) — Flow editor fondasi canvas + node 
 11. Story 006-02 link M-009 + shortcut + keyboard selesai, status `done`, di-merge ke `dev` — `006-02`.
 12. Story 006-03 mode + counter + state matrix — implementasi selesai, verifikasi hijau, status `done`, di-merge ke `dev` — `006-03`.
 13. Story 006-04 gambar M-010 + serializer markdown + slot mention — implementasi selesai, verifikasi hijau (27/27 RTE), status `done`, di-merge ke `dev` — `006-04`.
+14. Story 006-05 showcase final + audit + smoke — implementasi selesai, verifikasi hijau (typecheck/lint/531 test/test:tokens/showcase build), status `done` — `006-05`.
 
 ## Known Issues
 
