@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { addMonths } from 'date-fns';
+import { enUS as en, id } from 'date-fns/locale';
 import { EventCalendar, type CalendarEvent } from './event-calendar';
 
 const CONTEXT_DATE = new Date(2026, 10, 21);
@@ -568,5 +569,125 @@ describe('EventCalendar drag and drop', () => {
     expect(info.start.getDate()).toBe(22);
     expect(info.start.getHours()).toBe(10);
     expect(info.end.getHours()).toBe(11);
+  });
+});
+
+describe('EventCalendar locale', () => {
+  const LOCALE_EVENTS: CalendarEvent[] = [
+    { id: 'a', title: 'Meeting', start: dayDate(21, 9), end: dayDate(21, 10), category: 'info' },
+  ];
+
+  it('AC-03: locale en menampilkan nama hari dalam bahasa Inggris', () => {
+    render(
+      <EventCalendar
+        events={LOCALE_EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="week"
+        locale={en}
+        weekStartsOn={1}
+      />
+    );
+    // 21 Nov 2026 adalah Sabtu
+    expect(screen.getByText('Sat 21')).toBeDefined();
+  });
+
+  it('AC-03: locale id menampilkan nama hari dalam bahasa Indonesia', () => {
+    render(
+      <EventCalendar
+        events={LOCALE_EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="week"
+        locale={id}
+        weekStartsOn={1}
+      />
+    );
+    expect(screen.getByText('Sab 21')).toBeDefined();
+  });
+});
+
+describe('EventCalendar agenda', () => {
+  it('AC-04: agenda menampilkan event kronologis grup per hari, baris panggil onSelectEvent', () => {
+    const onSelectEvent = vi.fn();
+    render(
+      <EventCalendar
+        events={EVENTS}
+        defaultDate={CONTEXT_DATE}
+        defaultView="agenda"
+        onSelectEvent={onSelectEvent}
+      />
+    );
+
+    expect(screen.getAllByText('Design Conference')).toHaveLength(3);
+    expect(screen.getByText('Keynote')).toBeDefined();
+    expect(screen.getByText('Thursday, 19 November 2026')).toBeDefined();
+    expect(screen.getAllByRole('list')).toHaveLength(2);
+
+    const keynoteTitle = screen.getByText('Keynote');
+    const keynoteBtn = keynoteTitle.closest('button');
+    expect(keynoteBtn).toBeInstanceOf(HTMLButtonElement);
+    fireEvent.click(keynoteBtn!);
+    expect(onSelectEvent).toHaveBeenCalledTimes(1);
+    expect((onSelectEvent.mock.calls[0][0] as CalendarEvent).id).toBe('keynote');
+  });
+
+  it('AC-04: agenda periode tanpa event menampilkan pesan kosong', () => {
+    render(
+      <EventCalendar
+        events={[]}
+        defaultDate={new Date(2026, 0, 15)}
+        defaultView="agenda"
+      />
+    );
+    expect(screen.getByText('Tidak ada event pada periode ini.')).toBeDefined();
+  });
+});
+
+describe('EventCalendar state matrix', () => {
+  it('AC-01: loading menampilkan skeleton grid dengan aria-busy', () => {
+    render(
+      <EventCalendar events={[]} defaultDate={CONTEXT_DATE} loading />
+    );
+    const grid = screen.getByRole('grid');
+    expect(grid.getAttribute('aria-busy')).toBe('true');
+    expect(screen.getByText('Memuat event…')).toBeDefined();
+    expect(screen.getByLabelText('Previous period').getAttribute('disabled')).toBeDefined();
+  });
+
+  it('AC-01: error menampilkan alert role alert + pesan + tombol Coba lagi', () => {
+    const onRetry = vi.fn();
+    render(
+      <EventCalendar
+        events={[]}
+        defaultDate={CONTEXT_DATE}
+        error="Gagal memuat data"
+        onRetry={onRetry}
+      />
+    );
+    expect(screen.getByRole('alert')).toBeDefined();
+    expect(screen.getByText('Gagal memuat event')).toBeDefined();
+    expect(screen.getByText('Gagal memuat data')).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: 'Coba lagi' }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('AC-01: error tanpa onRetry tidak menampilkan tombol Coba lagi', () => {
+    render(
+      <EventCalendar events={[]} defaultDate={CONTEXT_DATE} error="Gagal memuat data" />
+    );
+    expect(screen.getByRole('alert')).toBeDefined();
+    expect(screen.queryByRole('button', { name: 'Coba lagi' })).toBeNull();
+  });
+
+  it('AC-01: empty (periode tanpa event) menampilkan empty-state role status', () => {
+    render(<EventCalendar events={[]} defaultDate={CONTEXT_DATE} />);
+    expect(screen.getByRole('status')).toBeDefined();
+    expect(screen.getByText('Tidak ada event di periode ini')).toBeDefined();
+  });
+
+  it('AC-01: success dengan event menampilkan grid aktif, bukan state matrix', () => {
+    render(<EventCalendar events={EVENTS} defaultDate={CONTEXT_DATE} defaultView="month" />);
+    expect(screen.queryByText('Tidak ada event di periode ini')).toBeNull();
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.getByRole('grid')).toBeDefined();
   });
 });

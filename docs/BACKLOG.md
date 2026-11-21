@@ -65,7 +65,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 004-01 | EventCalendar fondasi + month view + navigasi | done | `docs/stories/004-01-foundation-month-navigation.md` |
 | 004-02 | Time grid week/day + all-day + jam kerja + slot booking | done | `docs/stories/004-02-week-day-slot-allday.md` |
 | 004-03 | Multi-hari + konflik overlap + detail event + DnD | done | `docs/stories/004-03-multiday-overlap-detail-dnd.md` |
-| 004-04 | Locale + agenda + state matrix + showcase final + a11y | todo | `docs/stories/004-04-locale-agenda-states-showcase.md` |
+| 004-04 | Locale + agenda + state matrix + showcase final + a11y | done | `docs/stories/004-04-locale-agenda-states-showcase.md` |
 | 011-01 | Studio fondasi kanvas + kartu lega + layout seimbang | done | `docs/stories/011-01-fondasi-kanvas-kartu-layout.md` |
 | 011-02 | Studio tambah 1-klik inline-edit + panel detail on-demand | todo | `docs/stories/011-02-tambah-inline-panel-detail.md` |
 | 011-03 | Studio pindah drag/dialog + hapus + undo/redo | todo | `docs/stories/011-03-pindah-hapus-undo.md` |

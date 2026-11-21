@@ -7,10 +7,12 @@ import {
   addMonths,
   addWeeks,
   differenceInMinutes,
+  endOfMonth,
   endOfWeek,
   format,
   isSameDay,
   startOfDay,
+  startOfMonth,
   startOfWeek,
   subDays,
   subMonths,
@@ -22,8 +24,11 @@ import type { DayProps } from 'react-day-picker';
 import { cn } from '../../lib/utils';
 import { Badge, badgeVariants } from '../base/badge';
 import { Button } from '../base/button';
+import { Skeleton } from '../base/skeleton';
 import { Calendar } from '../form/date-picker';
 import { SegmentedControl, SegmentedControlItem } from '../form/segmented-control';
+import { Alert, AlertDescription, AlertTitle } from '../feedback/alert';
+import { EmptyState } from '../feedback/empty-state';
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../overlay/popover';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../overlay/sheet';
 import type { VariantProps } from 'class-variance-authority';
@@ -79,6 +84,9 @@ export interface EventCalendarProps {
   renderEvent?: (event: CalendarEvent) => React.ReactNode;
   onAction?: (action: 'edit' | 'delete', event: CalendarEvent) => void;
   renderEventActions?: (event: CalendarEvent) => React.ReactNode;
+  loading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
   ariaLabel?: string;
   className?: string;
 }
@@ -1001,6 +1009,9 @@ export function EventCalendar({
   renderEvent,
   onAction,
   renderEventActions,
+  loading = false,
+  error = null,
+  onRetry,
   ariaLabel = 'Event calendar',
   className,
 }: EventCalendarProps) {
@@ -1189,6 +1200,40 @@ export function EventCalendar({
     [events, days, interval]
   );
 
+  /** Agenda: filter event yang menyentuh periode aktif (bulan activeDate), urut start, grup per hari. */
+  const agendaGroups = React.useMemo(() => {
+    const monthStart = startOfMonth(activeDate);
+    const monthEnd = endOfMonth(activeDate);
+    const groups = new Map<string, { dayKey: string; dayLabel: string; events: CalendarEvent[] }>();
+    for (const event of events) {
+      const eventEnd = clampEnd(event);
+      let cursor = startOfDay(event.start);
+      const lastDay = startOfDay(eventEnd);
+      while (cursor <= lastDay && cursor <= monthEnd) {
+        if (cursor >= monthStart) {
+          const key = dayKey(cursor);
+          let group = groups.get(key);
+          if (!group) {
+            group = {
+              dayKey: key,
+              dayLabel: format(cursor, 'EEEE, d MMMM yyyy', { locale }),
+              events: [],
+            };
+            groups.set(key, group);
+          }
+          group.events.push(event);
+        }
+        cursor = addDays(cursor, 1);
+      }
+    }
+    return Array.from(groups.values())
+      .sort((a, b) => a.dayKey.localeCompare(b.dayKey))
+      .map((g) => ({
+        ...g,
+        events: g.events.sort((a, b) => a.start.getTime() - b.start.getTime()),
+      }));
+  }, [events, activeDate, locale]);
+
   const virtualAnchor = React.useMemo<React.RefObject<HTMLElement | null>>(
     () => ({ current: anchorEl }),
     [anchorEl]
@@ -1202,18 +1247,20 @@ export function EventCalendar({
             type="button"
             variant="outline"
             size="icon"
+            disabled={loading}
             aria-label="Previous period"
             onClick={() => changeDate(shiftDate(activeView, activeDate, -1))}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button type="button" variant="outline" size="sm" onClick={() => changeDate(new Date())}>
+          <Button type="button" variant="outline" size="sm" disabled={loading} onClick={() => changeDate(new Date())}>
             Today
           </Button>
           <Button
             type="button"
             variant="outline"
             size="icon"
+            disabled={loading}
             aria-label="Next period"
             onClick={() => changeDate(shiftDate(activeView, activeDate, 1))}
           >
@@ -1237,6 +1284,7 @@ export function EventCalendar({
           <SegmentedControl
             type="single"
             value={activeView}
+            disabled={loading}
             onValueChange={(value) => {
               if (value) changeView(value as CalendarView);
             }}
@@ -1251,58 +1299,128 @@ export function EventCalendar({
         </div>
       </div>
 
-      {activeView === 'month' && (
-        <Calendar
-          mode="single"
-          month={activeDate}
-          onMonthChange={(m) => changeDate(m)}
-          hideNavigation
-          fixedWeeks
-          showOutsideDays
-          weekStartsOn={weekStartsOn}
-          locale={locale}
-          className="w-full p-0"
-          classNames={{
-            months: 'w-full',
-            month: 'w-full space-y-0',
-            month_caption: 'hidden',
-            month_grid: 'w-full border-collapse rounded-lg border border-border bg-card',
-            weekdays: 'flex w-full border-b border-border bg-muted/30',
-            weekday: 'flex-1 py-2 text-center text-[0.8rem] font-medium text-muted-foreground',
-            week: 'flex w-full',
-            day: 'flex-1 border-r border-t border-border/50 p-0 align-top last:border-r-0',
-            day_button: 'h-6 w-6 rounded-md text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-            today: 'bg-accent font-semibold ring-1 ring-primary',
-            outside: 'text-muted-foreground opacity-50',
-          }}
-          components={monthComponents}
-        />
-      )}
-
-      {(activeView === 'week' || activeView === 'day') && (
-        <TimeGrid
-          days={days}
-          locale={locale}
-          workingStart={workingStart}
-          workingEnd={workingEnd}
-          interval={interval}
-          allDayByDay={allDayByDay}
-          segmentsBySlot={segmentsBySlot}
-          onSelectSlot={onSelectSlot}
-          onOpen={handleEventClick}
-          renderEvent={renderEvent}
-          editable={editable}
-          dragPreview={dragPreview}
-          onEventPointerDown={handleEventPointerDown}
-          ariaLabel={periodLabel(activeView, activeDate, weekStartsOn, locale)}
-        />
-      )}
-
-      {activeView === 'agenda' && (
+      {loading ? (
+        <div
+          role="grid"
+          aria-busy="true"
+          aria-label={ariaLabel}
+          className="rounded-lg border border-border bg-card min-h-[32rem] flex flex-col items-center justify-center py-10"
+        >
+          <div className="flex flex-col items-center gap-3">
+            <Skeleton className="w-24 h-24 rounded-full" />
+            <Skeleton className="w-40 h-4" />
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">Memuat event…</p>
+        </div>
+      ) : error ? (
+        <Alert variant="destructive" role="alert" className="rounded-lg border border-border">
+          <AlertTitle>Gagal memuat event</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+          {onRetry && (
+            <Button type="button" size="sm" onClick={onRetry} className="mt-3">
+              Coba lagi
+            </Button>
+          )}
+        </Alert>
+      ) : activeView === 'agenda' ? (
         <div className="rounded-lg border border-border bg-card p-4">
           <p className="text-sm font-medium text-foreground">{format(activeDate, 'LLLL yyyy', { locale })}</p>
-          <p className="mt-1 text-sm text-muted-foreground">Agenda list layout follows in the next iteration.</p>
+          {agendaGroups.length === 0 ? (
+            <p className="mt-1 text-sm text-muted-foreground">
+              Tidak ada event pada periode ini.
+            </p>
+          ) : (
+            <div className="mt-4 space-y-4" role="list">
+              {agendaGroups.map((group) => (
+                <section key={group.dayKey} role="listitem" className="space-y-1.5">
+                  <h3 className="text-sm font-semibold text-foreground">{group.dayLabel}</h3>
+                  <div className="space-y-1.5">
+                    {group.events.map((event) => (
+                      <button
+                        key={event.id}
+                        type="button"
+                        disabled={loading}
+                        onClick={() => onSelectEvent?.(event)}
+                        className="flex items-center justify-between gap-2 rounded border border-border/50 bg-background px-3 py-2 text-left text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:bg-accent/40"
+                        aria-label={formatDetailRange(event, locale)}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium truncate">{event.title}</p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {eventTimeRange(event, locale)}
+                          </p>
+                        </div>
+                        <span
+                          className="shrink-0 rounded-full border border-border/50 px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+                        >
+                          {event.category ?? 'primary'}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          )}
         </div>
+      ) : events.length === 0 ? (
+        <EmptyState
+          role="status"
+          title="Tidak ada event di periode ini"
+          description="Belum ada jadwal pada periode yang dipilih. Coba ganti view atau periode."
+          actionLabel="Buat event"
+        />
+      ) : (
+        <>
+          {activeView === 'month' && (
+            <Calendar
+              mode="single"
+              month={activeDate}
+              onMonthChange={(m) => changeDate(m)}
+              hideNavigation
+              fixedWeeks
+              showOutsideDays
+              weekStartsOn={weekStartsOn}
+              locale={locale}
+              className="w-full p-0"
+              classNames={{
+                months: 'w-full',
+                month: 'w-full space-y-0',
+                month_caption: 'hidden',
+                month_grid: 'w-full border-collapse rounded-lg border border-border bg-card',
+                weekdays: 'flex w-full border-b border-border bg-muted/30',
+                weekday: 'flex-1 py-2 text-center text-[0.8rem] font-medium text-muted-foreground',
+                week: 'flex w-full',
+                day: 'flex-1 border-r border-t border-border/50 p-0 align-top last:border-r-0',
+                day_button: 'h-6 w-6 rounded-md text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                today: 'bg-accent font-semibold ring-1 ring-primary',
+                outside: 'text-muted-foreground opacity-50',
+              }}
+              components={monthComponents}
+            />
+          )}
+
+          {(activeView === 'week' || activeView === 'day') && (
+            <TimeGrid
+              days={days}
+              locale={locale}
+              workingStart={workingStart}
+              workingEnd={workingEnd}
+              interval={interval}
+              allDayByDay={allDayByDay}
+              segmentsBySlot={segmentsBySlot}
+              onSelectSlot={onSelectSlot}
+              onOpen={handleEventClick}
+              renderEvent={renderEvent}
+              editable={editable}
+              dragPreview={dragPreview}
+              onEventPointerDown={handleEventPointerDown}
+              ariaLabel={periodLabel(activeView, activeDate, weekStartsOn, locale)}
+            />
+          )}
+
+
+        </>
       )}
 
       {selectedEvent && !isMobile && (
