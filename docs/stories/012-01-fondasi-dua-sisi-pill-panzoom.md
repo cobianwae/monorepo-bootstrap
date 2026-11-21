@@ -1,6 +1,6 @@
 # 012-01 — Fondasi kanvas dua sisi + node pill + pan/zoom
 
-Status: approved
+Status: review
 PRD: `docs/prd/012-mind-map.md` (revisi OQ#2/OQ#3 2026-11-21)
 Design: `docs/design/wireframes/mind-map.md` + `docs/design/flows/mind-map.mmd`
 FR: `FR-001`, `FR-003`, `FR-004`, `FR-008`
@@ -35,13 +35,13 @@ Goal: Komponen `MindMap` berdiri di atas `@xyflow/react` reuse dengan layout dua
 
 ## Tasks
 
-- [ ] Buat `packages/ui/src/components/canvas/mind-map.tsx` + tipe `MindNodeFlat/Nested`, `MindMapProps`, reuse `getAncestors` bila kontrak sama (bila beda, dokumentasikan satu baris bedanya) (wireframe §2)
-- [ ] Normalisasi + validasi terstruktur reuse pola 003/011 (bukan throw); konversi flat → xyflow `nodes`/`edges`
-- [ ] Implementasi layout dua sisi K1 + mapping xyflow; memo layout
-- [ ] Node custom pill root/cabang via `cva` + `cn()` + expander + badge +N + Radix `Tooltip`; edge `bezier` 1px
-- [ ] Controls + minimap + toolbar dasar (reset/fit) token-mapped; `role="application"`, `ariaLabel` default
-- [ ] Barrel export via `index.ts` + test co-located (flat=nested, 4 invalid, determinisme layout, expand controlled/uncontrolled)
-- [ ] Docs: catat slot/gap/split-rule dua sisi di story; siapkan draf seksi showcase (tanpa halaman penuh — scope 012-03)
+- [x] Buat `packages/ui/src/components/canvas/mind-map.tsx` + tipe `MindNodeFlat/Nested`, `MindMapProps`, reuse `getAncestors` bila kontrak sama (bila beda, dokumentasikan satu baris bedanya) (wireframe §2)
+- [x] Normalisasi + validasi terstruktur reuse pola 003/011 (bukan throw); konversi flat → xyflow `nodes`/`edges`
+- [x] Implementasi layout dua sisi K1 + mapping xyflow; memo layout
+- [x] Node custom pill root/cabang via `cva` + `cn()` + expander + badge +N + Radix `Tooltip`; edge `bezier` 1px
+- [x] Controls + minimap + toolbar dasar (reset/fit) token-mapped; `role="application"`, `ariaLabel` default
+- [x] Barrel export via `index.ts` + test co-located (flat=nested, 4 invalid, determinisme layout, expand controlled/uncontrolled)
+- [x] Docs: catat slot/gap/split-rule dua sisi di story; siapkan draf seksi showcase (tanpa halaman penuh — scope 012-03)
 
 ## Dependencies
 
@@ -52,3 +52,14 @@ Goal: Komponen `MindMap` berdiri di atas `@xyflow/react` reuse dengan layout dua
 
 - Risiko: split kanan-kiri tidak seimbang di 50 node — mitigasi contoh 50-node + aturan proporsional lebar subtree
 - Keputusan: K1 dua sisi seimbang decided OQ#2; K3 tanpa panel detail; CRUD/search/showcase penuh di 012-02–012-03
+
+## Catatan Implementasi
+
+- **Reuse `getAncestors`**: tidak direuse — kontrak beda (studio memakai field `title`, mind map memakai `label`); util ancestor dibutuhkan di 012-03 (pencarian/keyboard node), ditunda ke story tersebut. Dicatat juga di header `mind-map.tsx`.
+- **Slot/gap dua sisi (K4, §2)**: pill root 200×64, cabang 160×48; gap horizontal 32 (`MIND_GAP_X`), gap vertikal 24 (`MIND_GAP_Y`), stride slot daun 72 (`MIND_BRANCH_STRIDE`). Kolom per depth sisi kanan: `100+32+(depth-1)*192`; sisi kiri dicerminkan. Root di `(-100,-32)` agar pusatnya tepat (0,0).
+- **Split-rule K1**: greedy dalam urutan anak root — subtree masuk ke sisi dengan akumulasi lebar daun terlihat lebih kecil; tie → kanan. Deterministik; terbukti seimbang pada test 50 node (7 cabang → kanan 4, kiri 3). Setelah penempatan, tiap sisi digeser agar pusat rentang top-level-nya berimpit pusat vertikal root (root sentral).
+- **Kanonisasi urutan**: `normalizeMindInput` membangun `nodes` dalam urutan DFS dari root sehingga input flat dan nested yang setara menghasilkan render identik (AC-01) apa pun urutan penulisan input.
+- **Expanded controlled/uncontrolled**: semantik mengikuti studio — `defaultExpandedIds` = id yang awalnya COLLAPSED; tanpa prop, semua induk terbuka.
+- **Edge**: bezier (`type: 'default'`) dengan inline style `strokeWidth: 1, stroke: var(--border)` — tanpa perubahan `styles.css`.
+- **Verifikasi**: `pnpm lint` ✓, `pnpm test` ✓ (585 test packages/ui termasuk 14 mind-map, 7 tokens), typecheck packages/ui hanya menyisakan 12 error baseline `flow-editor.test.tsx` yang identik di `dev` (known issue, di luar scope story ini).
+- **Draf seksi showcase (012-03)**: halaman "Mind Map" menampilkan scenario render dua sisi, collapse/expand dengan badge +N, pan/zoom + reset/fit, minimap, dan error state invalid input. Interaksi inline (tambah/edit/hapus) menyusul di 012-02.
