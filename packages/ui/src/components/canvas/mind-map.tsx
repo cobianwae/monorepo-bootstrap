@@ -1,12 +1,17 @@
 'use client';
 
-// MindMap — fondasi kanvas dua sisi 012-01 (PRD 012, wireframe S-005.35).
-// Turunan ringan OrgChartStudio di atas `@xyflow/react` reuse: layout dua sisi
-// seimbang K1 (root sentral, anak root dibagi kanan-kiri proporsional lebar
-// subtree — greedy deterministik, tie → kanan), node pill kompak (root 200×64,
-// cabang 160×48 — K4), konektor bezier 1px token `border`, expand/collapse
-// manual dengan badge "+N". Tanpa tambah/edit/hapus, pencarian, undo, dan
-// halaman showcase — scope 012-02/012-03 (design K2/K3).
+// MindMap — kanvas dua sisi 012-01 (PRD 012, wireframe S-005.35) + tambah
+// inline/hapus/undo 012-02 (FR-002/FR-006, M-011). Turunan ringan
+// OrgChartStudio di atas `@xyflow/react` reuse: layout dua sisi seimbang K1
+// (root sentral, anak root dibagi kanan-kiri proporsional lebar subtree —
+// greedy deterministik, tie → kanan), node pill kompak (root 200×64, cabang
+// 160×48 — K4), konektor bezier 1px token `border`, expand/collapse manual
+// dengan badge "+N". 012-02: gagang "+" tambah anak/saudara (hover/fokus),
+// inline-edit validasi kosong, hapus daun langsung + cabang via M-011
+// (AlertDialog), controlled data/onChange sekali-per-commit, undo/redo ≤50
+// (toolbar + Ctrl+Z/Y), live region, toast "Urungkan", context menu per node.
+// Tanpa pencarian, pohon SR, drag-reparent (FR-010 ditunda K2/OQ#3), dan
+// halaman showcase — scope 012-03 (design K2/K3).
 // Catatan reuse (story task 1): `getAncestors` studio berkontrak field `title`,
 // mind map memakai `label` (wireframe §2) — tidak direuse; util ancestor path
 // (dipakai auto-expand pencarian) ditunda ke 012-03.
@@ -16,7 +21,16 @@
 // awalnya COLLAPSED; default (kosong) = semua induk ter-expand.
 
 import * as React from 'react';
-import { ChevronDown, ChevronRight, Maximize, Minus, Plus, RotateCcw } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronRight,
+  Maximize,
+  Minus,
+  Plus,
+  Redo2,
+  RotateCcw,
+  Undo2,
+} from 'lucide-react';
 import {
   Handle,
   MiniMap,
@@ -31,7 +45,27 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 import { Badge } from '../base/badge';
 import { Button } from '../base/button';
+import { Input } from '../base/input';
 import { EmptyState } from '../feedback/empty-state';
+import { toast } from '../feedback/use-toast';
+import { ToastAction } from '../feedback/toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../feedback/alert-dialog';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
+} from '../navigation/context-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../base/tooltip';
 
 // ---------------------------------------------------------------------------
@@ -248,6 +282,38 @@ export function normalizeMindInput(data: MindInput): MindNormalizedResult {
 }
 
 // ---------------------------------------------------------------------------
+// Mutasi tambah/hapus 012-02 (FR-002/FR-006) — pure helper agar mudah diuji.
+// ---------------------------------------------------------------------------
+
+/** Batas undo/redo internal (FR-006; pola studio STUDIO_UNDO_LIMIT). */
+export const MIND_UNDO_LIMIT = 50;
+
+export function pushMindHistoryCapped(
+  past: MindNodeFlat[][],
+  snapshot: MindNodeFlat[],
+  limit: number = MIND_UNDO_LIMIT,
+): MindNodeFlat[][] {
+  if (past.length >= limit) return [...past.slice(past.length - (limit - 1)), snapshot];
+  return [...past, snapshot];
+}
+
+/** Hapus node beserta seluruh subtree-nya (v1: selalu hapus turunan — AC-03). */
+export function applyMindDelete(flat: MindNodeFlat[], nodeId: string): MindNodeFlat[] {
+  const doomed = new Set<string>([nodeId]);
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const node of flat) {
+      if (node.parentId !== null && doomed.has(node.parentId) && !doomed.has(node.id)) {
+        doomed.add(node.id);
+        grew = true;
+      }
+    }
+  }
+  return flat.filter((node) => !doomed.has(node.id));
+}
+
+// ---------------------------------------------------------------------------
 // Layout dua sisi seimbang K1 (deterministik, AC-02)
 // ---------------------------------------------------------------------------
 
@@ -370,8 +436,27 @@ export type MindNodeData = {
   node: MindNodeNormalized;
   side: 'left' | 'right';
   isExpanded: boolean;
+  isEditing: boolean; // inline-edit aktif di pill ini (012-02)
+  isNew: boolean; // node baru — sorotan ring sampai mutasi berikutnya
   onToggle: (id: string) => void;
+  onAddChild: (parentId: string) => void;
+  onAddSibling: (nodeId: string) => void;
+  onStartEdit: (nodeId: string) => void;
+  onCommitInline: (nodeId: string, label: string) => void;
+  onCancelInline: (nodeId: string) => void;
+  onRequestDelete: (nodeId: string) => void;
 };
+
+/** Kumpulan handler node dalam satu objek agar memo flowNodes stabil. */
+interface MindNodeHandlers {
+  onToggle: (id: string) => void;
+  onAddChild: (parentId: string) => void;
+  onAddSibling: (nodeId: string) => void;
+  onStartEdit: (nodeId: string) => void;
+  onCommitInline: (nodeId: string, label: string) => void;
+  onCancelInline: (nodeId: string) => void;
+  onRequestDelete: (nodeId: string) => void;
+}
 
 export type MindFlowNode = Node<MindNodeData, 'mindNode'>;
 export type MindFlowEdge = Edge;
@@ -381,6 +466,11 @@ export function toMindFlowNodes(
   positions: MindPosition[],
   expandedSet: Set<string>,
   onToggle: (id: string) => void,
+  interaction?: {
+    editingId: string | null;
+    newNodeId: string | null;
+    handlers: MindNodeHandlers;
+  },
 ): MindFlowNode[] {
   const positionById = new Map(positions.map((position) => [position.id, position]));
   return normalized.nodes
@@ -398,6 +488,15 @@ export function toMindFlowNodes(
           node,
           side: position.side,
           isExpanded: expandedSet.has(node.id),
+          isEditing: interaction?.editingId === node.id,
+          isNew: interaction?.newNodeId === node.id,
+          onAddChild: () => undefined,
+          onAddSibling: () => undefined,
+          onStartEdit: () => undefined,
+          onCommitInline: () => undefined,
+          onCancelInline: () => undefined,
+          onRequestDelete: () => undefined,
+          ...interaction?.handlers,
           onToggle,
         },
       };
@@ -461,124 +560,365 @@ const mindPillVariants = cva(
 
 const MIND_HIDDEN_HANDLE_CLASS = '!border-border !bg-background opacity-0';
 
-function MindNode({ data }: { data: MindNodeData }) {
-  const { node, side, isExpanded, onToggle } = data;
-  const isRoot = node.depth === 0;
-  const hiddenCount = isExpanded ? 0 : node.descendantCount;
+// Gagang "+" 012-02 (FR-002, wireframe §2; pola StudioAddHandle): muncul saat
+// hover/fokus pill (group/mind-node), hit-area 44px, tidak memicu pan kanvas
+// (nodrag nopan). Enter/Space ditangani eksplisit (AC-01 pointer + keyboard).
+function MindAddHandle({
+  testId,
+  label,
+  className,
+  onAdd,
+}: {
+  testId: string;
+  label: string;
+  className: string;
+  onAdd: () => void;
+}) {
   return (
-    <div
-      data-testid="mind-map-node"
-      data-node-id={node.id}
-      data-level={isRoot ? 'root' : 'branch'}
-      data-side={side}
-      aria-disabled={node.disabled || undefined}
-      title={node.label}
-      tabIndex={node.disabled ? -1 : 0}
-      className={cn(
-        mindPillVariants({ level: isRoot ? 'root' : 'branch' }),
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-        node.disabled && 'pointer-events-none opacity-60',
-      )}
-    >
-      {/* Jangkar garis xyflow — Handle tak-terlihat yang ditempeli edge
-          (pola CR-014: tanpa ini edge gagal terbentuk). Root memancar dua
-          sisi; cabang target menghadap root, source ke sisi luar. */}
-      {isRoot ? (
-        <>
-          <Handle
-            type="source"
-            position={Position.Left}
-            id="out-l"
-            isConnectable={false}
-            aria-hidden="true"
-            className={MIND_HIDDEN_HANDLE_CLASS}
-            style={{ pointerEvents: 'none' }}
-          />
-          <Handle
-            type="source"
-            position={Position.Right}
-            id="out-r"
-            isConnectable={false}
-            aria-hidden="true"
-            className={MIND_HIDDEN_HANDLE_CLASS}
-            style={{ pointerEvents: 'none' }}
-          />
-        </>
-      ) : (
-        <>
-          <Handle
-            type="target"
-            position={side === 'right' ? Position.Left : Position.Right}
-            id="in"
-            isConnectable={false}
-            aria-hidden="true"
-            className={MIND_HIDDEN_HANDLE_CLASS}
-            style={{ pointerEvents: 'none' }}
-          />
-          <Handle
-            type="source"
-            position={side === 'right' ? Position.Right : Position.Left}
-            id="out"
-            isConnectable={false}
-            aria-hidden="true"
-            className={MIND_HIDDEN_HANDLE_CLASS}
-            style={{ pointerEvents: 'none' }}
-          />
-        </>
-      )}
-      {/* Dot aksen 8px level-1 saja (wireframe §2). */}
-      {node.depth === 1 && node.accent ? (
-        <span
-          aria-hidden="true"
-          data-testid={`mind-map-accent-${node.id}`}
-          className={cn('h-2 w-2 shrink-0 rounded-full', ACCENT_DOT_CLASS[node.accent])}
-        />
-      ) : null}
-      {node.hasChildren ? (
+    <Tooltip>
+      <TooltipTrigger asChild>
         <button
           type="button"
-          aria-label={isExpanded ? `Lipat ${node.label}` : `Buka ${node.label}`}
-          aria-expanded={isExpanded}
-          data-testid={`mind-map-expander-${node.id}`}
-          disabled={node.disabled}
+          data-testid={testId}
+          aria-label={label}
+          title={label}
+          onPointerDown={(event) => event.stopPropagation()}
+          onMouseDown={(event) => event.stopPropagation()}
           onClick={(event) => {
             event.stopPropagation();
-            onToggle(node.id);
+            onAdd();
           }}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        >
-          {isExpanded ? (
-            <ChevronDown className="h-4 w-4" aria-hidden="true" />
-          ) : (
-            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          onKeyDown={(event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault(); // cegah aktivasi native ganda
+            onAdd();
+          }}
+          className={cn(
+            'nodrag nopan absolute z-20 flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground opacity-0 motion-safe:transition-opacity hover:text-primary focus:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary group-hover/mind-node:opacity-100 group-focus-within/mind-node:opacity-100 motion-reduce:transition-none',
+            className,
           )}
-        </button>
-      ) : null}
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span
-            className={cn(
-              'min-w-0 flex-1 line-clamp-2 break-words text-foreground',
-              isRoot ? 'text-[15px] font-semibold leading-5' : 'text-[13px] leading-4',
-            )}
-          >
-            {node.label}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent>{node.label}</TooltipContent>
-      </Tooltip>
-      {!isExpanded && node.hasChildren ? (
-        <Badge
-          variant="secondary"
-          size="sm"
-          aria-label={`${hiddenCount} ide tersembunyi`}
-          data-testid={`mind-map-badge-${node.id}`}
-          className="shrink-0"
         >
-          +{hiddenCount}
-        </Badge>
-      ) : null}
-    </div>
+          <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card shadow-sm">
+            <Plus className="h-4 w-4" aria-hidden="true" />
+          </span>
+        </button>
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+function MindNode({ data }: { data: MindNodeData }) {
+  const {
+    node,
+    side,
+    isExpanded,
+    isEditing,
+    isNew,
+    onToggle,
+    onAddChild,
+    onAddSibling,
+    onStartEdit,
+    onCommitInline,
+    onCancelInline,
+    onRequestDelete,
+  } = data;
+  const isRoot = node.depth === 0;
+  const canAddSibling = !isRoot;
+  const hiddenCount = isExpanded ? 0 : node.descendantCount;
+
+  // Inline-edit 012-02 (AC-02): draft + validasi kosong + guard blur ganda
+  // (pola kartu studio). Esc di node baru membuang node; di node lama
+  // memulihkan label lama.
+  const [draft, setDraft] = React.useState(node.label);
+  const [draftInvalid, setDraftInvalid] = React.useState(false);
+  const handledRef = React.useRef(false);
+  const afterMenuCloseRef = React.useRef<(() => void) | null>(null);
+  React.useEffect(() => {
+    if (isEditing) {
+      handledRef.current = false;
+      setDraft(node.label);
+      setDraftInvalid(false);
+    }
+  }, [isEditing, node.label]);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  React.useEffect(() => {
+    if (isEditing) inputRef.current?.focus();
+  }, [isEditing]);
+  const commitDraft = React.useCallback(() => {
+    const label = draft.trim();
+    if (!label) {
+      setDraftInvalid(true);
+      inputRef.current?.focus();
+      return;
+    }
+    // Tandai tertangani sebelum commit agar blur susulan tidak commit ganda.
+    handledRef.current = true;
+    onCommitInline(node.id, label);
+  }, [draft, node.id, onCommitInline]);
+
+  // Posisi gagang (wireframe §2): gagang luar (tambah anak) di sisi luar pill;
+  // gagang sejajar (tambah saudara) di sisi menghadap root. Root hanya gagang
+  // tambah anak.
+  const atOuter = side === 'right' ? 'left-full' : 'left-0';
+  const atRootFacing = side === 'right' ? 'left-0' : 'left-full';
+  const handleAlign = 'top-1/2 -translate-x-1/2 -translate-y-1/2';
+
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        <div
+          data-testid="mind-map-node"
+          data-node-id={node.id}
+          data-level={isRoot ? 'root' : 'branch'}
+          data-side={side}
+          aria-disabled={node.disabled || undefined}
+          title={node.label}
+          tabIndex={node.disabled ? -1 : 0}
+          onKeyDown={(event) => {
+            // AC-03: Delete/Backspace pada pill fokus memicu alur hapus
+            // (daun langsung, cabang M-011, root ditolak). Abaikan saat edit.
+            if (isEditing || node.disabled) return;
+            const target = event.target as HTMLElement | null;
+            const tag = target?.tagName?.toLowerCase();
+            if (tag === 'input' || tag === 'textarea' || tag === 'select' || target?.isContentEditable === true) {
+              return;
+            }
+            if (event.key === 'Delete' || event.key === 'Backspace') {
+              event.preventDefault();
+              onRequestDelete(node.id);
+            }
+          }}
+          className={cn(
+            mindPillVariants({ level: isRoot ? 'root' : 'branch' }),
+            'group/mind-node focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+            isNew && 'ring-2 ring-primary',
+            node.disabled && 'pointer-events-none opacity-60',
+          )}
+        >
+          {/* Jangkar garis xyflow — Handle tak-terlihat yang ditempeli edge
+              (pola CR-014: tanpa ini edge gagal terbentuk). Root memancar dua
+              sisi; cabang target menghadap root, source ke sisi luar. */}
+          {isRoot ? (
+            <>
+              <Handle
+                type="source"
+                position={Position.Left}
+                id="out-l"
+                isConnectable={false}
+                aria-hidden="true"
+                className={MIND_HIDDEN_HANDLE_CLASS}
+                style={{ pointerEvents: 'none' }}
+              />
+              <Handle
+                type="source"
+                position={Position.Right}
+                id="out-r"
+                isConnectable={false}
+                aria-hidden="true"
+                className={MIND_HIDDEN_HANDLE_CLASS}
+                style={{ pointerEvents: 'none' }}
+              />
+            </>
+          ) : (
+            <>
+              <Handle
+                type="target"
+                position={side === 'right' ? Position.Left : Position.Right}
+                id="in"
+                isConnectable={false}
+                aria-hidden="true"
+                className={MIND_HIDDEN_HANDLE_CLASS}
+                style={{ pointerEvents: 'none' }}
+              />
+              <Handle
+                type="source"
+                position={side === 'right' ? Position.Right : Position.Left}
+                id="out"
+                isConnectable={false}
+                aria-hidden="true"
+                className={MIND_HIDDEN_HANDLE_CLASS}
+                style={{ pointerEvents: 'none' }}
+              />
+            </>
+          )}
+          {/* Dot aksen 8px level-1 saja (wireframe §2). */}
+          {node.depth === 1 && node.accent ? (
+            <span
+              aria-hidden="true"
+              data-testid={`mind-map-accent-${node.id}`}
+              className={cn('h-2 w-2 shrink-0 rounded-full', ACCENT_DOT_CLASS[node.accent])}
+            />
+          ) : null}
+          {node.hasChildren ? (
+            <button
+              type="button"
+              aria-label={isExpanded ? `Lipat ${node.label}` : `Buka ${node.label}`}
+              aria-expanded={isExpanded}
+              data-testid={`mind-map-expander-${node.id}`}
+              disabled={node.disabled}
+              onClick={(event) => {
+                event.stopPropagation();
+                onToggle(node.id);
+              }}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              {isExpanded ? (
+                <ChevronDown className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              )}
+            </button>
+          ) : null}
+          {isEditing ? (
+            <div className="relative min-w-0 flex-1">
+              <label htmlFor={`mind-map-inline-${node.id}`} className="sr-only">
+                {isNew ? 'Label ide baru' : `Ubah ide ${node.label}`}
+              </label>
+              <Input
+                ref={inputRef}
+                id={`mind-map-inline-${node.id}`}
+                data-testid={`mind-map-inline-input-${node.id}`}
+                value={draft}
+                aria-invalid={draftInvalid || undefined}
+                aria-describedby={draftInvalid ? `mind-map-inline-err-${node.id}` : undefined}
+                placeholder={isNew ? 'Ide baru' : 'Ubah ide'}
+                onChange={(event) => {
+                  setDraft(event.target.value);
+                  if (event.target.value.trim()) setDraftInvalid(false);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    commitDraft();
+                  } else if (event.key === 'Escape') {
+                    event.preventDefault();
+                    handledRef.current = true;
+                    onCancelInline(node.id);
+                  }
+                }}
+                onBlur={() => {
+                  // Enter/Esc yang sudah menangani: abaikan blur susulan agar
+                  // commit tidak ganda saat input ter-unmount.
+                  if (handledRef.current) return;
+                  commitDraft();
+                }}
+                className="h-7 border-0 bg-transparent px-1 text-[13px] shadow-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0"
+              />
+            </div>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span
+                  className={cn(
+                    'min-w-0 flex-1 line-clamp-2 break-words text-foreground',
+                    isRoot ? 'text-[15px] font-semibold leading-5' : 'text-[13px] leading-4',
+                  )}
+                >
+                  {node.label}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>{node.label}</TooltipContent>
+            </Tooltip>
+          )}
+          {/* Hint/pesan inline di bawah pill (wireframe §2) — absolut agar
+              tidak mengubah layout pill. */}
+          {isEditing ? (
+            draftInvalid ? (
+              <span
+                role="alert"
+                id={`mind-map-inline-err-${node.id}`}
+                data-testid={`mind-map-inline-err-${node.id}`}
+                className="absolute left-1/2 top-full z-20 mt-1 -translate-x-1/2 whitespace-nowrap rounded-sm bg-card px-1 text-[11px] text-destructive shadow-sm"
+              >
+                Label tidak boleh kosong.
+              </span>
+            ) : (
+              <span className="absolute left-1/2 top-full z-20 mt-1 -translate-x-1/2 whitespace-nowrap rounded-sm bg-card px-1 text-[11px] text-muted-foreground shadow-sm">
+                Enter simpan · Esc batal
+              </span>
+            )
+          ) : null}
+          {!isExpanded && node.hasChildren ? (
+            <Badge
+              variant="secondary"
+              size="sm"
+              aria-label={`${hiddenCount} ide tersembunyi`}
+              data-testid={`mind-map-badge-${node.id}`}
+              className="shrink-0"
+            >
+              +{hiddenCount}
+            </Badge>
+          ) : null}
+          {!isEditing && !node.disabled ? (
+            <>
+              <MindAddHandle
+                testId={`mind-map-add-child-${node.id}`}
+                label={`Tambah anak ${node.label}`}
+                className={cn(atOuter, handleAlign)}
+                onAdd={() => onAddChild(node.id)}
+              />
+              {canAddSibling ? (
+                <MindAddHandle
+                  testId={`mind-map-add-sibling-${node.id}`}
+                  label={`Tambah saudara ${node.label}`}
+                  className={cn(atRootFacing, handleAlign)}
+                  onAdd={() => onAddSibling(node.id)}
+                />
+              ) : null}
+            </>
+          ) : null}
+        </div>
+      </ContextMenuTrigger>
+      {/* Menu konteks per pill (wireframe §3) — setara aksi pointer gagang. */}
+      <ContextMenuContent onCloseAutoFocus={(event) => {
+        const action = afterMenuCloseRef.current;
+        if (action) {
+          event.preventDefault();
+          afterMenuCloseRef.current = null;
+          action();
+        }
+      }}>
+        <ContextMenuItem disabled={node.disabled} data-testid={`mind-map-menu-add-child-${node.id}`} onSelect={() => {
+          afterMenuCloseRef.current = () => onAddChild(node.id);
+        }}>
+          Tambah anak
+        </ContextMenuItem>
+        {canAddSibling ? (
+          <ContextMenuItem disabled={node.disabled} data-testid={`mind-map-menu-add-sibling-${node.id}`} onSelect={() => {
+            afterMenuCloseRef.current = () => onAddSibling(node.id);
+          }}>
+            Tambah saudara
+          </ContextMenuItem>
+        ) : null}
+        <ContextMenuItem disabled={node.disabled} data-testid={`mind-map-menu-edit-${node.id}`} onSelect={() => {
+          afterMenuCloseRef.current = () => onStartEdit(node.id);
+        }}>
+          Edit
+        </ContextMenuItem>
+        {node.hasChildren ? (
+          <ContextMenuItem disabled={node.disabled} data-testid={`mind-map-menu-toggle-${node.id}`} onSelect={() => onToggle(node.id)}>
+            {isExpanded ? 'Lipat' : 'Buka'}
+          </ContextMenuItem>
+        ) : null}
+        <ContextMenuSeparator />
+        <ContextMenuItem
+          data-testid={`mind-map-menu-delete-${node.id}`}
+          variant="destructive"
+          disabled={isRoot || node.disabled}
+          onSelect={() => {
+            afterMenuCloseRef.current = () => onRequestDelete(node.id);
+          }}
+        >
+          Hapus
+        </ContextMenuItem>
+        {isRoot ? (
+          <p className="max-w-56 px-2 py-1 text-xs text-muted-foreground">
+            Root tidak bisa dihapus — hapus cabangnya dulu.
+          </p>
+        ) : null}
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }
 
@@ -820,6 +1160,8 @@ function useMindReducedMotion(): boolean {
 
 export interface MindMapProps {
   data: MindInput; // satu root (FR-001)
+  /** Emit flat penuh sekali per commit tambah/edit/hapus — FR-006 (AC-04). */
+  onChange?: (flat: MindNodeFlat[]) => void;
   /** Semantik studio: id yang awalnya COLLAPSED; kosong = semua induk terbuka. */
   defaultExpandedIds?: string[];
   expandedIds?: string[]; // controlled penuh (AC-04)
@@ -831,6 +1173,7 @@ export interface MindMapProps {
 
 export function MindMap({
   data,
+  onChange,
   defaultExpandedIds,
   expandedIds,
   onExpandedChange,
@@ -871,6 +1214,225 @@ export function MindMap({
     [controlledExpanded, expandedSet, onExpandedChange],
   );
 
+  // ---- 012-02: tambah inline + hapus M-011 + undo/redo (FR-002/FR-006) ----
+  // History undo/redo di ref (bukan state) agar callback toast yang dibuat
+  // saat commit selalu membaca snapshot terbaru; `historyLen` adalah cermin
+  // panjang stack untuk disable tombol toolbar (ref tidak dibaca saat render).
+  const [editingId, setEditingId] = React.useState<string | null>(null);
+  const [newNodeId, setNewNodeId] = React.useState<string | null>(null);
+  const [focusNodeId, setFocusNodeId] = React.useState<string | null>(null);
+  const [deleteNodeId, setDeleteNodeId] = React.useState<string | null>(null);
+  const [historyLen, setHistoryLen] = React.useState({ past: 0, future: 0 });
+  const [announcement, setAnnouncement] = React.useState('');
+  const pastRef = React.useRef<MindNodeFlat[][]>([]);
+  const futureRef = React.useRef<MindNodeFlat[][]>([]);
+  const pendingIdsRef = React.useRef<Set<string>>(new Set());
+  const counterRef = React.useRef(0);
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
+  const canUndo = historyLen.past > 0;
+  const canRedo = historyLen.future > 0;
+  const syncHistoryLen = React.useCallback(() => {
+    setHistoryLen({ past: pastRef.current.length, future: futureRef.current.length });
+  }, []);
+  const internalFlatRef = React.useRef(internalFlat);
+  React.useEffect(() => {
+    internalFlatRef.current = internalFlat;
+  }, [internalFlat]);
+  // Callback konsumen disimpan di ref agar handler internal stabil (pola
+  // studio): identitas flowNodes tidak berubah tiap render hanya karena
+  // parent membuat arrow function baru.
+  const onChangeRef = React.useRef(onChange);
+  React.useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+  const emitChange = React.useCallback((next: MindNodeFlat[]) => {
+    onChangeRef.current?.(next);
+  }, []);
+
+  const undo = React.useCallback(() => {
+    const snapshot = pastRef.current[pastRef.current.length - 1];
+    if (!snapshot) return;
+    futureRef.current = pushMindHistoryCapped(futureRef.current, internalFlatRef.current.filter((node) => !pendingIdsRef.current.has(node.id)));
+    pendingIdsRef.current.clear();
+    pastRef.current = pastRef.current.slice(0, -1);
+    setInternalFlat(snapshot);
+    emitChange(snapshot);
+    setEditingId(null);
+    setNewNodeId(null);
+    setAnnouncement('Perubahan dibatalkan.');
+    syncHistoryLen();
+  }, [emitChange, syncHistoryLen]);
+
+  const redo = React.useCallback(() => {
+    const snapshot = futureRef.current[futureRef.current.length - 1];
+    if (!snapshot) return;
+    pastRef.current = pushMindHistoryCapped(pastRef.current, internalFlatRef.current.filter((node) => !pendingIdsRef.current.has(node.id)));
+    pendingIdsRef.current.clear();
+    futureRef.current = futureRef.current.slice(0, -1);
+    setInternalFlat(snapshot);
+    emitChange(snapshot);
+    setEditingId(null);
+    setNewNodeId(null);
+    setAnnouncement('Perubahan diulang.');
+    syncHistoryLen();
+  }, [emitChange, syncHistoryLen]);
+
+  // AC-04: tiap mutasi = satu onChange(flat penuh) + satu push undo (≤50) +
+  // toast "Urungkan" ≤5 dtk + live region.
+  const commitWithUndo = React.useCallback(
+    (snapshot: MindNodeFlat[], next: MindNodeFlat[], toastTitle: string) => {
+      pastRef.current = pushMindHistoryCapped(pastRef.current, snapshot);
+      futureRef.current = [];
+      setInternalFlat(next);
+      emitChange(next);
+      syncHistoryLen();
+      setAnnouncement(`${toastTitle}.`);
+      toast({
+        title: toastTitle,
+        description: 'Urungkan bila salah.',
+        duration: 5000,
+        action: (
+          <ToastAction altText="Urungkan" onClick={undo}>
+            Urungkan
+          </ToastAction>
+        ),
+      });
+    },
+    [emitChange, syncHistoryLen, undo],
+  );
+
+  const ensureExpanded = React.useCallback(
+    (parentId: string | null) => {
+      if (!parentId || expandedSet.has(parentId)) return;
+      const nextIds = [...expandedSet, parentId];
+      if (!controlledExpanded) setInternalExpanded(nextIds);
+      onExpandedChange?.(nextIds);
+    },
+    [controlledExpanded, expandedSet, onExpandedChange],
+  );
+
+  // Node pending belum di-commit → belum emitChange; commit memakai snapshot
+  // tanpa node pending agar undo menghapus node baru (pola studio).
+  const spawnPending = React.useCallback(
+    (parentId: string | null) => {
+      // Satu pending pada satu waktu: pending lama yang belum di-commit dibuang.
+      const staleIds = [...pendingIdsRef.current];
+      counterRef.current += 1;
+      let candidate = `ide-baru-${counterRef.current}`;
+      while (internalFlat.some((node) => node.id === candidate)) {
+        counterRef.current += 1;
+        candidate = `ide-baru-${counterRef.current}`;
+      }
+      pendingIdsRef.current = new Set([candidate]);
+      setInternalFlat((prevFlat) => [
+        ...prevFlat.filter((node) => !staleIds.includes(node.id)),
+        { id: candidate, parentId, label: '' },
+      ]);
+      ensureExpanded(parentId);
+      setNewNodeId(candidate);
+      setEditingId(candidate);
+    },
+    [ensureExpanded, internalFlat],
+  );
+
+  const handleCommitInline = React.useCallback(
+    (nodeId: string, label: string) => {
+      const isPending = pendingIdsRef.current.has(nodeId);
+      const snapshot = isPending ? internalFlat.filter((node) => node.id !== nodeId) : internalFlat;
+      const next = internalFlat.map((node) => (node.id === nodeId ? { ...node, label } : node));
+      pendingIdsRef.current.delete(nodeId);
+      setEditingId(null);
+      setNewNodeId(nodeId);
+      commitWithUndo(snapshot, next, isPending ? 'Ditambah' : 'Diperbarui');
+      setFocusNodeId(nodeId);
+    },
+    [commitWithUndo, internalFlat],
+  );
+
+  const handleStartEdit = React.useCallback((nodeId: string) => {
+    setEditingId(nodeId);
+  }, []);
+
+  // Esc (AC-02): node baru dibuang (fokus kembali ke parent); node lama
+  // kembali ke label sebelumnya (fokus kembali ke node).
+  const handleCancelInline = React.useCallback(
+    (nodeId: string) => {
+      const isPending = pendingIdsRef.current.has(nodeId);
+      const parentId = internalFlat.find((node) => node.id === nodeId)?.parentId ?? null;
+      if (isPending) {
+        pendingIdsRef.current.delete(nodeId);
+        // Node pending belum pernah di-commit via onChange → buang lokal saja.
+        setInternalFlat((prevFlat) => prevFlat.filter((node) => node.id !== nodeId));
+        if (parentId) setFocusNodeId(parentId);
+      } else {
+        setFocusNodeId(nodeId);
+      }
+      setEditingId(null);
+    },
+    [internalFlat],
+  );
+
+  // AC-03: daun hapus langsung; cabang buka M-011; root ditolak + penjelasan.
+  const confirmDelete = React.useCallback(
+    (nodeId: string) => {
+      const flat = internalFlatRef.current;
+      const target = flat.find((node) => node.id === nodeId);
+      if (!target || target.parentId === null) return; // root diproteksi
+      const next = applyMindDelete(flat, nodeId);
+      commitWithUndo(flat, next, 'Dihapus');
+      const descendantCount = normalized.byId.get(nodeId)?.descendantCount ?? 0;
+      setAnnouncement(
+        descendantCount > 0
+          ? `Ide ${target.label} dihapus beserta ${descendantCount} turunan.`
+          : `Ide ${target.label} dihapus.`,
+      );
+      setDeleteNodeId(null);
+      if (target.parentId) setFocusNodeId(target.parentId);
+    },
+    [commitWithUndo, normalized],
+  );
+
+  const handleRequestDelete = React.useCallback(
+    (nodeId: string) => {
+      const node = normalized.byId.get(nodeId);
+      if (!node) return;
+      if (node.depth === 0) {
+        setAnnouncement('Root tidak bisa dihapus — hapus cabangnya dulu.');
+        return;
+      }
+      if (node.descendantCount === 0) {
+        confirmDelete(nodeId); // daun: hapus langsung tanpa dialog
+        return;
+      }
+      setDeleteNodeId(nodeId); // cabang: buka M-011
+    },
+    [confirmDelete, normalized],
+  );
+
+  // Shortcut global Ctrl/Cmd+Z / Ctrl+Y / Ctrl+Shift+Z (AC-04): abaikan saat
+  // fokus di field input.
+  const handleRootKeyDown = React.useCallback(
+    (event: React.KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const tag = target?.tagName?.toLowerCase();
+      const inField =
+        tag === 'input' || tag === 'textarea' || tag === 'select' || target?.isContentEditable === true;
+      if (!inField && (event.ctrlKey || event.metaKey) && !event.altKey) {
+        const key = event.key.toLowerCase();
+        if (key === 'z' && !event.shiftKey) {
+          event.preventDefault();
+          undo();
+          return;
+        }
+        if (key === 'y' || (key === 'z' && event.shiftKey)) {
+          event.preventDefault();
+          redo();
+        }
+      }
+    },
+    [redo, undo],
+  );
+
   // Node tanpa keturunan selalu terlihat; collapsed menyembunyikan subtree
   // + edge-nya (FR-003) — walk pola studio.
   const visibleIds = React.useMemo(() => {
@@ -897,14 +1459,49 @@ export function MindMap({
     () => computeMindMapPositions(normalized, visibleIds),
     [normalized, visibleIds],
   );
+  // Handler node dalam satu objek agar memo flowNodes stabil (pola studio).
+  const handlers = React.useMemo(
+    () => ({
+      onToggle: toggleExpanded,
+      onAddChild: spawnPending,
+      onAddSibling: (nodeId: string) => {
+        const node = normalized.byId.get(nodeId);
+        if (node?.parentId) spawnPending(node.parentId);
+      },
+      onStartEdit: handleStartEdit,
+      onCommitInline: handleCommitInline,
+      onCancelInline: handleCancelInline,
+      onRequestDelete: handleRequestDelete,
+    }),
+    [
+      toggleExpanded,
+      spawnPending,
+      normalized,
+      handleStartEdit,
+      handleCommitInline,
+      handleCancelInline,
+      handleRequestDelete,
+    ],
+  );
   const flowNodes = React.useMemo(
-    () => toMindFlowNodes(normalized, positions, expandedSet, toggleExpanded),
-    [normalized, positions, expandedSet, toggleExpanded],
+    // eslint-disable-next-line react-hooks/refs -- handler hanya disimpan sebagai data; ref dibaca saat event, bukan render (pola studio).
+    () => toMindFlowNodes(normalized, positions, expandedSet, toggleExpanded, { editingId, newNodeId, handlers }),
+    [normalized, positions, expandedSet, toggleExpanded, editingId, newNodeId, handlers],
   );
   const flowEdges = React.useMemo(
     () => toMindFlowEdges(normalized, positions, visibleIds),
     [normalized, positions, visibleIds],
   );
+
+  // Fokus pill target (setelah commit/Esc/hapus kembali ke node/parent).
+  React.useEffect(() => {
+    if (!focusNodeId || !rootRef.current) return;
+    const target = Array.from(rootRef.current.querySelectorAll('[data-node-id]')).find(
+      (el) => el.getAttribute('data-node-id') === focusNodeId,
+    );
+    if (target instanceof HTMLElement) target.focus();
+    setFocusNodeId(null);
+  }, [focusNodeId, flowNodes]);
 
   if (normalized.error !== null) {
     const { message, nodeId } = normalized.error;
@@ -930,17 +1527,23 @@ export function MindMap({
   }
 
   if (normalized.isEmpty) {
-    // Empty state minimal 012-01; CTA "Buat peta" masuk bersama FR-002 (012-02).
+    // Empty state + CTA "Buat peta" (FR-002, wireframe §4): buat root lalu
+    // langsung inline-edit.
     return (
       <div className={cn('w-full', className)}>
         <EmptyState
           role="status"
           title="Belum ada peta ide"
-          description="Sediakan data flat (id/parentId) atau nested (children) dengan tepat satu root."
+          description="Mulai dari satu ide pusat, lalu tambah cabang lewat gagang +."
+          actionLabel="Buat peta"
+          onAction={() => spawnPending(null)}
         />
       </div>
     );
   }
+
+  const deleteNode = deleteNodeId ? (normalized.byId.get(deleteNodeId) ?? null) : null;
+  const deleteDescendantCount = deleteNode?.descendantCount ?? 0;
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -948,11 +1551,52 @@ export function MindMap({
         role="application"
         aria-label={ariaLabel}
         tabIndex={0}
+        ref={rootRef}
+        onKeyDown={handleRootKeyDown}
         className={cn(
           'w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           className,
         )}
       >
+        {/* Toolbar kanan (wireframe §1): tambah anak root + undo/redo. Fit/
+            reset zoom tetap di Controls di atas kanvas. */}
+        <div className="mb-2 flex flex-wrap items-center justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            aria-label="Tambah anak root"
+            data-testid="mind-map-add-root"
+            onClick={() => {
+              if (normalized.rootId) spawnPending(normalized.rootId);
+            }}
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            Tambah anak root
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            data-testid="mind-map-undo"
+            disabled={!canUndo}
+            onClick={undo}
+          >
+            <Undo2 className="h-4 w-4" aria-hidden="true" />
+            Urungkan
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            data-testid="mind-map-redo"
+            disabled={!canRedo}
+            onClick={redo}
+          >
+            <Redo2 className="h-4 w-4" aria-hidden="true" />
+            Ulangi
+          </Button>
+        </div>
         <ReactFlowProvider>
           <MindCanvasInner
             nodes={flowNodes}
@@ -965,6 +1609,53 @@ export function MindMap({
             reducedMotion={reducedMotion}
           />
         </ReactFlowProvider>
+        {/* Status strip bawah (wireframe §1): jumlah ide + zoom + live region
+            status mutasi (AC-04). */}
+        <div
+          data-testid="mind-map-status"
+          role="status"
+          aria-live="polite"
+          className="mt-1 flex items-center justify-between gap-2 text-xs text-muted-foreground"
+        >
+          <span>
+            {positions.length} ide tampil · zoom {Math.round(zoomLevel * 100)}%
+          </span>
+          <span data-testid="mind-map-announcement">{announcement}</span>
+        </div>
+        {/* M-011 (AC-03): konfirmasi hapus cabang — label + N turunan, v1
+            selalu hapus subtree. Esc/batal menutup tanpa mengubah data. */}
+        {deleteNode ? (
+          <AlertDialog open onOpenChange={(open) => { if (!open) setDeleteNodeId(null); }}>
+            <AlertDialogContent onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              const targetId = internalFlatRef.current.some((node) => node.id === deleteNode.id)
+                ? deleteNode.id : deleteNode.parentId;
+              if (!targetId) return;
+              const target = Array.from(rootRef.current?.querySelectorAll('[data-node-id]') ?? [])
+                .find((element) => element.getAttribute('data-node-id') === targetId);
+              if (target instanceof HTMLElement) target.focus();
+            }}>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {deleteDescendantCount > 0
+                    ? `Hapus "${deleteNode.label}" + ${deleteDescendantCount} turunan?`
+                    : `Hapus "${deleteNode.label}"?`}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {deleteDescendantCount > 0
+                    ? `Ide "${deleteNode.label}" beserta ${deleteDescendantCount} turunannya akan dihapus dari peta.`
+                    : `Ide "${deleteNode.label}" akan dihapus dari peta.`}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel data-testid="mind-map-delete-cancel">Batal</AlertDialogCancel>
+                <AlertDialogAction data-testid="mind-map-delete-confirm" onClick={() => confirmDelete(deleteNode.id)}>
+                  Ya, hapus
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        ) : null}
       </div>
     </TooltipProvider>
   );

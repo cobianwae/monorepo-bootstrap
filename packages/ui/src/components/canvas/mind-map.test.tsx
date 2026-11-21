@@ -3,14 +3,21 @@
 // Test co-located MindMap (012-01): AC-01 flat=nested + 4 invalid terstruktur,
 // AC-02 layout dua sisi deterministik (Peluncuran Q1 + 50 node), AC-03 pill +
 // badge "+N", AC-04 expand controlled/uncontrolled + keyboard +−0F.
+// 012-02: tambah gagang pointer+keyboard, inline-edit validasi kosong, hapus
+// daun langsung + cabang M-011 + proteksi root, onChange sekali-per-commit,
+// undo/redo (toolbar + Ctrl+Z/Y) dengan batas 50, empty CTA "Buat peta".
 
+import * as React from 'react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { Toaster } from '../feedback/toaster';
 
 import {
   MindMap,
+  applyMindDelete,
   computeMindMapPositions,
   normalizeMindInput,
+  pushMindHistoryCapped,
   toMindFlowEdges,
   type MindInput,
   type MindNodeFlat,
@@ -72,6 +79,21 @@ const nestedData: MindInput = {
 function nodeIds(container: HTMLElement): string[] {
   return Array.from(container.querySelectorAll('[data-testid="mind-map-node"]')).map(
     (el) => el.getAttribute('data-node-id') ?? '',
+  );
+}
+
+// Host terkontrol 012-02: mengikuti onChange agar alur controlled teruji
+// (pola ControlledStudio).
+function ControlledMind({ onChangeSpy }: { onChangeSpy?: (next: MindNodeFlat[]) => void }) {
+  const [flat, setFlat] = React.useState<MindNodeFlat[]>(() => [...(flatData as MindNodeFlat[])]);
+  return (
+    <MindMap
+      data={flat}
+      onChange={(next) => {
+        setFlat(next);
+        onChangeSpy?.(next);
+      }}
+    />
   );
 }
 
@@ -302,5 +324,311 @@ describe('MindMap fondasi (012-01)', () => {
     const { container } = render(<MindMap data={[]} />);
     expect(container.querySelector('[data-testid="mind-map-node"]')).toBeNull();
     expect(container.textContent).toContain('Belum ada peta ide');
+  });
+});
+
+describe('MindMap tambah/hapus/undo (012-02)', () => {
+  beforeEach(() => {
+    mockFitView.mockClear();
+    mockZoomIn.mockClear();
+    mockZoomOut.mockClear();
+    mockSetViewport.mockClear();
+    mockSetCenter.mockClear();
+  });
+
+  it('helper: pushMindHistoryCapped membatasi 50 dan applyMindDelete menghapus subtree', () => {
+    let past: MindNodeFlat[][] = [];
+    for (let i = 0; i < 60; i += 1) {
+      past = pushMindHistoryCapped(past, [{ id: `s-${i}`, parentId: null, label: `S${i}` }]);
+    }
+    expect(past).toHaveLength(50);
+    expect(past[0][0]?.id).toBe('s-10');
+
+    const flat: MindNodeFlat[] = [...(flatData as MindNodeFlat[])];
+    const next = applyMindDelete(flat, 'wawancara'); // subtree: wawancara + insight
+    expect(next).toHaveLength(7);
+    expect(next.some((node) => node.id === 'wawancara')).toBe(false);
+    expect(next.some((node) => node.id === 'insight')).toBe(false);
+    expect(next.some((node) => node.id === 'riset')).toBe(true);
+  });
+
+  it('AC-01: klik gagang tambah anak → node baru inline-edit fokus, commit onChange sekali (pointer)', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    const handle = container.querySelector('[data-testid="mind-map-add-child-riset"]') as HTMLElement;
+    expect(handle).not.toBeNull();
+    expect(handle.getAttribute('aria-label')).toBe('Tambah anak Riset pasar');
+    expect(handle.tagName).toBe('BUTTON'); // keyboard-activatable native
+    fireEvent.click(handle);
+
+    const input = container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]') as HTMLInputElement;
+    expect(input).not.toBeNull();
+    expect(document.activeElement).toBe(input);
+    expect(nodeIds(container)).toContain('ide-baru-1'); // node baru tampil di layout
+    expect(onChangeSpy).not.toHaveBeenCalled(); // pending belum commit
+
+    fireEvent.change(input, { target: { value: 'Go to market' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    const next = onChangeSpy.mock.calls[0][0] as MindNodeFlat[];
+    const added = next.find((node) => node.id === 'ide-baru-1');
+    expect(added?.parentId).toBe('riset');
+    expect(added?.label).toBe('Go to market');
+    expect(container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]')).toBeNull();
+  });
+
+  it('AC-01: Enter saat gagang fokus memicu tambah (keyboard)', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    const handle = container.querySelector('[data-testid="mind-map-add-child-riset"]') as HTMLElement;
+    fireEvent.keyDown(handle, { key: 'Enter' });
+    expect(container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]')).not.toBeNull();
+    fireEvent.change(container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]') as HTMLInputElement, {
+      target: { value: 'Survei cepat' },
+    });
+    fireEvent.keyDown(container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]') as HTMLElement, {
+      key: 'Enter',
+    });
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('AC-01: gagang saudara menambah node ke parent yang sama', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    const handle = container.querySelector('[data-testid="mind-map-add-sibling-mvp"]') as HTMLElement;
+    expect(handle.getAttribute('aria-label')).toBe('Tambah saudara Fitur inti');
+    fireEvent.click(handle);
+    const input = container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Fitur pendukung' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    const next = onChangeSpy.mock.calls[0][0] as MindNodeFlat[];
+    expect(next.find((node) => node.id === 'ide-baru-1')?.parentId).toBe('produk');
+  });
+
+  it('AC-02: Esc membuang node baru tanpa onChange dan fokus kembali ke parent', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    fireEvent.click(container.querySelector('[data-testid="mind-map-add-child-riset"]')!);
+    const input = container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]')!;
+    fireEvent.keyDown(input, { key: 'Escape' });
+    expect(onChangeSpy).not.toHaveBeenCalled();
+    expect(nodeIds(container)).not.toContain('ide-baru-1');
+    expect(document.activeElement?.getAttribute('data-node-id')).toBe('riset');
+  });
+
+  it('AC-02: kosong ditolak inline (aria-invalid + pesan, tetap edit); blur valid menyimpan', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    fireEvent.click(container.querySelector('[data-testid="mind-map-add-child-riset"]')!);
+    const input = container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]') as HTMLInputElement;
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+    expect(container.querySelector('[data-testid="mind-map-inline-err-ide-baru-1"]')?.textContent).toContain(
+      'tidak boleh kosong',
+    );
+    expect(container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]')).not.toBeNull();
+    expect(onChangeSpy).not.toHaveBeenCalled();
+
+    fireEvent.change(input, { target: { value: 'Sprint nol' } });
+    fireEvent.blur(input); // blur valid = simpan
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('AC-02: context menu Edit → inline-edit node lama → Esc kembalikan label + fokus', async () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    fireEvent.contextMenu(container.querySelector('[data-node-id="mvp"]')!);
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Edit' }));
+    const input = await screen.findByTestId('mind-map-inline-input-mvp') as HTMLInputElement;
+    expect(input).not.toBeNull();
+    expect(input.value).toBe('Fitur inti');
+    fireEvent.change(input, { target: { value: 'Draft baru' } });
+    fireEvent.keyDown(input, { key: 'Escape' });
+    expect(onChangeSpy).not.toHaveBeenCalled();
+    expect(container.querySelector('[data-testid="mind-map-inline-input-mvp"]')).toBeNull();
+    expect(container.querySelector('[data-node-id="mvp"]')?.textContent).toContain('Fitur inti');
+    expect(document.activeElement?.getAttribute('data-node-id')).toBe('mvp');
+  });
+
+  it('AC-02: commit edit node lama mengumumkan Diperbarui via live region', async () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    fireEvent.contextMenu(container.querySelector('[data-node-id="mvp"]')!);
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Edit' }));
+    const input = await screen.findByTestId('mind-map-inline-input-mvp') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Fitur inti v2' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    const next = onChangeSpy.mock.calls[0][0] as MindNodeFlat[];
+    expect(next.find((node) => node.id === 'mvp')?.label).toBe('Fitur inti v2');
+    expect(container.querySelector('[data-testid="mind-map-announcement"]')?.textContent).toContain('Diperbarui');
+  });
+
+  it('AC-03: Delete pada daun hapus langsung + satu onChange + live region, tanpa dialog', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    fireEvent.keyDown(container.querySelector('[data-node-id="kompetitor"]') as HTMLElement, { key: 'Delete' });
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    const next = onChangeSpy.mock.calls[0][0] as MindNodeFlat[];
+    expect(next.some((node) => node.id === 'kompetitor')).toBe(false);
+    expect(container.querySelector('[data-node-id="kompetitor"]')).toBeNull();
+    expect(container.querySelector('[data-testid="mind-map-announcement"]')?.textContent).toContain(
+      'Analisis kompetitor',
+    );
+    expect(document.body.querySelector('[data-testid="mind-map-delete-confirm"]')).toBeNull();
+    expect(document.activeElement?.getAttribute('data-node-id')).toBe('riset'); // fokus ke parent
+  });
+
+  it('AC-03: Delete pada cabang buka M-011 dengan label + N turunan; konfirmasi hapus subtree', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    fireEvent.keyDown(container.querySelector('[data-node-id="riset"]') as HTMLElement, { key: 'Delete' });
+    expect(onChangeSpy).not.toHaveBeenCalled();
+    expect(document.body.textContent).toContain('Hapus "Riset pasar" + 3 turunan?');
+    fireEvent.click(document.body.querySelector('[data-testid="mind-map-delete-confirm"]')!);
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    const next = onChangeSpy.mock.calls[0][0] as MindNodeFlat[];
+    for (const id of ['riset', 'kompetitor', 'wawancara', 'insight']) {
+      expect(next.some((node) => node.id === id)).toBe(false);
+    }
+    expect(container.querySelector('[data-testid="mind-map-delete-confirm"]')).toBeNull();
+  });
+
+  it('AC-03: Delete pada root ditolak + penjelasan; context menu Hapus root disabled', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    fireEvent.keyDown(container.querySelector('[data-node-id="q1"]') as HTMLElement, { key: 'Delete' });
+    expect(onChangeSpy).not.toHaveBeenCalled();
+    expect(document.body.querySelector('[data-testid="mind-map-delete-confirm"]')).toBeNull();
+    expect(container.querySelector('[data-testid="mind-map-announcement"]')?.textContent).toContain(
+      'Root tidak bisa dihapus',
+    );
+
+    fireEvent.contextMenu(container.querySelector('[data-node-id="q1"]')!);
+    const hapus = screen.getByRole('menuitem', { name: 'Hapus' });
+    expect(hapus.getAttribute('data-disabled')).not.toBeNull();
+  });
+
+  it('AC-04: undo/redo toolbar + shortcut Ctrl+Z/Ctrl+Y memanggil onChange tiap langkah', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    fireEvent.keyDown(container.querySelector('[data-node-id="kompetitor"]') as HTMLElement, { key: 'Delete' });
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    expect(container.querySelector('[data-node-id="kompetitor"]')).toBeNull();
+
+    fireEvent.click(container.querySelector('[data-testid="mind-map-undo"]')!);
+    expect(onChangeSpy).toHaveBeenCalledTimes(2);
+    expect((onChangeSpy.mock.calls[1][0] as MindNodeFlat[]).some((node) => node.id === 'kompetitor')).toBe(true);
+    expect(container.querySelector('[data-node-id="kompetitor"]')).not.toBeNull();
+
+    const app = container.querySelector('[role="application"]') as HTMLElement;
+    fireEvent.keyDown(app, { key: 'y', ctrlKey: true });
+    expect(onChangeSpy).toHaveBeenCalledTimes(3);
+    expect((onChangeSpy.mock.calls[2][0] as MindNodeFlat[]).some((node) => node.id === 'kompetitor')).toBe(false);
+    expect(container.querySelector('[data-node-id="kompetitor"]')).toBeNull();
+    fireEvent.keyDown(app, { key: 'z', ctrlKey: true });
+    expect(onChangeSpy).toHaveBeenCalledTimes(4);
+    expect(container.querySelector('[data-node-id="kompetitor"]')).not.toBeNull();
+  });
+
+  it('AC-03: Esc menutup M-011 tanpa mutasi dan mengembalikan fokus ke cabang', async () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    const branch = container.querySelector('[data-node-id="produk"]') as HTMLElement;
+    branch.focus();
+    fireEvent.keyDown(branch, { key: 'Delete' });
+    expect(screen.getByRole('alertdialog')).not.toBeNull();
+    expect(screen.getByRole('alertdialog').contains(document.activeElement)).toBe(true);
+    fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    await waitFor(() => expect(document.activeElement).toBe(branch));
+    expect(onChangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('AC-01: menu tambah anak menunggu fokus menu dilepas sebelum membuka input', async () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    fireEvent.contextMenu(container.querySelector('[data-node-id="produk"]')!);
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Tambah anak' }));
+    const input = await screen.findByTestId('mind-map-inline-input-ide-baru-1');
+    expect(document.activeElement).toBe(input);
+    expect(onChangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('AC-04: undo saat ada draft tidak memasukkan node pending ke redo', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    fireEvent.keyDown(container.querySelector('[data-node-id="kompetitor"]')!, { key: 'Delete' });
+    fireEvent.click(screen.getByTestId('mind-map-add-root'));
+    fireEvent.click(screen.getByTestId('mind-map-undo'));
+    fireEvent.click(screen.getByTestId('mind-map-redo'));
+    expect(onChangeSpy).toHaveBeenCalledTimes(3);
+    expect((onChangeSpy.mock.calls[2][0] as MindNodeFlat[]).some((node) => node.id.startsWith('ide-baru-'))).toBe(false);
+  });
+
+  it('AC-04: batas undo 50 — setelah habis tombol Urungkan disabled', async () => {
+    const onChangeSpy = vi.fn();
+    // Edit satu node agar uji batas history tidak mengukur biaya render 60 pill.
+    const { container } = render(
+      <MindMap data={[{ id: 'root', parentId: null, label: 'Awal' }]} onChange={onChangeSpy} />,
+    );
+    for (let i = 0; i < 51; i += 1) {
+      fireEvent.contextMenu(container.querySelector('[data-node-id="root"]')!);
+      fireEvent.click(screen.getByRole('menuitem', { name: 'Edit' }));
+      const input = await screen.findByTestId('mind-map-inline-input-root');
+      fireEvent.change(input, { target: { value: `Ide ${i + 1}` } });
+      fireEvent.keyDown(input, { key: 'Enter' });
+    }
+    expect(onChangeSpy).toHaveBeenCalledTimes(51);
+    const undoButton = () => container.querySelector('[data-testid="mind-map-undo"]') as HTMLButtonElement;
+    for (let i = 0; i < 50; i += 1) {
+      fireEvent.click(undoButton());
+    }
+    expect(onChangeSpy).toHaveBeenCalledTimes(101);
+    const undone = onChangeSpy.mock.calls[100][0] as MindNodeFlat[];
+    expect(undone).toEqual([{ id: 'root', parentId: null, label: 'Ide 1' }]);
+    expect(undoButton().disabled).toBe(true);
+  }, 20000);
+
+  it('AC-01: empty state CTA "Buat peta" → root langsung inline-edit', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<MindMap data={[]} onChange={onChangeSpy} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Buat peta' }));
+    const input = container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]') as HTMLInputElement;
+    expect(input).not.toBeNull();
+    expect(document.activeElement).toBe(input);
+    fireEvent.change(input, { target: { value: 'Peta besar' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    expect(onChangeSpy.mock.calls[0][0]).toEqual([{ id: 'ide-baru-1', parentId: null, label: 'Peta besar' }]);
+  });
+
+  it('AC-04: aksi Urungkan pada toast memulihkan daun dan memanggil onChange sekali', async () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(
+      <>
+        <ControlledMind onChangeSpy={onChangeSpy} />
+        <Toaster />
+      </>,
+    );
+    fireEvent.keyDown(container.querySelector('[data-node-id="kompetitor"]')!, { key: 'Delete' });
+    const title = await screen.findByText('Dihapus', { exact: true });
+    const toastItem = title.closest('li');
+    expect(toastItem).not.toBeNull();
+    fireEvent.click(within(toastItem!).getByRole('button', { name: 'Urungkan' }));
+    expect(onChangeSpy).toHaveBeenCalledTimes(2);
+    expect(nodeIds(container)).toContain('kompetitor');
+  });
+
+  it('AC-03: menu Hapus daun melepas fokus menu sebelum fokus dipindah ke parent', async () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
+    fireEvent.contextMenu(container.querySelector('[data-node-id="kompetitor"]')!);
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Hapus' }));
+    await waitFor(() => {
+      expect(onChangeSpy).toHaveBeenCalledTimes(1);
+      expect(document.activeElement?.getAttribute('data-node-id')).toBe('riset');
+    });
+    expect(nodeIds(container)).not.toContain('kompetitor');
   });
 });
