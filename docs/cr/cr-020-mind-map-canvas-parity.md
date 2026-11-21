@@ -1,6 +1,6 @@
 # CR-020 — Pulihkan perilaku kanvas Mind Map setara fondasi 011
 
-**Status:** approved
+**Status:** done
 **Sumber:** review / bug — user: "012 dia itu gak jalan deh canvasnya, coba deh check implementsi 011 yang secara fungsionalitas udah jalan"
 **Ref:** `docs/prd/012-mind-map.md` (approved, FR-002/004/005/009), `docs/design/wireframes/mind-map.md` (approved), story `012-01`–`012-03` (done), `docs/cr/cr-014-studio-layak-pakai.md` (done), `packages/ui/src/components/canvas/org-chart-studio.tsx`
 
@@ -49,14 +49,14 @@ bawah. Direproduksi di jsdom dengan ReactFlow asli (tanpa mock), bukan browser.
 
 ## Tasks (jalur small-fix)
 
-- [ ] Pulihkan `pointer-events` node MindMap (temuan 0) dan tambah tes regresi dengan ReactFlow asli (assert style node ≠ `none`; hover/klik `+` dan expander tidak diblokir). Kerjakan lebih dulu.
-- [ ] Teruskan target edit/fokus ke canvas dan pusatkan node setelah layout final; pertahankan zoom serta reduced-motion.
-- [ ] Pastikan minimap bisa ditampilkan melalui toggle di mobile.
-- [ ] Tambah tes regresi viewport nontrivial, bukan hanya callback mock.
-- [ ] Walkthrough browser Q1 dan 50 node: konektor, tambah anak/saudara, input terlihat, edit, lipat, hapus/undo, fit/reset, drag pan, Ctrl/Cmd+wheel, dan keyboard.
-- [ ] Verifikasi light/dark, mobile, zoom browser 200%, serta fokus dan alternatif pohon SR; catat hasil nyata, bukan asumsi dari DOM.
-- [ ] Sinkronkan sitemap dan catatan implementasi setelah perbaikan terverifikasi.
-- [ ] Jalankan typecheck → lint → test serta build showcase; catat baseline terpisah.
+- [x] Pulihkan `pointer-events` node MindMap (temuan 0) dan tambah tes regresi dengan ReactFlow asli (assert style node ≠ `none`; hover/klik `+` dan expander tidak diblokir). Kerjakan lebih dulu.
+- [x] Teruskan target edit/fokus ke canvas dan pusatkan node setelah layout final; pertahankan zoom serta reduced-motion.
+- [x] Pastikan minimap bisa ditampilkan melalui toggle di mobile.
+- [x] Tambah tes regresi viewport nontrivial, bukan hanya callback mock.
+- [x] Walkthrough browser Q1 dan 50 node: konektor, tambah anak/saudara, input terlihat, edit, lipat, hapus/undo, fit/reset, drag pan, Ctrl/Cmd+wheel, dan keyboard.
+- [x] Verifikasi light/dark, mobile, zoom browser 200%, serta fokus dan alternatif pohon SR; catat hasil nyata, bukan asumsi dari DOM.
+- [x] Sinkronkan sitemap dan catatan implementasi setelah perbaikan terverifikasi.
+- [x] Jalankan typecheck → lint → test serta build showcase; catat baseline terpisah.
 
 ## Keputusan
 
@@ -66,16 +66,17 @@ bawah. Direproduksi di jsdom dengan ReactFlow asli (tanpa mock), bukan browser.
 | 2 | Review tidak mengubah kode atau status artefak 011/012. | Scope permintaan adalah review dan draft CR. |
 | 3 | Tidak membuka perbaikan reset atau resize otomatis sebagai bug terkonfirmasi. | Reset sama dengan pembanding 011; resize belum diverifikasi di browser. |
 | 4 | Temuan 0 (pointer-events node `none`) ditambahkan ke CR-020 lewat amendment atas persetujuan user, bukan CR terpisah. | Satu cluster koheren (keluhan canvas 012 tidak jalan); blocker dikerjakan lebih dulu. |
+| 5 | CR ditetapkan `done` oleh user pada 2026-11-22 ("approve, set done, push, merge ke dev ,push"). | Hasil implementasi diterima; push branch, merge ke dev, dan push dev diizinkan. |
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA.
-- [ ] Perilaku Radix/a11y tidak rusak.
-- [ ] API `cva` dan export tetap konsisten.
-- [ ] State loading, empty, dan error relevan tersedia.
-- [ ] Showcase/docs diperbarui bila perlu.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass atau baseline dicatat.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA.
+- [x] Perilaku Radix/a11y tidak rusak.
+- [x] API `cva` dan export tetap konsisten.
+- [x] State loading, empty, dan error relevan tersedia.
+- [x] Showcase/docs diperbarui bila perlu.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass atau baseline dicatat.
 
 ## Verifikasi Review
 
@@ -91,9 +92,34 @@ Branch: `cr-020-mind-map-canvas-parity`
 Commit: `fix: restore mind map canvas behavior [CR-020]`
 
 - [x] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.
+
+### Hasil implementasi — 2026-11-22
+
+- Base: `origin/dev` `6871ce8` (fetch terbaru saat mulai; tidak ada perubahan user yang ditimpa).
+- Node builder memakai `style.pointerEvents: 'all'` tanpa mengaktifkan selectable/draggable. Tes permanen ReactFlow asli ditambahkan setelah terbukti merah (`none` vs `all`) sebelum perbaikan.
+- Target `editingId ?? focusNodeId` diteruskan ke canvas. `setCenter` memakai pusat root 200×64/cabang 160×48 setelah layout final, zoom saat ini, serta durasi 0 untuk reduced-motion. Guard target/posisi/mode edit mencegah rerender biasa mengganggu pan manual, tetapi edit ulang node yang sama setelah pan tetap memulihkan input. Kasus terakhir diuji ulang pada kedua dataset di production build final.
+- Toggle internal mobile bertarget 44px, `aria-pressed`, `nodrag nopan`; `minimap={false}` tetap meniadakan minimap dan toggle. Tidak ada perubahan API publik, dependency, token, atau OrgChartStudio.
+- Graphify dicoba pada perencanaan, tetapi graph dibangun dari `1568661` dan tidak memuat node MindMap; fallback pembacaan targeted.
+
+### Verifikasi implementasi
+
+- `pnpm typecheck`: **baseline tetap 12 error** `HTMLElement.disabled` di `flow-editor.test.tsx:706–753`. Error baru unused import pada test integrasi sempat ditemukan, dibersihkan; run final hanya baseline tersebut.
+- `pnpm lint`: **hijau**.
+- `pnpm test`: run awal **hijau** (705 UI + 68 showcase + 8 token). Setelah tambahan satu test reduced-motion/fokus, run final **705/706 UI**, seluruh **48 MindMap lulus**; satu kegagalan baseline smoke RichTextEditor `rte-link-save` muncul kembali dan gagal juga saat diulang terisolasi. Tidak memperbaiki file RTE di luar scope.
+- `pnpm --filter @ds/showcase test`: **68/68**, termasuk tiga scenario MindMap, dijalankan terpisah karena run root final berhenti pada UI.
+- `pnpm --filter @ds/ui exec vitest run src/components/canvas/mind-map.test.tsx src/components/canvas/mind-map.integration.test.tsx --maxWorkers=2 --testTimeout=30000`: **48/48** (45 unit + 3 integrasi). Hook viewport asli, pan lalu edit dengan zoom tetap, wrapper pointer, toggle minimap/prop false, pusat root/cabang, fokus keyboard/reduced-motion dan guard pan tercakup.
+- `pnpm test:tokens`: **8/8**, termasuk audit AA seluruh tema light/dark; tidak ada token diubah. `pnpm -C apps/showcase build`: **hijau**, 76 halaman termasuk MindMap.
+- Chrome headless melalui CDP pada production build, viewport 1440×1000: Q1 (12 node/11 path edge) dan dataset 50 node/49 path edge; computed pointer `all`; pointer/keyboard nyata untuk tambah anak/saudara, input baru fokus dan berada dalam bounds canvas, edit F2 menjaga zoom, lipat/buka, hapus daun/undo/redo, drag pan, Ctrl+wheel, keyboard pan/zoom, fit dan reset 100%. Tidak menganggap double-click sebagai jalur edit yang sudah didukung.
+- Light/dark: global showcase dipilih terang, lalu toggle gelap lokal diuji untuk kedua dataset. Minimap tampil/sembunyi pada lebar CSS 390px; tombol dan pohon tetap dapat dijangkau. Reflow 720px juga diuji.
+- Zoom browser Chrome asli **200%**, bukan hanya page-scale CSS: profil sementara melalui `chrome.settingsPrivate.setDefaultZoom(2)`, terkonfirmasi `innerWidth=720`/DPR 2 pada viewport 1440. Edit root F2 memusatkan input fokus di dalam canvas, minimap dapat ditoggle; zoom profil dikembalikan ke 1.
+- Pohon aksesibel dibuka; Chrome accessibility tree mengekspos `tree`/`treeitem`. **Suara pembaca layar native belum diuji**; AX tree bukan klaim validasi pengumuman suara.
+- Screenshot dan runner CDP sekali pakai disimpan di direktori temp sesi `.../T/opencode/cr-020-*`, tanpa dependency browser baru atau artefak besar di repo. Dev server sempat gagal menulis cache (`ENOSPC`); hanya cache webpack hasil sesi ini dibersihkan, lalu production build dan walkthrough lulus.
+- S-005.35 dan M-011 menjadi `implemented`; approval PRD/story tidak diubah. CR tetap `approved` untuk review user; belum push/PR/merge.
+- Penutupan 2026-11-22: user menyetujui hasil dan menetapkan `done`, sekaligus mengizinkan push branch, merge ke `dev`, dan push `dev`. Batas verifikasi SR native dan baseline di atas tidak berubah.
+- Verifikasi setelah sinkron dengan dev `aa6e0d8` (CR-021): `pnpm typecheck` hanya 12 error baseline FlowEditor; `pnpm lint`, `pnpm test` (706 UI + 68 showcase + 8 token), serta build showcase **hijau**. Smoke RTE lulus pada run integrasi; riwayat flaky tidak dihapus. Konflik hanya BACKLOG/STATUS-LOG; kedua progres dipertahankan.

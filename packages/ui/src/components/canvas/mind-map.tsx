@@ -486,6 +486,8 @@ export function toMindFlowNodes(
         id: node.id,
         type: 'mindNode' as const,
         position: { x: position.x, y: position.y },
+        // Node non-selectable/non-draggable tetap memiliki aksi pointer.
+        style: { pointerEvents: 'all' },
         width: isRoot ? MIND_NODE_WIDTH_ROOT : MIND_NODE_WIDTH_BRANCH,
         height: isRoot ? MIND_NODE_HEIGHT_ROOT : MIND_NODE_HEIGHT_BRANCH,
         data: {
@@ -1103,6 +1105,7 @@ function MindCanvas({
   reducedMotion,
   keyboardZoom,
   onZoomLevel,
+  centerNodeId,
 }: {
   nodes: MindFlowNode[];
   edges: MindFlowEdge[];
@@ -1113,8 +1116,28 @@ function MindCanvas({
   reducedMotion: boolean;
   keyboardZoom: (action: 'in' | 'out' | 'reset' | 'fit') => void;
   onZoomLevel: (zoom: number) => void;
+  centerNodeId: string | null;
 }) {
-  const { zoomIn, zoomOut, getViewport, setViewport } = useReactFlow();
+  const { zoomIn, zoomOut, getViewport, setViewport, setCenter } = useReactFlow();
+  const [mobileMinimap, setMobileMinimap] = React.useState(false);
+  const lastCenterRef = React.useRef<{ id: string; x: number; y: number; editing: boolean } | null>(null);
+  React.useEffect(() => {
+    if (!centerNodeId) {
+      lastCenterRef.current = null;
+      return;
+    }
+    const target = nodes.find((node) => node.id === centerNodeId);
+    if (!target) return;
+    const x = target.position.x + (target.width ?? MIND_NODE_WIDTH_BRANCH) / 2;
+    const y = target.position.y + (target.height ?? MIND_NODE_HEIGHT_BRANCH) / 2;
+    const editing = target.data.isEditing;
+    const previous = lastCenterRef.current;
+    // Render ulang tanpa perpindahan target tidak boleh membatalkan pan manual.
+    // Masuk edit pada target yang sama tetap perlu memulihkan input setelah pan.
+    if (previous?.id === centerNodeId && previous.x === x && previous.y === y && previous.editing === editing) return;
+    lastCenterRef.current = { id: centerNodeId, x, y, editing };
+    void setCenter(x, y, { zoom: getViewport().zoom, duration: zoomDuration });
+  }, [centerNodeId, nodes, getViewport, setCenter, zoomDuration]);
   // Ctrl/Cmd+wheel = zoom; wheel polos tidak mencegat scroll halaman (AC-04).
   const handleWheel = React.useCallback(
     (event: React.WheelEvent) => {
@@ -1208,7 +1231,7 @@ function MindCanvas({
               pannable
               zoomable
               aria-label="Minimap"
-              className="!border-border !bg-card hidden md:block"
+              className={cn('!border-border !bg-card', mobileMinimap ? 'block' : 'hidden md:block')}
               maskColor="transparent"
               maskStrokeColor="var(--primary)"
               maskStrokeWidth={2}
@@ -1217,6 +1240,19 @@ function MindCanvas({
           </div>
         ) : null}
         <MindControls zoomLabel={zoomLabel} zoomDuration={zoomDuration} />
+        {minimap ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            aria-label="Tampilkan minimap"
+            aria-pressed={mobileMinimap}
+            className="nodrag nopan absolute bottom-2 left-2 z-10 min-h-11 md:hidden"
+            onClick={() => setMobileMinimap((visible) => !visible)}
+          >
+            Minimap
+          </Button>
+        ) : null}
       </ReactFlow>
     </div>
   );
@@ -1231,6 +1267,7 @@ function MindCanvasInner({
   setZoomLevel,
   zoomDuration,
   reducedMotion,
+  centerNodeId,
 }: {
   nodes: MindFlowNode[];
   edges: MindFlowEdge[];
@@ -1240,6 +1277,7 @@ function MindCanvasInner({
   setZoomLevel: (zoom: number) => void;
   zoomDuration: number;
   reducedMotion: boolean;
+  centerNodeId: string | null;
 }) {
   const { zoomIn, zoomOut, fitView, getViewport, setViewport } = useReactFlow();
   const keyboardZoom = React.useCallback(
@@ -1264,6 +1302,7 @@ function MindCanvasInner({
       reducedMotion={reducedMotion}
       keyboardZoom={keyboardZoom}
       onZoomLevel={setZoomLevel}
+      centerNodeId={centerNodeId}
     />
   );
 }
@@ -1811,6 +1850,7 @@ export function MindMap({
             setZoomLevel={setZoomLevel}
             zoomDuration={zoomDuration}
             reducedMotion={reducedMotion}
+            centerNodeId={editingId ?? focusNodeId}
           />
         </ReactFlowProvider>
         <MindAccessibleTree
