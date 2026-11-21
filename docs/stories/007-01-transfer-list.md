@@ -1,6 +1,6 @@
 # 007-01 — Transfer list assign role + showcase
 
-Status: approved
+Status: done
 Spec: `docs/design/spec-transfer-list.md`
 FR: `FR-001`, `FR-002`, `FR-003`, `FR-004`, `FR-005`, `FR-006`, `FR-007`, `FR-009`
 Screens: `S-005.30`
@@ -46,14 +46,14 @@ Goal: Komponen `TransferList` dual-listbox controlled untuk assign role/anggota 
 
 ## Tasks
 
-- [ ] Buat `packages/ui/src/components/form/transfer-list.tsx` + tipe (`TransferItem`, `TransferListProps` controlled `value`/`onChange`)
-- [ ] Dua panel + counter + tombol pindah + pindah-semua + double-click
-- [ ] Multi-select (klik/shift/ctrl) + filter per panel (tampilan saja)
-- [ ] ARIA dua listbox + focus management + audit a11y
-- [ ] State matrix: skeleton, empty per panel, error
-- [ ] Barrel export + test co-located (counter, 3 cara pindah, multiselect, filter-vs-value)
-- [ ] Scenario showcase S-005.30 (`/patterns/transfer-list`) + smoke build
-- [ ] Update BACKLOG + STATUS-LOG; sitemap S-005.30 `planned` → `implemented`
+- [x] Buat `packages/ui/src/components/form/transfer-list.tsx` + tipe (`TransferItem`, `TransferListProps` controlled `value`/`onChange`)
+- [x] Dua panel + counter + tombol pindah + pindah-semua + double-click
+- [x] Multi-select (klik/shift/ctrl) + filter per panel (tampilan saja)
+- [x] ARIA dua listbox + focus management + audit a11y
+- [x] State matrix: skeleton, empty per panel, error
+- [x] Barrel export + test co-located (counter, 3 cara pindah, multiselect, filter-vs-value)
+- [x] Scenario showcase S-005.30 (`/patterns/transfer-list`) + smoke build
+- [x] Update BACKLOG + STATUS-LOG; sitemap S-005.30 `planned` → `implemented`
 
 ## Dependencies
 
