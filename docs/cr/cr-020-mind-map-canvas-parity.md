@@ -1,6 +1,6 @@
 # CR-020 — Pulihkan perilaku kanvas Mind Map setara fondasi 011
 
-**Status:** approved
+**Status:** done
 **Sumber:** review / bug — user: "012 dia itu gak jalan deh canvasnya, coba deh check implementsi 011 yang secara fungsionalitas udah jalan"
 **Ref:** `docs/prd/012-mind-map.md` (approved, FR-002/004/005/009), `docs/design/wireframes/mind-map.md` (approved), story `012-01`–`012-03` (done), `docs/cr/cr-014-studio-layak-pakai.md` (done), `packages/ui/src/components/canvas/org-chart-studio.tsx`
 
@@ -66,6 +66,7 @@ bawah. Direproduksi di jsdom dengan ReactFlow asli (tanpa mock), bukan browser.
 | 2 | Review tidak mengubah kode atau status artefak 011/012. | Scope permintaan adalah review dan draft CR. |
 | 3 | Tidak membuka perbaikan reset atau resize otomatis sebagai bug terkonfirmasi. | Reset sama dengan pembanding 011; resize belum diverifikasi di browser. |
 | 4 | Temuan 0 (pointer-events node `none`) ditambahkan ke CR-020 lewat amendment atas persetujuan user, bukan CR terpisah. | Satu cluster koheren (keluhan canvas 012 tidak jalan); blocker dikerjakan lebih dulu. |
+| 5 | CR ditetapkan `done` oleh user pada 2026-11-22 ("approve, set done, push, merge ke dev ,push"). | Hasil implementasi diterima; push branch, merge ke dev, dan push dev diizinkan. |
 
 ## Design System Checks
 
@@ -120,3 +121,5 @@ Commit: `fix: restore mind map canvas behavior [CR-020]`
 - Pohon aksesibel dibuka; Chrome accessibility tree mengekspos `tree`/`treeitem`. **Suara pembaca layar native belum diuji**; AX tree bukan klaim validasi pengumuman suara.
 - Screenshot dan runner CDP sekali pakai disimpan di direktori temp sesi `.../T/opencode/cr-020-*`, tanpa dependency browser baru atau artefak besar di repo. Dev server sempat gagal menulis cache (`ENOSPC`); hanya cache webpack hasil sesi ini dibersihkan, lalu production build dan walkthrough lulus.
 - S-005.35 dan M-011 menjadi `implemented`; approval PRD/story tidak diubah. CR tetap `approved` untuk review user; belum push/PR/merge.
+- Penutupan 2026-11-22: user menyetujui hasil dan menetapkan `done`, sekaligus mengizinkan push branch, merge ke `dev`, dan push `dev`. Batas verifikasi SR native dan baseline di atas tidak berubah.
+- Verifikasi setelah sinkron dengan dev `aa6e0d8` (CR-021): `pnpm typecheck` hanya 12 error baseline FlowEditor; `pnpm lint`, `pnpm test` (706 UI + 68 showcase + 8 token), serta build showcase **hijau**. Smoke RTE lulus pada run integrasi; riwayat flaky tidak dihapus. Konflik hanya BACKLOG/STATUS-LOG; kedua progres dipertahankan.

@@ -1,6 +1,6 @@
 # CR-021 — Flow Editor: kanvas rusak secara visual dan layout
 
-**Status:** approved
+**Status:** done
 **Sumber:** review artefak 005 atas laporan user (“secara UX ancur banget”) — diverifikasi di browser (Chrome headless 157, showcase `localhost:4000/patterns/flow-editor`, viewport 1440×1000, tema Pulse gelap + terang) dengan pengukuran DOM via CDP
 **Ref:** `docs/prd/005-flow-editor.md` (FR-001, FR-002, FR-010, FR-011, FR-013), `docs/design/flow-editor.md`, `docs/stories/005-01-canvas-node-foundation.md`, `005-02`, `005-05`, `005-06`, `packages/ui/src/components/canvas/flow-editor.tsx`, `packages/ui/src/styles.css`, `apps/showcase/src/app/(docs)/patterns/flow-editor/page.tsx`
 
@@ -37,17 +37,17 @@ minimum ±500px sehingga screenshot 390px terpotong; perlu emulasi device metric
 
 ## Tasks (jalur small-fix)
 
-- [ ] #1 Node di-posisi-kan xyflow; wrapper terukur 220×88; minimap menampilkan node.
-- [ ] #2 Handle: hit-area transparan 48px + dot 12px; judul/status tidak tertimpa.
-- [ ] #3 Toolbar di dalam kanvas, tombol ikon ber-label/tooltip, target ≥44px.
-- [ ] #4 `fitView` awal + saat ganti demo; kanvas lebar penuh; ≥5/5 node terlihat di 1440 px.
-- [ ] #5 Controls dirapikan, tidak menutup node.
-- [ ] #6 `text-micro` tidak dibuang `cn()`; “Siap” 10px.
-- [ ] #7 Pemetaan edge/handle/label light+dark; kontras ≥3:1; selaraskan komentar vs `@import`.
-- [ ] #8 Inspector: footer tidak meluap, copy/ID/meta, `Tutup`.
-- [ ] #9 Hydration mismatch hilang (console bersih).
-- [ ] #10 Keputusan gate visual (lihat Keputusan).
-- [ ] Verifikasi: `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`, screenshot light+dark.
+- [x] #1 Node di-posisi-kan xyflow; wrapper terukur 220×88; minimap menampilkan node.
+- [x] #2 Handle: hit-area transparan 48px + dot 12px; judul/status tidak tertimpa.
+- [x] #3 Toolbar di dalam kanvas, tombol ikon ber-label/tooltip, target ≥44px.
+- [x] #4 `fitView` awal + saat ganti demo; kanvas lebar penuh; ≥5/5 node terlihat di 1440 px.
+- [x] #5 Controls dirapikan, tidak menutup node.
+- [x] #6 `text-micro` tidak dibuang `cn()`; “Siap” 10px.
+- [x] #7 Pemetaan edge/handle/label light+dark; kontras ≥3:1; selaraskan komentar vs `@import`.
+- [x] #8 Inspector: footer tidak meluap, copy/ID/meta, `Tutup`.
+- [x] #9 Hydration mismatch hilang (console bersih).
+- [x] #10 Keputusan gate visual (lihat Keputusan).
+- [x] Verifikasi: `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`, screenshot light+dark.
 
 ## Keputusan
 
@@ -72,9 +72,9 @@ Branch: `cr-021-flow-editor-visual`
 Commit: `fix: perbaiki layout visual flow editor [CR-021]`
 
 - [x] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick.
 - [ ] `docs/STATUS.md` diperbarui bila relevan.
 - [ ] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.

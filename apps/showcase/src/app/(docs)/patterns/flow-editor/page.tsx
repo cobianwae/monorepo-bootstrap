@@ -460,7 +460,7 @@ function InspectorPanel({
         <SheetTitle className="text-sm">{sheetTitle}</SheetTitle>
         <SheetDescription>
           {isMulti
-            ? 'Gunakan [Hapus semua] untuk menghapus atomik, atau [Batalkan seleksi].'
+            ? 'Gunakan Hapus semua untuk menghapus sekaligus, atau Batalkan seleksi.'
             : isSingleNode
               ? 'Ubah judul node. Judul tidak boleh kosong.'
               : 'Ubah label edge, atau hapus edge dari kanvas.'}
@@ -542,9 +542,9 @@ function InspectorPanel({
               <div className="text-xs font-medium">Koneksi</div>
               <Input readOnly value={String(edgeCount)} className="text-xs" />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Button size="sm" onClick={onSaveTitle} disabled={titleError || draftTitle.trim().length === 0}>
-                Simpan
+                Simpan judul
               </Button>
               <Button variant="outline" size="sm" onClick={() => node && onDuplicate(node)}>
                 Duplikat
