@@ -1,6 +1,6 @@
 # 011-02 — Tambah 1-klik inline-edit + panel detail on-demand
 
-Status: review
+Status: done
 PRD: `docs/prd/011-org-chart-studio.md`
 Design: `docs/design/org-chart-studio.md`
 FR: `FR-005`, `FR-006`, `FR-013`, `FR-016`, `FR-019`
