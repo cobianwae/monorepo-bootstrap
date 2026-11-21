@@ -78,13 +78,13 @@ Skenario utama:
 | FR-006 | Validasi tetap dijalankan saat file masuk queue (ukuran, jumlah, tipe); file invalid ditolak dengan alasan per file tanpa menolak file valid lain dalam batch yang sama. | must | Batch campur valid/invalid → hanya invalid tertolak; pesan menyebut nama file dan alasannya. |
 | FR-007 | Komponen dapat dihubungkan ke mekanisme upload milik konsumen (komponen tidak memilih transport sendiri) dan menerima laporan progres dari konsumen. | must | Story demo memasang fungsi upload tiruan tanpa mengubah kode komponen. |
 | FR-008 | Queue dapat dioperasikan penuh dengan keyboard dan terbaca screen reader (struktur list, status, progres diumumkan). | must | Tab/keyboard mencapai seluruh kontrol aksi; role/aria pada list & progres; lolos audit a11y. |
-| FR-015 | Showcase scenario upload queue dengan state lengkap (empty, berjalan, gagal, selesai) dalam light & dark. | must | Route scenario showcase tersedia dan lolos smoke build. |
 | FR-009 | Thumbnail pratinjau untuk image; ikon generik untuk tipe lain. | should | Scenario image menampilkan thumbnail; non-image menampilkan ikon. |
 | FR-010 | Aksi kolektif: ulang semua yang gagal; batalkan semua yang sedang berjalan. | should | Satu aksi mengubah status seluruh item target; test memverifikasi. |
 | FR-011 | Urutan item queue dapat diubah (drag-and-drop) dengan alternatif keyboard. | should | Reorder via pointer dan keyboard mengubah urutan list teramati. |
 | FR-012 | Batas jumlah upload paralel dapat diatur konsumen; default aman ditetapkan di design. | should | Dengan batas 2 dan 5 file, hanya 2 item berstatus mengunggah bersamaan. |
 | FR-013 | Auto-retry terbatas untuk kegagalan sementara, diaktifkan konsumen. | could | Item gagal mencoba ulang sesuai batas sebelum gagal permanen. |
 | FR-014 | Mode tampilan ringkas (compact) yang menampilkan queue dalam ruang kecil. | could | Variant compact menampilkan queue tanpa melanggar kontras/target sentuh. |
+| FR-015 | Showcase scenario upload queue dengan state lengkap (empty, berjalan, gagal, selesai) dalam light & dark. | must | Route scenario showcase tersedia dan lolos smoke build. |
 
 ## Design Refs
 
