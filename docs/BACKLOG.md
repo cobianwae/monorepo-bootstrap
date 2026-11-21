@@ -77,11 +77,11 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 005-04 | Flow editor seleksi + inspector on-demand + hapus | approved | `docs/stories/005-04-seleksi-inspector-hapus.md` |
 | 005-05 | Flow editor undo/redo + toolbar pola | approved | `docs/stories/005-05-undo-redo-toolbar.md` |
 | 005-06 | Flow editor minimap + showcase + audit | approved | `docs/stories/005-06-minimap-showcase-audit.md` |
-| 006-01 | RTE fondasi controlled + toolbar inline/blok + undo | todo | `docs/stories/006-01-fondasi-toolbar-controlled.md` |
-| 006-02 | RTE link M-009 + shortcut + keyboard penuh | todo | `docs/stories/006-02-link-shortcut-keyboard.md` |
-| 006-03 | RTE mode + counter + state matrix | todo | `docs/stories/006-03-mode-counter-states.md` |
-| 006-04 | RTE gambar M-010 + serializer markdown + slot mention | todo | `docs/stories/006-04-gambar-markdown-mention.md` |
-| 006-05 | RTE showcase final + audit kontras + smoke | todo | `docs/stories/006-05-showcase-audit-smoke.md` |
+| 006-01 | RTE fondasi controlled + toolbar inline/blok + undo | approved | `docs/stories/006-01-fondasi-toolbar-controlled.md` |
+| 006-02 | RTE link M-009 + shortcut + keyboard penuh | approved | `docs/stories/006-02-link-shortcut-keyboard.md` |
+| 006-03 | RTE mode + counter + state matrix | approved | `docs/stories/006-03-mode-counter-states.md` |
+| 006-04 | RTE gambar M-010 + serializer markdown + slot mention | approved | `docs/stories/006-04-gambar-markdown-mention.md` |
+| 006-05 | RTE showcase final + audit kontras + smoke | approved | `docs/stories/006-05-showcase-audit-smoke.md` |
 
 ## Change Requests
 
@@ -90,6 +90,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-008 | Perapian dokumen PRD 001 & design upload-queue | approved | `docs/cr/cr-008-prd001-cleanup.md` |
 | CR-009 | OrgChartEditor layak total (DIHENTIKAN 2026-11-21, diganti 011) | dihentikan | `docs/cr/cr-009-org-chart-editor-layak.md` |
 | CR-010 | Org Chart Studio gate-2 follow-up (tutup OQ + perapian approved) | done | `docs/cr/cr-010-org-chart-studio-gate2-followup.md` |
+| CR-011 | Sitemap & rujukan docs Rich Text Editor (PRD 006) | approved | `docs/cr/cr-011-sitemap-rich-text-editor.md` |
 
 ## Catatan
 

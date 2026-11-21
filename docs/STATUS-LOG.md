@@ -75,3 +75,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 2026-11-21 — Story 005-01 `done` (approved oleh user) dan di-merge ke `dev` — `005-01`.
 2026-11-21 — Story 011-04 cari/keyboard/pohon SR/motion selesai, status review: highlightedIds + auto-expand getAncestors + live region jumlah (ring primary + badge Cocok + edge garis putus), keyboard penuh (F2/Ctrl+Enter edit, Space expand, panah pan 40px, ring primary 2px), pohon SR internal role=tree + tombol aksi per baris + skip-link, reduced-motion (durasi 0 + pinch mati) + hit-area 44px kontrol/toggle; test 8 baru + 457 hijau, typecheck/lint/test/test:tokens/showcase build hijau — `011-04`.
 2026-11-21 — Story 011-04 `done` (approved oleh user) dan di-merge ke `dev` — `011-04`.
+2026-11-21 — Review artefak 006 selesai (2 blocker, 4 major, 3 minor); approve CR-011 sitemap & rujukan RTE + gate 3 story 006-01–006-05 (siap implementasi) + setujui `@tiptap/extension-image` untuk FR-009 di 006-04 — CR-011, 006

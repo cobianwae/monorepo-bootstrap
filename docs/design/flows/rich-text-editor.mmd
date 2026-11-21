@@ -1,0 +1,85 @@
+<!-- Flow rich text editor — PRD 006, layar S-005.22 (+ demo S-004.03), modal M-009 link, M-010 gambar -->
+<!-- Job utama: ketik/format via toolbar & shortcut → sisip link → sisip gambar → pantau counter → simpan -->
+<!-- Constraint: TipTap 3.30.1 promosi ke packages/ui (starter-kit + link + underline + placeholder); tanpa fetch/persist di komponen -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman rich text editor] --> B{Mode muat konten?}
+  B -- async, masih dimuat --> L[Tampilkan skeleton + teks SR Memuat editor]
+  L --> B
+  B -- gagal dimuat/parse --> ERR[Tampilkan error + tombol Coba lagi]
+  ERR --> R[User menekan Coba lagi]
+  R --> A
+  B -- konten kosong --> EMP[Tampilkan placeholder di area konten]
+  EMP --> C
+  B -- siap --> C[Editor dirender: toolbar + area konten + strip counter]
+  C --> D{User memilih operasi?}
+  D -- format teks/blok --> F2[Alur format: flow 2]
+  D -- sisip/edit link --> F3[Alur link M-009: flow 3]
+  D -- gambar/counter/state --> F4[Alur gambar-counter-state: flow 4]
+  D -- readonly/disabled --> RO[Editing mati; konten tetap terbaca SR]
+  F2 --> C
+  F3 --> C
+  F4 --> C
+  RO --> C
+```
+
+```mermaid
+flowchart TD
+  A[User mengetik atau memblok teks] --> B{Memakai toolbar atau shortcut?}
+  B -- klik toolbar --> T[User menekan tombol Bold/Italic/Heading/List/Quote]
+  T --> T2[Format diterapkan ke seleksi; tombol aktif aria-pressed true]
+  B -- shortcut ketik --> S[User mengetik markdown shortcut: hashtag-spasi / strip-spasi / bintang-bintang]
+  S --> S2[Shortcut berubah jadi heading/list/bold-italic-code; setara toolbar]
+  B -- shortcut tahan --> K[User menekan Ctrl-B / Ctrl-I / Ctrl-U / Ctrl-Z]
+  K --> K2[Aksi setara toolbar/undo berjalan]
+  T2 --> U{User membatalkan?}
+  S2 --> U
+  K2 --> U
+  U -- undo --> Z[Undo kembalikan aksi terakhir; live region umumkan]
+  Z --> A
+  U -- lanjut --> A
+```
+
+```mermaid
+flowchart TD
+  A[User memblok teks atau fokus di link] --> B[User membuka editor link M-009 via toolbar / Ctrl-K / klik link]
+  B --> C{Popover link tampil: input URL + tombol Simpan/Buka/Hapus/Batal?}
+  C -- seleksi baru tanpa link --> N[Input kosong; fokus ke input; Simpan disabled sampai URL valid]
+  C -- edit link existing --> E[Input terisi URL lama; tombol Buka + Hapus aktif]
+  N --> V{URL valid? https/http atau path absolut}
+  E --> V
+  V -- tidak valid/kosong --> IV[Tolak inline: pesan + aria-invalid; popover tetap terbuka]
+  IV --> V
+  V -- Batal/Esc --> X[Tutup; fokus kembali ke editor/teks asal]
+  X --> A
+  V -- Simpan valid --> SV[Link tersimpan; chip/link aktif di toolbar]
+  SV --> H{User membuka/menghapus link?}
+  H -- klik link + Buka --> O[Buka URL di tab baru; fokus tetap di editor]
+  O --> A
+  H -- Hapus di popover --> D[Link dilepas jadi teks biasa; undo tersedia]
+  D --> A
+  H -- tidak --> A
+```
+
+```mermaid
+flowchart TD
+  A[User di area konten dengan counter] --> B[User mengetik; counter bertambah dari teks polos]
+  B --> C{Panjang vs batas 10000?}
+  C -- di bawah 90 persen --> OK[Counter netral; lanjut mengetik]
+  OK --> A
+  C -- 90-100 persen --> WARN[Tampilkan peringatan mendekati batas + teks bukan warna saja]
+  WARN --> A
+  C -- melewati batas --> OVER[Tampilkan state destructive + pesan; tetap bisa mengetik, simpan disarankan perbaiki]
+  OVER --> A
+  A --> G{User menyisipkan gambar via M-010?}
+  G -- tidak --> A
+  G -- ya --> I[User membuka dialog gambar: input URL + alt wajib + pratinjau]
+  I --> J{URL valid dan alt terisi?}
+  J -- alt kosong --> IA[Tolak: pesan alt wajib; dialog tetap terbuka]
+  IA --> I
+  J -- URL tidak valid --> IU[Tolak: pesan URL tidak valid; dialog tetap terbuka]
+  IU --> I
+  J -- valid --> IS[Gambar tersisip di posisi kursor dengan alt; undo tersedia]
+  IS --> A
+```
