@@ -1,6 +1,6 @@
 # 014-03 — Validasi + konfirmasi + showcase final
 
-Status: review
+Status: done
 PRD: `docs/prd/014-import-wizard.md` (approved, gate 1)
 Design: `docs/design/import-wizard.md` (approved, gate 2) + `docs/design/flows/import-wizard.mmd` (flow 3–4) + `docs/design/wireframes/import-wizard.md` (§2.3–2.4, §4–7)
 FR: `FR-003`, `FR-004`, `FR-005`, `FR-006`, `FR-008`, `FR-009`, `FR-011`
@@ -45,7 +45,7 @@ Goal: Wizard selesai ujung-ke-ujung: pratinjau error per sel yang bisa diperbaik
 - [x] Implementasi langkah 4 (§2.4): 3 stat + radio lewati/gagalkan + submit hitungan + sukses + Mulai ulang; `onComplete` hanya valid
 - [x] Finalisasi showcase S-005.37: `ol` end-to-end, panel demo 6 state, dataset valid/invalid/kosong/besar, resep 15 baris, toggle delimiter + light/dark, `data-testid` `iw-*` lengkap
 - [x] Audit: keyboard penuh, SR live region, fokus ring, `test:tokens` light & dark + tabel audit di story; smoke showcase build (lihat tabel audit di bawah)
-- [ ] Update `sitemap.md` S-005.37 series → `implemented` + catat `STATUS-LOG.md` setelah merge per AGENTS.md
+- [x] Update `sitemap.md` S-005.37 series → `implemented` + catat `STATUS-LOG.md` setelah merge per AGENTS.md (sitemap diubah di branch yang sama sebelum merge; catatan STATUS-LOG ditulis saat merge)
 
 ## Dependencies
 
