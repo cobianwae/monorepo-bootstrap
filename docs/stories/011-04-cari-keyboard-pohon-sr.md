@@ -1,6 +1,6 @@
 # 011-04 — Cari, keyboard penuh, pohon SR, dan motion/sentuh
 
-Status: todo
+Status: review
 PRD: `docs/prd/011-org-chart-studio.md`
 Design: `docs/design/org-chart-studio.md`
 FR: `FR-010`, `FR-011`, `FR-016`
@@ -35,12 +35,12 @@ Goal: Pencarian presentasional + seluruh operasi bisa via keyboard dan screen re
 
 ## Tasks
 
-- [ ] Wiring `highlightedIds` + `getAncestors` auto-expand + live region jumlah (komponen presentasional; query milik konsumen)
-- [ ] Keyboard map kanvas + kartu + gagang + global undo/redo; order fokus toolbar → search → kanvas → kartu/gagang → controls → panel → pohon SR
-- [ ] Pohon SR `role="tree"`/`treeitem`/`group` + tombol aksi per baris reuse pola 003
-- [ ] Reduced-motion (durasi 0, pinch mati) + audit hit-area ≥ 44px + responsif panel/minimap
-- [ ] Test: highlight + auto-expand + live region, keyboard tiap shortcut, pohon SR navigasi + aksi, reduced-motion + hit-area
-- [ ] Showcase: tambah pencarian + papan keyboard ke draf route (final di 011-05)
+- [x] Wiring `highlightedIds` + `getAncestors` auto-expand + live region jumlah (komponen presentasional; query milik konsumen)
+- [x] Keyboard map kanvas + kartu + gagang + global undo/redo; order fokus toolbar → search → kanvas → kartu/gagang → controls → panel → pohon SR
+- [x] Pohon SR `role="tree"`/`treeitem`/`group` + tombol aksi per baris reuse pola 003
+- [x] Reduced-motion (durasi 0, pinch mati) + audit hit-area ≥ 44px + responsif panel/minimap
+- [x] Test: highlight + auto-expand + live region, keyboard tiap shortcut, pohon SR navigasi + aksi, reduced-motion + hit-area
+- [x] Showcase: tambah pencarian + papan keyboard ke draf route (final di 011-05)
 
 ## Dependencies
 
