@@ -1,3 +1,4 @@
+@import "@xyflow/react/dist/style.css";
 @import "@ds/tokens/tokens.css";
 
 @source "./components";
@@ -90,13 +91,31 @@
 }
 
 @layer components {
-  /* xyflow 13.0.2 — default CSS tidak diimpor; semua permukaan dipetakan ke token (design D1/D11).
-   * border-strong sengaja TIDAK dipakai (tidak ada di @ds/tokens); edge pakai muted-foreground. */
-  .xyflow__panel,
-  .xyflow__viewport {
+  /* xyflow 13.0.2 — base `dist/style.css` diimpor di atas; blok ini memetakan
+   * semua permukaan ke token (design D1/D11). Prefix v13 = `.react-flow__*`
+   * (bukan `.xyflow__*`); tanpa pemetaan ini warna default (#fff / #141414 /
+   * #fefefe) bocor sebagai belang di tengah kanvas.
+   * border-strong sengaja TIDAK dipakai (tidak ada di @ds/tokens). */
+  .react-flow {
+    --xy-background-color: var(--background);
+    --xy-node-background-color: var(--card);
+    --xy-node-border: 1px solid var(--border);
+    --xy-node-color: var(--foreground);
+    --xy-handle-background-color: var(--background);
+    --xy-handle-border-color: var(--border);
+    --xy-minimap-background-color: var(--card);
+    --xy-minimap-mask-background-color: color-mix(in oklch, var(--background) 70%, transparent);
+    --xy-minimap-node-background-color: var(--muted-foreground);
+    --xy-controls-button-background-color: var(--card);
+    --xy-controls-button-background-color-hover: var(--accent);
+    --xy-edge-stroke-default: var(--muted-foreground);
+    --xy-edge-stroke-selected-default: var(--primary);
     background-color: var(--background);
   }
-  .xyflow__node {
+  .react-flow__viewport {
+    background-color: var(--background);
+  }
+  .react-flow__node {
     border-color: var(--border);
     background-color: var(--card);
     color: var(--foreground);
@@ -104,11 +123,11 @@
     border-width: 1px;
     border-style: solid;
   }
-  .xyflow__node.selected {
+  .react-flow__node.selected {
     border-color: var(--primary);
     box-shadow: 0 0 0 2px var(--primary);
   }
-  .xyflow__handle {
+  .react-flow__handle {
     border-color: var(--border);
     background-color: var(--background);
     border-width: 2px;
@@ -117,31 +136,31 @@
     height: 12px;
     border-radius: 50%;
   }
-  .xyflow__handle.connected {
+  .react-flow__handle.connected {
     background-color: var(--primary);
     border-color: var(--primary);
   }
-  .xyflow__edge {
+  .react-flow__edge {
     stroke: var(--muted-foreground);
     stroke-width: 1.5px;
   }
-  .xyflow__edge.selected {
+  .react-flow__edge.selected {
     stroke: var(--primary);
     stroke-width: 2px;
   }
-  .xyflow__controls {
+  .react-flow__controls {
     background-color: var(--card);
     border-color: var(--border);
   }
-  .xyflow__minimap {
+  .react-flow__minimap {
     border-color: var(--border);
     background-color: var(--card);
   }
-  .xyflow__selection {
+  .react-flow__selection {
     fill: color-mix(in oklch, var(--primary) 20%, transparent);
     stroke: var(--primary);
   }
-  .xyflow__selection__handle {
+  .react-flow__selection__handle {
     fill: var(--primary);
     stroke: var(--primary);
   }

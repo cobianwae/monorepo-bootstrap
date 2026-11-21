@@ -11,9 +11,11 @@
 // prop `onChange` diterima sesuai kontrak §2 dan mulai dipakai saat mutasi ada.
 
 import * as React from 'react';
-import { ChevronDown, ChevronRight, Maximize, Minus, Plus } from 'lucide-react';
+import { ChevronDown, ChevronRight, Maximize, Minus, Plus, RotateCcw } from 'lucide-react';
 import {
+  Handle,
   MiniMap,
+  Position,
   ReactFlow,
   ReactFlowProvider,
   useReactFlow,
@@ -555,6 +557,8 @@ export function toStudioFlowEdges(
         id: `${node.id}>${childId}`,
         source: node.id,
         target: childId,
+        sourceHandle: 'out',
+        targetHandle: 'in',
         type: 'smoothstep',
         style: isMatch
           ? { strokeWidth: 1.5, stroke: 'var(--primary)', strokeDasharray: '5 4' }
@@ -594,30 +598,45 @@ function getInitials(title: string): string {
     .join('');
 }
 
-// Gagang "+" 011-02 (FR-005, D5): visual lingkaran 24px, hit-area 44px (FR-016).
+// Gagang "+" 011-02 (FR-005, D5) + CR-014: muncul saat hover/fokus/kartu
+// terpilih (bukan opacity-0 total seperti spec awal yang tak-tertemukan, dan
+// bukan selalu-terlihat yang bikin kanvas penuh pil + terlihat "keluar-keluar").
+// Alur sentuh: ketuk kartu (terpilih, + muncul menetap) → ketuk +.
+// Dilengkapi title + Tooltip native, dan tidak memicu pan kanvas.
 function StudioAddHandle({
   testId,
   label,
   className,
   onAdd,
+  visible = false,
 }: {
   testId: string;
   label: string;
   className?: string;
   onAdd: () => void;
+  visible?: boolean;
 }) {
   return (
     <button
       type="button"
       data-testid={testId}
       aria-label={label}
+      title={label}
+      onPointerDown={(event) => {
+        event.stopPropagation();
+      }}
+      onMouseDown={(event) => {
+        event.stopPropagation();
+      }}
       onClick={(event) => {
         event.stopPropagation();
         onAdd();
       }}
       className={cn(
-        'absolute z-20 flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground',
-        'opacity-0 transition-opacity duration-200 group-hover/studio-node:opacity-100 group-focus-within/studio-node:opacity-100 focus:opacity-100 motion-reduce:transition-none',
+        'nodrag nopan absolute z-20 flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground',
+        visible
+          ? 'opacity-100'
+          : 'opacity-0 transition-opacity duration-200 group-hover/studio-node:opacity-100 group-focus-within/studio-node:opacity-100 focus:opacity-100 motion-reduce:transition-none',
         'hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
         className,
       )}
@@ -766,6 +785,27 @@ function StudioNode({ data }: { data: StudioNodeData }) {
               : 'border-border'),
       )}
     >
+      {/* CR-014 temuan #6 (blocker, error 008): jangkar garis React Flow.
+          Tombol "+" tetap aksi tambah; Handle tak-terlihat ini yang ditempeli edge.
+          Tanpa keduanya edge gagal dibuat ("source handle id: null"). */}
+      <Handle
+        type="target"
+        position={Position.Top}
+        id="in"
+        isConnectable={false}
+        aria-hidden="true"
+        className="!border-border !bg-background opacity-0"
+        style={{ pointerEvents: 'none' }}
+      />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="out"
+        isConnectable={false}
+        aria-hidden="true"
+        className="!border-border !bg-background opacity-0"
+        style={{ pointerEvents: 'none' }}
+      />
       {dropState !== null ? (
         <span
           data-testid="org-studio-drop-hint"
@@ -892,6 +932,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
             testId={`org-studio-add-child-${node.id}`}
             label={`Tambah bawahan untuk ${node.title}`}
             onAdd={() => onAddChild(node.id)}
+            visible={isSelected || isEditing}
             className="left-1/2 top-full -translate-x-1/2 -translate-y-1/2"
           />
           {canAddSibling ? (
@@ -899,6 +940,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
               testId={`org-studio-add-sibling-${node.id}`}
               label={`Tambah sejawat untuk ${node.title}`}
               onAdd={() => onAddSibling(node.id)}
+              visible={isSelected || isEditing}
               className="left-full top-1/2 -translate-x-1/2 -translate-y-1/2"
             />
           ) : null}
@@ -915,8 +957,10 @@ const studioNodeTypes = { studioNode: StudioNode };
 // ---------------------------------------------------------------------------
 
 function StudioControls({ zoomLabel, zoomDuration }: { zoomLabel: string; zoomDuration: number }) {
-  const { zoomIn, zoomOut, fitView, setViewport } = useReactFlow();
+  const { zoomIn, zoomOut, fitView, getViewport, setViewport } = useReactFlow();
   // 011-04 (FR-016): hit-area kontrol ≥ 44px; durasi 0 saat reduced-motion.
+  // CR-014 temuan #4: label Indonesia, ikon Reset (RotateCcw) beda dari Fit (Maximize),
+  // Reset hanya mengembalikan zoom 100% di posisi sekarang (tidak melempar ke sudut kosong).
   const buttonClass =
     'flex h-11 w-11 items-center justify-center rounded-sm text-muted-foreground motion-safe:transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2';
   return (
@@ -924,24 +968,28 @@ function StudioControls({ zoomLabel, zoomDuration }: { zoomLabel: string; zoomDu
       data-testid="org-studio-controls"
       className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-md border border-border bg-card p-1 shadow-sm"
     >
-      <button type="button" aria-label="Zoom out" onClick={() => void zoomOut({ duration: zoomDuration })} className={buttonClass}>
+      <button type="button" aria-label="Perkecil" title="Perkecil" onClick={() => void zoomOut({ duration: zoomDuration })} className={buttonClass}>
         <Minus className="h-4 w-4" aria-hidden="true" />
       </button>
       <span aria-live="polite" data-testid="org-studio-zoom-level" className="min-w-12 text-center text-sm text-foreground">
         {zoomLabel}
       </span>
-      <button type="button" aria-label="Zoom in" onClick={() => void zoomIn({ duration: zoomDuration })} className={buttonClass}>
+      <button type="button" aria-label="Perbesar" title="Perbesar" onClick={() => void zoomIn({ duration: zoomDuration })} className={buttonClass}>
         <Plus className="h-4 w-4" aria-hidden="true" />
       </button>
       <button
         type="button"
-        aria-label="Reset zoom"
-        onClick={() => void setViewport({ x: 0, y: 0, zoom: 1 })}
+        aria-label="Atur ulang zoom 100%"
+        title="Atur ulang zoom 100%"
+        onClick={() => {
+          const viewport = getViewport();
+          void setViewport({ x: viewport.x, y: viewport.y, zoom: 1 }, { duration: zoomDuration });
+        }}
         className={buttonClass}
       >
-        <Maximize className="h-4 w-4" aria-hidden="true" />
+        <RotateCcw className="h-4 w-4" aria-hidden="true" />
       </button>
-      <button type="button" aria-label="Fit view" onClick={() => void fitView({ padding: 0.2, duration: zoomDuration })} className={buttonClass}>
+      <button type="button" aria-label="Paskan tampilan" title="Paskan tampilan" onClick={() => void fitView({ padding: 0.2, duration: zoomDuration })} className={buttonClass}>
         <Maximize className="h-4 w-4" aria-hidden="true" />
       </button>
     </div>
@@ -958,6 +1006,7 @@ function StudioCanvas({
   reducedMotion,
   keyboardZoom,
   onZoomLevel,
+  centerNodeId,
 }: {
   nodes: StudioFlowNode[];
   edges: StudioFlowEdge[];
@@ -968,8 +1017,23 @@ function StudioCanvas({
   reducedMotion: boolean;
   keyboardZoom: (action: 'in' | 'out' | 'reset' | 'fit') => void;
   onZoomLevel: (zoom: number) => void;
+  centerNodeId: string | null;
 }) {
-  const { zoomIn, zoomOut, getViewport, setViewport } = useReactFlow();
+  const { zoomIn, zoomOut, getViewport, setViewport, setCenter } = useReactFlow();
+  // CR-014 temuan #2: node baru sering jatuh di luar viewport 480px sehingga
+  // tambah terasa "gak ngapa-ngapain". Pusatkan viewport ke node fokus (baru
+  // ditambah / selesai edit / undo) dengan zoom tidak berubah.
+  React.useEffect(() => {
+    if (!centerNodeId) return;
+    const target = nodes.find((node) => node.id === centerNodeId);
+    if (!target) return;
+    void setCenter(target.position.x + STUDIO_NODE_WIDTH / 2, target.position.y + STUDIO_NODE_HEIGHT / 2, {
+      zoom: getViewport().zoom,
+      duration: zoomDuration,
+    });
+    // `nodes` sengaja di-deps: posisi final baru ada setelah layout dihitung
+    // ulang (commit), jadi pemusatan mengikuti posisi terbaru sekali jalan.
+  }, [centerNodeId, nodes, getViewport, setCenter, zoomDuration]);
   // Ctrl/Cmd+wheel = zoom; wheel polos tidak mencegat scroll halaman (AC-04).
   // 011-04 (FR-016): pinch dimatikan saat reduced-motion.
   const handleWheel = React.useCallback(
@@ -1055,15 +1119,16 @@ function StudioCanvas({
         onMove={(_event, viewport) => onZoomLevel(viewport.zoom)}
       >
         {minimap ? (
-          <MiniMap
-            data-testid="org-studio-minimap"
-            pannable
-            zoomable
-            aria-label="Minimap"
-            className="!border-border !bg-card hidden md:block"
-            maskColor="color-mix(in oklch, var(--background) 70%, transparent)"
-            nodeColor="var(--primary)"
-          />
+          <div data-testid="org-studio-minimap" className="contents">
+            <MiniMap
+              pannable
+              zoomable
+              aria-label="Minimap"
+              className="!border-border !bg-card hidden md:block"
+              maskColor="color-mix(in oklch, var(--background) 70%, transparent)"
+              nodeColor="var(--primary)"
+            />
+          </div>
         ) : null}
         <StudioControls zoomLabel={zoomLabel} zoomDuration={zoomDuration} />
       </ReactFlow>
@@ -1744,6 +1809,12 @@ export function OrgChartStudio({
   const [newNodeId, setNewNodeId] = React.useState<string | null>(null);
   const [panelNodeId, setPanelNodeId] = React.useState<string | null>(null);
   const [focusNodeId, setFocusNodeId] = React.useState<string | null>(null);
+  // CR-014 temuan #5: toggle minimap internal agar fungsi tidak hilang di <md
+  // (prop `minimap` tetap nilai awal/default; toggle ini state tampilan lokal).
+  const [showMinimap, setShowMinimap] = React.useState(minimap);
+  React.useEffect(() => {
+    setShowMinimap(minimap);
+  }, [minimap]);
   // History undo disimpan di ref (bukan state) agar callback toast yang dibuat
   // saat commit selalu membaca snapshot terbaru, bukan closure lama.
   const pastRef = React.useRef<OrgStudioNodeFlat[][]>([]);
@@ -2313,6 +2384,16 @@ export function OrgChartStudio({
         >
           Ulangi
         </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          aria-pressed={showMinimap}
+          onClick={() => setShowMinimap((visible) => !visible)}
+          data-testid="org-studio-minimap-toggle"
+        >
+          {showMinimap ? 'Sembunyikan peta' : 'Tampilkan peta'}
+        </Button>
         <span className="text-xs text-muted-foreground">Ctrl+Z urungkan · Ctrl+Y ulangi · Delete hapus kartu fokus</span>
       </div>
       <div aria-live="polite" role="status" className="sr-only" data-testid="org-studio-live">
@@ -2356,11 +2437,12 @@ export function OrgChartStudio({
           nodes={flowNodes}
           edges={flowEdges}
           ariaLabel={ariaLabel}
-          minimap={minimap}
+          minimap={showMinimap}
           zoomLevel={zoomLevel}
           setZoomLevel={setZoomLevel}
           zoomDuration={zoomDuration}
           reducedMotion={reducedMotion}
+          centerNodeId={editingId ?? focusNodeId}
         />
       </ReactFlowProvider>
       {/* 011-04 (FR-011): skip-link + pohon SR internal sebagai jalur utama SR. */}
@@ -2434,6 +2516,7 @@ function StudioCanvasInner({
   setZoomLevel,
   zoomDuration,
   reducedMotion,
+  centerNodeId,
 }: {
   nodes: StudioFlowNode[];
   edges: StudioFlowEdge[];
@@ -2443,16 +2526,20 @@ function StudioCanvasInner({
   setZoomLevel: (zoom: number) => void;
   zoomDuration: number;
   reducedMotion: boolean;
+  centerNodeId: string | null;
 }) {
-  const { zoomIn, zoomOut, fitView, setViewport } = useReactFlow();
+  const { zoomIn, zoomOut, fitView, getViewport, setViewport } = useReactFlow();
   const keyboardZoom = React.useCallback(
     (action: 'in' | 'out' | 'reset' | 'fit') => {
       if (action === 'in') void zoomIn({ duration: zoomDuration });
       else if (action === 'out') void zoomOut({ duration: zoomDuration });
-      else if (action === 'reset') void setViewport({ x: 0, y: 0, zoom: 1 });
-      else void fitView({ padding: 0.2, duration: zoomDuration });
+      else if (action === 'reset') {
+        // CR-014: reset hanya kembalikan zoom 100%, posisi dipertahankan.
+        const viewport = getViewport();
+        void setViewport({ x: viewport.x, y: viewport.y, zoom: 1 }, { duration: zoomDuration });
+      } else void fitView({ padding: 0.2, duration: zoomDuration });
     },
-    [fitView, setViewport, zoomDuration, zoomIn, zoomOut],
+    [fitView, getViewport, setViewport, zoomDuration, zoomIn, zoomOut],
   );
   return (
     <StudioCanvas
@@ -2465,6 +2552,7 @@ function StudioCanvasInner({
       reducedMotion={reducedMotion}
       keyboardZoom={keyboardZoom}
       onZoomLevel={setZoomLevel}
+      centerNodeId={centerNodeId}
     />
   );
 }
