@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { render, renderHook, screen, within, fireEvent } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { useReactFlow } from '@xyflow/react';
+import { render, renderHook, screen, within, fireEvent, act } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Toaster } from '../feedback/toaster';
 import { TooltipProvider } from '../base/tooltip';
 import { FlowEditor, type FlowEdge, type FlowNode, type FlowPaletteItem, useFlowHistory } from './flow-editor';
+import type { Connection } from '@xyflow/react';
 
 const mockStf = vi.hoisted(() => vi.fn((pos: { x: number; y: number }) => pos));
 const mockGetViewport = vi.hoisted(() => vi.fn(() => ({ x: 0, y: 0, zoom: 1 })));
@@ -16,18 +16,22 @@ vi.mock('@xyflow/react', async (importOriginal) => {
     // ReactFlow test-friendly: render nodes via nodeTypes dan edges sebagai div,
     // tanpa memerlukan DOM kanvas xyflow asli di jsdom.
     ReactFlow: function MockReactFlow(props: Record<string, unknown>) {
-      const { nodes = [], edges = [], nodeTypes = {}, children, onInit, onViewportChange } = props as {
+      const { nodes = [], edges = [], nodeTypes = {}, children, onInit, onViewportChange, onConnect, onSelectionChange } = props as {
         nodes?: Array<{ id: string; type: string; data: Record<string, unknown>; selected?: boolean; position?: { x: number; y: number } }>;
         edges?: Array<{ id: string; source: string; target: string }>;
         nodeTypes?: Record<string, React.ComponentType>;
         children?: React.ReactNode;
         onInit?: (instance: unknown, viewport: { x: number; y: number; zoom: number }) => void;
         onViewportChange?: (viewport: { zoom: number }) => void;
+        onConnect?: (connection: Connection) => void;
+        onSelectionChange?: (selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => void;
       };
       React.useEffect(() => {
         if (onInit) onInit(null as unknown as never, { x: 0, y: 0, zoom: 1 });
         if (onViewportChange) onViewportChange({ zoom: 1 });
-      }, [onInit, onViewportChange]);
+        ;(window as unknown as Record<string, unknown>).__flowOnConnect = onConnect;
+        ;(window as unknown as Record<string, unknown>).__flowSelectionChange = onSelectionChange;
+      }, [onInit, onViewportChange, onConnect, onSelectionChange]);
       return (
         <div data-testid="flow-canvas">
           {(nodes as Array<{ id: string; type: string; data: Record<string, unknown>; selected?: boolean; position?: { x: number; y: number } }>).map((node) => {
@@ -314,5 +318,142 @@ describe('FlowEditor palette + keyboard + snap (005-02)', () => {
     const newNode = container.querySelector('[data-testid^="flow-node-node-"]');
     expect(newNode).not.toBeNull();
     expect(newNode?.getAttribute('aria-selected')).toBe('true');
+  });
+});
+
+describe('FlowEditor edge + validasi + label (005-03)', () => {
+  const onConnect = vi.fn();
+  const onEdgesChange = vi.fn();
+  const onSelectionChange = vi.fn();
+
+  const renderControlled = (overrides: React.ComponentProps<typeof FlowEditor> = {}) =>
+    renderEditor({
+      nodes: baseNodes,
+      edges: baseEdges,
+      onConnect,
+      onEdgesChange,
+      onSelectionChange,
+      ...overrides,
+    });
+
+  const triggerConnect = (conn: Connection) => {
+    const fn = (window as unknown as Record<string, unknown>).__flowOnConnect as
+      | ((c: Connection) => void)
+      | null;
+    expect(fn).not.toBeNull();
+    act(() => {
+      fn!(conn);
+    });
+  };
+
+  const triggerSelect = (selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => {
+    const fn = (window as unknown as Record<string, unknown>).__flowSelectionChange as
+      | ((s: { nodes: FlowNode[]; edges: FlowEdge[] }) => void)
+      | null;
+    expect(fn).not.toBeNull();
+    act(() => {
+      fn!(selection);
+    });
+  };
+
+  beforeEach(() => {
+    onConnect.mockClear();
+    onEdgesChange.mockClear();
+    onSelectionChange.mockClear();
+    ;(window as unknown as Record<string, unknown>).__flowOnConnect = null;
+    ;(window as unknown as Record<string, unknown>).__flowSelectionChange = null;
+  });
+
+  it('AC-01: sambung valid via onConnect + live region "Edge X→Y tersambung"', () => {
+    renderControlled();
+    triggerConnect({ source: 'n1', target: 'n2', sourceHandle: 'c', targetHandle: 'd' });
+    expect(onConnect).toHaveBeenCalledWith({
+      source: 'n1',
+      target: 'n2',
+      sourceHandle: 'c',
+      targetHandle: 'd',
+    });
+    expect(screen.getByText(/Edge n1→n2 tersambung/)).not.toBeNull();
+  });
+
+  it('AC-02: keyboard Enter-Tab-Enter sambung edge via handle', () => {
+    renderControlled();
+    const src = screen.getByTestId('flow-handle-n1-source');
+    fireEvent.keyDown(src, { key: 'Enter' }); // mulai connecting dari sumber
+    const tgt = screen.getByTestId('flow-handle-n2-target');
+    fireEvent.keyDown(tgt, { key: 'Enter' }); // selesaikan ke target
+    expect(onConnect).toHaveBeenCalledWith({
+      source: 'n1',
+      target: 'n2',
+      sourceHandle: 'source',
+      targetHandle: 'target',
+    });
+  });
+
+  it('AC-02: keyboard invalid (duplikat) → penolakan + fokus kembali ke sumber', () => {
+    // e2 menempati pasangan n1(source)→n2(target) dengan sourceHandle 'source'/targetHandle 'target' yang sama seperti jalur keyboard.
+    renderEditor({
+      nodes: baseNodes,
+      edges: [
+        ...baseEdges,
+        { id: 'e2', source: 'n1', target: 'n2', sourceHandle: 'source', targetHandle: 'target', animated: false },
+      ],
+      onConnect,
+      onSelectionChange,
+    });
+    const src = screen.getByTestId('flow-handle-n1-source');
+    fireEvent.keyDown(src, { key: 'Enter' });
+    const tgt = screen.getByTestId('flow-handle-n2-target');
+    fireEvent.keyDown(tgt, { key: 'Enter' });
+    expect(onConnect).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert').textContent).toContain('edge duplikat sudah ada');
+    expect(document.activeElement).toBe(src);
+  });
+
+  it('AC-03: self-loop ditolak + teks alasan + role="alert" sementara', () => {
+    renderControlled();
+    triggerConnect({ source: 'n1', target: 'n1', sourceHandle: 'c', targetHandle: 'd' });
+    expect(onConnect).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert').textContent).toContain('self-loop tidak diizinkan');
+  });
+
+  it('AC-03: duplikat ditolak + teks alasan', () => {
+    renderControlled();
+    triggerConnect({ source: 'n1', target: 'n2', sourceHandle: 'a', targetHandle: 'b' }); // duplikat e1
+    expect(onConnect).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert').textContent).toContain('edge duplikat sudah ada');
+  });
+
+  it('AC-03: handle tujuan penuh ditolak + teks alasan', () => {
+    renderControlled();
+    // e1: n1→n2 targetHandle 'b'; target n2 dengan targetHandle 'b' sudah penuh.
+    triggerConnect({ source: 'n1', target: 'n2', sourceHandle: 'x', targetHandle: 'b' });
+    expect(onConnect).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert').textContent).toContain('handle tujuan sudah penuh');
+  });
+
+  it('AC-04: isValidConnection hanya mengencangkan (AND), tidak boleh melonggarkan arah', () => {
+    // Default lolos, custom menolak → ditolak.
+    const customReject = vi.fn(() => false);
+    renderEditor({ nodes: baseNodes, edges: baseEdges, onConnect, isValidConnection: customReject });
+    triggerConnect({ source: 'n1', target: 'n2', sourceHandle: 'c', targetHandle: 'd' });
+    expect(onConnect).not.toHaveBeenCalled();
+    expect(customReject).toHaveBeenCalled();
+
+    // Default menolak (self-loop), custom terima → tetap ditolak (custom tidak boleh melonggarkan).
+    const customAccept = vi.fn(() => true);
+    renderEditor({ nodes: baseNodes, edges: baseEdges, onConnect, isValidConnection: customAccept });
+    triggerConnect({ source: 'n1', target: 'n1', sourceHandle: 'c', targetHandle: 'd' });
+    expect(onConnect).not.toHaveBeenCalled();
+  });
+
+  it('AC-06: hapus edge terpilih via Delete + onEdgesChange remove satu commit', () => {
+    renderControlled();
+    triggerSelect({ nodes: [], edges: [{ id: 'e1' } as FlowEdge] });
+    const section = screen.getByTestId('flow-editor');
+    fireEvent.keyDown(section, { key: 'Delete' });
+    expect(onEdgesChange).toHaveBeenCalledWith(
+      [{ id: 'e1', type: 'remove' }] as unknown as never,
+    );
   });
 });
