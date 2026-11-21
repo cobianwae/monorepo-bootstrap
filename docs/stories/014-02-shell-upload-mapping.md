@@ -45,7 +45,7 @@ Goal: Kerangka wizard 4 langkah berdiri dengan langkah 1–2 fungsional: unggah/
 - [x] Implementasi langkah 1 (§2.1): dropzone + `file-input`, `textarea` tempel, radio delimiter auto/manual, tombol template (Blob dari 014-01), state empty/loading(`progress`)/error(`alert`) + `data-testid` `iw-*`
 - [x] Implementasi langkah 2 (§2.2): tabel mapping + `select` per header + badge wajib + pesan duplikat + gate Lanjut + fokus-ke-pesan
 - [x] Store satu (`file → mapping`) terjaga saat mundur; wiring util 014-01 (tanpa duplikasi logika)
-- [ ] Test co-located/showcase: gate wajib, duplikat ditolak, state terjaga, fokus `h2` + live region; tanpa token baru, audit `test:tokens` awal
+- [x] Test co-located/showcase: gate wajib, duplikat ditolak, state terjaga, fokus `h2` + live region; tanpa token baru, audit `test:tokens` awal
 
 ## Dependencies
 
@@ -59,7 +59,9 @@ Goal: Kerangka wizard 4 langkah berdiri dengan langkah 1–2 fungsional: unggah/
 
 ## Catatan Implementasi (2026-11-21)
 
-- Task 5 (test) **belum tuntas**: logika gate, duplikat ditolak, dan state terjaga saat mundur teruji (`_lib/wizard-state.test.ts`, 31 test showcase hijau). Fokus `h2` dan live region belum teruji otomatis: `apps/showcase` tidak memiliki `@testing-library/react` atau jsdom; menambahkannya butuh approval dependency.
+- Task 5 (test): logika gate, state mundur, dan penolakan duplikat teruji di `_lib/wizard-state.test.ts`; alur halaman (gate → fokus pesan, fokus `h2` + live region saat ganti langkah, state tempel terjaga saat mundur) teruji di `page.test.tsx` dengan jsdom. Showcase: 35 test hijau.
+- Dependency (disetujui user): devDependencies `@testing-library/react@^16.3.2`, `@testing-library/dom@^10.4.1` (peer wajib), dan `jsdom@^30.0.1` di `apps/showcase`. `vitest.config.ts` showcase menambah `esbuild.jsx: 'automatic'`, sama dengan `packages/ui`.
+- Tes penolakan duplikat via UI (Radix Select) belum diuji otomatis; logikanya teruji di `wizard-state.test.ts`.
 - Deviasi disetujui user: loading parsing tanpa persentase (`progressbar` indeterminate + "Memparsing berkas…").
 - Belum sesuai AC-05: langkah depan stepper tidak memiliki `aria-disabled` per langkah karena `Stepper` di `packages/ui` tidak menerima prop itu; diganti teks "Langkah 3–4 belum tersedia". Mengubah API `Stepper` butuh approval.
 - Belum sesuai AC-02: state file kosong belum punya tombol CTA "Pilih file lain" (hanya teks).
