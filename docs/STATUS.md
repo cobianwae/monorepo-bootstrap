@@ -25,6 +25,7 @@ Story 018-02 keyboard/banner/states `done` atas persetujuan user, ter-merge ke `
 - Graphify bersifat per-machine; graph tidak di-commit.
 - `apps/web` dan `apps/api` masih tipis; integration test belum aktif.
 - Verifikasi 018-02 dari `dev` lokal `773b5ed`: 12 error tipe baseline `flow-editor.test.tsx:702–749`; test paralel default mengalami kegagalan timing FlowEditor/OrgChartEditor/FileUpload. Dengan `--maxWorkers=2 --testTimeout=30000`, 586 test UI + 7 token lulus; konfigurasi tidak diubah. Lihat story 018-02 dan CR-015.
+- Verifikasi merge 018-02 di atas `dev` `b5b7237`: lint hijau, 12 error tipe FlowEditor tetap; 606/607 test UI lulus (termasuk 15 PermissionMatrix), satu smoke RichTextEditor gagal mencari `rte-link-save` di baris 543 dan gagal ulang terisolasi; file RTE tidak berubah oleh merge. Showcase 35/35 lulus.
 
 ## Aturan Update
 
