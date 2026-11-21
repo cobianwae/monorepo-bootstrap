@@ -83,7 +83,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 005-02 | Flow editor palette drag + tambah keyboard + snap | done | `docs/stories/005-02-palette-drop-snap.md` |
 | 005-03 | Flow editor edge sambung + validasi + label | done | `docs/stories/005-03-edge-validasi-label.md` |
 | 005-04 | Flow editor seleksi + inspector on-demand + hapus | done | `docs/stories/005-04-seleksi-inspector-hapus.md` |
-| 005-05 | Flow editor undo/redo + toolbar pola | approved | `docs/stories/005-05-undo-redo-toolbar.md` |
+| 005-05 | Flow editor undo/redo + toolbar pola | done | `docs/stories/005-05-undo-redo-toolbar.md` |
 | 005-06 | Flow editor minimap + showcase + audit | approved | `docs/stories/005-06-minimap-showcase-audit.md` |
 | 006-01 | RTE fondasi controlled + toolbar inline/blok + undo | done | `docs/stories/006-01-fondasi-toolbar-controlled.md` |
 | 006-02 | RTE link M-009 + shortcut + keyboard penuh | done | `docs/stories/006-02-link-shortcut-keyboard.md` |
@@ -97,6 +97,9 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 012-01 | Mind map fondasi dua sisi + pill + pan/zoom | approved | `docs/stories/012-01-fondasi-dua-sisi-pill-panzoom.md` |
 | 012-02 | Mind map tambah inline + hapus M-011 + undo/redo | approved | `docs/stories/012-02-tambah-hapus-undo.md` |
 | 012-03 | Mind map keyboard + cari + states + showcase audit | approved | `docs/stories/012-03-keyboard-cari-showcase-audit.md` |
+| 014-01 | Import wizard util parse/mapping/validasi + template | approved | `docs/stories/014-01-util-parse-mapping-validasi.md` |
+| 014-02 | Import wizard shell stepper + upload + mapping | approved | `docs/stories/014-02-shell-upload-mapping.md` |
+| 014-03 | Import wizard validasi + konfirmasi + showcase final | approved | `docs/stories/014-03-validasi-konfirmasi-showcase.md` |
 
 ## Change Requests
 

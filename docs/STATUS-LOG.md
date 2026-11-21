@@ -5,6 +5,10 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Story 004-04 Locale + agenda + state matrix + showcase final + a11y selesai verifikasi (typecheck, lint, test, showcase build hijau; event-calendar.tsx prop loading/error/onRetry, state matrix, agenda view, showcase page state+locale panel), status `review` — `004-04`.
 - 2026-11-21 — Story 004-04 `done` (approved oleh user) dan di-merge ke `dev` — `004-04`.
 
+- 2026-11-21 — Story 005-05 Undo/redo + toolbar pola selesai implementasi: useFlowHistory bounded (default 50) + klon struktural (bukan JSON.stringify), undo/redo via onNodesChange/onEdgesChange + state internal, toolbar (Urungkan/Ulangi/Snap/Grid, data-testid, disabled state), keyboard Ctrl+Z/Ctrl+Shift+Z/Ctrl+Y, live region + toast, FlowCanvasHost showGrid prop; 32 test flow-editor hijau, typecheck/lint bersih untuk flow-editor (baseline @tiptap merah, out of scope), status `review` — `005-05`.
+
+- 2026-11-21 — Story 005-05 `done` (disetujui user), di-commit di branch `005-05-undo-redo-toolbar` — `005-05`.
+
 - 2026-11-21 — Story 004-01 fondasi EventCalendar + month view + navigasi selesai (9 test hijau; kegagalan typecheck/test/build hanya baseline `@xyflow/react` lama) — `004-01`.
 - 2026-11-21 — Story 004-01 `done` (approved oleh user) dan di-merge ke `dev` — `004-01`.
 

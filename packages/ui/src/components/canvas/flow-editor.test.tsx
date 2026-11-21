@@ -613,3 +613,157 @@ describe('FlowEditor seleksi + inspector on-demand + hapus (005-04)', () => {
     expect(screen.queryByRole('menu')).toBeNull();
   });
 });
+
+describe('FlowEditor undo/redo + toolbar (005-05)', () => {
+  const paletteItems: FlowPaletteItem[] = [{ type: 'action', title: 'Kirim email' }];
+
+  const renderUndo = (overrides: React.ComponentProps<typeof FlowEditor> = {}) =>
+    renderEditor({ defaultNodes: baseNodes, defaultEdges: baseEdges, paletteItems, ...overrides });
+
+  const triggerConnect = (conn: Connection) => {
+    const fn = (window as unknown as Record<string, unknown>).__flowOnConnect as
+      | ((c: Connection) => void)
+      | null;
+    expect(fn).not.toBeNull();
+    act(() => {
+      fn!(conn);
+    });
+  };
+
+  const triggerSelect = (selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => {
+    const fn = (window as unknown as Record<string, unknown>).__flowSelectionChange as
+      | ((s: { nodes: FlowNode[]; edges: FlowEdge[] }) => void)
+      | null;
+    expect(fn).not.toBeNull();
+    act(() => {
+      fn!(selection);
+    });
+  };
+
+  const countNodes = () => screen.getAllByTestId(/^flow-node-n/).length;
+  const countEdges = () => screen.getAllByTestId(/^flow-sr-edge-/).length;
+
+  beforeEach(() => {
+    ;(window as unknown as Record<string, unknown>).__flowOnConnect = null;
+    ;(window as unknown as Record<string, unknown>).__flowSelectionChange = null;
+  });
+
+  it('useFlowHistory implementasi penuh (bukan stub)', () => {
+    const { result } = renderHook(() => useFlowHistory({ historyLimit: 20 }));
+    expect(result.current.historyLimit).toBe(20);
+    expect(typeof result.current.push).toBe('function');
+    expect(typeof result.current.undo).toBe('function');
+    expect(typeof result.current.redo).toBe('function');
+    expect(result.current.canUndo).toBe(false);
+    expect(result.current.canRedo).toBe(false);
+  });
+
+  it('AC-01: round-trip tambah node → sambung edge → hapus edge via toolbar undo/redo', () => {
+    renderUndo();
+    expect(countNodes()).toBe(2);
+    expect(countEdges()).toBe(1);
+
+    // mutasi 1: tambah node lewat palette
+    const add = screen.getByTestId('flow-palette-add-action');
+    fireEvent.click(add);
+    expect(countNodes()).toBe(3);
+    expect(countEdges()).toBe(1);
+
+    // mutasi 2: sambung edge n1 → n2 (handles berbeda dari e1)
+    triggerConnect({ source: 'n1', target: 'n2', sourceHandle: 'c', targetHandle: 'd' });
+    expect(countEdges()).toBe(2);
+
+    // mutasi 3: hapus edge e1 via Delete (pilih e1 dulu)
+    triggerSelect({ nodes: [], edges: [{ id: 'e1' } as FlowEdge] });
+    fireEvent.keyDown(screen.getByTestId('flow-editor'), { key: 'Delete' });
+    expect(countEdges()).toBe(1); // e1 hilang, sisa edge baru
+
+    // undo ×3 kembali ke state awal
+    const undo = screen.getByTestId('flow-toolbar-undo');
+    fireEvent.click(undo); // undo hapus e1 → e1 kembali
+    expect(countEdges()).toBe(2);
+    fireEvent.click(undo); // undo sambung edge baru
+    expect(countEdges()).toBe(1);
+    fireEvent.click(undo); // undo tambah node
+    expect(countNodes()).toBe(2);
+    expect(countEdges()).toBe(1);
+
+    // redo ×3 kembali ke state setelah hapus e1
+    const redo = screen.getByTestId('flow-toolbar-redo');
+    fireEvent.click(redo); // tambah node
+    expect(countNodes()).toBe(3);
+    fireEvent.click(redo); // sambung edge baru
+    expect(countEdges()).toBe(2);
+    fireEvent.click(redo); // hapus e1
+    expect(countEdges()).toBe(1);
+    expect(countNodes()).toBe(3);
+
+    // redo stack habis; undo stack masih ada (bisa meng-urungkan ulang)
+    expect(redo.disabled).toBe(true);
+    expect(undo.disabled).toBe(false);
+  });
+
+  it('AC-02: batas stack 50 + cabang baru membersihkan redo', () => {
+    renderUndo({ defaultNodes: [], defaultEdges: [] });
+    const add = screen.getByTestId('flow-palette-add-action');
+    for (let i = 0; i < 55; i++) fireEvent.click(add);
+    expect(countNodes()).toBe(55);
+
+    const undo = screen.getByTestId('flow-toolbar-undo');
+    for (let i = 0; i < 50; i++) fireEvent.click(undo);
+    // stack terbatas 50: 5 state terpanjang terbuang, sisa 5 node
+    expect(countNodes()).toBe(5);
+    expect(undo.disabled).toBe(true);
+
+    // cabang baru: tambah 1 node → redo stack dibersihkan
+    fireEvent.click(add);
+    expect(countNodes()).toBe(6);
+    expect(screen.getByTestId('flow-toolbar-redo').disabled).toBe(true);
+  });
+
+  it('AC-03: toolbar + keyboard (Ctrl+Z / Ctrl+Y) setara + disabled + live region', () => {
+    renderUndo();
+    const undo = screen.getByTestId('flow-toolbar-undo');
+    const redo = screen.getByTestId('flow-toolbar-redo');
+    expect(undo.disabled).toBe(true);
+    expect(redo.disabled).toBe(true);
+
+    // tambah node → dapat di-urungkan
+    fireEvent.click(screen.getByTestId('flow-palette-add-action'));
+    expect(countNodes()).toBe(3);
+    expect(undo.disabled).toBe(false);
+    expect(redo.disabled).toBe(true);
+
+    // jalur keyboard Ctrl+Z
+    fireEvent.keyDown(screen.getByTestId('flow-editor'), { key: 'z', ctrlKey: true });
+    expect(countNodes()).toBe(2);
+    expect(screen.getByText('Perubahan dibatalkan')).not.toBeNull();
+    expect(undo.disabled).toBe(true);
+    expect(redo.disabled).toBe(false);
+
+    // jalur keyboard Ctrl+Y (alias redo)
+    fireEvent.keyDown(screen.getByTestId('flow-editor'), { key: 'y', ctrlKey: true });
+    expect(countNodes()).toBe(3);
+    expect(screen.getByText('Perubahan diulang')).not.toBeNull();
+    expect(undo.disabled).toBe(false);
+    expect(redo.disabled).toBe(true);
+  });
+
+  it('AC-04: data non-serialisable (fungsi) tidak crash saat undo/redo', () => {
+    const nodeWithFn = {
+      ...baseNodes[0],
+      data: { ...baseNodes[0].data, onIcon: () => {} },
+    };
+    renderUndo({ defaultNodes: [nodeWithFn, baseNodes[1]], defaultEdges: baseEdges });
+    expect(countNodes()).toBe(2);
+
+    fireEvent.click(screen.getByTestId('flow-palette-add-action'));
+    expect(countNodes()).toBe(3);
+
+    fireEvent.click(screen.getByTestId('flow-toolbar-undo'));
+    expect(countNodes()).toBe(2);
+
+    fireEvent.click(screen.getByTestId('flow-toolbar-redo'));
+    expect(countNodes()).toBe(3);
+  });
+});

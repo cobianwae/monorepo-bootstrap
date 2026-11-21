@@ -81,6 +81,11 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.34 | Org Chart Studio (PRD 011) | `/patterns/org-chart-studio` | implemented |
 | S-005.34.01 | Org Chart Studio — panel detail (inspector + tab pohon SR) | `/patterns/org-chart-studio` (panel kanan) | implemented |
 | S-005.35 | Mind Map (PRD 012) | `/patterns/mind-map` | in-design |
+| S-005.37 | Import Wizard (PRD 014) | `/patterns/import-wizard` | in-design |
+| S-005.37.01 | Import Wizard — langkah upload | `/patterns/import-wizard` (langkah 1) | in-design |
+| S-005.37.02 | Import Wizard — langkah mapping | `/patterns/import-wizard` (langkah 2) | in-design |
+| S-005.37.03 | Import Wizard — langkah validasi | `/patterns/import-wizard` (langkah 3) | in-design |
+| S-005.37.04 | Import Wizard — langkah konfirmasi | `/patterns/import-wizard` (langkah 4) | in-design |
 | S-006 | Guidelines | `/guidelines` | implemented |
 | S-007 | Contribution | `/contribution` | implemented |
 | S-008 | What's New | `/whats-new` | implemented |

@@ -72,6 +72,7 @@ Pattern adalah resep komposisi komponen + state + aturan UX, bukan komponen baru
 | Media Gallery | Grid, lightbox, keyboard |
 | Notifications | Toast/inbox, read state |
 | Onboarding | Step, skip, progress |
+| Import Wizard | Impor CSV 4 langkah: upload → mapping → validasi → konfirmasi; pratinjau error per sel, template contoh, hasil via callback (composed, kategori `form` + `data-display`, tanpa komponen baru v1); penyusun: stepper, file-input/file-upload (compose), select/combobox, data-table/table, alert, badge, progress, skeleton, empty-state, button |
 | Optimistic Updates | Perubahan langsung + rollback |
 | Org Chart | Diagram hierarki organisasi read-only (legacy PRD 003, diganti 011 — lihat Org Chart Studio) |
 | Org Chart Editor | Editor hierarki organisasi v1 (legacy PRD 010, diganti 011 — lihat Org Chart Studio) |

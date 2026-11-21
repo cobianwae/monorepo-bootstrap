@@ -1,0 +1,78 @@
+<!-- Flow import wizard CSV — PRD 014, layar S-005.37 (.01–.04) -->
+<!-- Job utama: upload CSV → petakan kolom → perbaiki error validasi → konfirmasi & terima data bersih -->
+<!-- Constraint: papaparse untuk parsing (auto-detect + override); validasi + UI milik sendiri; hasil via onComplete -->
+
+```mermaid
+flowchart TD
+  A[User membuka halaman import wizard] --> B[Wizard tampil langkah 1 Upload + tombol Unduh template]
+  B --> C{User memasukkan file?}
+  C -- drag-drop / pilih file / tempel CSV --> P[Parsing papaparse: deteksi delimiter + baca header + sampel baris]
+  P --> Q{Hasil parsing?}
+  Q -- masih parsing file besar --> L[Tampilkan progress parsing + skeleton; fokus tetap di langkah 1]
+  L --> P
+  Q -- gagal: encoding/delimiter tak terbaca --> ERR[Tampilkan error + penyebab + tombol Coba lagi]
+  ERR --> R[User mengganti file atau delimiter manual]
+  R --> P
+  Q -- kosong: 0 baris data --> EMP[Tampilkan empty: file kosong + CTA pilih file lain]
+  EMP --> C
+  Q -- berhasil --> D[Header terdeteksi; auto-suggest mapping; lanjut ke langkah 2]
+  D --> F2[Alur mapping: flow 2]
+  F2 --> F3[Alur validasi: flow 3]
+  F3 --> F4[Alur konfirmasi: flow 4]
+```
+
+```mermaid
+flowchart TD
+  A[User di langkah 2 Mapping] --> B[Tabel mapping: tiap kolom CSV + dropdown target + badge wajib/opsional]
+  B --> C[Auto-suggest terisi dari normalisasi header + kamus sinonim]
+  C --> D{User mengubah pemetaan?}
+  D -- ganti target / abaikan kolom --> E[Pemetaan diperbarui; duplikat target ditolak dengan pesan]
+  E --> F{Field wajib sudah terpetakan semua?}
+  F -- belum --> G[Tombol Lanjut disabled + daftar wajib hilang + fokus ke pesan saat coba lanjut]
+  G --> D
+  F -- sudah --> H[User menekan Lanjut]
+  H --> I[State mapping tersimpan; validasi dijalankan atas sampel + seluruh baris]
+  I --> J[Alur validasi: flow 3]
+  J --> K[User menekan Kembali dari validasi]
+  K --> L[Mapping tampil lagi tanpa hilang; fokus ke judul langkah 2]
+  L --> D
+```
+
+```mermaid
+flowchart TD
+  A[User di langkah 3 Validasi] --> B[Pratinjau baris + sel error bertanda + pesan Bahasa Indonesia per sel]
+  B --> C{Mode error?}
+  C -- baris gagal ada --> D[User memfilter: semua / hanya error; klik sel error baca pesan via deskripsi]
+  D --> E{User memperbaiki?}
+  E -- kembali ke mapping ganti kolom --> M[Mapping diubah; validasi dihitung ulang]
+  M --> B
+  E -- perbaiki file dan unggah ulang --> U[File baru diparsing; mapping dicoba dipertahankan bila header cocok]
+  U --> B
+  E -- tandai baris dilewati --> S[Baris ditandai dilewati; tidak ikut hasil akhir]
+  S --> B
+  C -- semua valid --> V[Tombol Lanjut ke konfirmasi aktif]
+  V --> W[User menekan Lanjut]
+  W --> X[Alur konfirmasi: flow 4]
+  E -- lanjut dengan error tersisa --> Y{Opsi gagalkan vs lewati?}
+  Y -- lewati, default --> S
+  Y -- gagalkan seluruh impor --> Z[Impor diblokir; pesan jumlah error; kembali perbaiki]
+  Z --> B
+```
+
+```mermaid
+flowchart TD
+  A[User di langkah 4 Konfirmasi] --> B[Ringkasan: N valid + N dilewati + N gagal + opsi lewati/gagalkan]
+  B --> C{User memilih aksi?}
+  C -- kembali perbaiki --> K[Kembali ke mapping atau validasi; semua state terjaga]
+  K --> A
+  C -- unduh template / salin ringkasan --> T[Template CSV header + contoh terunduh]
+  T --> B
+  C -- submit impor --> S[User menekan Impor N baris]
+  S --> V{Ada baris gagal dan opsi gagalkan?}
+  V -- ya --> G[Submit ditolak dengan pesan; fokus ke ringkasan error]
+  G --> B
+  V -- tidak, hanya valid + dilewati --> O[onComplete dipanggil dengan baris valid saja]
+  O --> SC[Tampilkan sukses: jumlah diimpor + tombol Mulai ulang / impor file lain]
+  SC --> R[User memulai ulang]
+  R --> A
+```
