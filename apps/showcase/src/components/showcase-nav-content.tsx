@@ -157,6 +157,7 @@ export const NAV_SECTIONS: NavSection[] = [
           { title: 'Org Chart', href: '/patterns/org-chart', icon: Network },
           { title: 'Org Chart Editor', href: '/patterns/org-chart-editor', icon: Network },
           { title: 'Org Chart Studio', href: '/patterns/org-chart-studio', icon: Network },
+          { title: 'Mind Map', href: '/patterns/mind-map', icon: Network },
           { title: 'Calendar & Scheduling', href: '/patterns/calendar', icon: CalendarDays },
           { title: 'Kanban & Drag & Drop', href: '/patterns/kanban', icon: Columns3 },
           { title: 'Workspace Layout', href: '/patterns/workspace', icon: Layers },

@@ -22,6 +22,7 @@ import {
   type MindInput,
   type MindNodeFlat,
 } from './mind-map';
+import { getContrastRatio, THEMES } from '@ds/tokens';
 
 const mockFitView = vi.fn();
 const mockZoomIn = vi.fn();
@@ -96,6 +97,162 @@ function ControlledMind({ onChangeSpy }: { onChangeSpy?: (next: MindNodeFlat[]) 
     />
   );
 }
+
+describe('MindMap keyboard, SR dan states (012-03)', () => {
+  it('kiri/kanan mengunjungi saudara di sisi sama dan melewati node disabled', () => {
+    const data: MindNodeFlat[] = [
+      { id: 'root', parentId: null, label: 'Root' },
+      { id: 'a', parentId: 'root', label: 'A' },
+      { id: 'a1', parentId: 'a', label: 'A1' },
+      { id: 'a2', parentId: 'a', label: 'A2', disabled: true },
+      { id: 'a3', parentId: 'a', label: 'A3' },
+    ];
+    const { container } = render(<MindMap data={data} />);
+    const pill = (id: string) => container.querySelector<HTMLElement>(`[data-node-id="${id}"]`)!;
+    fireEvent.keyDown(pill('a1'), { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(pill('a3'));
+    fireEvent.keyDown(pill('a3'), { key: 'ArrowLeft' });
+    expect(document.activeElement).toBe(pill('a1'));
+    expect(pill('a2').tabIndex).toBe(-1);
+  });
+
+  it('shortcut canvas tidak mengambil pengetikan/undo input native', () => {
+    const spy = vi.fn();
+    const { container } = render(<ControlledMind onChangeSpy={spy} />);
+    const node = container.querySelector('[data-node-id="produk"]')!;
+    fireEvent.keyDown(node, { key: 'F2' });
+    const input = screen.getByRole('textbox', { name: 'Ubah ide Produk MVP' });
+    fireEvent.keyDown(input, { key: '+', ctrlKey: false });
+    fireEvent.keyDown(input, { key: 'z', ctrlKey: true });
+    fireEvent.keyDown(input, { key: 'Delete' });
+    expect(mockZoomIn).not.toHaveBeenCalled();
+    expect(spy).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(input);
+  });
+
+  it('reduced motion mematikan durasi zoom dan tombol pan memakai langkah 40px', () => {
+    const original = window.matchMedia;
+    window.matchMedia = (query) => ({
+      matches: true, media: query, onchange: null, addEventListener() {}, removeEventListener() {},
+      addListener() {}, removeListener() {}, dispatchEvent: () => true,
+    });
+    try {
+      render(<MindMap data={flatData} />);
+      fireEvent.keyDown(screen.getByTestId('mind-map-viewport'), { key: '0' });
+      expect(mockSetViewport).toHaveBeenCalledWith({ x: 0, y: 0, zoom: 1 }, { duration: 0 });
+      fireEvent.keyDown(screen.getByTestId('mind-map-viewport'), { key: 'ArrowRight' });
+      expect(mockSetViewport).toHaveBeenCalledWith({ x: -40, y: 0, zoom: 1 });
+    } finally { window.matchMedia = original; }
+  });
+
+  it('slot search setelah toolbar dan sebelum canvas dalam urutan DOM', () => {
+    const { container } = render(<MindMap data={flatData} searchSlot={<input aria-label="Cari ide" />} />);
+    const search = screen.getByRole('textbox', { name: 'Cari ide' });
+    const toolbar = screen.getByTestId('mind-map-redo');
+    const viewport = screen.getByTestId('mind-map-viewport');
+    expect(toolbar.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(search.compareDocumentPosition(viewport) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(viewport.tabIndex).toBe(0);
+    expect(container.querySelectorAll('[data-node-id][tabindex="0"]')).toHaveLength(1);
+  });
+  it('audit Pulse light/dark: teks ≥4.5 dan penanda visual ≥3', () => {
+    const pulse = THEMES.find((theme) => theme.id === 'pulse')!;
+    for (const mode of ['light', 'dark'] as const) {
+      const card = mode === 'light' ? '#FFFFFF' : '#141620';
+      const foreground = mode === 'light' ? '#18181B' : '#F4F4F5';
+      const muted = pulse.pairs.find((pair) => pair.name === 'Muted Caption Text')!;
+      const secondary = pulse.pairs.find((pair) => pair.name === 'Secondary Action Button')!;
+      const primary = pulse.swatches.primary[`${mode}Hex`];
+      expect(getContrastRatio(foreground, card)).toBeGreaterThanOrEqual(4.5);
+      expect(getContrastRatio(muted[`${mode}Fg`], card)).toBeGreaterThanOrEqual(4.5);
+      expect(getContrastRatio(secondary[`${mode}Fg`], secondary[`${mode}Bg`])).toBeGreaterThanOrEqual(4.5);
+      expect(getContrastRatio(primary, card)).toBeGreaterThanOrEqual(3);
+      expect(getContrastRatio(primary, pulse.swatches.surface[`${mode}Hex`])).toBeGreaterThanOrEqual(3);
+      for (const name of ['Success Badge / Banner', 'Warning Banner', 'Info Notice']) {
+        const pair = pulse.pairs.find((candidate) => candidate.name === name)!;
+        expect(getContrastRatio(pair[`${mode}Bg`], card)).toBeGreaterThanOrEqual(3);
+      }
+    }
+  });
+  it('Enter/F2 edit; Space lipat; panah parent/anak memindahkan fokus', async () => {
+    const { container } = render(<MindMap data={flatData} />);
+    const pill = (id: string) => container.querySelector<HTMLElement>(`[data-node-id="${id}"]`)!;
+    fireEvent.keyDown(pill('riset'), { key: 'ArrowUp' });
+    expect(document.activeElement).toBe(pill('q1'));
+    fireEvent.keyDown(pill('q1'), { key: 'ArrowDown' });
+    expect(document.activeElement).toBe(pill('riset'));
+    fireEvent.keyDown(pill('riset'), { key: ' ' });
+    expect(nodeIds(container)).not.toContain('kompetitor');
+    fireEvent.keyDown(pill('riset'), { key: 'ArrowDown' });
+    await waitFor(() => expect(document.activeElement).toBe(pill('kompetitor')));
+    fireEvent.keyDown(pill('kompetitor'), { key: 'F2' });
+    const input = screen.getByRole('textbox', { name: 'Ubah ide Analisis kompetitor' });
+    expect(document.activeElement).toBe(input);
+    fireEvent.keyDown(input, { key: 'Escape' });
+    fireEvent.keyDown(pill('kompetitor'), { key: 'Enter' });
+    expect(screen.getByRole('textbox', { name: 'Ubah ide Analisis kompetitor' })).toBeTruthy();
+  });
+
+  it('pohon SR tree/group/treeitem, roving tabindex dan keyboard standar', () => {
+    const { container } = render(<MindMap data={flatData} />);
+    container.querySelector('details')!.open = true;
+    const tree = screen.getByRole('tree', { name: 'Pohon ide' });
+    const items = () => within(tree).getAllByRole('treeitem');
+    expect(items().filter((item) => item.tabIndex === 0)).toHaveLength(1);
+    const root = items()[0];
+    expect(root.getAttribute('aria-level')).toBe('1');
+    expect(root.getAttribute('aria-expanded')).toBe('true');
+    expect(within(tree).getAllByRole('group').length).toBeGreaterThan(0);
+    fireEvent.keyDown(root, { key: 'End' });
+    expect(document.activeElement).toBe(items().at(-1));
+    fireEvent.keyDown(document.activeElement!, { key: 'Home' });
+    expect(document.activeElement).toBe(root);
+    fireEvent.keyDown(root, { key: 'ArrowLeft' });
+    expect(root.getAttribute('aria-expanded')).toBe('false');
+    expect(items()).toHaveLength(1);
+    fireEvent.keyDown(root, { key: 'ArrowRight' });
+    fireEvent.keyDown(root, { key: 'ArrowDown' });
+    expect(document.activeElement?.getAttribute('data-tree-id')).toBe('riset');
+    expect(items().filter((item) => item.tabIndex === 0)).toHaveLength(1);
+    fireEvent.click(within(tree).getByRole('button', { name: 'Edit Riset pasar' }));
+    expect(document.activeElement).toBe(screen.getByRole('textbox', { name: 'Ubah ide Riset pasar' }));
+  });
+
+  it('sorotan presentasional non-warna hilang setelah props dibersihkan', () => {
+    const { container, rerender } = render(<MindMap data={flatData} highlightedIds={['produk']} />);
+    const pill = () => container.querySelector('[data-node-id="produk"]')!;
+    expect(pill().textContent).toContain('Cocok');
+    expect(pill().className).toContain('border-dashed');
+    rerender(<MindMap data={flatData} highlightedIds={[]} />);
+    expect(pill().textContent).not.toContain('Cocok');
+  });
+
+  it('loading enam skeleton tanpa kontrol aktif; error eksternal mempertahankan diagram', () => {
+    const { container, rerender } = render(<MindMap data={flatData} loading />);
+    expect(screen.getAllByTestId('mind-map-skeleton')).toHaveLength(6);
+    expect(container.querySelector('[aria-busy="true"]')).not.toBeNull();
+    expect(screen.queryByRole('button')).toBeNull();
+    rerender(<MindMap data={flatData} error="Simpan gagal, coba lagi." />);
+    expect(screen.getByRole('alert').textContent).toContain('Simpan gagal');
+    expect(nodeIds(container)).toHaveLength(9);
+  });
+
+  it('invalid menyebut penyebab/id dan hanya menyatakan disalin setelah clipboard berhasil', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    const original = Object.getOwnPropertyDescriptor(navigator, 'clipboard');
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
+    try {
+      render(<MindMap data={[{ id: 'x', parentId: null, label: 'A' }, { id: 'x', parentId: null, label: 'B' }]} />);
+      expect(screen.getByRole('alert').textContent).toContain('ID duplikat');
+      fireEvent.click(screen.getByRole('button', { name: 'Salin detail error' }));
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Detail disalin' })).toBeTruthy());
+      expect(writeText.mock.calls[0][0]).toContain('node: x');
+    } finally {
+      if (original) Object.defineProperty(navigator, 'clipboard', original);
+      else Reflect.deleteProperty(navigator, 'clipboard');
+    }
+  });
+});
 
 describe('MindMap fondasi (012-01)', () => {
   beforeEach(() => {
