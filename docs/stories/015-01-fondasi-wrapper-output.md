@@ -1,6 +1,6 @@
 # 015-01 — Fondasi wrapper + aspek + output blob
 
-Status: approved
+Status: in-progress
 PRD: `docs/prd/015-image-cropper.md` (approved, gate 1)
 Design: `docs/design/wireframes/image-cropper.md` (approved, gate 2) + `docs/design/flows/image-cropper.mmd` (diagram 1–2) + sitemap `S-005.38`
 FR: `FR-001`, `FR-002`, `FR-005`, `FR-010`
@@ -41,11 +41,11 @@ Goal: Mesin crop berdiri tanpa showcase final: wrapper `react-easy-crop` token-f
 
 ## Tasks
 
-- [ ] Tambah dependency `react-easy-crop` (+ `@types` bila perlu) ke `packages/ui` — butuh approval eksplisit per CONVENTIONS (konsep approved gate 1, K1/C1); isolasi CSS di wrapper
-- [ ] Buat `packages/ui/src/components/form/image-cropper.tsx` (named export, props §2.4 wireframe) + `image-cropper-utils.ts` (decode/resize/EXIF/`getCroppedBlob`) + `index` barrel; tanpa token baru
+- [x] Tambah dependency `react-easy-crop` (+ `@types` bila perlu) ke `packages/ui` — butuh approval eksplisit per CONVENTIONS (konsep approved gate 1, K1/C1); isolasi CSS di wrapper
+- [x] Buat `packages/ui/src/components/form/image-cropper.tsx` (named export, props §2.4 wireframe) + `image-cropper-utils.ts` (decode/resize/EXIF/`getCroppedBlob`) + `index` barrel; tanpa token baru
 - [ ] Implementasi viewport + overlay token (`background/80`, garis `primary`), gagang hit ≥44px, clamp zoom + `restrictPosition`, preset aspek + `cropShape rect/round`
-- [ ] Tulis test co-located (mock canvas/`createImageBitmap`): aspek 4 preset, clamp zoom + tidak-lepas, output dimensi avatar/cover + rotasi, tolak non-gambar/besar, EXIF bila feasible
-- [ ] Verifikasi `pnpm typecheck`, `lint`, `test` untuk file baru; catat OQ/K2–K3 default di story
+- [x] Tulis test co-located (mock canvas/`createImageBitmap`): aspek 4 preset, clamp zoom + tidak-lepas, output dimensi avatar/cover + rotasi, tolak non-gambar/besar, EXIF bila feasible
+- [x] Verifikasi `pnpm typecheck`, `lint`, `test` untuk file baru; catat OQ/K2–K3 default di story
 
 ## Dependencies
 
@@ -56,3 +56,27 @@ Goal: Mesin crop berdiri tanpa showcase final: wrapper `react-easy-crop` token-f
 
 - Risiko: CSS library menabrak token — mitigasi override terisolasi di wrapper + audit visual
 - Keputusan: K1 wrapper token-first; K2 output default 512×512/1280×720; K3 10 MB; K5 EXIF tanpa dep baru; K4 inline v1 (dialog = compose konsumen, bukan scope story ini)
+
+## Catatan implementasi (in-progress)
+
+- Dependency: `react-easy-crop@6.2.5` di `packages/ui` (disetujui user). Peer React 19 kompatibel; warning peer `eslint@10` pada `@eslint/js` sudah ada sebelum perubahan ini.
+- File: `form/image-cropper.tsx`, `form/image-cropper-utils.ts`, test co-located `image-cropper.test.tsx` dan `image-cropper-utils.test.ts`; barrel di `src/index.ts`. Tanpa token baru.
+- Output: PNG (`image/png`) agar transparansi sumber tidak berubah menjadi hitam; dimensi persis `outputSize`; default K2 (avatar 512×512, aspek 16:9 → 1280×720).
+- Validasi (AC-05): tipe dulu, lalu ukuran sebelum decode; pesan Bahasa Indonesia dengan ukuran aktual.
+- Zoom dibatasi `MIN_ZOOM=1`–`MAX_ZOOM=5` (`clampZoom`), `restrictPosition` aktif (AC-02).
+- Aspek: preset lewat prop `aspect` (1, 16/9, 4/3). Mode `'free'` mengikuti rasio asli gambar, karena `react-easy-crop` 6.2.5 tidak memiliki aspek bebas.
+- K5 EXIF (`could`): tidak memakai `createImageBitmap`; orientasi EXIF mengandalkan default browser (`image-orientation: from-image`) saat decode `<img>`/canvas. Tidak dapat diverifikasi di jsdom → known limitation, bukan blocker.
+- Tombol "Simpan hasil" minimal di 015-01 sebagai pemicu `onComplete`; footer penuh, segmented aspek, kontrol zoom/putar/reset, dan keyboard masuk 015-02.
+
+### Gap terbuka (perlu keputusan user)
+
+- **Resize sudut (AC-01) — percobaan opsi A (tanpa dependency baru):** `react-easy-crop` 6.2.5 menerima prop `cropSize` yang dikendalikan dari luar. Empat gagang sudut (`button`, hit area 44px, `touch-none`) dirender di atas `Cropper`, dan pointer drag menghitung ulang `cropSize` dengan aspek terkunci (`resizeCropSize`, simetris terhadap pusat, dibatasi kontainer dan minimum 96px). Logika geometri di `image-cropper-geometry.ts` (fungsi murni, test di `image-cropper-geometry.test.ts`).
+- **Belum tervalidasi:** perilaku pointer dan clamp saat resize hanya bisa diverifikasi di browser (jsdom tidak mensimulasikan layout). Perlu cek manual sebelum story ditandai `review`.
+- **Belum ada di 015-01:** resize lewat keyboard (fallback WCAG untuk gagang) — masuk 015-02 bersama kontrol zoom/putar/reset.
+
+### Verifikasi
+
+- `pnpm typecheck`: 12 error baseline di `flow-editor.test.tsx:702–749` (known issue, tidak berubah); tidak ada error dari file 015-01.
+- `pnpm --filter @ds/ui lint`: hijau.
+- `packages/ui` test (`--maxWorkers=2 --testTimeout=30000`): 57 file, 637 test lulus; 21 test baru (14 util + 7 komponen).
+- `pnpm test:tokens` dan `pnpm -C apps/showcase build` tidak dijalankan: tidak ada perubahan token atau showcase.
