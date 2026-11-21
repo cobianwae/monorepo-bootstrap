@@ -58,6 +58,7 @@ import {
   TimePicker,
   TagInput,
   FilterBuilder,
+  RichTextEditor,
   type ComboboxOption,
   type FilterChip,
   type FilterFieldDefinition,
@@ -176,6 +177,7 @@ export default function FormsPage() {
   const [rangeError, setRangeError] = React.useState<string | null>(null);
   const [time, setTime] = React.useState('09:30');
   const [otp, setOtp] = React.useState('');
+  const [rteDescription, setRteDescription] = React.useState('<p>Tulis <strong>deskripsi tugas</strong> dengan format ringkas…</p>');
 
   const [filterChips, setFilterChips] = React.useState<FilterChip[]>([
     { id: 'fc-1', fieldId: 'status', operator: 'eq', value: 'active' },
@@ -561,6 +563,31 @@ export default function FormsPage() {
                 onCheckedChange={setSwitchActive}
               />
             </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* 3b. Rich text description (S-004.03 demo ringkas 006-05) */}
+      <section id="rte-demo" className="space-y-4 scroll-mt-20">
+        <div className="space-y-1">
+          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
+            <TextCursorInput className="h-6 w-6 text-highlight" />
+            <span>Rich Text Description</span>
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Demo ringkas S-004.03: placeholder + toolbar + counter. Contoh form benar (controlled). Panel demo penuh di{' '}
+            <a className="text-highlight underline underline-offset-4" href="/patterns/rich-text-editor">S-005.22</a>.
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="p-6">
+            <RichTextEditor
+              value={rteDescription}
+              onChange={setRteDescription}
+              placeholder="Tulis deskripsi…"
+              maxLength={2000}
+            />
           </CardContent>
         </Card>
       </section>
