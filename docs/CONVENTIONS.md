@@ -40,6 +40,16 @@ Aturan:
 - Jangan menambah token duplikat; cek `tokens.css` dan `tokens.ts` lebih dulu.
 - Perubahan token wajib disertai audit kontras light dan dark.
 
+## Visual (halaman docs showcase)
+
+Rujukan: `docs/design/visual-language.md`.
+
+- Dilarang `text-[Npx]`; teks terkecil `text-xs`.
+- Heading section lewat `SectionHeading` (`apps/showcase/src/components/section-heading.tsx`), bukan class manual.
+- `primary` hanya untuk aksi; aksen dekoratif dan callout memakai `highlight`.
+- Segmented/toggle memakai `SegmentedControl` dari `@ds/ui`; jangan menulis ulang dengan `<button>`.
+- Klaim kepatuhan (WCAG, jumlah langkah scale) dihitung dari data token, bukan ditulis tangan.
+
 ## Commit
 
 Format:

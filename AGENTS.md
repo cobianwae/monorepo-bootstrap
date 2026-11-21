@@ -44,6 +44,7 @@ libs/           # Shared business logic
 |---|---|
 | `docs/ARCHITECTURE.md` | Prinsip, dependency, token pipeline, anatomy komponen (auto-loaded) |
 | `docs/CONVENTIONS.md` | Naming, commit, verifikasi, larangan (auto-loaded) |
+| `docs/design/visual-language.md` | Aturan visual: type scale, color roles, section heading, art direction (auto-loaded) |
 | `docs/STATUS.md` | Snapshot posisi proyek; dibaca di awal sesi |
 | `docs/STATUS-LOG.md` | Detail historis; tidak dimuat penuh |
 | `docs/BACKLOG.md` | Indeks PRD, story, CR aktif |
@@ -59,7 +60,7 @@ libs/           # Shared business logic
 
 1. Baca `docs/STATUS.md` sebagai snapshot. Jangan memuat `STATUS-LOG.md` atau `BACKLOG-ARCHIVE.md` secara penuh.
 2. Grep `docs/BACKLOG.md` hanya untuk baris aktif. Jika tidak ada target, tawarkan item dari bagian **Next** di STATUS.
-3. `ARCHITECTURE.md` dan `CONVENTIONS.md` sudah auto-loaded lewat `opencode.json`.
+3. `ARCHITECTURE.md`, `CONVENTIONS.md`, dan `design/visual-language.md` sudah auto-loaded lewat `opencode.json`.
 4. Untuk pertanyaan struktural (dependency, blast radius, relasi komponen), coba **graphify MCP** lebih dulu (`get_node`, `get_neighbors`, `graph_stats`, `get_community`). Grep hanya untuk melengkapi.
 5. Jika graphify tidak tersedia atau graph tidak relevan, catat alasannya dan fallback ke grep.
 6. Baca file secara targeted (`offset`/`limit`). Jangan dump file >200 baris.
@@ -149,6 +150,7 @@ Komponen dirujuk dengan nama file/export, bukan ID terpisah.
 11. Testing: unit test untuk services/utils/tokens, integration test untuk API endpoints.
 12. Import path gunakan alias `@ds/ui`, `@ds/tokens`, `@shared/types`, `@app/`, `@web/`.
 13. Commit messages: conventional commits (feat/fix/refactor/chore).
+14. Visual: patuhi `docs/design/visual-language.md` saat menyentuh `apps/showcase` atau `packages/ui`. Heading section lewat `SectionHeading`, dilarang `text-[Npx]`, `primary` hanya untuk aksi (aksen dekoratif = `highlight`), segmented/toggle lewat `SegmentedControl`. Pagar: `apps/showcase/src/test/visual-language-guard.test.ts`.
 
 ## Commands
 

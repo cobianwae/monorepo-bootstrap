@@ -60,6 +60,13 @@ Scope tema bersarang (`<div data-theme="…" class="dark">`) didukung lewat blok
 Tema yang tersedia: `pulse`, `sunset`, `botanic`, `midnight`, `nebula`, `lagoon`, `ink`, `graphite`.
 Setiap tema wajib punya perilaku light dan dark yang kontrasnya lolos audit.
 
+## Art Direction
+
+Di atas tema ada lapisan **art direction** (`atelier`, `aurora`, `blueprint`; `packages/tokens/src/art-directions.ts`).
+Setiap art direction membawa font, motif latar, dan sekumpulan tone. Art direction mengubah **kulit**
+(font, motif, tone, gradient), bukan **struktur** (hierarki, spacing, peran warna, state, motion).
+Aturan lengkap dan daftar variable vs invariant ada di `docs/design/visual-language.md`.
+
 ## Anatomy Komponen
 
 - Primitive Radix untuk perilaku dan a11y.

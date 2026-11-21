@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "instructions": ["docs/ARCHITECTURE.md", "docs/CONVENTIONS.md"],
+  "instructions": ["docs/ARCHITECTURE.md", "docs/CONVENTIONS.md", "docs/design/visual-language.md"],
   "snapshots": false,
   "formatter": false,
   "tool_output": {
