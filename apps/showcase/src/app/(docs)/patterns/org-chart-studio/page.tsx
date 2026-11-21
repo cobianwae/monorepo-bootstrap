@@ -1,39 +1,42 @@
 'use client';
 
-// Draf showcase OrgChartStudio (011-04): tambah 1-klik inline-edit + panel
-// detail on-demand + pindah drag/dialog (M-007) + hapus (M-008) + undo/redo
-// + pencarian presentasional + papan keyboard. State controlled milik konsumen.
-// Scope penuh (langkah bernomor, state matrix) di 011-05.
+// Showcase final OrgChartStudio (011-05, S-005.34): langkah end-to-end bernomor,
+// panel demo 6 state matrix, contoh 40 orang 1 klik, resep integrasi 15 baris,
+// toolbar + pencarian + live region + controls + minimap + panel S-005.34.01 +
+// M-007/M-008 + toast + pohon SR internal + papan keyboard + catatan a11y.
+// State controlled milik konsumen (resep FR-013/FR-014).
 
 import * as React from 'react';
 import { Sparkles } from 'lucide-react';
-import { Button, Input, Label, OrgChartStudio, PageHeader, type OrgStudioNodeFlat } from '@ds/ui';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Input,
+  Label,
+  OrgChartStudio,
+  PageHeader,
+  toast,
+  type OrgStudioNodeFlat,
+} from '@ds/ui';
+import { StudioDemoPanel, type StudioDemoKind } from './_components/studio-demo-panel';
+import { STUDIO_STEPS, buildStudioExample40, buildStudioInvalid, studioSeedData, type StudioInvalidKind } from './_components/studio-demo-data';
+import { StudioRecipe } from './_components/studio-recipe';
+import { StudioShortcuts } from './_components/studio-shortcuts';
 
-const seedData: OrgStudioNodeFlat[] = [
-  { id: 'ceo', parentId: null, title: 'Ratna Wijaya', subtitle: 'Chief Executive Officer', badge: 'Direksi', accent: 'primary' },
-  { id: 'eng-head', parentId: 'ceo', title: 'Bima Prasetyo', subtitle: 'VP Engineering', badge: 'Engineering', accent: 'info' },
-  { id: 'eng-fe', parentId: 'eng-head', title: 'Sari Dewi', subtitle: 'Engineering Manager Frontend', badge: 'Engineering', accent: 'info' },
-  { id: 'eng-be', parentId: 'eng-head', title: 'Andi Kurniawan', subtitle: 'Engineering Manager Backend', badge: 'Engineering', accent: 'info' },
-  { id: 'ops-head', parentId: 'ceo', title: 'Eko Santoso', subtitle: 'VP Operations', badge: 'Operations', accent: 'success' },
-  { id: 'ops-mgr', parentId: 'ops-head', title: 'Nina Hartati', subtitle: 'Operations Manager', badge: 'Operations', accent: 'success' },
-];
-
-const SHORTCUTS: Array<{ keys: string; action: string }> = [
-  { keys: 'Tab', action: 'Urutan fokus: toolbar → kanvas → kartu/gagang → kontrol → panel → pohon aksesibel' },
-  { keys: '← ↑ ↓ →', action: 'Geser kanvas 40px (fokus di viewport)' },
-  { keys: '+ − 0 F', action: 'Zoom in / out / reset 100% / fit view' },
-  { keys: 'Enter', action: 'Pilih kartu fokus' },
-  { keys: 'Shift+Enter', action: 'Buka panel detail kartu fokus' },
-  { keys: 'F2 / Ctrl+Enter', action: 'Ubah nama kartu fokus (inline-edit)' },
-  { keys: 'Space', action: 'Perluas/ciutkan kartu induk' },
-  { keys: 'Delete', action: 'Hapus kartu fokus (dialog M-008, root diproteksi)' },
-  { keys: 'Ctrl+Z / Ctrl+Y', action: 'Urungkan / ulangi perubahan' },
-];
+const EXTERNAL_ERROR_MESSAGE =
+  'Gagal menyinkronkan dengan server (demo): perubahan lokal aman, diagram terakhir tetap tampil.';
 
 export default function OrgChartStudioPage() {
-  const [data, setData] = React.useState<OrgStudioNodeFlat[]>(seedData);
+  const [data, setData] = React.useState<OrgStudioNodeFlat[]>(studioSeedData);
   const [query, setQuery] = React.useState('');
   const [expandedIds, setExpandedIds] = React.useState<string[] | undefined>(undefined);
+  const [kind, setKind] = React.useState<StudioDemoKind>('success');
+  const [invalidKind, setInvalidKind] = React.useState<StudioInvalidKind>('duplikat');
+  const [externalError, setExternalError] = React.useState<string | null>(null);
+  const [minimap, setMinimap] = React.useState(true);
+  const example40 = React.useMemo(() => buildStudioExample40(), []);
 
   // Pencarian presentasional milik konsumen (design D9): cocok nama/jabatan/badge.
   const highlightedIds = React.useMemo(() => {
@@ -49,11 +52,69 @@ export default function OrgChartStudioPage() {
       .map((node) => node.id);
   }, [data, query]);
 
-  const resetDemo = React.useCallback(() => {
-    setData(seedData);
+  const visibleData = React.useMemo<OrgStudioNodeFlat[]>(() => {
+    switch (kind) {
+      case 'empty':
+        return [];
+      case 'invalid':
+        return buildStudioInvalid(invalidKind);
+      default:
+        return data;
+    }
+  }, [kind, data, invalidKind]);
+
+  const handleKindChange = React.useCallback(
+    (next: StudioDemoKind) => {
+      if (next === 'contoh') {
+        setData(example40);
+        setQuery('');
+        setExpandedIds(undefined);
+      }
+      setKind(next);
+      setExternalError(next === 'eksternal' ? EXTERNAL_ERROR_MESSAGE : null);
+      if (next === 'loading') {
+        toast({ title: 'Memuat struktur…', description: 'Skeleton 8 kartu + teks SR (aria-busy).', duration: 3000 });
+      }
+    },
+    [example40],
+  );
+
+  const loadExample = React.useCallback(() => {
+    setData(example40);
+    setKind('success');
     setQuery('');
     setExpandedIds(undefined);
+    setExternalError(null);
+    toast({ title: 'Contoh dimuat', description: '40 orang · 4 tingkat · 4 departemen.', duration: 4000 });
+  }, [example40]);
+
+  const resetDemo = React.useCallback(() => {
+    setData(studioSeedData);
+    setQuery('');
+    setExpandedIds(undefined);
+    setKind('success');
+    setInvalidKind('duplikat');
+    setExternalError(null);
+    setMinimap(true);
   }, []);
+
+  const createRoot = React.useCallback(() => {
+    const root: OrgStudioNodeFlat[] = [
+      { id: 'root', parentId: null, title: 'Unit baru', subtitle: 'Klik kartu lalu F2 untuk ganti nama', badge: 'Direksi', accent: 'primary' },
+    ];
+    setData(root);
+    setKind('success');
+    toast({ title: 'Root dibuat', description: 'Fokus kartu lalu tekan F2 untuk inline-edit.', duration: 4000 });
+  }, []);
+
+  const deptCount = React.useMemo(
+    () => new Set(visibleData.map((node) => node.badge).filter(Boolean)).size,
+    [visibleData],
+  );
+  const meta =
+    kind === 'contoh'
+      ? `${visibleData.length} orang · 4 tingkat · ${deptCount} departemen`
+      : `${visibleData.length} orang · ${deptCount} departemen`;
 
   return (
     <div className="animate-in fade-in-50 space-y-10 duration-200">
@@ -61,8 +122,32 @@ export default function OrgChartStudioPage() {
         eyebrow="UX Recipe Scenario"
         eyebrowIcon={Sparkles}
         title="Org Chart Studio / Studio Organisasi"
-        description="Draf 011-04 (S-005.34): tambah 1-klik + panel detail (S-005.34.01) + pindah via seret kartu atau dialog M-007 + hapus via Delete/dialog M-008 (root diproteksi) + toolbar Urungkan/Ulangi (Ctrl+Z/Y) + pencarian + pohon aksesibel + papan keyboard. Tiap commit memanggil onChange sekali; toast menyediakan Urungkan."
+        description={`S-005.34 final (PRD 011): tambah 1-klik inline-edit + panel detail (S-005.34.01) + pindah drag/dialog M-007 + hapus M-008 + undo/redo + pencarian + pohon SR + state matrix 6 demo. ${meta}.`}
       />
+
+      <StudioDemoPanel
+        kind={kind}
+        onKindChange={handleKindChange}
+        invalidKind={invalidKind}
+        onInvalidKindChange={setInvalidKind}
+        minimap={minimap}
+        onMinimapChange={setMinimap}
+        onLoadExample={loadExample}
+        onReset={resetDemo}
+      />
+
+      <section aria-labelledby="org-studio-steps" className="space-y-2">
+        <h2 id="org-studio-steps" className="text-lg font-semibold text-foreground">
+          Langkah end-to-end (FR-014)
+        </h2>
+        <ol className="list-decimal space-y-1 pl-5 text-sm text-muted-foreground marker:font-medium marker:text-foreground">
+          {STUDIO_STEPS.map((step) => (
+            <li key={step.title}>
+              <span className="font-medium text-foreground">{step.title}:</span> {step.detail}
+            </li>
+          ))}
+        </ol>
+      </section>
 
       <div className="flex flex-wrap items-center gap-3">
         <Button type="button" variant="outline" size="sm" onClick={resetDemo}>
@@ -87,41 +172,40 @@ export default function OrgChartStudioPage() {
         </p>
       </div>
 
+      {externalError ? (
+        <Alert variant="destructive">
+          <AlertTitle>Kesalahan eksternal (demo)</AlertTitle>
+          <AlertDescription>
+            <p>{externalError}</p>
+            <Button type="button" variant="outline" size="sm" className="mt-2" onClick={() => setExternalError(null)}>
+              Coba lagi
+            </Button>
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
       <div className="space-y-2">
         <OrgChartStudio
-          data={data}
+          data={visibleData}
           onChange={setData}
           expandedIds={expandedIds}
           onExpandedChange={setExpandedIds}
           highlightedIds={highlightedIds}
+          loading={kind === 'loading'}
+          minimap={minimap}
+          emptyActionLabel="Buat root"
+          onEmptyAction={createRoot}
           ariaLabel="Org chart studio"
         />
         <p className="text-xs text-muted-foreground">
           Resep kontrol: pegang <code>data</code> di state, sambung <code>onChange</code> langsung ke{' '}
-          <code>setData</code> (log demo mock). Pencarian milik konsumen: hitung{' '}
-          <code>highlightedIds</code> dari query sendiri; komponen membuka path + mengumumkan jumlah.
+          <code>setData</code> (log demo mock). Pencarian milik konsumen: hitung <code>highlightedIds</code> dari
+          query sendiri; komponen membuka path + mengumumkan jumlah.
         </p>
       </div>
 
-      <section aria-labelledby="org-studio-shortcuts" className="space-y-3">
-        <h2 id="org-studio-shortcuts" className="text-lg font-semibold text-foreground">
-          Papan keyboard
-        </h2>
-        <dl className="grid gap-2 sm:grid-cols-2">
-          {SHORTCUTS.map((row) => (
-            <div key={row.keys} className="rounded-md border border-border bg-card p-3">
-              <dt className="font-mono text-sm font-medium text-foreground">{row.keys}</dt>
-              <dd className="mt-1 text-sm text-muted-foreground">{row.action}</dd>
-            </div>
-          ))}
-        </dl>
-        <p className="text-xs text-muted-foreground">
-          Catatan aksesibilitas: kanvas memakai <code>role=&quot;application&quot;</code>; jalur utama screen
-          reader adalah pohon aksesibel internal (<code>role=&quot;tree&quot;</code>, tautan &quot;Lewati kanvas
-          ke pohon aksesibel&quot; tersedia sebelum kanvas). Error memakai live region assertive; status lain
-          polite.
-        </p>
-      </section>
+      <StudioRecipe />
+      <StudioShortcuts />
     </div>
   );
 }

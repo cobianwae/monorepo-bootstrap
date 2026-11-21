@@ -1,8 +1,12 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { Network, Sparkles } from 'lucide-react';
 import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   OrgChart,
   OrgChartEditor,
@@ -140,6 +144,20 @@ export default function OrgChartEditorPage() {
         title="Org Chart Editor / Editor Organisasi"
         description="Pattern OrgChartEditor (S-005.33): editor organisasi end-to-end di atas canvas xyflow — browse, tambah, pindah, edit, hapus, undo, dan search — dengan state matrix (loading/empty/error), pohon alternatif untuk screen reader, dan resep controlled data + onChange milik konsumen. Handler demo mock."
       />
+
+      <Alert variant="warning">
+        <AlertTitle>Deprecated — digantikan Org Chart Studio (PRD 011)</AlertTitle>
+        <AlertDescription>
+          <p>
+            Komponen <code>OrgChartEditor</code> dan halaman ini (S-005.33) berstatus deprecated dan akan dihapus
+            saat 011 shipped. Untuk fitur baru gunakan{' '}
+            <Link href="/patterns/org-chart-studio" className="font-medium underline underline-offset-4">
+              Org Chart Studio (/patterns/org-chart-studio)
+            </Link>
+            .
+          </p>
+        </AlertDescription>
+      </Alert>
 
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">

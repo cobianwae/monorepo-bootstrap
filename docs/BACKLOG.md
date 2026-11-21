@@ -70,7 +70,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 011-02 | Studio tambah 1-klik inline-edit + panel detail on-demand | done | `docs/stories/011-02-tambah-inline-panel-detail.md` |
 | 011-03 | Studio pindah drag/dialog + hapus + undo/redo | done | `docs/stories/011-03-pindah-hapus-undo.md` |
 | 011-04 | Studio cari + keyboard + pohon SR + motion/sentuh | done | `docs/stories/011-04-cari-keyboard-pohon-sr.md` |
-| 011-05 | Studio states + showcase + audit kontras + legacy deprecated | todo | `docs/stories/011-05-states-showcase-audit-legacy.md` |
+| 011-05 | Studio states + showcase + audit kontras + legacy deprecated | review | `docs/stories/011-05-states-showcase-audit-legacy.md` |
 | 005-01 | Flow editor fondasi canvas + node custom DS | done | `docs/stories/005-01-canvas-node-foundation.md` |
 | 005-02 | Flow editor palette drag + tambah keyboard + snap | approved | `docs/stories/005-02-palette-drop-snap.md` |
 | 005-03 | Flow editor edge sambung + validasi + label | approved | `docs/stories/005-03-edge-validasi-label.md` |
