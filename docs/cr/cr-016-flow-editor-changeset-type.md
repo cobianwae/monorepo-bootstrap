@@ -1,6 +1,6 @@
 # CR-016 — Flow Editor: perlakuan `NodeChangeset`/`EdgeChangeset` sebagai array (`changes.some is not a function`)
 
-**Status:** approved (keputusan #1 disetujui user: tetap `Changeset` xyflow)
+**Status:** done (ditutup 2026-11-22 atas instruksi user; fix sudah live di `dev` tanpa commit berlabel CR-016, verifikasi target 49/49 hijau)
 **Sumber:** bug (review artefak 005)
 **Ref:** `docs/prd/005-flow-editor.md` (FR-005, FR-007, FR-012), `docs/stories/005-01-canvas-node-foundation.md`, `docs/stories/005-04-seleksi-inspector-hapus.md`, `docs/stories/005-05-undo-redo-toolbar.md`, `docs/stories/005-06-minimap-showcase-audit.md`, `docs/design/flow-editor.md`
 
@@ -34,11 +34,11 @@ Test (`flow-editor.test.tsx:12`) me-mock `@xyflow/react` dan mengirim array bias
 ## Tasks (jalur small-fix)
 
 - [x] Keputusan #1 disetujui user.
-- [ ] Reproduksi di showcase `/patterns/flow-editor`: drag node, klik node, hapus node → catat error. (belum; reproduksi dilakukan lewat test dengan `Changeset` asli)
+- [ ] Reproduksi di showcase `/patterns/flow-editor`: drag node, klik node, hapus node → catat error. (dilakukan lewat test dengan `Changeset` asli; target 49/49 hijau 2026-11-22)
 - [x] Fix handler `handleNodesChange` / `handleEdgesChange` (`flow-editor.tsx`) dan `page.tsx` showcase (`changes.toArray()`, cast ganda dihapus).
 - [x] Fix pembangun undo/redo dan remove edge (`computeNodeChanges`, `computeEdgeChanges` → `new NodeChangeset/EdgeChangeset(...)`; remove keyboard dan menu konteks).
 - [x] Test changeset asli ditambahkan di `flow-editor.test.tsx` (describe "FlowEditor changeset xyflow asli (CR-016)"; 3 test baru + assertion 005-03 disesuaikan ke `toArray()`).
-- [x] Verifikasi: flow-editor.test 49/49 hijau; `tsc` tanpa error baru (error tersisa di `flow-editor.test.tsx` baris 7xx = baseline 005-05/CR-015); lint `packages/ui` flow-editor dan showcase flow-editor bersih. Belum: `pnpm test` penuh, build showcase, uji browser manual drag/select/delete.
+- [x] Verifikasi target 2026-11-22: `flow-editor.test.tsx` 49/49 hijau. Belum: `pnpm test` penuh, build showcase, uji browser manual drag/select/delete (tindak lanjut).
 
 ## Keputusan
 
@@ -61,10 +61,11 @@ Test (`flow-editor.test.tsx:12`) me-mock `@xyflow/react` dan mengirim array bias
 Branch: `cr-016-flow-editor-changeset`
 Commit: `fix: normalisasi changeset xyflow pada flow editor [CR-016]`
 
-- [ ] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR disetujui user (approved + instruksi tutup 2026-11-22).
+- [ ] Branch dibuat. (dilewati — pekerjaan sudah live di `dev` tanpa branch berlabel; tidak dibuat retroaktif)
+- [x] Perubahan diimplementasikan (terverifikasi live di `dev`: `toArray()` + `new NodeChangeset/EdgeChangeset` + test CR-016).
+- [ ] Commit: tidak ada commit berlabel CR-016 (perubahan masuk lewat jalur lain).
+- [x] Verifikasi dijalankan (target `flow-editor.test.tsx` 49/49 hijau 2026-11-22).
+- [x] CR di-tick dan status diperbarui (langsung ke `docs/BACKLOG-ARCHIVE.md` sebagai done; tidak pernah tercatat di BACKLOG aktif).
+- [x] `docs/STATUS.md` diperbarui.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.

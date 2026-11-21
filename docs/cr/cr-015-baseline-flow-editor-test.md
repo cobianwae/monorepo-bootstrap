@@ -1,6 +1,6 @@
 # CR-015 — Verifikasi baseline dev (known issue flow-editor.test.tsx) + bersihkan entri stale
 
-**Status:** approved
+**Status:** done (diarsipkan 2026-11-22 — premis "baseline hijau" kedaluwarsa oleh kegagalan baseline baru di `docs/STATUS.md`; verifikasi docs awal sudah masuk commit `aa4e2f9`)
 **Sumber:** bug / verifikasi baseline (known issue di `docs/STATUS.md`)
 **Ref:** `docs/STATUS.md` (Known Issues), `packages/ui/src/components/canvas/flow-editor.test.tsx`, commit `883d742` (005-03), `docs/STATUS-LOG.md` (entri CR-008/CR-011)
 
