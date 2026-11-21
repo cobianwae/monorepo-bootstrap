@@ -113,3 +113,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Story 006-04 `done` (approved oleh user) dan di-merge ke `dev` — `006-04`.
 - 2026-11-21 — Story 006-05 showcase final + audit + smoke selesai (upgrade S-005.22 komponen-only + ol 6 langkah + panel demo + resep 15 baris, demo ringkas S-004.03 #rte-demo, audit Pulse AA light/dark + 3 smoke test, 531 test + typecheck/lint/test:tokens/showcase build hijau), status `review` — `006-05`.
 - 2026-11-21 — Story 006-05 `done` (approved oleh user) — `006-05`.
+- 2026-11-21 — Story 007-01 TransferList assign role selesai (dual-listbox controlled value/onChange, 3 cara pindah, multi-select shift/ctrl, filter per panel, ARIA listbox + focus management, skeleton/empty/error, 10 test hijau; showcase S-005.30 + smoke build hijau; typecheck hanya gagal di known issue flow-editor.test.tsx per CR-015), status `review` — `007-01`.
