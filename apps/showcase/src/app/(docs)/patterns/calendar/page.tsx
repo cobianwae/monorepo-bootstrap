@@ -12,6 +12,7 @@ import {
   type WorkingHours,
 } from '@ds/ui';
 import { format } from 'date-fns';
+import { enUS as en, id } from 'date-fns/locale';
 
 const DEMO_DATE = new Date(2026, 10, 21);
 
@@ -86,6 +87,11 @@ const WORKING_HOUR_OPTIONS: Array<{ label: string; value: WorkingHours }> = [
   { label: '09–17', value: { start: '09:00', end: '17:00' } },
 ];
 
+const LOCALE_OPTIONS: Array<{ label: string; value: typeof en | typeof id }> = [
+  { label: 'English', value: en },
+  { label: 'Bahasa Indonesia', value: id },
+];
+
 export default function CalendarPage() {
   const [view, setView] = React.useState<CalendarView>('month');
   const [date, setDate] = React.useState<Date>(DEMO_DATE);
@@ -93,6 +99,9 @@ export default function CalendarPage() {
   const [slotInterval, setSlotInterval] = React.useState(30);
   const [events, setEvents] = React.useState<CalendarEvent[]>(DEMO_EVENTS);
   const [editable, setEditable] = React.useState(true);
+  const [locale, setLocale] = React.useState<typeof en | typeof id>(en);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const [lastSlot, setLastSlot] = React.useState<string | null>(null);
   const [lastEvent, setLastEvent] = React.useState<string | null>(null);
   const [lastDrop, setLastDrop] = React.useState<string | null>(null);
@@ -104,6 +113,12 @@ export default function CalendarPage() {
 
   const handleSelectEvent = (event: CalendarEvent) => {
     setLastEvent(event.title);
+  };
+
+  const handleRetry = () => {
+    setError(null);
+    setLoading(false);
+    setEvents(DEMO_EVENTS);
   };
 
   const handleEventDrop = ({ id, start, end }: EventDropInfo) => {
@@ -168,16 +183,19 @@ export default function CalendarPage() {
               ))}
             </div>
 
-            <div className="flex items-center gap-2">
-              <Switch
-                id="calendar-editable"
-                checked={editable}
-                onCheckedChange={setEditable}
-                aria-describedby="calendar-editable-hint"
-              />
-              <label htmlFor="calendar-editable" className="text-xs font-medium text-muted-foreground">
-                Editable
-              </label>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">Locale</span>
+              {LOCALE_OPTIONS.map((option) => (
+                <Button
+                  key={option.label}
+                  type="button"
+                  variant={locale === option.value ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setLocale(option.value)}
+                >
+                  {option.label}
+                </Button>
+              ))}
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -195,14 +213,59 @@ export default function CalendarPage() {
               ))}
             </div>
 
+            <div className="flex items-center gap-2">
+              <Switch
+                id="calendar-editable"
+                checked={editable}
+                onCheckedChange={setEditable}
+                aria-describedby="calendar-editable-hint"
+              />
+              <label htmlFor="calendar-editable" className="text-xs font-medium text-muted-foreground">
+                Editable
+              </label>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Switch
+                id="calendar-loading"
+                checked={loading}
+                onCheckedChange={setLoading}
+                aria-describedby="calendar-loading-hint"
+              />
+              <label htmlFor="calendar-loading" className="text-xs font-medium text-muted-foreground">
+                Loading
+              </label>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Switch
+                id="calendar-error"
+                checked={!!error}
+                onCheckedChange={(v) => setError(v ? 'Gagal memuat data dari server' : null)}
+                aria-describedby="calendar-error-hint"
+              />
+              <label htmlFor="calendar-error" className="text-xs font-medium text-muted-foreground">
+                Error
+              </label>
+            </div>
+
             <p className="w-full text-sm text-muted-foreground">
               Demo state — view: {view} · date: {format(date, 'EEEE, d MMMM yyyy')} · working hours:{' '}
               {workingHours.start}–{workingHours.end} · interval: {slotInterval} min · editable:{' '}
-              {editable ? 'on' : 'off'}
+              {editable ? 'on' : 'off'} · locale:{' '}
+              {locale === id ? 'Bahasa Indonesia' : 'English'} · loading:{loading ? 'on' : 'off'} ·
+              error:{error ? 'on' : 'off'}
             </p>
             <p id="calendar-editable-hint" className="w-full text-xs text-muted-foreground">
               Editable menyalakan drag-and-drop blok waktu dan aksi Edit/Delete di detail event. Matikan untuk
               mode baca-saja; detail tetap dapat dibuka.
+            </p>
+            <p id="calendar-loading-hint" className="w-full text-xs text-muted-foreground">
+              Loading menampilkan skeleton grid dengan aria-busy dan menonaktifkan navigasi sementara.
+            </p>
+            <p id="calendar-error-hint" className="w-full text-xs text-muted-foreground">
+              Error menampilkan alert role=&quot;alert&quot; dengan pesan teks dan tombol &quot;Coba lagi&quot; yang memanggil
+              onRetry (handler demo di luar komponen).
             </p>
             <p className="w-full text-sm text-muted-foreground" aria-live="polite">
               Selected slot: {lastSlot ?? 'none yet'} · selected event: {lastEvent ?? 'none yet'} · drop:{' '}
@@ -216,8 +279,13 @@ export default function CalendarPage() {
           onViewChange={setView}
           currentDate={date}
           onDateChange={setDate}
+          locale={locale}
+          weekStartsOn={1}
           workingHours={workingHours}
           slotIntervalMinutes={slotInterval}
+          loading={loading}
+          error={error}
+          onRetry={handleRetry}
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectEvent}
           editable={editable}
@@ -260,6 +328,35 @@ export default function CalendarPage() {
               With Editable on, drag a timed block to another slot for a live preview, or use the keyboard &quot;Move
               to selected slot&quot; controls inside the detail panel. Both emit the same onEventDrop payload.
             </li>
+            <li>
+              Agenda view menampilkan event kronologis periode aktif, grup per hari, dengan baris tombol yang
+              memanggil onSelectEvent dengan payload event utuh.
+            </li>
+            <li>
+              State matrix: loading (skeleton grid, aria-busy, navigasi disabled), empty (role=&quot;status&quot; +
+              CTA konsumen), dan error (role=&quot;alert&quot; + pesan teks + tombol Coba lagi → onRetry).
+            </li>
+            <li>
+              Locale en ↔ id mengubah nama hari/bulan dan awal pekan via prop locale (terverifikasi test dan terlihat
+              di weekday header week view).
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-3 pt-6">
+          <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+            <UserRound className="h-4 w-4 text-muted-foreground" />
+            Catatan aksesibilitas
+          </h2>
+          <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
+            <li>Grid pakai role=&quot;grid&quot;, sel role=&quot;gridcell&quot;, dan event berupa tombol bernama (judul + waktu + kategori).</li>
+            <li>Toolbar view switcher pakai radiogroup; perubahan periode/view diumumkan lewat live region (aria-live=&quot;polite&quot;).</li>
+            <li>Fokus ring warna token primary 2px terlihat di mode light dan dark; tab navigasi pada slot dan event dapat dioperasikan keyboard-only.</li>
+            <li>Pembeda status dan kategori tidak pernah mengandalkan warna saja (ada teks/labels serta badge).</li>
+            <li>prefers-reduced-motion dihormati; animasi dinonaktifkan bila pengguna mengaktifkannya.</li>
+            <li>Semua handler pada demo adalah mock (log/toast) di luar komponen; komponen itu sendiri tidak memanggil API.</li>
           </ul>
         </CardContent>
       </Card>

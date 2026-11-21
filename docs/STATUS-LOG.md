@@ -2,6 +2,8 @@
 
 Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 
+- 2026-11-21 — Story 004-04 Locale + agenda + state matrix + showcase final + a11y selesai verifikasi (typecheck, lint, test, showcase build hijau; event-calendar.tsx prop loading/error/onRetry, state matrix, agenda view, showcase page state+locale panel), status `review` — `004-04`.
+
 - 2026-11-21 — Story 004-01 fondasi EventCalendar + month view + navigasi selesai (9 test hijau; kegagalan typecheck/test/build hanya baseline `@xyflow/react` lama) — `004-01`.
 - 2026-11-21 — Story 004-01 `done` (approved oleh user) dan di-merge ke `dev` — `004-01`.
 

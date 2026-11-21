@@ -1,6 +1,6 @@
 # 004-04 — Locale + agenda + state matrix + showcase final + a11y
 
-Status: todo
+Status: review
 PRD: `docs/prd/004-calendar-scheduler.md`
 Design: `docs/design/calendar-scheduler.md` (approved, gate 2)
 FR: `FR-008`, `FR-009`, `FR-010`, `FR-014` (could), `FR-015`
@@ -41,13 +41,13 @@ Goal: Menutup PRD — locale en/id, agenda kronologis, state matrix penuh, dan s
 
 ## Tasks
 
-- [ ] `locale` (date-fns) + `weekStartsOn` + label periode per locale
-- [ ] View agenda: filter periode → urut `start` → grup per hari (baris tombol → `onSelectEvent`)
-- [ ] State matrix: `loading` skeleton per view, empty `empty-state`, `error` + `onRetry` (`role`/`aria` sesuai wireframe §4)
-- [ ] Showcase final: dataset realistis + panel demo lengkap + legenda kategori + catatan a11y; acuan konsumen `S-022` dicatat
-- [ ] Audit a11y + kontras kategori light/dark + `prefers-reduced-motion`
-- [ ] Update `docs/BACKLOG.md` + `docs/STATUS.md` + append `docs/STATUS-LOG.md`
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test` → `pnpm -C apps/showcase build`
+- [x] `locale` (date-fns) + `weekStartsOn` + label periode per locale
+- [x] View agenda: filter periode → urut `start` → grup per hari (baris tombol → `onSelectEvent`)
+- [x] State matrix: `loading` skeleton per view, empty `empty-state`, `error` + `onRetry` (`role`/`aria` sesuai wireframe §4)
+- [x] Showcase final: dataset realistis + panel demo lengkap + legenda kategori + catatan a11y; acuan konsumen `S-022` dicatat
+- [x] Audit a11y + kontras kategori light/dark + `prefers-reduced-motion`
+- [x] Update `docs/BACKLOG.md` + `docs/STATUS.md` + append `docs/STATUS-LOG.md`
+- [x] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test` → `pnpm -C apps/showcase build`
 
 ## Dependencies
 
