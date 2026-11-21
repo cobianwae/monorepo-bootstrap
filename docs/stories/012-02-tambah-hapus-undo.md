@@ -1,6 +1,6 @@
 # 012-02 — Tambah inline + hapus M-011 + undo/redo
 
-Status: review
+Status: done
 PRD: `docs/prd/012-mind-map.md` (revisi OQ#2/OQ#3 2026-11-21)
 Design: `docs/design/wireframes/mind-map.md` + `docs/design/flows/mind-map.mmd`
 FR: `FR-002`, `FR-006`
@@ -53,6 +53,8 @@ Goal: Ideation 1-klik — tambah anak/saudara via gagang, inline-edit validasi, 
 - Keputusan: K2 FR-010 tunda v1 (tanpa drag); K3 tanpa panel (edit hanya inline, beda dari Studio M-007/M-008)
 
 ## Implementasi dan verifikasi — 2026-11-21
+
+- Status `done` ditetapkan atas approval user; user mengizinkan push branch, merge ke `dev`, dan push `dev`.
 
 - Branch `012-02-tambah-hapus-undo` di worktree `arah-cr`, disinkronkan fast-forward ke `origin/dev` `31a2687` sebelum verifikasi akhir.
 - Kontrak additive `onChange(flat: MindNodeFlat[])`; argumen lama `toMindFlowNodes(..., onToggle)` tetap didukung. Draft tambah belum memanggil `onChange`; commit valid menghasilkan satu snapshot dan satu callback.
