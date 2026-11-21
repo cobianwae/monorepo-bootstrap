@@ -82,11 +82,14 @@ export type {
 // (kontrak `label` beda dari getAncestors studio — lihat catatan mind-map.tsx).
 export {
   MindMap,
+  MIND_UNDO_LIMIT,
   MIND_NODE_HEIGHT_BRANCH,
   MIND_NODE_HEIGHT_ROOT,
   MIND_NODE_WIDTH_BRANCH,
   MIND_NODE_WIDTH_ROOT,
   computeMindMapPositions,
+  applyMindDelete,
+  pushMindHistoryCapped,
   normalizeMindInput,
   toMindFlowEdges,
   toMindFlowNodes,
@@ -193,7 +196,6 @@ export * from './components/data-display/chat';
 export * from './components/layout/prose';
 export * from './components/form/search-input';
 export * from './components/feedback/banner';
-
 
 
 
