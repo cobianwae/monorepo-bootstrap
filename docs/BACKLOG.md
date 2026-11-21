@@ -82,13 +82,13 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-019 | Flow Editor inspector on-demand tidak mengunci + sesuai AC | done | `docs/cr/cr-019-flow-inspector-on-demand.md` |
 | CR-020 | Mind Map: pointer, pemusatan edit/fokus, minimap mobile dipulihkan; tes/browser/build terverifikasi, disetujui user | done | `docs/cr/cr-020-mind-map-canvas-parity.md` |
 | CR-021 | Flow Editor: kanvas rusak visual/layout (node 0×0, handle, toolbar, fitView, edge) | done | `docs/cr/cr-021-flow-editor-visual-rusak.md` |
-| CR-022 | Mind Map: hierarki visual dan konsistensi komponen (root, badge, focus ring, tombol demo) | approved | `docs/cr/cr-022-mind-map-hierarki-konsistensi.md` |
-| CR-023 | Mind Map: warna semantik dan state feedback (edge, highlight, error, skeleton, minimap) | approved | `docs/cr/cr-023-mind-map-warna-state.md` |
-| CR-024 | Mind Map: microcopy, konten, dan a11y detail (istilah, deskripsi, hint, input, gagang mobile) | approved | `docs/cr/cr-024-mind-map-microcopy-a11y.md` |
-| CR-025 | Mind Map: tindak lanjut audit halaman (target sentuh salin resep, grup aksi, pre keyboard, cakupan test) | approved | `docs/cr/cr-025-mind-map-audit-followup.md` |
-| CR-026 | Mind Map: tata letak, hierarki, dan ikonografi halaman showcase (panel demo, pencarian, spacing, tipografi) | approved | `docs/cr/cr-026-mind-map-showcase-layout.md` |
-| CR-027 | Mind Map: polish halaman showcase (urutan demo, bingkai ganda, ikon status, resep salin) | approved | `docs/cr/cr-027-mind-map-showcase-polish.md` |
-| CR-028 | Mind Map: pencarian dan toolbar dalam satu baris (komponen `packages/ui`, urutan DOM) | approved | `docs/cr/cr-028-mind-map-toolbar-search-row.md` |
+| CR-022 | Mind Map: hierarki visual dan konsistensi komponen (root, badge, focus ring, tombol demo) | done | `docs/cr/cr-022-mind-map-hierarki-konsistensi.md` |
+| CR-023 | Mind Map: warna semantik dan state feedback (edge, highlight, error, skeleton, minimap) | done | `docs/cr/cr-023-mind-map-warna-state.md` |
+| CR-024 | Mind Map: microcopy, konten, dan a11y detail (istilah, deskripsi, hint, input, gagang mobile) | done | `docs/cr/cr-024-mind-map-microcopy-a11y.md` |
+| CR-025 | Mind Map: tindak lanjut audit halaman (target sentuh salin resep, grup aksi, pre keyboard, cakupan test) | done | `docs/cr/cr-025-mind-map-audit-followup.md` |
+| CR-026 | Mind Map: tata letak, hierarki, dan ikonografi halaman showcase (panel demo, pencarian, spacing, tipografi) | done | `docs/cr/cr-026-mind-map-showcase-layout.md` |
+| CR-027 | Mind Map: polish halaman showcase (urutan demo, bingkai ganda, ikon status, resep salin) | done | `docs/cr/cr-027-mind-map-showcase-polish.md` |
+| CR-028 | Mind Map: pencarian dan toolbar dalam satu baris (komponen `packages/ui`, urutan DOM) | done | `docs/cr/cr-028-mind-map-toolbar-search-row.md` |
 
 ## Catatan
 

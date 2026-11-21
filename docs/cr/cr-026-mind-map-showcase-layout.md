@@ -1,6 +1,8 @@
 # CR-026 — Mind Map: tata letak, hierarki, dan ikonografi halaman showcase
 
-**Status:** approved
+**Status:** done
+
+User menetapkan `done` dan mengizinkan push CR-022–028 serta merge/push `dev` (2026-11-22); penutupan bersama dicatat di branch CR-028.
 **Sumber:** masukan user (halaman showcase `/patterns/mind-map` terasa ngasal: demo interaktif tidak jelas, flat tanpa ikon, tipografi dan spacing tidak konsisten) + perbandingan dengan `/patterns/org-chart-studio`
 **Ref:** `docs/prd/012-mind-map.md`, `apps/showcase/src/app/(docs)/patterns/mind-map/page.tsx`, pola acuan `apps/showcase/src/app/(docs)/patterns/org-chart-studio/page.tsx` + `_components/*`
 
@@ -110,6 +112,6 @@ Commit: `fix: rapikan tata letak halaman showcase mind map [CR-026]`
 - [ ] Branch dibuat.
 - [ ] Perubahan diimplementasikan.
 - [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.

@@ -1,6 +1,8 @@
 # CR-027 — Mind Map: polish halaman showcase (urutan, bingkai, ikon, resep)
 
-**Status:** approved
+**Status:** done
+
+User menetapkan `done` dan mengizinkan push CR-022–028 serta merge/push `dev` (2026-11-22); penutupan bersama dicatat di branch CR-028. Catatan verifikasi/isu tema campuran tetap berlaku.
 **Sumber:** audit `/improve-ui` pasca CR-026 (cluster A dan C), berbasis kode; belum ada pengecekan visual di browser
 **Ref:** `apps/showcase/src/app/(docs)/patterns/mind-map/page.tsx`, `_components/mind-map-demo-panel.tsx`, `_components/mind-map-recipe.tsx`, `docs/cr/cr-026-mind-map-showcase-layout.md`
 

@@ -1,6 +1,6 @@
 # CR-028 — Mind Map: pencarian dan toolbar dalam satu baris (komponen)
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit `/improve-ui` pasca CR-026 (cluster B) + keluhan user "susunan layout button tab pencarian itu gak jelas"
 **Ref:** `packages/ui/src/components/canvas/mind-map.tsx:1822-1864`, `packages/ui/src/components/canvas/mind-map.test.tsx:199-208`, `docs/stories/012-03-keyboard-cari-showcase-audit.md` (AC urutan DOM, status done), wireframe `docs/design/wireframes/mind-map.md` §1
 
@@ -91,4 +91,4 @@ Commit: `fix: sejajarkan pencarian dan toolbar mind map [CR-028]`
 - Chrome headless production: tema global/lokal selaras light/light dan dark/dark, lebar **1440, 768, 390, 320px**. Pencarian kiri/aksi kanan satu baris pada 1440px; membungkus di bawahnya tanpa overflow halaman. Tab nyata dari pencarian menuju tambah; urutan DOM searah visual. Tombol aksi tetap 44px. Screenshot desktop/mobile ditinjau.
 - Bukti lokal (tidak di-commit): `cr028-browser.mjs` dan `cr028-{light,dark}-{1440,390}.png` di direktori temp OpenCode sesi.
 - Tidak mengubah warna/token. Audit Pulse co-located lulus; checklist kontras menyeluruh tetap terbuka karena isu tema global dark/lokal light dari CR-027 belum ditangani. SR bersuara native tidak diuji.
-- Tetap `approved` menunggu review user; tidak push/merge atau menetapkan `done`. Perubahan nav showcase existing tidak disentuh/disertakan.
+- User menetapkan `done` dan mengizinkan push seluruh branch CR-022–028 serta merge/push `dev` (2026-11-22). Penutupan bersama dicatat di branch CR-028. Perubahan nav showcase existing tidak disentuh/disertakan.

@@ -1,6 +1,6 @@
 # CR-023 — Mind Map: warna semantik dan state feedback
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit ui-designer `/improve-ui` scope `patterns/mind-map`
 **Ref:** `docs/prd/012-mind-map.md` (FR-003/FR-007/FR-008), `packages/ui/src/components/canvas/mind-map.tsx`, `apps/showcase/src/app/(docs)/patterns/mind-map/page.tsx`
 
@@ -81,9 +81,9 @@ Commit: `fix: perjelas warna dan state mind map [CR-023]`
 - [x] Branch dibuat.
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
 
 ### Hasil implementasi
 
@@ -91,4 +91,4 @@ Commit: `fix: perjelas warna dan state mind map [CR-023]`
 - `pnpm lint`: hijau.
 - MindMap + integrasi: **48/48 lulus** (termasuk assert edge baru).
 - Showcase page: **3/3 lulus**; `pnpm test:tokens` **8/8**; build showcase hijau.
-- Menunggu user menetapkan `done`, lalu update BACKLOG/STATUS/STATUS-LOG + push/merge.
+- User menetapkan `done` dan mengizinkan push seluruh branch CR-022–028 serta merge/push `dev` (2026-11-22). Penutupan bersama dicatat di branch CR-028.

@@ -1,6 +1,8 @@
 # CR-025 — Mind Map: tindak lanjut audit halaman (target sentuh, grup aksi, pre keyboard, cakupan test)
 
-**Status:** approved
+**Status:** done
+
+User menetapkan `done` dan mengizinkan push CR-022–028 serta merge/push `dev` (2026-11-22); penutupan bersama dicatat di branch CR-028.
 **Sumber:** audit ui-ux-auditor `/audit` scope `apps/showcase/src/app/(docs)/patterns/mind-map/`
 **Ref:** `docs/prd/012-mind-map.md` (FR-005/FR-009), `apps/showcase/src/app/(docs)/patterns/mind-map/page.tsx`, `apps/showcase/src/app/(docs)/patterns/mind-map/page.test.tsx`
 
@@ -71,5 +73,5 @@ Commit: `fix: tindak lanjut audit halaman mind map [CR-025]`
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan.
 - [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.

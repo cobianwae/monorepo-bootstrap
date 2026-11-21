@@ -1,6 +1,8 @@
 # CR-024 — Mind Map: microcopy, konten, dan a11y detail
 
-**Status:** approved
+**Status:** done
+
+User menetapkan `done` dan mengizinkan push CR-022–028 serta merge/push `dev` (2026-11-22); penutupan bersama dicatat di branch CR-028.
 **Sumber:** audit ui-designer `/improve-ui` scope `patterns/mind-map` + masukan user (konten/deskripsi)
 **Ref:** `docs/prd/012-mind-map.md` (FR-005/FR-009), `packages/ui/src/components/canvas/mind-map.tsx`, `apps/showcase/src/app/(docs)/patterns/mind-map/page.tsx`
 
@@ -90,6 +92,6 @@ Commit: `fix: rapikan microcopy mind map [CR-024]`
 - [x] Branch dibuat.
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
