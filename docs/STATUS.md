@@ -37,6 +37,7 @@ Story 005-01 (`done`, ter-merge ke `dev`) — Flow editor fondasi canvas + node 
 8. Story 005-04 seleksi + inspector on-demand + hapus — implementasi selesai, verifikasi typecheck/lint/test/test:tokens/showcase build hijau, status `done`, di-merge ke `dev` — `005-04`.
 9. Story 006-01 fondasi controlled + toolbar inline/blok + undo selesai, status `done`, di-merge ke `dev` — `006-01`.
 10. Story 006-02 link M-009 + shortcut + keyboard selesai, status `done`, di-merge ke `dev` — `006-02`.
+11. Story 006-03 mode + counter + state matrix — implementasi selesai, verifikasi typecheck/lint/test/test:tokens/showcase build hijau, status `review` — `006-03`.
 
 ## Known Issues
 
