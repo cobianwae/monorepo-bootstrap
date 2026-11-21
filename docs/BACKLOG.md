@@ -77,7 +77,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 005-04 | Flow editor seleksi + inspector on-demand + hapus | approved | `docs/stories/005-04-seleksi-inspector-hapus.md` |
 | 005-05 | Flow editor undo/redo + toolbar pola | approved | `docs/stories/005-05-undo-redo-toolbar.md` |
 | 005-06 | Flow editor minimap + showcase + audit | approved | `docs/stories/005-06-minimap-showcase-audit.md` |
-| 006-01 | RTE fondasi controlled + toolbar inline/blok + undo | approved | `docs/stories/006-01-fondasi-toolbar-controlled.md` |
+| 006-01 | RTE fondasi controlled + toolbar inline/blok + undo | done | `docs/stories/006-01-fondasi-toolbar-controlled.md` |
 | 006-02 | RTE link M-009 + shortcut + keyboard penuh | approved | `docs/stories/006-02-link-shortcut-keyboard.md` |
 | 006-03 | RTE mode + counter + state matrix | approved | `docs/stories/006-03-mode-counter-states.md` |
 | 006-04 | RTE gambar M-010 + serializer markdown + slot mention | approved | `docs/stories/006-04-gambar-markdown-mention.md` |
