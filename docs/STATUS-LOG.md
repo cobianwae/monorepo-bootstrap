@@ -77,3 +77,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 2026-11-21 — Story 011-04 `done` (approved oleh user) dan di-merge ke `dev` — `011-04`.
 2026-11-21 — Review artefak 006 selesai (2 blocker, 4 major, 3 minor); approve CR-011 sitemap & rujukan RTE + gate 3 story 006-01–006-05 (siap implementasi) + setujui `@tiptap/extension-image` untuk FR-009 di 006-04 — CR-011, 006
 2026-11-21 — Story 011-05 showcase final + state matrix + audit + legacy selesai, status review: ol 6 langkah + panel demo 6 state + contoh 40 orang 1 klik + resep 15 baris + minimap/theme toggle + Reset demo, teks SR loading di komponen, banner deprecated S-005.28/S-005.33 + migrasi, sitemap S-005.34 series implemented, audit kontras AA light & dark (tabel di story), test 6 baru + 473 hijau, typecheck/lint/test:tokens/showcase build hijau, grep legacy bersih — `011-05`.
+2026-11-21 — Story 011-05 `done` (approved oleh user) dan di-merge ke `dev` — `011-05`.

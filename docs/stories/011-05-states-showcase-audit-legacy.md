@@ -1,6 +1,6 @@
 # 011-05 — State matrix, showcase final, audit kontras, dan legacy
 
-Status: review
+Status: done
 PRD: `docs/prd/011-org-chart-studio.md`
 Design: `docs/design/org-chart-studio.md`
 FR: `FR-012`, `FR-014`, `FR-015`, `FR-017`, `FR-018`
