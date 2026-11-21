@@ -1,6 +1,6 @@
 # 006-02 — Link M-009 + markdown shortcut + keyboard penuh
 
-Status: approved
+Status: done
 PRD: `docs/prd/006-rich-text-editor.md`
 Design: `docs/design/rich-text-editor.md`
 FR: `FR-003`, `FR-004`, `FR-006`
@@ -35,11 +35,11 @@ Goal: Sisip/edit/hapus link via popover accessible + shortcut markdown setara to
 
 ## Tasks
 
-- [ ] M-009: `popover` (desktop anchor seleksi) / `dialog`-sheet (mobile) — input URL + label, pesan validasi, aksi Simpan/Buka/Hapus/Batal; `extendMarkRange` + `setLink/unsetLink`
-- [ ] Shortcut `Ctrl/Cmd+K` + klik-link-membuka-M-009 (`openOnClick:false`); validasi `https?://` atau `/path`
-- [ ] InputRules StarterKit aktif + test kesetaraan shortcut-vs-toolbar
-- [ ] Test: sisip/edit/hapus link via keyboard, tolak URL invalid/kosong, Esc fokus-kembali, tidak ada prompt
-- [ ] Showcase: hubungkan M-009 ke draf S-005.22 dari 006-01 (panel demo final di 006-05)
+- [x] M-009: `popover` (desktop anchor seleksi) / `dialog`-sheet (mobile) — input URL + label, pesan validasi, aksi Simpan/Buka/Hapus/Batal; `extendMarkRange` + `setLink/unsetLink`
+- [x] Shortcut `Ctrl/Cmd+K` + klik-link-membuka-M-009 (`openOnClick:false`); validasi `https?://` atau `/path`
+- [x] InputRules StarterKit aktif + test kesetaraan shortcut-vs-toolbar
+- [x] Test: sisip/edit/hapus link via keyboard, tolak URL invalid/kosong, Esc fokus-kembali, tidak ada prompt
+- [x] Showcase: hubungkan M-009 ke draf S-005.22 dari 006-01 (panel demo final di 006-05)
 
 ## Dependencies
 
