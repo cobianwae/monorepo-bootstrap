@@ -1,4 +1,6 @@
 @import "@xyflow/react/dist/style.css";
+@import "driver.js/dist/driver.css";
+@import "./components/overlay/tour.css";
 @import "@ds/tokens/tokens.css";
 
 @source "./components";

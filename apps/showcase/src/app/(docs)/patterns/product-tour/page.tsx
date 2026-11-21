@@ -8,800 +8,326 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
   Button,
   Badge,
-  Input,
-  Label,
-  Checkbox,
   Progress,
-  Skeleton,
-  Banner,
   EmptyState,
-  Kbd,
-  toast,
-  cn,
+  Banner,
 } from '@ds/ui';
-import {
-  Compass,
-  MousePointerClick,
-  RotateCcw,
-  ListOrdered,
-  Plus,
-  Users,
-  Wallet,
-  Send,
-  Eye,
-  X,
-  ArrowLeft,
-  ArrowRight,
-  Play,
-  CheckCircle2,
-  type LucideIcon,
-} from 'lucide-react';
+import { Tour, type TourStep, type TourStepStatus } from '@ds/ui';
+import { Compass, MousePointerClick, RotateCcw, Copy, Check } from 'lucide-react';
 
-const STORAGE_KEY = 'ds:tour-dismissed';
-const GAP = 12;
-const MARGIN = 12;
-const STEP_CARD_WIDTH = 320;
-const ESTIMATED_CARD_HEIGHT = 260;
+const RESEP = `const [open, setOpen] = useState(false);
+<Tour steps={STEPS} open={open}
+  onFinish={(s) => {
+    localStorage.setItem('tour-done',
+      JSON.stringify(s));
+    setOpen(false);
+  }}
+  onSkip={(s, at) => {
+    localStorage.setItem('tour-skip',
+      JSON.stringify({ at, s }));
+    setOpen(false);
+  }} />`;
 
-type Placement = 'top' | 'bottom' | 'right' | 'left';
-type TourKey = 'create' | 'segmentation' | 'budget' | 'publish';
+type DemoVariant = 'penuh' | 'tiga-hilang' | 'semua-hilang' | 'kosong' | 'loading';
 
-const TOUR_SELECTOR = (key: TourKey) => `[data-tour="${key}"]`;
+const VARIANT_LABEL: Record<DemoVariant, string> = {
+  penuh: '5 langkah valid',
+  'tiga-hilang': 'Langkah 3 hilang',
+  'semua-hilang': 'Semua hilang (error)',
+  kosong: 'Kosong (empty)',
+  loading: 'Pemicu loading singkat',
+};
 
-interface TourStep {
-  key: TourKey;
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  placement: Placement;
+function clickDriver(selector: string) {
+  const el = document.querySelector<HTMLElement>(selector);
+  el?.click();
 }
 
-interface HighlightRect {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-}
+export default function ProductTourPatternPage() {
+  const mulaiRef = React.useRef<HTMLButtonElement>(null);
 
-const TOUR_STEPS: TourStep[] = [
-  {
-    key: 'create',
-    icon: Plus,
-    title: 'Create your campaign',
-    description:
-      'Kick off a new campaign from the toolbar. You can also duplicate an existing one to reuse its targeting rules.',
-    placement: 'bottom',
-  },
-  {
-    key: 'segmentation',
-    icon: Users,
-    title: 'Segment your audience',
-    description:
-      'Reach the right people by combining location, device and interest rules into a reusable segment.',
-    placement: 'right',
-  },
-  {
-    key: 'budget',
-    icon: Wallet,
-    title: 'Set a daily budget',
-    description:
-      'Cap how much you spend per day. The dashboard shows a live burn-down against your limit.',
-    placement: 'bottom',
-  },
-  {
-    key: 'publish',
-    icon: Send,
-    title: 'Publish when ready',
-    description:
-      'Send the campaign to review. Once approved it starts serving to the segmented audience.',
-    placement: 'top',
-  },
-];
+  const [open, setOpen] = React.useState(false);
+  const [variant, setVariant] = React.useState<DemoVariant>('penuh');
+  const [sembunyiTiga, setSembunyiTiga] = React.useState(true);
+  const [loadingDemo, setLoadingDemo] = React.useState(false);
+  const [indeks, setIndeks] = React.useState(0);
+  const [status, setStatus] = React.useState<TourStepStatus[]>([]);
+  const [hasil, setHasil] = React.useState<string | null>(null);
+  const [disalin, setDisalin] = React.useState(false);
 
-const STATS: Array<{
-  label: string;
-  value: string;
-  delta: string;
-  tone: 'success' | 'muted';
-  icon: LucideIcon;
-}> = [
-  { label: 'Reach', value: '412K', delta: '+12%', tone: 'success', icon: Eye },
-  { label: 'CTR', value: '2.8%', delta: '+0.4pt', tone: 'success', icon: MousePointerClick },
-  { label: 'Spend', value: '$31', delta: 'on track', tone: 'muted', icon: Wallet },
-];
+  const hilangTiga = variant === 'tiga-hilang' || (variant === 'penuh' && sembunyiTiga);
+  const semuaHilang = variant === 'semua-hilang';
+  const kosong = variant === 'kosong';
 
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
-}
+  const steps: TourStep[] = React.useMemo(() => {
+    if (kosong) return [];
+    const dasar: Array<Omit<TourStep, 'target'>> = [
+      { id: 'buat', title: 'Buat proyek', content: 'Mulai dari tombol Buat Proyek di bar aksi contoh ini.' },
+      { id: 'cari', title: 'Cari tugas', content: 'Filter daftar tugas contoh tanpa membuka halaman lain.' },
+      { id: 'filter', title: 'Filter status', content: 'Saring kartu contoh berdasarkan status aktif.' },
+      { id: 'metrik', title: 'Pantau metrik', content: 'Lihat ringkasan angka contoh sebelum lanjut.' },
+      { id: 'tabel', title: 'Kelola tabel', content: 'Kelola baris contoh; langkah terakhir tur ini.' },
+    ];
+    return dasar.map((s) => ({
+      ...s,
+      target: semuaHilang ? `#tak-ada-${s.id}` : `[data-tour-target="${s.id}"]`,
+    }));
+  }, [kosong, semuaHilang]);
 
-function computeCardStyle(
-  rect: DOMRect,
-  placement: Placement,
-  viewportWidth: number,
-  viewportHeight: number
-): React.CSSProperties {
-  const centeredLeft = clamp(
-    rect.left + rect.width / 2 - STEP_CARD_WIDTH / 2,
-    MARGIN,
-    viewportWidth - STEP_CARD_WIDTH - MARGIN
-  );
-
-  switch (placement) {
-    case 'top': {
-      if (rect.top - GAP - ESTIMATED_CARD_HEIGHT < MARGIN) {
-        return { top: rect.bottom + GAP, left: centeredLeft };
-      }
-      return { top: rect.top - GAP, left: centeredLeft, transform: 'translateY(-100%)' };
-    }
-    case 'right': {
-      if (rect.right + GAP + STEP_CARD_WIDTH > viewportWidth - MARGIN) {
-        return { top: rect.bottom + GAP, left: centeredLeft };
-      }
-      return {
-        top: rect.top + rect.height / 2,
-        left: rect.right + GAP,
-        transform: 'translateY(-50%)',
-      };
-    }
-    case 'left': {
-      if (rect.left - GAP - STEP_CARD_WIDTH < MARGIN) {
-        return { top: rect.bottom + GAP, left: centeredLeft };
-      }
-      return {
-        top: rect.top + rect.height / 2,
-        left: rect.left - GAP - STEP_CARD_WIDTH,
-        transform: 'translateY(-50%)',
-      };
-    }
-    case 'bottom':
-    default: {
-      if (rect.bottom + GAP + ESTIMATED_CARD_HEIGHT > viewportHeight - MARGIN) {
-        return { top: rect.top - GAP, left: centeredLeft, transform: 'translateY(-100%)' };
-      }
-      return { top: rect.bottom + GAP, left: centeredLeft };
-    }
-  }
-}
-
-function DemoSkeleton() {
-  return (
-    <Card className="overflow-hidden border-border shadow-lg">
-      <CardHeader className="border-b border-border/60 bg-muted/20">
-        <div className="flex items-center justify-between gap-3">
-          <div className="space-y-2">
-            <Skeleton className="h-5 w-44" />
-            <Skeleton className="h-3 w-56 max-w-full" />
-          </div>
-          <Skeleton className="h-9 w-32" />
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4 p-5">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <Skeleton className="h-16" />
-          <Skeleton className="h-16" />
-          <Skeleton className="h-16" />
-        </div>
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <Skeleton className="h-40" />
-          <Skeleton className="h-40" />
-          <Skeleton className="h-40" />
-        </div>
-      </CardContent>
-      <CardFooter className="border-t border-border/60 bg-muted/20 p-4">
-        <Skeleton className="ml-auto h-8 w-28" />
-      </CardFooter>
-    </Card>
-  );
-}
-
-function CampaignDashboard() {
-  return (
-    <Card className="overflow-hidden border-border shadow-lg">
-      <CardHeader className="flex flex-row items-center justify-between gap-3 border-b border-border/60 bg-muted/20">
-        <div className="min-w-0 space-y-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <CardTitle className="text-base sm:text-lg">Campaign Dashboard</CardTitle>
-            <Badge
-              variant="outline"
-              className="border-warning/40 bg-warning/10 text-warning"
-            >
-              Draft
-            </Badge>
-          </div>
-          <CardDescription>Q3 brand awareness · Acme Co</CardDescription>
-        </div>
-        <div
-          data-tour="create"
-          className="shrink-0"
-        >
-          <Button
-            className="gap-1.5"
-            onClick={() =>
-              toast({
-                variant: 'success',
-                title: 'Campaign draft created',
-                description: 'A blank campaign was added to your workspace.',
-              })
-            }
-          >
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Create Campaign</span>
-            <span className="sm:hidden">Create</span>
-          </Button>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-5 p-5">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {STATS.map((stat) => {
-            const StatIcon = stat.icon;
-            return (
-              <div
-                key={stat.label}
-                className="flex items-center gap-3 rounded-lg border border-border bg-card p-3"
-              >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-highlight/10 text-highlight">
-                  <StatIcon className="h-4 w-4" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
-                    {stat.label}
-                  </p>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="font-display text-lg font-bold text-foreground">
-                      {stat.value}
-                    </span>
-                    <span
-                      className={cn(
-                        'text-[10px] font-medium',
-                        stat.tone === 'success' ? 'text-success' : 'text-muted-foreground'
-                      )}
-                    >
-                      {stat.delta}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div
-            data-tour="segmentation"
-            className="space-y-3 rounded-lg border border-border bg-muted/20 p-4"
-          >
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <Users className="h-4 w-4 text-highlight" />
-              Segmentation
-              <Badge variant="outline" className="ml-auto text-[10px]">
-                3 rules
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground">2.4M reachable users in segment</p>
-            <div className="flex flex-wrap gap-1.5">
-              <Badge variant="secondary">US + CA</Badge>
-              <Badge variant="secondary">iOS &amp; Android</Badge>
-              <Badge variant="secondary">Age 25–44</Badge>
-            </div>
-            <div className="flex items-center justify-between rounded-md bg-highlight/10 px-3 py-2 text-[11px]">
-              <span className="font-medium text-highlight">Lookalike engine</span>
-              <span className="font-mono text-foreground">4% match</span>
-            </div>
-          </div>
-
-          <div className="space-y-3 rounded-lg border border-border bg-card p-4">
-            <Label htmlFor="daily-budget">Daily budget (USD)</Label>
-            <div
-              data-tour="budget"
-            >
-              <Input
-                id="daily-budget"
-                type="number"
-                min="1"
-                defaultValue="50"
-                startAdornment={<span>$</span>}
-              />
-            </div>
-            <Progress value={62} className="h-2" />
-            <p className="text-[11px] text-muted-foreground">
-              Spent $31 of $50 today · pacing healthy
-            </p>
-          </div>
-
-          <div className="space-y-3 rounded-lg border border-border bg-muted/20 p-4">
-            <p className="text-sm font-semibold text-foreground">Reach forecast</p>
-            <div className="flex items-end gap-2">
-              <span className="font-display text-2xl font-bold text-foreground">1.2M</span>
-              <span className="pb-1 text-[11px] text-muted-foreground">est. weekly</span>
-            </div>
-            <div className="flex h-16 items-end gap-1.5">
-              {[40, 62, 48, 80, 55, 90, 70].map((height, index) => (
-                <div
-                  key={index}
-                  style={{ height: `${height}%` }}
-                  className="flex-1 rounded-t-sm bg-highlight/40"
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </CardContent>
-
-      <CardFooter className="flex flex-wrap items-center justify-between gap-3 border-t border-border/60 bg-muted/20 p-4">
-        <p className="text-xs text-muted-foreground">Last saved 2 min ago · auto-save on</p>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            Save draft
-          </Button>
-          <div
-            data-tour="publish"
-          >
-            <Button
-              variant="success"
-              size="sm"
-              className="gap-1.5"
-              onClick={() =>
-                toast({
-                  variant: 'success',
-                  title: 'Campaign published',
-                  description: 'Your campaign is now in review and will start serving soon.',
-                })
-              }
-            >
-              <Send className="h-3.5 w-3.5" />
-              Publish
-            </Button>
-          </div>
-        </div>
-      </CardFooter>
-    </Card>
-  );
-}
-
-export default function ProductTourPage() {
-  const [loading, setLoading] = React.useState(true);
-  const [activeStep, setActiveStep] = React.useState<number | null>(null);
-  const [showDismissedBanner, setShowDismissedBanner] = React.useState(false);
-  const [dontShowAgain, setDontShowAgain] = React.useState(false);
-  const [highlight, setHighlight] = React.useState<HighlightRect | null>(null);
-  const [cardStyle, setCardStyle] = React.useState<React.CSSProperties>({});
-  const [targetMissing, setTargetMissing] = React.useState(false);
-
-  const stepCardRef = React.useRef<HTMLDivElement | null>(null);
-
-  const getTarget = React.useCallback((key: TourKey) => {
-    return document.querySelector<HTMLElement>(TOUR_SELECTOR(key));
-  }, []);
-
-  const startTour = React.useCallback(() => {
-    setShowDismissedBanner(false);
-    setActiveStep(0);
-  }, []);
-
-  const endTour = React.useCallback((completed: boolean) => {
-    setActiveStep(null);
-    setHighlight(null);
-    setCardStyle({});
-    setTargetMissing(false);
-    if (completed) {
-      toast({
-        variant: 'success',
-        title: 'Tour completed',
-        description: 'You know the ropes now — happy campaigning!',
-      });
-    }
-  }, []);
-
-  const next = React.useCallback(() => {
-    setActiveStep((prev) =>
-      prev === null || prev >= TOUR_STEPS.length - 1 ? prev : prev + 1
-    );
-  }, []);
-
-  const prev = React.useCallback(() => {
-    setActiveStep((prev) => (prev === null || prev <= 0 ? prev : prev - 1));
-  }, []);
-
-  React.useEffect(() => {
-    const id = window.setTimeout(() => {
-      setLoading(false);
-      const stored = localStorage.getItem(STORAGE_KEY) === 'true';
-      if (stored) {
-        setDontShowAgain(true);
-        setShowDismissedBanner(true);
-      } else {
-        startTour();
-      }
-    }, 500);
-    return () => window.clearTimeout(id);
-  }, [startTour]);
-
-  const measure = React.useCallback(() => {
-    if (activeStep === null) return;
-    const step = TOUR_STEPS[activeStep];
-    const el = getTarget(step.key);
-    if (!el) {
-      setTargetMissing(true);
-      setHighlight(null);
-      setCardStyle({});
+  const mulaiTur = React.useCallback(() => {
+    if (steps.length === 0) return;
+    if (variant === 'loading') {
+      setLoadingDemo(true);
+      window.setTimeout(() => {
+        setLoadingDemo(false);
+        setHasil(null);
+        setStatus([]);
+        setOpen(true);
+      }, 400);
       return;
     }
-    const rect = el.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) {
-      setTargetMissing(true);
-      setHighlight(null);
-      setCardStyle({});
-      return;
+    setHasil(null);
+    setStatus([]);
+    setOpen(true);
+    requestAnimationFrame(() => mulaiRef.current?.focus({ preventScroll: true }));
+  }, [steps.length, variant]);
+
+  const salinResep = React.useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(RESEP);
+      setDisalin(true);
+      window.setTimeout(() => setDisalin(false), 1500);
+    } catch {
+      setDisalin(false);
     }
-    setTargetMissing(false);
-    setHighlight({
-      top: rect.top - 4,
-      left: rect.left - 4,
-      width: rect.width + 8,
-      height: rect.height + 8,
-    });
-    setCardStyle(
-      computeCardStyle(rect, step.placement, window.innerWidth, window.innerHeight)
-    );
-  }, [activeStep, getTarget]);
+  }, []);
 
-  React.useEffect(() => {
-    if (activeStep === null) return;
-    const step = TOUR_STEPS[activeStep];
-    const el = getTarget(step.key);
-    if (el) {
-      el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    }
-    const frame = window.requestAnimationFrame(() => measure());
-    const timeout = window.setTimeout(() => measure(), 400);
-    window.addEventListener('resize', measure);
-    window.addEventListener('scroll', measure, true);
-    return () => {
-      window.cancelAnimationFrame(frame);
-      window.clearTimeout(timeout);
-      window.removeEventListener('resize', measure);
-      window.removeEventListener('scroll', measure, true);
-    };
-  }, [activeStep, measure, getTarget]);
-
-  React.useEffect(() => {
-    if (activeStep === null || targetMissing) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        endTour(false);
-      } else if (event.key === 'ArrowRight') {
-        event.preventDefault();
-        next();
-      } else if (event.key === 'ArrowLeft') {
-        event.preventDefault();
-        prev();
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [activeStep, targetMissing, endTour, next, prev]);
-
-  React.useEffect(() => {
-    if (activeStep !== null && !targetMissing) {
-      stepCardRef.current?.focus({ preventScroll: true });
-    }
-  }, [activeStep, targetMissing]);
-
-  const handleDontShowAgain = (checked: boolean) => {
-    setDontShowAgain(checked);
-    if (checked) {
-      localStorage.setItem(STORAGE_KEY, 'true');
-      setShowDismissedBanner(true);
-      endTour(false);
-      toast({
-        variant: 'info',
-        title: 'Tour dismissed',
-        description: 'We won\u2019t auto-start the tour again in this browser.',
-      });
-    } else {
-      localStorage.removeItem(STORAGE_KEY);
-      setShowDismissedBanner(false);
-    }
-  };
-
-  const restartTour = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    setDontShowAgain(false);
-    setShowDismissedBanner(false);
-    startTour();
-    toast({
-      variant: 'success',
-      title: 'Tour restarted',
-      description: 'Coach marks are back, starting from step one.',
-    });
-  };
-
-  const step = activeStep !== null ? TOUR_STEPS[activeStep] : null;
-  const StepIcon = step?.icon;
 
   return (
-    <div className="space-y-10 animate-in fade-in-50 duration-200">
+    <div className="flex flex-col gap-6 p-6">
       <PageHeader
-        eyebrow="UX Recipe Scenario"
+        eyebrow="Pola · S-005.20"
         eyebrowIcon={Compass}
-        title="Guided Product Tour & Coach Marks"
-        description="A step-by-step onboarding tour that dims the page and rings the current target. Built from scratch with React state and geometry — no tour library required — with keyboard navigation, reduced-motion support and localStorage persistence."
+        title="Product Tour — tur 5 langkah (S-005.20)"
+        description="Dashboard contoh di bawah adalah area target tur (bukan data produksi). Jalankan skenario 6 langkah, coba semua state demo, lalu audit keyboard dan kontras light & dark via theme toggle."
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline">driver.js</Badge>
+            <Badge variant="outline">5 langkah</Badge>
+          </div>
+        }
       />
 
-      {/* Interactive demo surface */}
-      <section id="demo-surface" className="space-y-4 scroll-mt-20">
-        <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-          <MousePointerClick className="h-6 w-6 text-highlight" />
-          <span>Interactive Demo Surface</span>
-        </h2>
+      <ol className="flex flex-col gap-1 rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
+        <li>1. Klik Mulai tur — spotlight membuka langkah 1 dari 5.</li>
+        <li>2. Lanjut sampai langkah 3 disembunyikan (dilewati + pemberitahuan).</li>
+        <li>3. Lanjut ke langkah 5 lalu Selesai (onFinish, fokus kembali ke Mulai tur).</li>
+        <li>4. Ulangi, lalu tekan Esc di langkah 3.</li>
+        <li>5. Dialog konfirmasi Lewati tur? muncul (progres &gt; 1) — pilih Ya, lewati.</li>
+        <li>6. Fokus kembali ke Mulai tur tanpa error.</li>
+      </ol>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-border bg-card/50 p-4">
-          <div className="space-y-0.5">
-            <p className="text-sm font-semibold text-foreground">Try the guided tour</p>
-            <p className="text-xs text-muted-foreground">
-              Start the tour to walk through the dashboard with coach marks. Use the arrows,
-              keyboard, or the step list below.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button onClick={startTour} disabled={loading} className="gap-1.5">
-              <Play className="h-4 w-4" />
-              Start Tour
-            </Button>
-            {activeStep !== null && (
-              <Button variant="outline" onClick={() => endTour(false)}>
-                Stop
-              </Button>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button ref={mulaiRef} type="button" onClick={mulaiTur} data-testid="tour-start">
+          <MousePointerClick className="h-4 w-4" />
+          Mulai tur
+        </Button>
+        <Button type="button" variant="outline" onClick={() => clickDriver('.driver-popover-next-btn')} data-testid="tour-next">
+          Lanjut (demo)
+        </Button>
+        <Button type="button" variant="outline" onClick={() => clickDriver('.driver-popover-prev-btn')} data-testid="tour-back">
+          Kembali (demo)
+        </Button>
+        <Button type="button" variant="ghost" onClick={() => clickDriver('.driver-popover-close-btn')} data-testid="tour-skip">
+          Lewati (demo)
+        </Button>
+      </div>
+
+      <Card className="border-border">
+        <CardHeader>
+          <CardTitle>Dashboard contoh — area target tur</CardTitle>
+          <CardDescription>Contoh statis untuk sorotan tur; bukan data produksi.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap gap-2">
+            <div data-tour-target="buat" className="rounded-lg border border-border bg-muted/20 px-4 py-3 text-sm font-medium">
+              [Buat Proyek] (langkah 1)
+            </div>
+            <div data-tour-target="cari" className="rounded-lg border border-border bg-muted/20 px-4 py-3 text-sm font-medium">
+              [Cari tugas] (langkah 2)
+            </div>
+            {!hilangTiga && !semuaHilang && (
+              <div data-tour-target="filter" className="rounded-lg border border-border bg-muted/20 px-4 py-3 text-sm font-medium">
+                [Filter status] (langkah 3)
+              </div>
             )}
           </div>
-        </div>
-
-        {loading ? <DemoSkeleton /> : <CampaignDashboard />}
-      </section>
-
-      {/* Dismiss & persistence */}
-      <section id="dismiss-persistence" className="space-y-4 scroll-mt-20">
-        <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-          <RotateCcw className="h-6 w-6 text-highlight" />
-          <span>Dismiss &amp; Persistence</span>
-        </h2>
-
-        {showDismissedBanner && (
-          <Banner variant="info" dismissible={false} icon={RotateCcw}>
-            Tour dismissed. Restart available below.
-          </Banner>
-        )}
-
-        <Card className="border-border">
-          <CardHeader>
-            <CardTitle>Control the tour</CardTitle>
-            <CardDescription>
-              The &quot;Don&apos;t show this again&quot; flag is persisted to localStorage under{' '}
-              <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[11px]">
-                {STORAGE_KEY}
-              </code>{' '}
-              and read back on mount.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border bg-card/40 p-4 transition-colors hover:bg-accent/50">
-              <Checkbox
-                checked={dontShowAgain}
-                onCheckedChange={(checked) => handleDontShowAgain(checked === true)}
-                className="mt-0.5"
-              />
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-foreground">Don&apos;t show this again</p>
-                <p className="text-xs text-muted-foreground">
-                  Skips the auto-start on the next visit to this page.
-                </p>
-              </div>
-            </label>
-
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-dashed border-border bg-muted/20 p-4">
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-foreground">Restart the tour</p>
-                <p className="text-xs text-muted-foreground">
-                  Clears the flag and relaunches the coach marks from step one.
-                </p>
-              </div>
-              <Button variant="outline" onClick={restartTour} disabled={loading} className="gap-1.5">
-                <RotateCcw className="h-4 w-4" />
-                Restart Tour
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Tour steps editor */}
-      <section id="steps-editor" className="space-y-4 scroll-mt-20">
-        <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-          <ListOrdered className="h-6 w-6 text-highlight" />
-          <span>Tour Steps Editor</span>
-        </h2>
-
-        <Card className="border-border">
-          <CardContent className="divide-y divide-border p-0">
-            {TOUR_STEPS.map((item, index) => {
-              const ItemIcon = item.icon;
-              const isActive = activeStep === index;
-              return (
-                <div
-                  key={item.key}
-                  className={cn(
-                    'flex items-start gap-4 p-4 transition-colors sm:px-5',
-                    isActive && 'bg-highlight/10'
-                  )}
-                >
-                  <div
-                    className={cn(
-                      'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border font-mono text-xs font-semibold transition-colors',
-                      isActive
-                        ? 'border-highlight bg-highlight text-highlight-foreground'
-                        : 'border-border bg-muted/30 text-muted-foreground'
-                    )}
-                  >
-                    {index + 1}
+          {!semuaHilang ? (
+            <>
+              <div data-tour-target="metrik" className="grid grid-cols-3 gap-2">
+                {['Aktif 12', 'Selesai 48', 'Arsip 7'].map((m) => (
+                  <div key={m} className="rounded-lg border border-border bg-card px-3 py-4 text-center text-sm font-semibold">
+                    {m} <span className="block text-xs font-normal text-muted-foreground">(langkah 4)</span>
                   </div>
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <ItemIcon
-                        className={cn(
-                          'h-4 w-4',
-                          isActive ? 'text-highlight' : 'text-muted-foreground'
-                        )}
-                      />
-                      <p className="text-sm font-semibold text-foreground">{item.title}</p>
-                      <Badge variant="outline" className="font-mono text-[10px]">
-                        {item.placement}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">{item.description}</p>
-                  </div>
-                  {isActive && (
-                    <div className="flex shrink-0 items-center gap-1">
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7"
-                        aria-label="Previous step"
-                        onClick={prev}
-                        disabled={index === 0}
-                      >
-                        <ArrowLeft className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7"
-                        aria-label="Next step"
-                        onClick={next}
-                        disabled={index === TOUR_STEPS.length - 1}
-                      >
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Tour overlay */}
-      {activeStep !== null && step && StepIcon && (
-        <div
-          className="fixed inset-0 z-overlay bg-background/80 backdrop-blur-sm"
-          aria-hidden="true"
-        >
-          {highlight && !targetMissing && (
-            <div
-              className="pointer-events-none fixed rounded-xl border-2 border-highlight ring-4 ring-highlight/20 transition-all duration-300 ease-in-out motion-reduce:transition-none"
-              style={{
-                top: highlight.top,
-                left: highlight.left,
-                width: highlight.width,
-                height: highlight.height,
-              }}
-            />
-          )}
-
-          {targetMissing ? (
-            <div className="fixed inset-0 flex items-center justify-center p-4">
-              <div className="w-full max-w-sm">
-                <EmptyState
-                  icon={MousePointerClick}
-                  title="Target out of reach"
-                  description="Some tour targets are hidden at this viewport size. Expand the window or scroll and the highlight will re-lock onto the dashboard."
-                  actionLabel="Close tour"
-                  onAction={() => endTour(false)}
-                />
+                ))}
               </div>
-            </div>
+              <div data-tour-target="tabel" className="rounded-lg border border-border">
+                {['Tugas A — aktif', 'Tugas B — selesai', 'Tugas C — aktif'].map((r) => (
+                  <div key={r} className="border-b border-border px-3 py-2 text-sm last:border-0">
+                    {r}
+                  </div>
+                ))}
+                <p className="px-3 py-2 text-xs text-muted-foreground">Tabel mini contoh (langkah 5).</p>
+              </div>
+            </>
           ) : (
-            <div
-              ref={stepCardRef}
-              role="dialog"
-              aria-label={step.title}
-              tabIndex={-1}
-              className="fixed z-tooltip w-full max-w-xs outline-none"
-              style={cardStyle}
-            >
-              <Card className="border-highlight/40 shadow-2xl">
-                <CardHeader className="space-y-2 p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-highlight text-highlight-foreground">
-                        <StepIcon className="h-3.5 w-3.5" />
-                      </span>
-                      <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-highlight">
-                        Step {activeStep + 1} of {TOUR_STEPS.length}
-                      </p>
-                    </div>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="-mr-1 -mt-1 h-7 w-7"
-                      aria-label="Skip tour"
-                      onClick={() => endTour(false)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <CardTitle className="text-base">{step.title}</CardTitle>
-                  <CardDescription className="text-xs leading-relaxed">
-                    {step.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3 px-4 pb-4">
-                  <Progress
-                    value={((activeStep + 1) / TOUR_STEPS.length) * 100}
-                    className="h-1.5"
-                  />
-                  <div className="flex items-center justify-between gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={prev}
-                      disabled={activeStep === 0}
-                      className="gap-1.5"
-                    >
-                      <ArrowLeft className="h-3.5 w-3.5" />
-                      Back
-                    </Button>
-                    {activeStep === TOUR_STEPS.length - 1 ? (
-                      <Button variant="highlight" size="sm" onClick={() => endTour(true)} className="gap-1.5">
-                        Finish
-                        <CheckCircle2 className="h-3.5 w-3.5" />
-                      </Button>
-                    ) : (
-                      <Button size="sm" onClick={next} className="gap-1.5">
-                        Next
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </Button>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1.5 pt-0.5 text-[11px] text-muted-foreground">
-                    <Kbd size="sm">←</Kbd>
-                    <Kbd size="sm">→</Kbd>
-                    <span>navigate</span>
-                    <span className="mx-0.5">·</span>
-                    <Kbd size="sm">Esc</Kbd>
-                    <span>to skip</span>
-                  </div>
-                </CardContent>
-              </Card>
+            <p className="rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-4 text-sm">Semua target contoh disembunyikan untuk varian error.</p>
+          )}
+        </CardContent>
+      </Card>
+
+      <div data-testid="tour-popover">
+        <Tour
+          steps={steps}
+          open={open}
+          onStepChange={(i) => setIndeks(i)}
+          onFinish={(s) => {
+            setStatus(s);
+            setHasil('Tur selesai — status per langkah tersimpan via onFinish.');
+            setOpen(false);
+            requestAnimationFrame(() => mulaiRef.current?.focus({ preventScroll: true }));
+          }}
+          onSkip={(s, at) => {
+            setStatus(s);
+            setHasil(`Tur dilewati pada langkah ${at + 1} — status per langkah tersimpan via onSkip.`);
+            setOpen(false);
+            requestAnimationFrame(() => mulaiRef.current?.focus({ preventScroll: true }));
+          }}
+        />
+      </div>
+
+      <Card className="border-border">
+        <CardHeader>
+          <CardTitle>Panel demo — semua state (§3)</CardTitle>
+          <CardDescription>Toggle tanpa reload; tiap state teramati di showcase.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Varian demo">
+            {(Object.keys(VARIANT_LABEL) as DemoVariant[]).map((v) => (
+              <Button
+                key={v}
+                type="button"
+                variant={variant === v ? 'default' : 'outline'}
+                size="sm"
+                aria-pressed={variant === v}
+                onClick={() => {
+                  setVariant(v);
+                  setOpen(false);
+                }}
+              >
+                {VARIANT_LABEL[v]}
+              </Button>
+            ))}
+          </div>
+          <label className="flex cursor-pointer items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={sembunyiTiga}
+              onChange={(e) => setSembunyiTiga(e.target.checked)}
+              className="h-4 w-4 accent-[var(--primary)]"
+            />
+            Sembunyikan langkah 3 (tanpa reload)
+          </label>
+          {loadingDemo && <Banner variant="info">Memuat langkah… (aria-busy, kontrol disabled singkat)</Banner>}
+          {kosong && (
+            <div role="status" className="rounded-lg border border-border px-3 py-2 text-sm">
+              Belum ada langkah tur — tombol Mulai tur disabled bila steps kosong.
             </div>
           )}
-        </div>
-      )}
+          <div className="space-y-1" data-testid="tour-progress">
+            <p className="text-sm font-medium">
+              {steps.length === 0 ? 'Langkah 0 dari 0' : `Langkah ${Math.min(indeks + 1, steps.length)} dari ${steps.length}`}
+            </p>
+            <Progress value={steps.length === 0 ? 0 : ((Math.min(indeks + 1, steps.length)) / steps.length) * 100} className="h-1.5" />
+          </div>
+          {hasil && (
+            <p role="status" data-testid="tour-confirm" className="rounded-lg border border-border bg-muted/20 px-3 py-2 text-sm">
+              {hasil}
+            </p>
+          )}
+          {status.length > 0 && (
+            <ul className="space-y-1 text-xs text-muted-foreground">
+              {status.map((s) => (
+                <li key={s.id} className="font-mono">
+                  {s.id} #{s.index + 1} — {s.result}
+                </li>
+              ))}
+            </ul>
+          )}
+          {(status.some((s) => s.result === 'skipped-missing') || hilangTiga) && (
+            <p className="rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 text-sm">
+              Langkah 3 dilewati: target tidak ditemukan — teks, bukan warna saja.
+            </p>
+          )}
+          {semuaHilang && (
+            <div role="alert" className="rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm">
+              Semua target tidak ditemukan — 5 dari 5 target hilang.
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="border-border">
+        <CardHeader>
+          <CardTitle>Resep onFinish / onSkip (15 baris)</CardTitle>
+          <CardDescription>Konsumen menyalin pola persistence milik sendiri; komponen tanpa storage internal.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <pre className="overflow-x-auto rounded-lg bg-muted p-3 font-mono text-xs">{RESEP}</pre>
+          <Button type="button" variant="outline" size="sm" onClick={salinResep} className="gap-1.5">
+            {disalin ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            {disalin ? 'Tersalin' : 'Salin resep'}
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="border-border">
+        <CardHeader>
+          <CardTitle>Keyboard, SR &amp; motion</CardTitle>
+          <CardDescription>Order fokus: pemicu → popover → dialog → pemicu. Reduced-motion instan.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+            <li>Tab cycling di footer popover; Enter mengaktifkan tombol fokus.</li>
+            <li>Esc masuk alur lewati (dialog hanya bila progres &gt; 1, langsung bila langkah 1).</li>
+            <li>Tiap langkah diumumkan + teks progress; error selalu teks + role alert/status.</li>
+            <li>Fokus ring primary 2px offset 2; semua tombol ≥ 44px.</li>
+            <li>Uji dengan prefers-reduced-motion: spotlight + scroll instan.</li>
+          </ul>
+          <Button type="button" variant="outline" size="sm" className="mt-3 gap-1.5" onClick={() => setOpen(false)}>
+            <RotateCcw className="h-3.5 w-3.5" />
+            Tutup tur &amp; kembalikan fokus
+          </Button>
+          {status.length === 0 && !hasil && (
+            <div className="mt-3">
+              <EmptyState
+                icon={Compass}
+                title="Belum ada hasil tur"
+                description="Jalankan tur untuk melihat status per langkah di sini."
+                actionLabel="Mulai tur"
+                onAction={mulaiTur}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <style>{`@media (max-width: 767px) {
+        .ds-tour-popover.driver-popover { max-width: calc(100vw - 32px); }
+        .ds-tour-popover .driver-popover-footer { display: flex; flex-direction: column; gap: 8px; }
+      }`}</style>
     </div>
   );
 }

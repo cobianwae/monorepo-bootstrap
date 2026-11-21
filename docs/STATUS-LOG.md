@@ -2,6 +2,9 @@
 
 Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 
+- 2026-11-21 — Story 017-03 `done` (approved oleh user) dan di-merge ke `dev` — `017-03`.
+- 2026-11-21 — Story 017-03 showcase product tour + audit + smoke selesai implementasi: rewrite `/patterns/product-tour` (dashboard contoh 5 target + Tour 017-01/02 + ol 6 langkah + panel demo semua state + resep 15 baris + 7 data-testid + responsif <md), CSS driver/tour dimuat global via styles.css (preseden xyflow), audit kontras light/dark lolos (teks ≥5,65 grafis ≥4,37), lint hijau, 616 test UI + 7 token hijau, showcase build hijau; typecheck hanya baseline flow-editor.test.tsx (CR-015); sitemap S-005.20 → implemented, status `review` — `017-03`.
+
 - 2026-11-21 — Story 004-04 Locale + agenda + state matrix + showcase final + a11y selesai verifikasi (typecheck, lint, test, showcase build hijau; event-calendar.tsx prop loading/error/onRetry, state matrix, agenda view, showcase page state+locale panel), status `review` — `004-04`.
 - 2026-11-21 — Story 004-04 `done` (approved oleh user) dan di-merge ke `dev` — `004-04`.
 
