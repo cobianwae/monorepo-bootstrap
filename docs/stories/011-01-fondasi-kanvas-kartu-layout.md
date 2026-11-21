@@ -1,6 +1,6 @@
 # 011-01 — Fondasi kanvas, kartu lega, dan layout seimbang
 
-Status: review
+Status: done
 PRD: `docs/prd/011-org-chart-studio.md`
 Design: `docs/design/org-chart-studio.md`
 FR: `FR-001`, `FR-002`, `FR-003`, `FR-004`, `FR-013`, `FR-017`

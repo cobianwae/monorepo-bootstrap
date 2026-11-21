@@ -63,3 +63,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 2026-11-21 — CR-010 `done` (di-merge ke dev; tanpa branch terpisah sesuai instruksi user) — CR-010
 2026-11-21 — CR-009 DIHENTIKAN (reversal keputusan diselesaikan-dulu; mulai dari awal via 011) — CR-009, 011
 - 2026-11-21 — Story 011-01 fondasi OrgChartStudio selesai (normalize/validasi + balanced-tidy 240×84 + kartu lega + pan/zoom/reset/fit, test 15 hijau; typecheck/lint/test/test:tokens hijau) — `011-01`.
+- 2026-11-21 — Story 011-01 `done` (approved oleh user) dan di-merge ke `dev` — `011-01`.
