@@ -1,6 +1,6 @@
 # 005-01 — Fondasi canvas + node custom DS
 
-Status: review
+Status: done
 PRD: `docs/prd/005-flow-editor.md`
 Design: `docs/design/flow-editor.md`
 FR: `FR-001`, `FR-002`, `FR-010`, `FR-012`, `FR-013`
