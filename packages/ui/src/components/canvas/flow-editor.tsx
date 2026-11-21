@@ -18,6 +18,7 @@ import {
   MiniMap,
   ReactFlow,
   ReactFlowProvider,
+  useReactFlow,
   type Connection,
   type Edge,
   type EdgeChangeset,
@@ -30,7 +31,19 @@ import {
   type NodeTypes,
   type Position,
   type BackgroundVariant,
+  type XYPosition,
 } from '@xyflow/react';
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  useDraggable,
+  useDroppable,
+  type DragEndEvent,
+  closestCenter,
+} from '@dnd-kit/core';
+import { Plus } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Badge } from '../base/badge';
 import { EmptyState } from '../feedback/empty-state';
@@ -286,31 +299,92 @@ const defaultNodeTypes: Record<string, ComponentType<{ data: FlowNodeData; selec
 };
 
 // ---------------------------------------------------------------------------
-// FlowPalette — render bila paletteItems diisi (story 005-02 pallete+dnd)
+// FlowPalette — search + drag (@dnd-kit) + tombol [+] per item (story 005-02)
 // ---------------------------------------------------------------------------
 
 interface FlowPaletteProps {
   items: FlowPaletteItem[];
-  onAdd: (item: FlowPaletteItem, position: { x: number; y: number }) => void;
+  onAdd: (item: FlowPaletteItem) => void; // [+] keyboard → posisi tengah viewport (ditangani host)
 }
 
 export function FlowPalette({ items, onAdd }: FlowPaletteProps) {
+  const [query, setQuery] = React.useState('');
+
+  const filtered = items.filter(
+    (item) =>
+      item.title.toLowerCase().includes(query.toLowerCase()) ||
+      (item.description ?? '').toLowerCase().includes(query.toLowerCase()),
+  );
+
   return (
-    <div data-testid="flow-palette" className="p-2 border border-border bg-card rounded-md shadow-sm space-y-2">
-      {items.map((item) => (
-        <button
-          key={item.type}
-          type="button"
-          data-testid={`flow-palette-item-${item.type}`}
-          className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          onClick={() => void onAdd(item, { x: 0, y: 0 })}
-        >
-          <span className="flex shrink-0 items-center justify-center w-5 h-5 rounded bg-muted text-muted-foreground text-xs">
-            {item.icon ? React.createElement(item.icon as React.ComponentType) : '•'}
-          </span>
-          <span className="truncate">{item.title}</span>
-        </button>
-      ))}
+    <section data-testid="flow-palette" className="flex w-64 flex-col gap-2">
+      <label htmlFor="flow-palette-search" className="sr-only">
+        Cari jenis node
+      </label>
+      <input
+        id="flow-palette-search"
+        data-testid="flow-palette-search"
+        type="search"
+        className="rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        placeholder="Cari jenis node…"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+      />
+      <div aria-live="polite" data-testid="flow-palette-live" className="sr-only">
+        {filtered.length} jenis
+      </div>
+      <div className="flex flex-col gap-1">
+        {filtered.map((item) => (
+          <FlowPaletteItemRow key={item.type} item={item} onAdd={onAdd} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+interface FlowPaletteItemRowProps {
+  item: FlowPaletteItem;
+  onAdd: (item: FlowPaletteItem) => void;
+}
+
+function FlowPaletteItemRow({ item, onAdd }: FlowPaletteItemRowProps) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: `palette-${item.type}`,
+    data: { item },
+    attributes: { role: 'button', tabIndex: 0 },
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      data-testid={`flow-palette-item-${item.type}`}
+      className={cn(
+        'flex w-full items-center gap-2 rounded-md border px-3 py-2 text-left text-sm',
+        isDragging ? 'border-primary bg-primary/10 opacity-80' : 'border-border bg-card hover:bg-accent',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+      )}
+    >
+      <span className="flex shrink-0 items-center justify-center w-5 h-5 rounded bg-muted text-muted-foreground text-xs">
+        {item.icon ? React.createElement(item.icon as React.ComponentType) : '•'}
+      </span>
+      <span className="truncate">{item.title}</span>
+      <button
+        type="button"
+        data-testid={`flow-palette-add-${item.type}`}
+        className="flex shrink-0 items-center justify-center w-8 h-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={`Tambah ${item.title}`}
+        onClick={() => void onAdd(item)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            void onAdd(item);
+          }
+        }}
+      >
+        <Plus className="h-4 w-4" />
+      </button>
     </div>
   );
 }
@@ -383,6 +457,224 @@ function FlowControls({
         </button>
       </div>
     </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// FlowCanvasHost — ReactFlow + DndContext + drop ke canvas (story 005-02)
+// useReactFlow valid karena berada di dalam ReactFlowProvider.
+// ---------------------------------------------------------------------------
+
+interface FlowCanvasHostProps {
+  nodes: FlowNode[];
+  edges: FlowEdge[];
+  onNodesChange?: OnNodesChange<FlowNode>;
+  onEdgesChange?: OnEdgesChange<FlowEdge>;
+  onConnect?: OnConnect;
+  onSelectionChange?: (selection: { nodes: FlowNode[]; edges: FlowEdge[] }) => void;
+  onViewportChange?: (viewport: { zoom: number }) => void;
+  defaultNodes?: FlowNode[];
+  defaultEdges?: FlowEdge[];
+  isValidConnection?: (
+    connection: {
+      source: string;
+      target: string;
+      sourceHandle?: string | null;
+      targetHandle?: string | null;
+    },
+  ) => boolean;
+  nodeTypes: unknown;
+  onAddFromPalette: (item: FlowPaletteItem, position: { x: number; y: number }) => void;
+  snapToGrid: boolean;
+  gridSize: number;
+  minimap: boolean;
+  isInteractionLocked: boolean;
+  onToggleLock: () => void;
+  zoomLevel: number;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetZoom: () => void;
+  fitView: () => void;
+  ariaLabel: string;
+  paletteItems: FlowPaletteItem[];
+}
+
+function CanvasDropZone() {
+  const { setNodeRef } = useDroppable({
+    id: 'canvas',
+    data: { kind: 'canvas' },
+  });
+  return <div ref={setNodeRef} data-testid="flow-canvas-drop-zone" className="absolute inset-0" />;
+}
+
+type FlowCanvasApi = {
+  screenToFlowPosition: (pos: { x: number; y: number }) => { x: number; y: number };
+  getViewport: () => { x: number; y: number; zoom: number };
+};
+
+// CanvasApi memanggil useReactFlow() di dalam ReactFlowProvider (induk ReactFlow)
+// dan menyimpan API ke ref yang dimiliki FlowCanvasHost, sehingga event handler
+// drag/keyboard (di luar provider) bisa membacanya setelah mount.
+function CanvasApi({ apiRef }: { apiRef: React.MutableRefObject<FlowCanvasApi | null> }) {
+  const api = useReactFlow();
+  React.useEffect(() => {
+    apiRef.current = {
+      screenToFlowPosition: api.screenToFlowPosition,
+      getViewport: api.getViewport,
+    };
+  }, [api, apiRef]);
+  return null;
+}
+
+function FlowCanvasHost({
+  nodes,
+  edges,
+  onNodesChange,
+  onEdgesChange,
+  onConnect,
+  onSelectionChange,
+  onViewportChange,
+  defaultNodes,
+  defaultEdges,
+  isValidConnection,
+  nodeTypes,
+  onAddFromPalette,
+  snapToGrid,
+  gridSize,
+  minimap,
+  isInteractionLocked,
+  onToggleLock,
+  zoomLevel,
+  zoomIn,
+  zoomOut,
+  resetZoom,
+  fitView,
+  ariaLabel,
+  paletteItems,
+}: FlowCanvasHostProps) {
+  const apiRef = React.useRef<FlowCanvasApi | null>(null);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+  );
+
+  const handleDragEnd = React.useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      const item = (active.data.current as { item?: FlowPaletteItem } | undefined)?.item;
+      if (!item) return;
+      // Di luar canvas → batal (fokus tetap di palette).
+      if (!over || over.id !== 'canvas') return;
+
+      const rect = active.rect.current.translated;
+      const activator = event.activatorEvent as PointerEvent | null;
+      const clientX = activator?.clientX ?? rect?.left ?? 0;
+      const clientY = activator?.clientY ?? rect?.top ?? 0;
+
+      const screenToFlowPosition = apiRef.current?.screenToFlowPosition;
+      if (!screenToFlowPosition) return;
+      let pos: XYPosition = screenToFlowPosition({ x: clientX, y: clientY });
+      if (snapToGrid && gridSize > 0) {
+        pos = {
+          x: Math.round(pos.x / gridSize) * gridSize,
+          y: Math.round(pos.y / gridSize) * gridSize,
+        };
+      }
+
+      void onAddFromPalette(item, pos);
+    },
+    [snapToGrid, gridSize, onAddFromPalette],
+  );
+
+  const handleKeyboardAdd = React.useCallback(
+    (item: FlowPaletteItem) => {
+      const getViewport = apiRef.current?.getViewport;
+      const screenToFlowPosition = apiRef.current?.screenToFlowPosition;
+      if (!getViewport || !screenToFlowPosition) return;
+      const viewport = getViewport();
+      const pos = screenToFlowPosition({
+        x: viewport.x + window.innerWidth / 2,
+        y: viewport.y + window.innerHeight / 2,
+      });
+      void onAddFromPalette(item, pos);
+    },
+    [onAddFromPalette],
+  );
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="flex gap-4">
+        {paletteItems && paletteItems.length > 0 ? (
+          <FlowPalette items={paletteItems} onAdd={handleKeyboardAdd} />
+        ) : null}
+
+        <div
+          className="relative w-full h-[560px] overflow-hidden rounded-md border border-border bg-background"
+          role="application"
+        >
+          <ReactFlowProvider>
+            <ReactFlow
+              aria-label={ariaLabel}
+              nodes={nodes}
+              edges={edges}
+              nodeTypes={nodeTypes as unknown as NodeTypes}
+              defaultNodes={defaultNodes}
+              defaultEdges={defaultEdges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onSelectionChange={onSelectionChange}
+              onViewportChange={onViewportChange}
+              isValidConnection={isValidConnection}
+              defaultEdgeOptions={{ type: 'default', animated: false }}
+              minZoom={0.25}
+              maxZoom={2}
+              snapToGrid={snapToGrid}
+              snapGrid={[gridSize, gridSize]}
+              zoomOnScroll={false}
+              zoomOnPinch
+              panOnDrag
+              nodesDraggable={!isInteractionLocked}
+              nodesConnectable={!isInteractionLocked}
+              elementsSelectable
+              proOptions={{ hideAttribution: true }}
+              fitView={false}
+              fitViewOptions={{ padding: 0.2 }}
+              onNodeClick={(_event, _node) => {
+                // seleksi diatur melalui onSelectionChange xyflow; tidak ada state internal tambahan
+              }}
+            >
+              <Background variant={('dots' as unknown as BackgroundVariant)} gap={gridSize * 4} />
+              {minimap ? (
+                <MiniMap
+                  data-testid="flow-minimap"
+                  pannable
+                  zoomable
+                  aria-label="Minimap"
+                  className="hidden md:block !border-border !bg-card"
+                  maskColor="color-mix(in oklch, var(--background) 70%, transparent)"
+                  nodeColor="var(--primary)"
+                />
+              ) : null}
+              <FlowControls
+                zoomLevel={zoomLevel}
+                zoomIn={zoomIn}
+                zoomOut={zoomOut}
+                resetZoom={resetZoom}
+                fitView={fitView}
+                isLocked={isInteractionLocked}
+                onToggleLock={onToggleLock}
+              />
+              <CanvasApi apiRef={apiRef} />
+              <CanvasDropZone />
+            </ReactFlow>
+          </ReactFlowProvider>
+        </div>
+      </div>
+    </DndContext>
   );
 }
 
@@ -528,8 +820,9 @@ export function FlowEditor(props: FlowEditorProps) {
         return;
       }
       setInternalNodes((prev) => [...prev, node]);
+      _history.push(nodes, edges);
     },
-    [onAddFromPalette],
+    [_history, onAddFromPalette, nodes, edges],
   );
 
   const zoomIn = React.useCallback(() => setZoomLevel((z) => Math.min(z + 0.25, 2)), []);
@@ -592,63 +885,32 @@ export function FlowEditor(props: FlowEditorProps) {
       )}
 
       {!loading && (
-        <div className="relative w-full h-[560px] overflow-hidden rounded-md border border-border bg-background" role="application">
-          <ReactFlowProvider>
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              nodeTypes={nodeTypes as unknown as NodeTypes}
-              defaultNodes={defaultNodes}
-              defaultEdges={defaultEdges}
-              onNodesChange={handleNodesChange}
-              onEdgesChange={handleEdgesChange}
-              onConnect={handleConnect}
-              onSelectionChange={handleSelectionChange}
-              onViewportChange={({ zoom }: { zoom: number }) => setZoomLevel(zoom)}
-              fitView={false}
-              fitViewOptions={{ padding: 0.2 }}
-              minZoom={0.25}
-              maxZoom={2}
-              snapToGrid={snapToGrid}
-              snapGrid={[gridSize, gridSize]}
-              zoomOnScroll={false}
-              zoomOnPinch
-              panOnDrag
-              nodesDraggable={!isInteractionLocked}
-              nodesConnectable={!isInteractionLocked}
-              elementsSelectable
-              proOptions={{ hideAttribution: true }}
-              aria-label={ariaLabel}
-              defaultEdgeOptions={{ type: 'default', animated: false }}
-              isValidConnection={isValidConnection}
-              onNodeClick={(_event, _node) => {
-                // seleksi diatur melalui onSelectionChange xyflow; tidak ada state internal tambahan
-              }}
-            >
-              <Background variant={('dots' as unknown as BackgroundVariant)} gap={gridSize * 4} />
-              {minimap ? (
-                <MiniMap
-                  data-testid="flow-minimap"
-                  pannable
-                  zoomable
-                  aria-label="Minimap"
-                  className="hidden md:block !border-border !bg-card"
-                  maskColor="color-mix(in oklch, var(--background) 70%, transparent)"
-                  nodeColor="var(--primary)"
-                />
-              ) : null}
-              <FlowControls
-                zoomLevel={zoomLevel}
-                zoomIn={zoomIn}
-                zoomOut={zoomOut}
-                resetZoom={resetZoom}
-                fitView={() => {}}
-                isLocked={isInteractionLocked}
-                onToggleLock={() => setIsInteractionLocked((prev) => !prev)}
-              />
-            </ReactFlow>
-          </ReactFlowProvider>
-        </div>
+        <FlowCanvasHost
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={handleNodesChange}
+          onEdgesChange={handleEdgesChange}
+          onConnect={handleConnect}
+          onSelectionChange={handleSelectionChange}
+          onViewportChange={({ zoom }: { zoom: number }) => setZoomLevel(zoom)}
+          defaultNodes={defaultNodes}
+          defaultEdges={defaultEdges}
+          isValidConnection={isValidConnection}
+          nodeTypes={nodeTypes}
+          onAddFromPalette={handleAddFromPalette}
+          snapToGrid={snapToGrid}
+          gridSize={gridSize}
+          minimap={minimap}
+          isInteractionLocked={isInteractionLocked}
+          onToggleLock={() => setIsInteractionLocked((prev) => !prev)}
+          zoomLevel={zoomLevel}
+          zoomIn={zoomIn}
+          zoomOut={zoomOut}
+          resetZoom={resetZoom}
+          fitView={() => {}}
+          ariaLabel={ariaLabel}
+          paletteItems={paletteItems ?? []}
+        />
       )}
 
       {/* Live region zoom level */}
@@ -671,10 +933,6 @@ export function FlowEditor(props: FlowEditorProps) {
           ))}
         </ul>
       </div>
-
-      {paletteItems && paletteItems.length > 0 ? (
-        <FlowPalette items={paletteItems} onAdd={handleAddFromPalette} />
-      ) : null}
     </section>
   );
 }

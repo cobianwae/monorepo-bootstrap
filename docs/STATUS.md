@@ -31,6 +31,7 @@ Story 005-01 (`done`, ter-merge ke `dev`) — Flow editor fondasi canvas + node 
 3. PRD 001 masih `approved` — tetapkan `shipped` bila sudah sesuai keputusan user, lalu arsipkan dari `BACKLOG.md`.
 4. Lengkapi `docs/design/object-model.md` (kategori `canvas` bila perlu + entri komponen baru) dan `sitemap.md` (S-005.29–S-005.32 masih `planned`).
 5. CR-010 `done`; CR-009 dihentikan (diganti 011); story 011-03 `done` (di-merge ke dev), lanjut 011-04.
+6. Story 005-02 palette drag + tombol [+] + snap grid selesai verifikasi (typecheck/lint/test/17 test flow-editor/showcase build hijau), status `review` — `005-02`.
 
 ## Known Issues
 

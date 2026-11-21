@@ -58,6 +58,8 @@ export default function FlowEditorPage() {
   const [edges, setEdges] = React.useState<FlowEdge[]>(initialEdges);
   const [selected, setSelected] = React.useState<{ nodes: FlowNode[]; edges: FlowEdge[] } | null>(null);
   const [demo, setDemo] = React.useState<'data' | 'loading' | 'empty' | 'error'>('data');
+  const [snapToGrid, setSnapToGrid] = React.useState(false);
+  const gridSize = 16;
 
   const handleNodesChange = React.useCallback((changes: NodeChangeParam) => {
     setNodes((prev) => {
@@ -153,6 +155,16 @@ export default function FlowEditorPage() {
                 <Button variant="outline" size="sm" onClick={() => setDemo('loading')}>Simulasi memuat</Button>
                 <Button variant="outline" size="sm" onClick={() => setDemo('empty')}>Kosongkan</Button>
                 <Button variant="outline" size="sm" onClick={() => setDemo('error')}>Paksa error</Button>
+                <Separator orientation="vertical" className="h-4" />
+                <Button
+                  variant={snapToGrid ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSnapToGrid((prev) => !prev)}
+                  aria-pressed={snapToGrid}
+                  data-testid="flow-snap-toggle"
+                >
+                  Snap grid {snapToGrid ? 'on' : 'off'}
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
@@ -171,6 +183,8 @@ export default function FlowEditorPage() {
                   void toast({ title: 'Diretry', description: 'Flow dimuat ulang.' });
                 }}
                 minimap
+                snapToGrid={snapToGrid}
+                gridSize={gridSize}
                 ariaLabel="Editor alur demonstrasi"
               />
             </CardContent>
