@@ -19,6 +19,7 @@ import {
 import { MindDemoPanel } from './_components/mind-map-demo-panel';
 import { MindMapRecipe } from './_components/mind-map-recipe';
 import { MindMapShortcuts } from './_components/mind-map-shortcuts';
+import { MindMapUseCases } from './_components/mind-map-use-cases';
 import { EXAMPLE, LARGE, STEPS, type DemoState } from './_components/mind-map-demo-data';
 
 export default function MindMapPatternPage() {
@@ -156,6 +157,8 @@ export default function MindMapPatternPage() {
           </CardContent>
         </Card>
       </section>
+
+      <MindMapUseCases />
 
       <section aria-labelledby="mind-steps" className="space-y-3">
         <div className="space-y-1">

@@ -54,9 +54,9 @@
 ## Tasks (jalur small-fix)
 
 - [x] D1: posisi section dan copy tiga kartu ditetapkan (lihat Keputusan 1 dan 2).
-- [ ] D1: tambah section "Kapan dipakai" (grid 3 `Card`, ikon `Lightbulb` `aria-hidden`).
-- [ ] Perbarui `page.test.tsx:19-21` — urutan `h2` mencakup `Kapan dipakai` pada posisi yang diputuskan; tambah satu asersi isi tiga kartu bila perlu.
-- [ ] Verifikasi: test showcase mind-map, eslint, tsc showcase, `pnpm -C apps/showcase build`, cek visual light/dark dan 390px (grid satu kolom).
+- [x] D1: tambah section "Kapan dipakai" (grid 3 `Card`, ikon `Lightbulb` `aria-hidden`) di `_components/mind-map-use-cases.tsx`.
+- [x] Perbarui `page.test.tsx:19-21` — urutan `h2` mencakup `Kapan dipakai` pada posisi yang diputuskan. Asersi isi kartu tidak ditambahkan (tidak wajib; isi statis).
+- [x] Verifikasi: test showcase mind-map 9/9, tsc showcase, lint workspace, cek visual terang 390px (grid satu kolom, tanpa overflow) dan gelap 1440px (tanpa overflow). `pnpm -C apps/showcase build` ditunda.
 
 ## Keputusan
 
@@ -86,9 +86,9 @@ Branch: `cr-032-mind-map-kapan-dipakai` (bertumpuk dari `cr-031-mind-map-kompone
 Commit: `feat: tambah section kapan dipakai pada showcase mind map [CR-032]`
 
 - [x] CR disetujui user (instruksi user: "approve smua", sesi /improve-ui).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan (build showcase ditunda).
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [ ] `docs/STATUS.md` diperbarui bila relevan (ditunda, sama seperti CR-029–031).
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
