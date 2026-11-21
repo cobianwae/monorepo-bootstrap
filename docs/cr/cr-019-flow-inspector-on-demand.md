@@ -59,6 +59,6 @@ Commit: `fix: inspector flow-editor on-demand tidak mengunci [CR-019]`
 - [x] Branch dibuat.
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan (lint, test showcase 68/68, tsc, build; browser/SR manual belum).
-- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui (status tetap `approved` menunggu `done` dari user).
+- [x] CR di-tick. Status di `docs/BACKLOG.md` tetap `approved` (tidak diubah; `done` menunggu user).
 - [x] `docs/STATUS.md` diperbarui bila relevan.
 - [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
