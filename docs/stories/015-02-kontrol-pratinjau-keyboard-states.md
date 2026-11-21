@@ -1,6 +1,6 @@
 # 015-02 — Kontrol + pratinjau + keyboard + state matrix
 
-Status: review
+Status: done
 PRD: `docs/prd/015-image-cropper.md` (approved, gate 1)
 Design: `docs/design/wireframes/image-cropper.md` (approved, gate 2, §2.2–§2.3, §3–§4) + `docs/design/flows/image-cropper.mmd` (diagram 2–3)
 FR: `FR-003`, `FR-004`, `FR-006`, `FR-007`
