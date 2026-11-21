@@ -7,11 +7,13 @@
     "build": "next build",
     "start": "next start --port 4000",
     "build:types": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest run"
   },
   "dependencies": {
     "@ds/tokens": "workspace:*",
     "@ds/ui": "workspace:*",
+    "papaparse": "^5.5.3",
     "@hookform/resolvers": "^5.9.0",
     "@shared/types": "workspace:*",
     "@tanstack/react-table": "^8.21.3",
@@ -39,8 +41,10 @@
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/papaparse": "^5.5.2",
     "postcss": "^8.5.0",
     "tailwindcss": "^4.0.0",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
   }
 }

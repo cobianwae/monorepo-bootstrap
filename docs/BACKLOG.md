@@ -100,7 +100,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 013-01 | Diff viewer parser + unified + header + states | approved | `docs/stories/013-01-parser-unified-header-states.md` |
 | 013-02 | Diff viewer split + navigasi hunk + slot komentar | approved | `docs/stories/013-02-split-navigasi-komentar.md` |
 | 013-03 | Diff viewer showcase + audit kontras + smoke | approved | `docs/stories/013-03-showcase-audit-smoke.md` |
-| 014-01 | Import wizard util parse/mapping/validasi + template | approved | `docs/stories/014-01-util-parse-mapping-validasi.md` |
+| 014-01 | Import wizard util parse/mapping/validasi + template | review | `docs/stories/014-01-util-parse-mapping-validasi.md` |
 | 014-02 | Import wizard shell stepper + upload + mapping | approved | `docs/stories/014-02-shell-upload-mapping.md` |
 | 014-03 | Import wizard validasi + konfirmasi + showcase final | approved | `docs/stories/014-03-validasi-konfirmasi-showcase.md` |
 | 015-01 | Image cropper fondasi wrapper + aspek + output blob | approved | `docs/stories/015-01-fondasi-wrapper-output.md` |
