@@ -1,6 +1,6 @@
 # 017-02 — Target hilang + keyboard + motion + states
 
-Status: review
+Status: done
 PRD: `docs/prd/017-product-tour.md` (approved, gate 1)
 Design: `docs/design/wireframes/product-tour.md` (approved, gate 2, K2/K4/K5 + §2.3/§3/§4) + `docs/design/flows/product-tour.mmd` (diagram 2–3)
 FR: `FR-003`, `FR-005`, `FR-006`, `FR-007`
