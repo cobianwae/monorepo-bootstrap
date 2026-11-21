@@ -82,6 +82,9 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-019 | Flow Editor inspector on-demand tidak mengunci + sesuai AC | done | `docs/cr/cr-019-flow-inspector-on-demand.md` |
 | CR-020 | Mind Map: pointer, pemusatan edit/fokus, minimap mobile dipulihkan; tes/browser/build terverifikasi, disetujui user | done | `docs/cr/cr-020-mind-map-canvas-parity.md` |
 | CR-021 | Flow Editor: kanvas rusak visual/layout (node 0×0, handle, toolbar, fitView, edge) | done | `docs/cr/cr-021-flow-editor-visual-rusak.md` |
+| CR-022 | Mind Map: hierarki visual dan konsistensi komponen (root, badge, focus ring, tombol demo) | approved | `docs/cr/cr-022-mind-map-hierarki-konsistensi.md` |
+| CR-023 | Mind Map: warna semantik dan state feedback (edge, highlight, error, skeleton, minimap) | approved | `docs/cr/cr-023-mind-map-warna-state.md` |
+| CR-024 | Mind Map: microcopy, konten, dan a11y detail (istilah, deskripsi, hint, input, gagang mobile) | approved | `docs/cr/cr-024-mind-map-microcopy-a11y.md` |
 
 ## Catatan
 

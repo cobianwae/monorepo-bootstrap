@@ -554,7 +554,7 @@ const mindPillVariants = cva(
   {
     variants: {
       level: {
-        root: 'h-16 w-[200px] border-2 border-primary/40 px-3',
+        root: 'h-16 w-[200px] border-2 border-primary bg-primary/5 px-3',
         branch: 'h-12 w-[160px] border-border px-2.5',
       },
     },
@@ -882,7 +882,7 @@ function MindNode({ data }: { data: MindNodeData }) {
             </Badge>
           ) : null}
           {data.highlighted ? (
-            <Badge variant="secondary" size="sm" className="absolute -top-3 right-0">Cocok</Badge>
+            <Badge variant="default" size="sm" className="absolute -top-2 right-1">Cocok</Badge>
           ) : null}
           {!isEditing && !node.disabled ? (
             <>

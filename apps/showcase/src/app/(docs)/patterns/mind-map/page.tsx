@@ -101,14 +101,18 @@ export default function MindMapPatternPage() {
         className={`${dark ? 'dark' : 'light'} rounded-lg border border-border bg-background p-4 text-foreground`}
         style={{ colorScheme: dark ? 'dark' : 'light' }}>
         <h2 id="mind-demo" className="text-lg font-semibold">Demo interaktif</h2>
-        <div role="group" aria-label="Panel demo" className="my-3 flex flex-wrap gap-2">
-          {STATES.map((state) => (
-            <Button key={state} variant={demoState === state ? 'default' : 'outline'} className="min-h-11"
-              aria-pressed={demoState === state} onClick={() => selectState(state)}>{state}</Button>
-          ))}
-          <Button variant="outline" className="min-h-11" onClick={() => load(LARGE, 'Berisi')}>Muat 50 node</Button>
-          <Button variant="outline" className="min-h-11" aria-pressed={dark} onClick={() => setDark(!dark)}>Mode gelap</Button>
-          <Button variant="outline" className="min-h-11" aria-pressed={minimap} onClick={() => setMinimap(!minimap)}>Minimap</Button>
+        <div role="group" aria-label="Panel demo" className="my-3 flex flex-wrap items-center gap-2">
+          <div role="group" aria-label="Status demo" className="flex flex-wrap gap-2 rounded-md bg-muted p-1">
+            {STATES.map((state) => (
+              <Button key={state} variant={demoState === state ? 'default' : 'ghost'} className="min-h-11"
+                aria-pressed={demoState === state} onClick={() => selectState(state)}>{state}</Button>
+            ))}
+            <Button variant="ghost" className="min-h-11" onClick={() => load(LARGE, 'Berisi')}>Muat 50 node</Button>
+          </div>
+          <div role="group" aria-label="Tampilan demo" className="flex flex-wrap gap-2">
+            <Button variant="outline" className="min-h-11" aria-pressed={dark} onClick={() => setDark(!dark)}>Mode gelap</Button>
+            <Button variant="outline" className="min-h-11" aria-pressed={minimap} onClick={() => setMinimap(!minimap)}>Minimap</Button>
+          </div>
         </div>
         <MindMap data={data} onChange={setData} expandedIds={expanded} onExpandedChange={setExpanded}
           highlightedIds={matches.map((node) => node.id)} loading={demoState === 'Loading'}
