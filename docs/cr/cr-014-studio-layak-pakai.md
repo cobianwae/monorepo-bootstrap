@@ -14,6 +14,7 @@
 | 4 | major | `packages/ui/src/components/canvas/org-chart-studio.tsx:917-948` | Reset zoom (`setViewport x:0 y:0 zoom:1`) melempar ke sudut kosong; ikon Reset dan Fit view sama (`Maximize`); `aria-label` Inggris di UI Indonesia. | Bedakan ikon (mis. `RotateCcw` vs `Maximize`), Reset kembali ke viewport awal/fit, label Indonesia ("Perkecil / Perbesar / Atur ulang / Paskan"). |
 | 5 | minor | `packages/ui/src/components/canvas/org-chart-studio.tsx:1057-1063` | Minimap `hidden md:block` tanpa toggle internal; toggle cuma di panel demo showcase. | Tambah tombol minimap on/off di toolbar/controls. |
 | 6 | blocker | `packages/ui/src/components/canvas/org-chart-studio.tsx:632-909` (`StudioNode`), `541-566` (`toStudioFlowEdges`) | Node kustom `studioNode` tidak merender `<Handle>` React Flow sama sekali (cuma tombol `+` HTML). Edge `smoothstep` source→target tanpa handle → error `reactflow.dev/error#008`: `Couldn't create edge for source handle id: "null"` (mis. `fin-mgr-1>fin-2`). Garis tidak tersambung. | Tambah `<Handle type="source" position={Position.Bottom}>` + `<Handle type="target" position={Position.Top}>` tersembunyi/styled-token di tiap kartu (atau `sourcePosition`/`targetPosition` + handle id eksplisit di edge). Bukan ganti tombol `+` — handle untuk konektor, tombol untuk aksi. |
+| 7 | major | `packages/ui/src/styles.css` (override `.xyflow__*` mati) + area kerja kanvas | Override token memakai prefix `.xyflow__*`, sedangkan @xyflow/react 13 merender `.react-flow__*` → seluruh override mati. Warna default (#fff / #141414 / #fefefe) bocor: belang di tengah area kerja + minimap/kontrol putih. | Tulis ulang override dengan prefix `.react-flow__*` + set variabel `--xy-*` (`background`, `node`, `minimap`, `controls`, `edge`) ke token di `:root` `.react-flow`. |
 
 ## Perubahan yang Diusulkan
 
@@ -26,6 +27,7 @@
 
 - [x] Import base CSS xyflow + verifikasi garis muncul (40-node contoh).
 - [x] Tambah `<Handle>` source/target tersembunyi di tiap kartu; pastikan error `008` hilang dan edge tersambung.
+- [x] Perbaiki prefix override `.react-flow__*` + variabel `--xy-*` → token (belang tengah kanvas hilang).
 - [x] Gagang `+` terlihat + tooltip + anti-pan; klik menghasilkan input terlihat tanpa scroll manual.
 - [x] Auto-center ke node baru setelah tambah.
 - [x] Bedakan ikon Reset/Fit + label Indonesia; Reset tidak melempar ke kosong.
