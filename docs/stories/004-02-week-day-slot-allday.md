@@ -1,6 +1,6 @@
 # 004-02 — Time grid week/day + all-day + jam kerja + slot booking
 
-Status: review
+Status: done
 PRD: `docs/prd/004-calendar-scheduler.md`
 Design: `docs/design/calendar-scheduler.md` (approved, gate 2)
 FR: `FR-001` (week/day), `FR-006`, `FR-011`, `FR-012`

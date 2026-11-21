@@ -62,7 +62,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 010-03 | Org editor reparent drag + move dialog + undo/redo | done | `docs/stories/010-03-reparent-undo.md` |
 | 010-04 | Org editor search + states + showcase + a11y penuh | done | `docs/stories/010-04-search-states-showcase.md` |
 | 004-01 | EventCalendar fondasi + month view + navigasi | done | `docs/stories/004-01-foundation-month-navigation.md` |
-| 004-02 | Time grid week/day + all-day + jam kerja + slot booking | review | `docs/stories/004-02-week-day-slot-allday.md` |
+| 004-02 | Time grid week/day + all-day + jam kerja + slot booking | done | `docs/stories/004-02-week-day-slot-allday.md` |
 | 004-03 | Multi-hari + konflik overlap + detail event + DnD | todo | `docs/stories/004-03-multiday-overlap-detail-dnd.md` |
 | 004-04 | Locale + agenda + state matrix + showcase final + a11y | todo | `docs/stories/004-04-locale-agenda-states-showcase.md` |
 
