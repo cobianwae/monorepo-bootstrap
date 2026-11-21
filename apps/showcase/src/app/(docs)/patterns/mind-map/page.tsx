@@ -1,8 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { Network, Search } from 'lucide-react';
-import { Input, Label, MindMap, PageHeader, getAncestors, type MindNodeFlat } from '@ds/ui';
+import { ListOrdered, Network, Search } from 'lucide-react';
+import { Badge, Input, Label, MindMap, PageHeader, getAncestors, type MindNodeFlat } from '@ds/ui';
 import { MindDemoPanel } from './_components/mind-map-demo-panel';
 import { MindMapRecipe } from './_components/mind-map-recipe';
 import { MindMapShortcuts } from './_components/mind-map-shortcuts';
@@ -90,6 +90,12 @@ export default function MindMapPatternPage() {
         eyebrowIcon={Network}
         title="Mind Map"
         description="Ubah curah pendapat menjadi peta ide yang bisa dicari, dilipat, dan dikelola langsung di kanvas."
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="highlight" className="font-mono text-xs">6 state demo</Badge>
+            <Badge variant="outline" className="font-mono text-xs">Pohon pembaca layar</Badge>
+          </div>
+        }
       />
 
       <section
@@ -99,8 +105,9 @@ export default function MindMapPatternPage() {
         style={{ colorScheme: dark ? 'dark' : 'light' }}
       >
         <div className="space-y-1">
-          <h2 id="mind-demo" className="text-lg font-semibold text-foreground">
-            Demo interaktif
+          <h2 id="mind-demo" className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+            <Network aria-hidden="true" className="h-6 w-6 text-highlight" />
+            <span>Demo interaktif</span>
           </h2>
           <p className="text-sm text-muted-foreground">
             Pilih status data atau tampilan di panel, lalu coba langsung di kanvas.
@@ -134,8 +141,9 @@ export default function MindMapPatternPage() {
 
       <section aria-labelledby="mind-steps" className="space-y-3">
         <div className="space-y-1">
-          <h2 id="mind-steps" className="text-lg font-semibold text-foreground">
-            Alur brainstorming
+          <h2 id="mind-steps" className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+            <ListOrdered aria-hidden="true" className="h-6 w-6 text-highlight" />
+            <span>Alur brainstorming</span>
           </h2>
           <p className="text-sm text-muted-foreground">
             Ikuti enam langkah ini untuk mengembangkan ide pusat menjadi rencana yang terstruktur.

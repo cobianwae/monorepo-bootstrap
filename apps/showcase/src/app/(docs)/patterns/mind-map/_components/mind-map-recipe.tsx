@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Check, Copy } from 'lucide-react';
+import { Check, Code2, Copy } from 'lucide-react';
 import { Button } from '@ds/ui';
 import { RECIPE } from './mind-map-demo-data';
 
@@ -29,8 +29,9 @@ export function MindMapRecipe() {
     <section aria-labelledby="mind-recipe" className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="space-y-1">
-          <h2 id="mind-recipe" className="text-lg font-semibold text-foreground">
-            Resep integrasi
+          <h2 id="mind-recipe" className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+            <Code2 aria-hidden="true" className="h-6 w-6 text-highlight" />
+            <span>Resep integrasi</span>
           </h2>
           <p className="text-sm text-muted-foreground">
             Salin contoh ini untuk menghubungkan data dan pencarian di aplikasi konsumen.

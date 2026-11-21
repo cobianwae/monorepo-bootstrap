@@ -56,11 +56,12 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] A1: samakan pola judul `h2` (ukuran, `font-display`, ikon `aria-hidden`) pada demo, alur, keyboard, dan resep.
-- [ ] A2: isi `actions` `PageHeader` dengan `Badge` fakta yang terverifikasi.
-- [ ] A3: tinjau visual setelah A1; tidak mengubah spacing kecuali terbukti perlu.
-- [ ] Perbarui test bila perlu (lihat Cek test).
-- [ ] Verifikasi: test showcase mind-map, eslint, tsc showcase, `pnpm -C apps/showcase build`, cek visual light/dark di browser.
+- [x] A1: samakan pola judul `h2` (ukuran, `font-display`, ikon `aria-hidden`) pada demo, alur, keyboard, dan resep.
+- [x] A2: isi `actions` `PageHeader` dengan `Badge` fakta yang terverifikasi (`6 state demo`: 6 tombol status di panel; `Pohon pembaca layar`: `role="tree"` di `packages/ui/src/components/canvas/mind-map.tsx:1049`).
+- [x] A3: tinjau visual setelah A1; tidak mengubah spacing.
+- [x] Perbarui test bila perlu: tidak perlu, asersi urutan h2 (textContent) tetap valid.
+- [x] Verifikasi: test mind-map 9/9, `build:types` showcase hijau, `pnpm lint` workspace bersih, dev server `/patterns/mind-map` HTTP 200 dengan markup baru.
+- [ ] Belum dikerjakan: `pnpm -C apps/showcase build` (ditunda, dev server :4000 memakai `.next`) dan cek screenshot light/dark + 390px. Cek markup saja, belum cek visual piksel.
 
 ## Keputusan
 
@@ -90,9 +91,9 @@ Branch: `cr-029-mind-map-hierarki-header-section` (bertumpuk dari `cr-033-token-
 Commit: `feat: hierarki header dan judul section mind map [CR-029]`
 
 - [x] CR disetujui user (instruksi user: "approve smua", sesi /improve-ui).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan (lihat Tasks di atas).
+- [x] CR di-tick. Status tetap `approved` sampai user menetapkan `done`.
+- [ ] `docs/STATUS.md` diperbarui bila relevan (tidak diperbarui di CR ini; dilakukan di akhir rantai).
+- [x] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` dijalankan.

@@ -1,3 +1,5 @@
+import { Keyboard } from 'lucide-react';
+
 const SHORTCUTS: Array<{ keys: string; action: string }> = [
   { keys: 'Enter / F2', action: 'Ubah nama ide' },
   { keys: 'Space', action: 'Lipat atau buka cabang' },
@@ -12,8 +14,9 @@ export function MindMapShortcuts() {
   return (
     <section aria-labelledby="mind-keyboard" className="space-y-3">
       <div className="space-y-1">
-        <h2 id="mind-keyboard" className="text-lg font-semibold text-foreground">
-          Papan keyboard
+        <h2 id="mind-keyboard" className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
+          <Keyboard aria-hidden="true" className="h-6 w-6 text-highlight" />
+          <span>Papan keyboard</span>
         </h2>
         <p className="text-sm text-muted-foreground">
           Fokuskan ide atau kanvas untuk menelusuri dan mengelola peta tanpa mouse.
