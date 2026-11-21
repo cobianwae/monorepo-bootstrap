@@ -1,6 +1,6 @@
 # 008-01 — Cascader alamat/kategori + showcase
 
-Status: approved
+Status: review
 Spec: `docs/design/spec-cascader-tree-select.md`
 FR: `FR-001`, `FR-002`, `FR-003`, `FR-004`, `FR-005`, `FR-006`
 Screens: `S-005.31`
@@ -40,14 +40,14 @@ Goal: Komponen `Cascader` dropdown kolom bertingkat (3 tingkat, lazy load, clear
 
 ## Tasks
 
-- [ ] Buat `packages/ui/src/components/form/cascader.tsx` + tipe (node `id`/`parentId`, `value` path, mode tampil)
-- [ ] Dropdown kolom bertingkat + leaf menutup + isi nilai
-- [ ] Lazy load per kolom (callback konsumen) + pencarian flat (FR-004 `could` masuk v1)
-- [ ] Clearable/disabled/error konsisten pola form
-- [ ] Navigasi keyboard + ARIA + audit a11y
-- [ ] Barrel export + test co-located (3 tingkat, 2 mode nilai, lazy, clear)
-- [ ] Scenario S-005.31 bagian cascader (`/patterns/cascader-tree-select`) + smoke build
-- [ ] Update BACKLOG + STATUS-LOG
+- [x] Buat `packages/ui/src/components/form/cascader.tsx` + tipe (node `id`/`parentId`, `value` path, mode tampil)
+- [x] Dropdown kolom bertingkat + leaf menutup + isi nilai
+- [x] Lazy load per kolom (callback konsumen) + pencarian flat (FR-004 `could` masuk v1)
+- [x] Clearable/disabled/error konsisten pola form
+- [x] Navigasi keyboard + ARIA + audit a11y
+- [x] Barrel export + test co-located (3 tingkat, 2 mode nilai, lazy, clear)
+- [x] Scenario S-005.31 bagian cascader (`/patterns/cascader-tree-select`) + smoke build
+- [x] Update BACKLOG + STATUS-LOG
 
 ## Dependencies
 
