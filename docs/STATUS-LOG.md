@@ -77,3 +77,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 2026-11-21 — Story 011-04 `done` (approved oleh user) dan di-merge ke `dev` — `011-04`.
 2026-11-21 — Review artefak 006 selesai (2 blocker, 4 major, 3 minor); approve CR-011 sitemap & rujukan RTE + gate 3 story 006-01–006-05 (siap implementasi) + setujui `@tiptap/extension-image` untuk FR-009 di 006-04 — CR-011, 006
 - 2026-11-21 — Story 005-02 palette drag + tombol [+] Enter/Space + snap grid selesai verifikasi (drop posisi lewat screenToFlowPosition + snap ke grid gridSize 16 / presisi piksel, search + live region "N jenis", fokus pindah ke node baru tanpa auto-buka sheet, batal di luar canvas; 17 test flow-editor hijau, typecheck/lint/showcase build hijau), status review — 005-02.
+- 2026-11-21 — Story 005-02 `done` (approved oleh user) dan di-merge ke `dev` — `005-02`.

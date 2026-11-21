@@ -1,6 +1,6 @@
 # 005-02 — Palette drag + tambah keyboard + snap grid
 
-Status: review
+Status: done
 PRD: `docs/prd/005-flow-editor.md`
 Design: `docs/design/flow-editor.md`
 FR: `FR-004`, `FR-009`, `FR-011`
