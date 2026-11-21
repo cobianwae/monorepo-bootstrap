@@ -81,6 +81,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-018 | Tour: varian cva + responsif di komponen + sinkron docs | approved | `docs/cr/cr-018-tour-varian-responsif-docs.md` |
 | CR-019 | Flow Editor inspector on-demand tidak mengunci + sesuai AC | done | `docs/cr/cr-019-flow-inspector-on-demand.md` |
 | CR-020 | Mind Map: pemusatan node edit/fokus + parity kanvas 011 + regresi viewport | approved | `docs/cr/cr-020-mind-map-canvas-parity.md` |
+| CR-021 | Flow Editor: kanvas rusak visual/layout (node 0×0, handle, toolbar, fitView, edge) | approved | `docs/cr/cr-021-flow-editor-visual-rusak.md` |
 
 ## Catatan
 
