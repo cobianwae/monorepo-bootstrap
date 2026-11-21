@@ -94,3 +94,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Nomor PRD 007–009 didokumentasikan sebagai reservasi seri story lightweight track (007-01, 008-01/008-02, 009-01); ID artefak imutabel, lubang tidak diisi ulang — `BACKLOG`.
 - 2026-11-21 — Approve story lightweight 007-01, 008-01, 008-02, 009-01 (gate 3): transfer list, cascader, tree select, mention + emoji; siap implementasi satu per satu — `007-01`, `008-01`, `008-02`, `009-01`.
 - 2026-11-21 — Story 006-02 link M-009 + shortcut + keyboard selesai (M-009 Popover/Sheet + validasi live + Ctrl/Cmd+K + klik anchor, 10 test baru hijau; typecheck/lint/test/test:tokens/showcase build hijau), status `review` — `006-02`.
+- 2026-11-21 — Story 006-02 `done` (approved oleh user) dan di-merge ke `dev` — `006-02`.

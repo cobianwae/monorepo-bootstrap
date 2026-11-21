@@ -1,6 +1,6 @@
 # 006-02 — Link M-009 + markdown shortcut + keyboard penuh
 
-Status: review
+Status: done
 PRD: `docs/prd/006-rich-text-editor.md`
 Design: `docs/design/rich-text-editor.md`
 FR: `FR-003`, `FR-004`, `FR-006`
