@@ -86,6 +86,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-023 | Mind Map: warna semantik dan state feedback (edge, highlight, error, skeleton, minimap) | approved | `docs/cr/cr-023-mind-map-warna-state.md` |
 | CR-024 | Mind Map: microcopy, konten, dan a11y detail (istilah, deskripsi, hint, input, gagang mobile) | approved | `docs/cr/cr-024-mind-map-microcopy-a11y.md` |
 | CR-025 | Mind Map: tindak lanjut audit halaman (target sentuh salin resep, grup aksi, pre keyboard, cakupan test) | approved | `docs/cr/cr-025-mind-map-audit-followup.md` |
+| CR-026 | Mind Map: tata letak, hierarki, dan ikonografi halaman showcase (panel demo, pencarian, spacing, tipografi) | approved | `docs/cr/cr-026-mind-map-showcase-layout.md` |
 
 ## Catatan
 
