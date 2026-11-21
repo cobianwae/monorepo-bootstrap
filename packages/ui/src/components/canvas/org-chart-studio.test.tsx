@@ -1,5 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import * as React from 'react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { Toaster } from '../feedback/toaster';
 import {
   OrgChartStudio,
   computeStudioPositions,
@@ -221,5 +223,184 @@ describe('OrgChartStudio fondasi (011-01)', () => {
     fireEvent.click(button as HTMLElement);
     expect(onEmptyAction).toHaveBeenCalled();
     empty.unmount();
+  });
+});
+
+describe('OrgChartStudio tambah 1-klik + panel detail (011-02)', () => {
+  function ControlledStudio({
+    initial = flatData,
+    onChangeSpy,
+    minimap = true,
+  }: {
+    initial?: OrgStudioInput;
+    onChangeSpy?: (next: { id: string; parentId: string | null; title: string }[]) => void;
+    minimap?: boolean;
+  }) {
+    const [data, setData] = React.useState(initial);
+    return (
+      <OrgChartStudio
+        data={data}
+        minimap={minimap}
+        onChange={(next) => {
+          onChangeSpy?.(next);
+          setData(next);
+        }}
+      />
+    );
+  }
+
+  function addChildViaHandle(container: HTMLElement, parentId: string): void {
+    fireEvent.click(container.querySelector(`[data-testid="org-studio-add-child-${parentId}"]`) as HTMLElement);
+  }
+
+  function commitViaEnter(input: HTMLElement, title: string): void {
+    fireEvent.change(input, { target: { value: title } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+  }
+
+  it('AC-01: gagang bawah → inline-edit fokus → Enter commit sorotan, onChange sekali, panel tidak terbuka', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    addChildViaHandle(container, 'ceo');
+    const input = container.querySelector('[data-testid="org-studio-inline-input-studio-baru-1"]') as HTMLInputElement;
+    expect(input).not.toBeNull();
+    expect(document.activeElement).toBe(input);
+    expect(input.getAttribute('aria-label')).toBeNull();
+    expect(container.querySelector('[data-testid="org-studio-detail-path"]')).toBeNull();
+    commitViaEnter(input, 'Staff Baru');
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    const next = onChangeSpy.mock.calls[0][0] as { id: string; parentId: string | null; title: string }[];
+    expect(next).toHaveLength(5);
+    expect(next.find((node) => node.id === 'studio-baru-1')).toEqual({
+      id: 'studio-baru-1',
+      parentId: 'ceo',
+      title: 'Staff Baru',
+    });
+    const created = container.querySelector('[data-node-id="studio-baru-1"]');
+    expect(created).not.toBeNull();
+    expect(created?.getAttribute('data-new')).toBe('true');
+    expect(created?.textContent).toContain('Staff Baru');
+    // Tambah yang di-commit tidak pernah membuka panel.
+    expect(screen.queryByText(/Panel detail on-demand/)).toBeNull();
+    expect(document.activeElement?.getAttribute('data-node-id')).toBe('studio-baru-1');
+  });
+
+  it('AC-01: gagang samping menambah sejawat dengan parent yang sama; root tidak punya gagang sejawat', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    expect(container.querySelector('[data-testid="org-studio-add-sibling-ceo"]')).toBeNull();
+    fireEvent.click(container.querySelector('[data-testid="org-studio-add-sibling-cto"]') as HTMLElement);
+    const input = container.querySelector('[data-testid="org-studio-inline-input-studio-baru-1"]') as HTMLInputElement;
+    expect(input).not.toBeNull();
+    commitViaEnter(input, 'Sejawat CTO');
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    const next = onChangeSpy.mock.calls[0][0] as { id: string; parentId: string | null; title: string }[];
+    expect(next.find((node) => node.id === 'studio-baru-1')?.parentId).toBe('ceo');
+  });
+
+  it('AC-02: Esc membuang kartu tanpa onChange dan fokus kembali ke parent', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    addChildViaHandle(container, 'ceo');
+    const input = container.querySelector('[data-testid="org-studio-inline-input-studio-baru-1"]') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'Batal' } });
+    fireEvent.keyDown(input, { key: 'Escape' });
+    expect(onChangeSpy).not.toHaveBeenCalled();
+    expect(container.querySelector('[data-node-id="studio-baru-1"]')).toBeNull();
+    expect(document.activeElement?.getAttribute('data-node-id')).toBe('ceo');
+  });
+
+  it('AC-02: nama kosong ditolak inline (aria-invalid + pesan, tetap edit); blur dengan valid menyimpan', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    addChildViaHandle(container, 'ceo');
+    const input = container.querySelector('[data-testid="org-studio-inline-input-studio-baru-1"]') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: '   ' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(onChangeSpy).not.toHaveBeenCalled();
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain('Nama tidak boleh kosong');
+    expect(container.querySelector('[data-testid="org-studio-inline-input-studio-baru-1"]')).not.toBeNull();
+    fireEvent.change(input, { target: { value: 'Via Blur' } });
+    fireEvent.blur(input);
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    const next = onChangeSpy.mock.calls[0][0] as { id: string; title: string }[];
+    expect(next.find((node) => node.id === 'studio-baru-1')?.title).toBe('Via Blur');
+  });
+
+  it('AC-03: panel hanya terbuka via [≡]/double-click/Shift+Enter dan berisi breadcrumb, meta, dan form edit', async () => {
+    const { container } = render(<ControlledStudio minimap={false} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Detail CTO' }));
+    // Panel terbuka (query role/text dipengaruhi aria-hidden Radix di jsdom,
+    // sehingga assertion memakai testid + textContent; state sudah ter-flush
+    // oleh fireEvent/act sehingga query sinkron cukup).
+    expect(screen.queryByTestId('org-studio-detail-title')).not.toBeNull();
+    expect(screen.getByTestId('org-studio-detail-path').textContent).toContain('Direktur Utama / CTO');
+    expect(screen.getByTestId('org-studio-detail-meta').textContent).toContain('Atasan');
+    expect(screen.getByTestId('org-studio-detail-meta').textContent).toContain('Anak');
+    expect(screen.getByTestId('org-studio-detail-title')).not.toBeNull();
+    expect(screen.getByTestId('org-studio-detail-subtitle')).not.toBeNull();
+    expect(screen.getByTestId('org-studio-detail-badge')).not.toBeNull();
+    expect((screen.getByTestId('org-studio-detail-move') as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByTestId('org-studio-detail-delete') as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Tutup' }));
+    expect(screen.queryByTestId('org-studio-detail-title')).toBeNull();
+    // double-click membuka panel (query ulang: node di-render ulang)
+    const ctoCardAgain = container.querySelector('[data-node-id="cto"]') as HTMLElement;
+    fireEvent.doubleClick(ctoCardAgain);
+    expect(screen.queryByTestId('org-studio-detail-title')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Tutup' }));
+    // Shift+Enter membuka panel
+    const ctoCardLatest = container.querySelector('[data-node-id="cto"]') as HTMLElement;
+    fireEvent.keyDown(ctoCardLatest, { key: 'Enter', shiftKey: true });
+    expect(screen.queryByTestId('org-studio-detail-title')).not.toBeNull();
+  });
+
+  it('AC-03/AC-04: simpan panel commit sekali via onChange; nama kosong ditolak', () => {
+    const onChangeSpy = vi.fn();
+    render(<ControlledStudio onChangeSpy={onChangeSpy} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Detail CFO' }));
+    const titleInput = screen.getByTestId('org-studio-detail-title') as HTMLInputElement;
+    fireEvent.change(titleInput, { target: { value: '  ' } });
+    fireEvent.click(screen.getByTestId('org-studio-detail-save'));
+    expect(onChangeSpy).not.toHaveBeenCalled();
+    expect(titleInput.getAttribute('aria-invalid')).toBe('true');
+    fireEvent.change(titleInput, { target: { value: 'CFO Baru' } });
+    fireEvent.click(screen.getByTestId('org-studio-detail-save'));
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    const next = onChangeSpy.mock.calls[0][0] as { id: string; title: string }[];
+    expect(next.find((node) => node.id === 'cfo')?.title).toBe('CFO Baru');
+  });
+
+  it('AC-04: hit-area gagang 44px dengan visual 24px', () => {
+    const { container } = render(<OrgChartStudio data={flatData} />);
+    const handle = container.querySelector('[data-testid="org-studio-add-child-ceo"]') as HTMLElement;
+    expect(handle.className).toContain('h-11');
+    expect(handle.className).toContain('w-11');
+    const visual = handle.querySelector('span') as HTMLElement;
+    expect(visual.className).toContain('h-6');
+    expect(visual.className).toContain('w-6');
+    expect(screen.getByRole('button', { name: 'Tambah bawahan untuk Direktur Utama' })).not.toBeNull();
+  });
+
+  it('AC-04: toast "Ditambah — Urungkan" memanggil undo mengembalikan snapshot asal', () => {
+    const onChangeSpy = vi.fn();
+    const { container } = render(
+      <>
+        <ControlledStudio onChangeSpy={onChangeSpy} />
+        <Toaster />
+      </>,
+    );
+    addChildViaHandle(container, 'ceo');
+    const input = container.querySelector('[data-testid="org-studio-inline-input-studio-baru-1"]') as HTMLInputElement;
+    commitViaEnter(input, 'Staff Baru');
+    expect(onChangeSpy).toHaveBeenCalledTimes(1);
+    // Toast terbaru paling akhir di DOM (Toaster merender urutan store); abaikan toast sisa test lain.
+    const undoButtons = within(document.body).getAllByRole('button', { name: 'Urungkan' });
+    fireEvent.click(undoButtons[undoButtons.length - 1]);
+    expect(onChangeSpy).toHaveBeenCalledTimes(2);
+    const undone = onChangeSpy.mock.calls[1][0] as { id: string }[];
+    expect(undone).toHaveLength(4);
+    expect(undone.find((node) => node.id === 'studio-baru-1')).toBeUndefined();
   });
 });

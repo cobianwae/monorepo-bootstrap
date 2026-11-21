@@ -1,6 +1,6 @@
 # 011-02 — Tambah 1-klik inline-edit + panel detail on-demand
 
-Status: todo
+Status: review
 PRD: `docs/prd/011-org-chart-studio.md`
 Design: `docs/design/org-chart-studio.md`
 FR: `FR-005`, `FR-006`, `FR-013`, `FR-016`, `FR-019`
@@ -35,12 +35,12 @@ Goal: Tambah bawahan/sejawat ≤ 3 klik via gagang `+` langsung inline-edit di k
 
 ## Tasks
 
-- [ ] Gagang `+` bawah/samping: muncul saat hover/fokus, `aria-label` per parent, keyboard Enter/Space, hit-area 44px
-- [ ] Inline-edit di kartu (`input` + hint "Enter simpan · Esc batal"); validasi nama wajib; sorotan kartu baru
-- [ ] Panel `S-005.34.01` sheet kanan 320px (overlay di mobile): breadcrumb, meta, form edit + tombol pindah/hapus (dialog di 011-03)
-- [ ] Wiring `data` + `onChange` sekali-per-commit + undo-push pertama (stack penuh di 011-03); toast Urungkan
-- [ ] Test: tambah bawahan/sejawat ≤3 klik, Enter/Esc/kosong, panel tidak auto-buka, `onChange` sekali, hit-area
-- [ ] Showcase: tambah seksi draf di route studio (scope penuh di 011-05)
+- [x] Gagang `+` bawah/samping: muncul saat hover/fokus, `aria-label` per parent, keyboard Enter/Space, hit-area 44px
+- [x] Inline-edit di kartu (`input` + hint "Enter simpan · Esc batal"); validasi nama wajib; sorotan kartu baru
+- [x] Panel `S-005.34.01` sheet kanan 320px (overlay di mobile): breadcrumb, meta, form edit + tombol pindah/hapus (dialog di 011-03)
+- [x] Wiring `data` + `onChange` sekali-per-commit + undo-push pertama (stack penuh di 011-03); toast Urungkan
+- [x] Test: tambah bawahan/sejawat ≤3 klik, Enter/Esc/kosong, panel tidak auto-buka, `onChange` sekali, hit-area
+- [x] Showcase: tambah seksi draf di route studio (scope penuh di 011-05)
 
 ## Dependencies
 

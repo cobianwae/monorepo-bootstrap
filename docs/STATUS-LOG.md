@@ -69,3 +69,4 @@ Append-only. Format: `YYYY-MM-DD — ringkasan — referensi`.
 - 2026-11-21 — Story 004-03 multi-hari + overlap + detail event M-006 + DnD selesai (`done`, approved oleh user) dan di-merge ke `dev` — `004-03`
 - 2026-11-21 — Story 011-01 fondasi OrgChartStudio selesai (normalize/validasi + balanced-tidy 240×84 + kartu lega + pan/zoom/reset/fit, test 15 hijau; typecheck/lint/test/test:tokens hijau) — `011-01`.
 - 2026-11-21 — Story 011-01 `done` (approved oleh user) dan di-merge ke `dev` — `011-01`.
+2026-11-21 — Story 011-02 tambah 1-klik inline-edit + panel detail on-demand selesai, status review: gagang + bawah/samping 44px, inline-edit Enter/Esc/blur-valid, panel S-005.34.01 on-demand ([≡]/avatar/double-click/Shift+Enter, ZoomOnDoubleClick=false), onChange sekali-per-commit + undo-push + toast Urungkan, test 23 hijau, showcase draf /patterns/org-chart-studio; verifikasi typecheck/lint/test (427)/showcase build hijau — `011-02`.

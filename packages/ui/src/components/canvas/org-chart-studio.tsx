@@ -24,8 +24,26 @@ import { cn } from '../../lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '../base/avatar';
 import { Badge } from '../base/badge';
 import { Button } from '../base/button';
+import { Input } from '../base/input';
+import { Label } from '../base/label';
 import { Skeleton } from '../base/skeleton';
 import { EmptyState } from '../feedback/empty-state';
+import { ToastAction } from '../feedback/toast';
+import { toast } from '../feedback/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../form/select';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '../overlay/sheet';
 
 export type OrgStudioAccent = 'primary' | 'success' | 'warning' | 'info' | 'destructive';
 
@@ -107,6 +125,10 @@ function flattenNested(root: OrgStudioNodeNested): OrgStudioNodeFlat[] {
   };
   walk(root, null);
   return flat;
+}
+
+function toFlatInput(data: OrgStudioInput): OrgStudioNodeFlat[] {
+  return Array.isArray(data) ? [...data] : flattenNested(data);
 }
 
 export function normalizeStudioInput(data: OrgStudioInput): StudioNormalizedResult {
@@ -326,8 +348,15 @@ export type StudioNodeData = {
   isExpanded: boolean;
   isSelected: boolean;
   isHighlighted: boolean;
+  isEditing: boolean; // kartu sedang mode inline-edit (FR-005)
+  isNew: boolean; // kartu baru saja di-commit → sorotan (FR-005)
   onToggle: (id: string) => void;
   onSelectNode: ((node: OrgStudioNodeNormalized) => void) | undefined;
+  onAddChild: (parentId: string) => void; // gagang bawah "+" (FR-005)
+  onAddSibling: (nodeId: string) => void; // gagang samping "+" (FR-005)
+  onOpenDetail: (node: OrgStudioNodeNormalized) => void; // panel S-005.34.01 (FR-006)
+  onCommitInline: (nodeId: string, title: string) => void;
+  onCancelInline: (nodeId: string) => void;
 };
 
 export type StudioFlowNode = Node<StudioNodeData, 'studioNode'>;
@@ -339,7 +368,17 @@ export function toStudioFlowNodes(
   expandedSet: Set<string>,
   highlightedSet: Set<string>,
   selectedId: string | null,
-  handlers: { onToggle: StudioNodeData['onToggle']; onSelectNode: StudioNodeData['onSelectNode'] },
+  editingId: string | null,
+  newNodeId: string | null,
+  handlers: {
+    onToggle: StudioNodeData['onToggle'];
+    onSelectNode: StudioNodeData['onSelectNode'];
+    onAddChild: StudioNodeData['onAddChild'];
+    onAddSibling: StudioNodeData['onAddSibling'];
+    onOpenDetail: StudioNodeData['onOpenDetail'];
+    onCommitInline: StudioNodeData['onCommitInline'];
+    onCancelInline: StudioNodeData['onCancelInline'];
+  },
 ): StudioFlowNode[] {
   const positionById = new Map(positions.map((position) => [position.id, position]));
   return normalized.nodes
@@ -358,8 +397,15 @@ export function toStudioFlowNodes(
           isExpanded: expandedSet.has(node.id),
           isSelected: selected,
           isHighlighted: highlightedSet.has(node.id),
+          isEditing: editingId === node.id,
+          isNew: newNodeId === node.id,
           onToggle: handlers.onToggle,
           onSelectNode: handlers.onSelectNode,
+          onAddChild: handlers.onAddChild,
+          onAddSibling: handlers.onAddSibling,
+          onOpenDetail: handlers.onOpenDetail,
+          onCommitInline: handlers.onCommitInline,
+          onCancelInline: handlers.onCancelInline,
         },
         selected,
       };
@@ -416,29 +462,118 @@ function getInitials(title: string): string {
     .join('');
 }
 
+// Gagang "+" 011-02 (FR-005, D5): visual lingkaran 24px, hit-area 44px (FR-016).
+function StudioAddHandle({
+  testId,
+  label,
+  className,
+  onAdd,
+}: {
+  testId: string;
+  label: string;
+  className?: string;
+  onAdd: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      data-testid={testId}
+      aria-label={label}
+      onClick={(event) => {
+        event.stopPropagation();
+        onAdd();
+      }}
+      className={cn(
+        'absolute z-20 flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground',
+        'opacity-0 transition-opacity duration-200 group-hover/studio-node:opacity-100 group-focus-within/studio-node:opacity-100 focus:opacity-100 motion-reduce:transition-none',
+        'hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        className,
+      )}
+    >
+      <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card shadow-sm">
+        <Plus className="h-4 w-4" aria-hidden="true" />
+      </span>
+    </button>
+  );
+}
+
 function StudioNode({ data }: { data: StudioNodeData }) {
-  const { node, isExpanded, isSelected, isHighlighted, onToggle, onSelectNode } = data;
+  const {
+    node,
+    isExpanded,
+    isSelected,
+    isHighlighted,
+    isEditing,
+    isNew,
+    onToggle,
+    onSelectNode,
+    onAddChild,
+    onAddSibling,
+    onOpenDetail,
+    onCommitInline,
+    onCancelInline,
+  } = data;
   const badgeVariant = node.accent ? ACCENT_BADGE_VARIANT[node.accent] : 'secondary';
   const fullTitle = `${node.title}${node.subtitle ? ` — ${node.subtitle}` : ''}${node.badge ? ` (${node.badge})` : ''}`;
+  const [draft, setDraft] = React.useState(node.title);
+  const [draftInvalid, setDraftInvalid] = React.useState(false);
+  // Sinkronkan draft saat mulai edit kartu ini; jangan reset saat commit
+  // karena node.title berubah setelah commit.
+  const handledRef = React.useRef(false);
+  React.useEffect(() => {
+    if (isEditing) {
+      handledRef.current = false;
+      setDraft(node.title);
+      setDraftInvalid(false);
+    }
+  }, [isEditing, node.title]);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  React.useEffect(() => {
+    if (isEditing) inputRef.current?.focus();
+  }, [isEditing]);
+  const commitDraft = React.useCallback(() => {
+    const title = draft.trim();
+    if (!title) {
+      setDraftInvalid(true);
+      inputRef.current?.focus();
+      return;
+    }
+    // Tandai tertangani sebelum commit agar blur susulan tidak commit ganda.
+    handledRef.current = true;
+    onCommitInline(node.id, title);
+  }, [draft, node.id, onCommitInline]);
+  const canAddSibling = node.parentId !== null;
   return (
     <div
       data-testid="org-studio-node"
       data-node-id={node.id}
       data-selected={isSelected ? 'true' : undefined}
       data-highlighted={isHighlighted ? 'true' : undefined}
-      title={fullTitle}
+      data-new={isNew ? 'true' : undefined}
+      title={isEditing ? undefined : fullTitle}
       tabIndex={0}
-      onClick={() => onSelectNode?.(node)}
+      onClick={() => {
+        if (!isEditing) onSelectNode?.(node);
+      }}
+      onDoubleClick={() => {
+        if (!isEditing) onOpenDetail(node);
+      }}
       onKeyDown={(event) => {
-        if (event.key === 'Enter') {
+        if (isEditing) return;
+        if (event.key === 'Enter' && event.shiftKey) {
+          event.preventDefault();
+          onOpenDetail(node);
+        } else if (event.key === 'Enter') {
           event.preventDefault();
           onSelectNode?.(node);
         }
       }}
       className={cn(
-        'relative flex h-[84px] w-[240px] items-center gap-2 rounded-md border bg-card pl-4 pr-2 text-card-foreground',
+        'group/studio-node relative flex h-[84px] w-[240px] items-center gap-2 rounded-md border bg-card pl-4 pr-2 text-card-foreground',
         'motion-safe:transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-        isSelected || isHighlighted ? 'border-primary ring-2 ring-ring' : 'border-border',
+        isSelected || isHighlighted || isNew || isEditing
+          ? 'border-primary ring-2 ring-ring'
+          : 'border-border',
       )}
     >
       {isHighlighted ? (
@@ -456,7 +591,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
           className={cn('absolute left-0 top-0 h-full w-[3px] rounded-l-md', ACCENT_STRIP_CLASS[node.accent])}
         />
       ) : null}
-      {node.hasChildren ? (
+      {node.hasChildren && !isEditing ? (
         <button
           type="button"
           aria-label={isExpanded ? `Collapse ${node.title}` : `Perluas ${node.title}`}
@@ -474,22 +609,99 @@ function StudioNode({ data }: { data: StudioNodeData }) {
           )}
         </button>
       ) : null}
-      <Avatar size="sm">
-        {node.avatarSrc ? <AvatarImage src={node.avatarSrc} alt="" /> : null}
-        <AvatarFallback>{getInitials(node.title)}</AvatarFallback>
-      </Avatar>
+      <button
+        type="button"
+        aria-label={`Detail ${node.title}`}
+        data-testid={`org-studio-detail-${node.id}`}
+        disabled={isEditing}
+        onClick={(event) => {
+          event.stopPropagation();
+          onOpenDetail(node);
+        }}
+        className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed"
+      >
+        <Avatar size="sm">
+          {node.avatarSrc ? <AvatarImage src={node.avatarSrc} alt="" /> : null}
+          <AvatarFallback>{getInitials(node.title)}</AvatarFallback>
+        </Avatar>
+      </button>
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
-        <span className="truncate text-sm font-medium text-foreground" title={node.title}>
-          {node.title}
-        </span>
-        {node.subtitle ? (
-          <span className="line-clamp-2 break-words text-xs leading-4 text-muted-foreground">{node.subtitle}</span>
-        ) : null}
+        {isEditing ? (
+          <>
+            <label htmlFor={`org-studio-inline-${node.id}`} className="sr-only">
+              Nama node baru
+            </label>
+            <Input
+              ref={inputRef}
+              id={`org-studio-inline-${node.id}`}
+              data-testid={`org-studio-inline-input-${node.id}`}
+              value={draft}
+              aria-invalid={draftInvalid || undefined}
+              aria-describedby={draftInvalid ? `org-studio-inline-err-${node.id}` : undefined}
+              placeholder="Nama baru"
+              onChange={(event) => {
+                setDraft(event.target.value);
+                if (event.target.value.trim()) setDraftInvalid(false);
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  commitDraft();
+                } else if (event.key === 'Escape') {
+                  event.preventDefault();
+                  handledRef.current = true;
+                  onCancelInline(node.id);
+                }
+              }}
+              onBlur={() => {
+                // Enter/Esc yang sudah menangani: abaikan blur susulan agar
+                // commit tidak ganda saat input ter-unmount.
+                if (handledRef.current) return;
+                commitDraft();
+              }}
+              className="h-8 text-sm"
+            />
+            {draftInvalid ? (
+              <span role="alert" id={`org-studio-inline-err-${node.id}`} className="text-xs text-destructive">
+                Nama tidak boleh kosong.
+              </span>
+            ) : (
+              <span className="text-xs text-muted-foreground">Enter simpan · Esc batal</span>
+            )}
+          </>
+        ) : (
+          <>
+            <span className="truncate text-sm font-medium text-foreground" title={node.title}>
+              {node.title}
+            </span>
+            {node.subtitle ? (
+              <span className="line-clamp-2 break-words text-xs leading-4 text-muted-foreground">{node.subtitle}</span>
+            ) : null}
+          </>
+        )}
       </div>
-      {node.badge ? (
+      {node.badge && !isEditing ? (
         <Badge variant={badgeVariant} size="sm" className="shrink-0">
           {node.badge}
         </Badge>
+      ) : null}
+      {!isEditing ? (
+        <>
+          <StudioAddHandle
+            testId={`org-studio-add-child-${node.id}`}
+            label={`Tambah bawahan untuk ${node.title}`}
+            onAdd={() => onAddChild(node.id)}
+            className="left-1/2 top-full -translate-x-1/2 -translate-y-1/2"
+          />
+          {canAddSibling ? (
+            <StudioAddHandle
+              testId={`org-studio-add-sibling-${node.id}`}
+              label={`Tambah sejawat untuk ${node.title}`}
+              onAdd={() => onAddSibling(node.id)}
+              className="left-full top-1/2 -translate-x-1/2 -translate-y-1/2"
+            />
+          ) : null}
+        </>
       ) : null}
     </div>
   );
@@ -592,6 +804,9 @@ function StudioCanvas({
         fitView
         fitViewOptions={{ padding: 0.2 }}
         zoomOnScroll={false}
+        // Double-click dipakai untuk buka panel detail kartu (FR-006, D6);
+        // zoom-on-double-click xyflow memakan event tersebut.
+        zoomOnDoubleClick={false}
         zoomOnPinch
         panOnDrag
         nodesDraggable={false}
@@ -619,6 +834,205 @@ function StudioCanvas({
 }
 
 // ---------------------------------------------------------------------------
+// Panel detail S-005.34.01 (011-02, FR-006, D6): sheet kanan 320px,
+// overlay di mobile; hanya terbuka bila diminta via [≡]/avatar/double-click/
+// Shift+Enter — tidak pernah otomatis saat tambah.
+// ---------------------------------------------------------------------------
+
+export interface StudioDetailDraft {
+  title: string;
+  subtitle: string;
+  badge: string;
+  accent: OrgStudioAccent | null;
+}
+
+const ACCENT_OPTIONS: Array<{ value: OrgStudioAccent; label: string }> = [
+  { value: 'primary', label: 'primary' },
+  { value: 'success', label: 'success' },
+  { value: 'warning', label: 'warning' },
+  { value: 'info', label: 'info' },
+  { value: 'destructive', label: 'destructive' },
+];
+
+function StudioDetailPanel({
+  node,
+  open,
+  onOpenChange,
+  parentTitle,
+  childTitles,
+  pathTitles,
+  onSave,
+}: {
+  node: OrgStudioNodeNormalized | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  parentTitle: string | null;
+  childTitles: string[];
+  pathTitles: string[];
+  onSave: (nodeId: string, draft: StudioDetailDraft) => void;
+}) {
+  const [draft, setDraft] = React.useState<StudioDetailDraft>({
+    title: node?.title ?? '',
+    subtitle: node?.subtitle ?? '',
+    badge: node?.badge ?? '',
+    accent: node?.accent ?? null,
+  });
+  const [titleInvalid, setTitleInvalid] = React.useState(false);
+  const badgeVariant = node?.accent ? ACCENT_BADGE_VARIANT[node.accent] : 'secondary';
+  const isRoot = node?.parentId === null || node === null;
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="right" aria-describedby={undefined} className="w-80 overflow-y-auto sm:max-w-[320px]">
+        <SheetHeader>
+          <SheetTitle>{node ? `Detail ${node.title}` : 'Detail'}</SheetTitle>
+          <SheetDescription>Panel detail on-demand. Tambah tidak pernah membuka panel ini.</SheetDescription>
+        </SheetHeader>
+        {node ? (
+          <div className="mt-4 space-y-4">
+            <div className="flex items-center gap-3">
+              <Avatar size="lg">
+                {node.avatarSrc ? <AvatarImage src={node.avatarSrc} alt="" /> : null}
+                <AvatarFallback>{getInitials(node.title)}</AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <p className="truncate text-base font-medium text-foreground">{node.title}</p>
+                {node.subtitle ? <p className="truncate text-sm text-muted-foreground">{node.subtitle}</p> : null}
+                {node.badge ? (
+                  <Badge variant={badgeVariant} size="sm" className="mt-1">
+                    {node.badge}
+                  </Badge>
+                ) : null}
+              </div>
+            </div>
+            <dl className="space-y-1 text-sm" data-testid="org-studio-detail-meta">
+              <div className="flex gap-2">
+                <dt className="shrink-0 text-muted-foreground">Path:</dt>
+                <dd className="break-words text-foreground" data-testid="org-studio-detail-path">
+                  {pathTitles.join(' / ')}
+                </dd>
+              </div>
+              <div className="flex gap-2">
+                <dt className="shrink-0 text-muted-foreground">Atasan:</dt>
+                <dd className="break-words text-foreground">{parentTitle ?? '—'}</dd>
+              </div>
+              <div className="flex gap-2">
+                <dt className="shrink-0 text-muted-foreground">Anak:</dt>
+                <dd className="break-words text-foreground">
+                  {childTitles.length > 0 ? childTitles.join(', ') : '—'}
+                </dd>
+              </div>
+            </dl>
+            <form
+              className="space-y-4"
+              onSubmit={(event) => {
+                event.preventDefault();
+                if (!draft.title.trim()) {
+                  setTitleInvalid(true);
+                  return;
+                }
+                onSave(node.id, draft);
+              }}
+            >
+              <div className="space-y-2">
+                <Label htmlFor="org-studio-detail-title">Nama</Label>
+                <Input
+                  id="org-studio-detail-title"
+                  data-testid="org-studio-detail-title"
+                  value={draft.title}
+                  aria-invalid={titleInvalid || undefined}
+                  onChange={(event) => {
+                    setDraft((d) => ({ ...d, title: event.target.value }));
+                    if (event.target.value.trim()) setTitleInvalid(false);
+                  }}
+                />
+                {titleInvalid ? (
+                  <p role="alert" className="text-sm text-destructive">
+                    Nama tidak boleh kosong.
+                  </p>
+                ) : null}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="org-studio-detail-subtitle">Jabatan</Label>
+                <Input
+                  id="org-studio-detail-subtitle"
+                  data-testid="org-studio-detail-subtitle"
+                  value={draft.subtitle}
+                  onChange={(event) => setDraft((d) => ({ ...d, subtitle: event.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="org-studio-detail-badge">Badge</Label>
+                <Input
+                  id="org-studio-detail-badge"
+                  data-testid="org-studio-detail-badge"
+                  value={draft.badge}
+                  onChange={(event) => setDraft((d) => ({ ...d, badge: event.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="org-studio-detail-accent">Accent</Label>
+                <Select
+                  value={draft.accent ?? 'none'}
+                  onValueChange={(value) =>
+                    setDraft((d) => ({
+                      ...d,
+                      accent: value === 'none' ? null : (value as OrgStudioAccent),
+                    }))
+                  }
+                >
+                  <SelectTrigger id="org-studio-detail-accent" data-testid="org-studio-detail-accent">
+                    <SelectValue placeholder="Tanpa accent" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Tanpa accent</SelectItem>
+                    {ACCENT_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button type="submit" size="sm" data-testid="org-studio-detail-save">
+                  Simpan
+                </Button>
+                <Button type="button" variant="outline" size="sm" onClick={() => onOpenChange(false)}>
+                  Tutup
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled
+                  title="Dialog pindah tersedia di 011-03"
+                  data-testid="org-studio-detail-move"
+                >
+                  Pindah…
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  disabled
+                  title={isRoot ? 'Root tidak dapat dihapus' : 'Dialog hapus tersedia di 011-03'}
+                  data-testid="org-studio-detail-delete"
+                >
+                  Hapus
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Dialog pindah/hapus hadir di 011-03; tombol pindah/hapus dinonaktifkan untuk sekarang.
+              </p>
+            </form>
+          </div>
+        ) : null}
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Komponen utama
 // ---------------------------------------------------------------------------
 
@@ -638,9 +1052,14 @@ export function OrgChartStudio({
   ariaLabel = 'Org chart studio',
   className,
 }: OrgChartStudioProps) {
-  // Fondasi 011-01: tanpa mutasi, `onChange` belum dipanggil. Prop tetap
-  // diterima sesuai kontrak §2 agar wiring 011-02/03 tidak breaking.
-  void onChange;
+  // State deklaratif 011-02 (FR-013, D8): data internal ditegakkan dari prop
+  // `data` dan dimutasi lewat satu commit point yang selalu memanggil
+  // `onChange(next)` tepat sekali + push undo. Kontrol penuh (data+onChange)
+  // tetap dipegang konsumen; komponen hanya memantulkan.
+  const [internalFlat, setInternalFlat] = React.useState<OrgStudioNodeFlat[]>(() => toFlatInput(data));
+  React.useEffect(() => {
+    setInternalFlat(toFlatInput(data));
+  }, [data]);
   // Semantik mengikuti OrgChartEditor: defaultExpandedIds = set id yang
   // awalnya COLLAPSED; default (kosong) = semua induk ter-expand.
   const [internalExpanded, setInternalExpanded] = React.useState<string[]>(() => {
@@ -651,8 +1070,37 @@ export function OrgChartStudio({
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [errorCopied, setErrorCopied] = React.useState(false);
   const [zoomLevel, setZoomLevel] = React.useState(1);
+  // 011-02: node pending inline-edit, sorotan node baru, panel detail, fokus.
+  const [editingId, setEditingId] = React.useState<string | null>(null);
+  const [newNodeId, setNewNodeId] = React.useState<string | null>(null);
+  const [panelNodeId, setPanelNodeId] = React.useState<string | null>(null);
+  const [focusNodeId, setFocusNodeId] = React.useState<string | null>(null);
+  // History undo disimpan di ref (bukan state) agar callback toast yang dibuat
+  // saat commit selalu membaca snapshot terbaru, bukan closure lama.
+  const pastRef = React.useRef<OrgStudioNodeFlat[][]>([]);
+  const pendingIdsRef = React.useRef<Set<string>>(new Set());
+  const counterRef = React.useRef(0);
+  const rootRef = React.useRef<HTMLDivElement | null>(null);
+  // Callback konsumen disimpan di ref agar handler internal stabil: identitas
+  // flowNodes tidak berubah tiap render hanya karena parent membuat arrow
+  // function baru (loop store xyflow/MiniMap bila tidak stabil).
+  const onChangeRef = React.useRef(onChange);
+  const onSelectRef = React.useRef(onSelect);
+  const onExpandedChangeRef = React.useRef(onExpandedChange);
+  React.useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+  React.useEffect(() => {
+    onSelectRef.current = onSelect;
+  }, [onSelect]);
+  React.useEffect(() => {
+    onExpandedChangeRef.current = onExpandedChange;
+  }, [onExpandedChange]);
+  const emitChange = React.useCallback((next: OrgStudioNodeFlat[]) => {
+    onChangeRef.current?.(next);
+  }, []);
 
-  const normalized = React.useMemo(() => normalizeStudioInput(data), [data]);
+  const normalized = React.useMemo(() => normalizeStudioInput(internalFlat), [internalFlat]);
 
   const controlledExpanded = expandedIds !== undefined;
   const expandedSet = React.useMemo(
@@ -667,9 +1115,9 @@ export function OrgChartStudio({
       else next.add(id);
       const nextIds = [...next];
       if (!controlledExpanded) setInternalExpanded(nextIds);
-      onExpandedChange?.(nextIds);
+      onExpandedChangeRef.current?.(nextIds);
     },
-    [controlledExpanded, expandedSet, onExpandedChange],
+    [controlledExpanded, expandedSet],
   );
 
   // Node tanpa keturunan selalu "expanded"; hanya induk yang bisa collapse.
@@ -689,6 +1137,129 @@ export function OrgChartStudio({
 
   const highlightedSet = React.useMemo(() => new Set(highlightedIds), [highlightedIds]);
 
+  // ---- 011-02: tambah 1-klik + panel detail + commit sekali (FR-005/006/013) ----
+  const undo = React.useCallback(() => {
+    const snapshot = pastRef.current[pastRef.current.length - 1];
+    if (!snapshot) return;
+    pastRef.current = pastRef.current.slice(0, -1);
+    setInternalFlat(snapshot);
+    emitChange(snapshot);
+    setEditingId(null);
+    setNewNodeId(null);
+  }, [emitChange]);
+
+  const commitWithUndo = React.useCallback(
+    (snapshot: OrgStudioNodeFlat[], next: OrgStudioNodeFlat[], toastTitle: string) => {
+      pastRef.current = [...pastRef.current.slice(-49), snapshot];
+      setInternalFlat(next);
+      emitChange(next);
+      toast({
+        title: toastTitle,
+        description: 'Urungkan bila salah.',
+        duration: 5000,
+        action: (
+          <ToastAction altText="Urungkan" onClick={undo}>
+            Urungkan
+          </ToastAction>
+        ),
+      });
+    },
+    [emitChange, undo],
+  );
+
+  const ensureExpanded = React.useCallback(
+    (parentId: string | null) => {
+      if (!parentId || expandedSet.has(parentId)) return;
+      const nextIds = [...expandedSet, parentId];
+      if (!controlledExpanded) setInternalExpanded(nextIds);
+      onExpandedChangeRef.current?.(nextIds);
+    },
+    [controlledExpanded, expandedSet],
+  );
+
+  const spawnPending = React.useCallback(
+    (parentId: string) => {
+      // Satu pending pada satu waktu: pending lama yang belum di-commit dibuang.
+      const staleIds = [...pendingIdsRef.current];
+      counterRef.current += 1;
+      let candidate = `studio-baru-${counterRef.current}`;
+      while (internalFlat.some((node) => node.id === candidate)) {
+        counterRef.current += 1;
+        candidate = `studio-baru-${counterRef.current}`;
+      }
+      pendingIdsRef.current = new Set([candidate]);
+      setInternalFlat((prevFlat) => [
+        ...prevFlat.filter((node) => !staleIds.includes(node.id)),
+        { id: candidate, parentId, title: '' },
+      ]);
+      ensureExpanded(parentId);
+      setSelectedId(candidate);
+      setNewNodeId(null);
+      setEditingId(candidate);
+    },
+    [ensureExpanded, internalFlat],
+  );
+
+  const handleCommitInline = React.useCallback(
+    (nodeId: string, title: string) => {
+      const isPending = pendingIdsRef.current.has(nodeId);
+      // Snapshot undo = flat TANPA node pending, agar toast "Urungkan"
+      // menghapus node yang baru ditambah.
+      const snapshot = isPending ? internalFlat.filter((node) => node.id !== nodeId) : internalFlat;
+      const next = internalFlat.map((node) => (node.id === nodeId ? { ...node, title } : node));
+      pendingIdsRef.current.delete(nodeId);
+      setEditingId(null);
+      setNewNodeId(nodeId);
+      commitWithUndo(snapshot, next, 'Ditambah');
+      setFocusNodeId(nodeId);
+    },
+    [commitWithUndo, internalFlat],
+  );
+
+  const handleCancelInline = React.useCallback(
+    (nodeId: string) => {
+      const isPending = pendingIdsRef.current.has(nodeId);
+      const parentId = internalFlat.find((node) => node.id === nodeId)?.parentId ?? null;
+      if (isPending) {
+        pendingIdsRef.current.delete(nodeId);
+        // Node pending belum pernah di-commit via onChange → buang lokal saja.
+        setInternalFlat((prevFlat) => prevFlat.filter((node) => node.id !== nodeId));
+      }
+      setEditingId(null);
+      if (parentId) setFocusNodeId(parentId);
+    },
+    [internalFlat],
+  );
+
+  const openDetail = React.useCallback((node: OrgStudioNodeNormalized) => {
+    setSelectedId(node.id);
+    onSelectRef.current?.(node);
+    setPanelNodeId(node.id);
+  }, []);
+
+  const handlePanelSave = React.useCallback(
+    (nodeId: string, draft: StudioDetailDraft) => {
+      const next = internalFlat.map((node) =>
+        node.id === nodeId
+          ? {
+              ...node,
+              title: draft.title.trim(),
+              subtitle: draft.subtitle.trim() ? draft.subtitle.trim() : undefined,
+              badge: draft.badge.trim() ? draft.badge.trim() : undefined,
+              accent: draft.accent ?? undefined,
+            }
+          : node,
+      );
+      commitWithUndo(internalFlat, next, 'Diperbarui');
+    },
+    [commitWithUndo, internalFlat],
+  );
+
+  const handleSelectNode = React.useCallback((node: OrgStudioNodeNormalized) => {
+    setSelectedId(node.id);
+    onSelectRef.current?.(node);
+  }, []);
+
   const flowNodes = React.useMemo(
     () =>
       toStudioFlowNodes(
@@ -697,16 +1268,55 @@ export function OrgChartStudio({
         expandedSet,
         highlightedSet,
         selectedId,
+        editingId,
+        newNodeId,
+        // eslint-disable-next-line react-hooks/refs -- handler stabil; ref hanya dibaca di event handler, bukan saat render
         {
           onToggle: toggleExpanded,
-          onSelectNode: (node) => {
-            setSelectedId(node.id);
-            onSelect?.(node);
+          onSelectNode: handleSelectNode,
+          onAddChild: spawnPending,
+          onAddSibling: (nodeId) => {
+            const node = normalized.byId.get(nodeId);
+            if (node?.parentId) spawnPending(node.parentId);
           },
+          onOpenDetail: openDetail,
+          onCommitInline: handleCommitInline,
+          onCancelInline: handleCancelInline,
         },
       ),
-    [expandedSet, highlightedSet, normalized, onSelect, selectedId, toggleExpanded, visibleIds],
+    [
+      expandedSet,
+      highlightedSet,
+      normalized,
+      selectedId,
+      editingId,
+      newNodeId,
+      toggleExpanded,
+      visibleIds,
+      spawnPending,
+      openDetail,
+      handleCommitInline,
+      handleCancelInline,
+      handleSelectNode,
+    ],
   );
+
+  const panelNode = panelNodeId ? (normalized.byId.get(panelNodeId) ?? null) : null;
+  const panelParentTitle = panelNode?.parentId ? (normalized.byId.get(panelNode.parentId)?.title ?? null) : null;
+  const panelChildTitles = panelNode ? panelNode.childIds.map((id) => normalized.byId.get(id)?.title ?? id) : [];
+  const panelPathTitles = panelNode
+    ? [...getAncestors(internalFlat, panelNode.id).map((id) => normalized.byId.get(id)?.title ?? id), panelNode.title]
+    : [];
+
+  // Fokus kartu target (setelah commit/Esc kembali ke parent).
+  React.useEffect(() => {
+    if (!focusNodeId || !rootRef.current) return;
+    const target = Array.from(rootRef.current.querySelectorAll('[data-node-id]')).find(
+      (el) => el.getAttribute('data-node-id') === focusNodeId,
+    );
+    if (target instanceof HTMLElement) target.focus();
+    setFocusNodeId(null);
+  }, [focusNodeId, flowNodes]);
   const flowEdges = React.useMemo(() => toStudioFlowEdges(normalized, visibleIds), [normalized, visibleIds]);
 
   if (loading) {
@@ -781,6 +1391,7 @@ export function OrgChartStudio({
       role="application"
       aria-label={ariaLabel}
       tabIndex={0}
+      ref={rootRef}
       className={cn(
         'w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         className,
@@ -796,6 +1407,18 @@ export function OrgChartStudio({
           setZoomLevel={setZoomLevel}
         />
       </ReactFlowProvider>
+      <StudioDetailPanel
+        key={panelNode?.id ?? 'closed'}
+        node={panelNode}
+        open={panelNode !== null}
+        onOpenChange={(open) => {
+          if (!open) setPanelNodeId(null);
+        }}
+        parentTitle={panelParentTitle}
+        childTitles={panelChildTitles}
+        pathTitles={panelPathTitles}
+        onSave={handlePanelSave}
+      />
     </div>
   );
 }
