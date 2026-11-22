@@ -241,7 +241,7 @@ export default function MasterDetailPage() {
             <p className="mt-1 text-muted-foreground">{selected.preview}</p>
           </div>
           <div className="rounded-lg bg-highlight/5 border border-highlight/20 p-3">
-            <p className="text-xs font-semibold text-highlight">You (Support)</p>
+            <p className="text-xs font-semibold text-foreground">You (Support)</p>
             <p className="mt-1 text-muted-foreground">
               Investigating — can you share the network trace and the exact OIDC issuer?
             </p>

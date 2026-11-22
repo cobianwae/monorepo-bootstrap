@@ -681,7 +681,7 @@ export default function DataDisplayPage() {
                               {item.description}
                             </p>
                           </div>
-                          <div className="pt-2 border-t border-border/50 text-xs font-semibold text-highlight flex items-center gap-1">
+                          <div className="pt-2 border-t border-border/50 text-xs font-semibold text-foreground flex items-center gap-1">
                             <span>Explore docs</span>
                             <ArrowRight className="h-3 w-3" />
                           </div>

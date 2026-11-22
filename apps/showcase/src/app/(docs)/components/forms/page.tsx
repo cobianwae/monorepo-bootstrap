@@ -457,7 +457,7 @@ export default function FormsPage() {
                       </div>
                       <RadioGroupItem value={plan.id} id={`plan-${plan.id}`} />
                     </div>
-                    <div className="mt-4 pt-3 border-t border-border/50 text-xs font-bold font-mono text-highlight">
+                    <div className="mt-4 pt-3 border-t border-border/50 text-xs font-bold font-mono text-foreground">
                       {plan.price}
                     </div>
                   </label>

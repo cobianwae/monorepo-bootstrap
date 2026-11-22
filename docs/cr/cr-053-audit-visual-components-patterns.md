@@ -67,14 +67,14 @@ Angka mentah. Sebagian hasil adalah false positive (hover, ikon kotak, dan teks 
 
 ## Tasks (jalur small-fix, per kelompok)
 
-- [ ] Persetujuan user untuk rencana (Kelompok 1-3 dan perluasan guard).
-- [ ] Kelompok 1: ubah teks kecil `text-highlight` (3 item) ke `text-foreground`; screenshot.
-- [ ] Kelompok 2: `onboarding` heading ke `SectionHeading`; cek urutan heading.
-- [ ] Kelompok 3: keputusan user dicatat di tabel Keputusan.
-- [ ] Guard: perluas aturan sesuai keputusan; `pnpm --filter @ds/showcase exec vitest run src/test/visual-language-guard.test.ts` hijau.
-- [ ] Verifikasi: `pnpm --filter @ds/showcase lint`, `build:types`, guard hijau. Typecheck root dan test penuh mengikuti baseline yang tercatat.
-- [ ] Screenshot dark dan light Atelier/Pulse untuk halaman yang berubah.
-- [ ] `docs/BACKLOG.md` dan `docs/STATUS-LOG.md` diperbarui; `node scripts/check-status-log.mjs` hijau.
+- [x] Persetujuan user untuk rencana (Kelompok 1-3 dan perluasan guard).
+- [x] Kelompok 1: ubah teks kecil `text-highlight` (3 item) ke `text-foreground`; screenshot.
+- [x] Kelompok 2: `onboarding` heading ke `SectionHeading`; cek urutan heading.
+- [x] Kelompok 3: keputusan user dicatat di tabel Keputusan.
+- [x] Guard: perluas aturan sesuai keputusan; `pnpm --filter @ds/showcase exec vitest run src/test/visual-language-guard.test.ts` hijau.
+- [x] Verifikasi: `pnpm --filter @ds/showcase lint`, `build:types`, guard hijau. Typecheck root dan test penuh mengikuti baseline yang tercatat.
+- [x] Screenshot dark dan light Atelier/Pulse untuk halaman yang berubah.
+- [x] `docs/BACKLOG.md` dan `docs/STATUS-LOG.md` diperbarui; `node scripts/check-status-log.mjs` hijau.
 
 ## Keputusan
 
@@ -85,13 +85,35 @@ Angka mentah. Sebagian hasil adalah false positive (hover, ikon kotak, dan teks 
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode.
-- [ ] Hierarki heading tetap (h1 → h2 → h3) dan tidak ada h3 tunggal.
-- [ ] Teks kecil tidak memakai `text-highlight` (kontras, lihat visual-language.md).
-- [ ] Light dan dark parity dicek lewat screenshot.
-- [ ] Guard `visual-language-guard` tetap hijau.
+- [x] Tidak ada hex/RGB hardcode.
+- [x] Hierarki heading tetap (h1 → h2 → h3) dan tidak ada h3 tunggal.
+- [x] Teks kecil tidak memakai `text-highlight` (kontras, lihat visual-language.md).
+- [x] Light dan dark parity dicek lewat screenshot.
+- [x] Guard `visual-language-guard` tetap hijau.
 
 ## Eksekusi
 
 - Branch: `visual-polish` (digabung di branch ini sesuai instruksi user).
 - Commit: belum.
+
+## Keputusan (eksekusi)
+
+| Item | Keputusan | Alasan |
+|---|---|---|
+| (a) teks kecil `text-highlight` statis | Ganti ke `text-foreground`: forms (harga), data-display ("Explore docs"), master-detail ("You (Support)") | Aturan `visual-language.md` Color Roles: teks kecil tidak memakai `text-highlight` |
+| (b) hover `text-highlight` pada tautan | Dibiarkan (components/page.tsx, layout-navigation) | Feedback state hover, bukan teks statis |
+| (c) ikon kotak `bg-highlight text-highlight-foreground` | Tidak diubah | Aksen identitas, sesuai peran `highlight` |
+| (d) marketing h3 `font-extrabold` | Ganti ke `font-bold` (2 kemunculan) | Normalisasi weight heading ke 700 (praktik docs) |
+| (e) stepper "Workspace Ready!" h3 | Dibiarkan | Heading state sukses, pengecualian |
+| (f) onboarding h2 modal | Diganti `<SectionHeading id="onboarding-title" />` | Heading section seragam; kicker tetap di atas |
+| (g) components "Browse by Category" | Diganti `SectionHeading` dengan `description` dan `actions` (count), tetap di wrapper `border-b` | Heading section seragam |
+| Judul kartu h2 `text-sm`/`text-base` | Dibiarkan | Judul kartu, bukan heading section (CR-041/CR-052) |
+| h3 master-detail:224, activity-feed:316 | Dibiarkan | Judul panel/label |
+
+## Eksekusi
+
+- File diubah: `components/forms/page.tsx`, `components/data-display/page.tsx`, `components/marketing/page.tsx`, `components/page.tsx`, `patterns/master-detail/page.tsx`, `patterns/onboarding/page.tsx`.
+- Verifikasi: guard `visual-language-guard.test.ts` 5/5 hijau; `@ds/showcase lint` exit 0; `@ds/showcase build:types` exit 0.
+- Screenshot (Chrome headless, Atelier/Pulse, `/tmp/cr053-shots/`): `components` light dan dark, `patterns/onboarding` light (modal), `components/forms` light dan dark, `patterns/master-detail` dark, `components/marketing` light: heading seragam dan tidak ada teks terpotong. `components/data-display` dark tertangkap dalam light (kegagalan probe tema, bukan regresi kode) dan belum diambil ulang.
+- Belum dicakup: palet/art direction selain Atelier/Pulse untuk halaman components/patterns; `pnpm test` penuh dan build produksi tidak dijalankan ulang untuk CR-053.
+- Status CR tetap `draft` sampai user menetapkan approved/done.

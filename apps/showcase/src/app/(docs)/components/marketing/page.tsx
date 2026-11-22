@@ -319,7 +319,7 @@ export default function MarketingBlocksPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <StatementCard variant="neon" glow padding="lg">
-                <h3 className="text-2xl font-extrabold font-display text-foreground mb-2">
+                <h3 className="text-2xl font-bold font-display text-foreground mb-2">
                   Design systems are code, not mood boards.
                 </h3>
                 <p className="statement-muted text-sm text-muted-foreground leading-relaxed">
@@ -327,7 +327,7 @@ export default function MarketingBlocksPage() {
                 </p>
               </StatementCard>
               <StatementCard variant="inverted" padding="lg">
-                <h3 className="text-2xl font-extrabold font-display mb-2">
+                <h3 className="text-2xl font-bold font-display mb-2">
                   Perceptual color, guaranteed contrast.
                 </h3>
                 <p className="statement-muted text-sm text-background/70 leading-relaxed">

@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@ds/ui';
 import { PageHeader } from '@ds/ui';
+import { SectionHeading } from '../../../../components/section-heading';
 
 const STORAGE_KEY = 'ds-onboarding-dismissed';
 
@@ -164,9 +165,7 @@ export default function OnboardingPage() {
                   <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Step 1 of 2 · Let&apos;s get set up
                   </p>
-                  <h2 id="onboarding-title" className="text-lg font-bold text-foreground">
-                    {allDone ? 'All set!' : 'Finish your setup'}
-                  </h2>
+                  <SectionHeading id="onboarding-title" title={allDone ? 'All set!' : 'Finish your setup'} />
                 </div>
                 <Button
                   size="sm"

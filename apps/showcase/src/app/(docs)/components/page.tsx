@@ -21,6 +21,7 @@ import {
   Button,
 } from '@ds/ui';
 import type { LucideIcon } from 'lucide-react';
+import { SectionHeading } from '../../../components/section-heading';
 
 interface CategoryCard {
   title: string;
@@ -127,18 +128,16 @@ export default function ComponentsIndexPage() {
 
       {/* Category Grid */}
       <div className="space-y-5">
-        <div className="flex items-center justify-between border-b border-border pb-3">
-          <div>
-            <h2 className="text-xl font-bold tracking-tight text-foreground font-display">
-              Browse by Category
-            </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Pick a domain to browse its primitives and composition patterns
-            </p>
-          </div>
-          <span className="text-xs font-mono text-muted-foreground hidden sm:inline">
-            {CATEGORIES.length} CATEGORIES
-          </span>
+        <div className="border-b border-border pb-3">
+          <SectionHeading
+            title="Browse by Category"
+            description="Pick a domain to browse its primitives and composition patterns"
+            actions={
+              <span className="text-xs font-mono text-muted-foreground hidden sm:inline">
+                {CATEGORIES.length} CATEGORIES
+              </span>
+            }
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
