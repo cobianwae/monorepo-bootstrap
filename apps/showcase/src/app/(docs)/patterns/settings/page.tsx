@@ -74,6 +74,7 @@ import {
   Clock,
   RotateCcw,
 } from 'lucide-react';
+import { SectionHeading } from '@/components/section-heading';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -442,9 +443,7 @@ export default function SettingsPage() {
           <div className="min-w-0 flex-1 space-y-6">
             <TabsContent value="profile">
               <section id="profile" className="space-y-4 scroll-mt-20">
-                <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                  <span>Profile</span>
-                </h2>
+                <SectionHeading title="Profile" />
 
                 {profileDirty && (
                   <Banner
@@ -573,9 +572,7 @@ export default function SettingsPage() {
 
             <TabsContent value="workspace">
               <section id="workspace" className="space-y-4 scroll-mt-20">
-                <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                  <span>Workspace</span>
-                </h2>
+                <SectionHeading title="Workspace" />
 
                 <Card>
                   <CardHeader>
@@ -750,9 +747,7 @@ export default function SettingsPage() {
 
             <TabsContent value="appearance">
               <section id="appearance" className="space-y-4 scroll-mt-20">
-                <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                  <span>Appearance</span>
-                </h2>
+                <SectionHeading title="Appearance" />
 
                 <div className="grid gap-6 lg:grid-cols-2">
                   <Card>
@@ -874,9 +869,7 @@ export default function SettingsPage() {
 
             <TabsContent value="security">
               <section id="security" className="space-y-4 scroll-mt-20">
-                <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                  <span>Security</span>
-                </h2>
+                <SectionHeading title="Security" />
 
                 <Card>
                   <CardHeader>
@@ -1093,9 +1086,7 @@ export default function SettingsPage() {
 
             <TabsContent value="danger-zone">
               <section id="danger-zone" className="space-y-4 scroll-mt-20">
-                <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                  <span>Danger Zone</span>
-                </h2>
+                <SectionHeading title="Danger Zone" />
 
                 <Card className="border-destructive/40">
                   <CardHeader>

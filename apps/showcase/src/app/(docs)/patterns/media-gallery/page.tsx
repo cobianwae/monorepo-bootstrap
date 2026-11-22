@@ -49,6 +49,7 @@ import {
   Download,
   ImageOff,
 } from 'lucide-react';
+import { SectionHeading } from '@/components/section-heading';
 
 type GalleryCategory = 'Screenshot' | 'Diagram' | 'Mockup';
 
@@ -266,9 +267,7 @@ export default function MediaGalleryPage() {
       />
 
       <section id="gallery" className="space-y-4 scroll-mt-20">
-        <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-          <span>Gallery Grid</span>
-        </h2>
+        <SectionHeading title="Gallery Grid" />
 
         <Card className="border-border">
           <CardHeader className="gap-1.5">
@@ -435,9 +434,7 @@ export default function MediaGalleryPage() {
       </section>
 
       <section id="lightbox" className="space-y-4 scroll-mt-20">
-        <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-          <span>Lightbox &amp; Keyboard Navigation</span>
-        </h2>
+        <SectionHeading title="Lightbox &amp; Keyboard Navigation" />
 
         <Card className="border-border">
           <CardHeader className="gap-1.5">

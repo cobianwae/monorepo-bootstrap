@@ -36,6 +36,7 @@ import {
   DotPattern,
   TableOfContents,
 } from '@ds/ui';
+import { SectionHeading } from '@/components/section-heading';
 
 export default function MarketingBlocksPage() {
   const [billingInterval, setBillingInterval] = React.useState<'monthly' | 'yearly'>('monthly');
@@ -73,9 +74,7 @@ export default function MarketingBlocksPage() {
           {/* SECTION 1: HERO */}
           <section id="hero" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <span>Hero Section</span>
-              </h2>
+              <SectionHeading title="Hero Section" />
               <p className="text-sm text-muted-foreground">
                 Hero block featuring eyebrow badges, gradient typography, action buttons, and responsive media preview cards.
               </p>
@@ -119,9 +118,7 @@ export default function MarketingBlocksPage() {
           {/* SECTION 2: FEATURES */}
           <section id="features" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <span>Feature Grid</span>
-              </h2>
+              <SectionHeading title="Feature Grid" />
               <p className="text-sm text-muted-foreground">
                 Responsive feature grids with icons, badges, and gradient borders.
               </p>
@@ -156,9 +153,7 @@ export default function MarketingBlocksPage() {
           {/* SECTION 3: STATS */}
           <section id="stats" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <span>Stats & Metrics Band</span>
-              </h2>
+              <SectionHeading title="Stats & Metrics Band" />
               <p className="text-sm text-muted-foreground">
                 Display quantitative KPIs, performance benchmarks, and traction statistics.
               </p>
@@ -175,9 +170,7 @@ export default function MarketingBlocksPage() {
           {/* SECTION 4: PRICING */}
           <section id="pricing" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <span>Pricing Matrix</span>
-              </h2>
+              <SectionHeading title="Pricing Matrix" />
               <p className="text-sm text-muted-foreground">
                 Pricing tier cards with monthly/yearly interval toggles, feature checklists, and prominent popular tier highlights.
               </p>
@@ -269,9 +262,7 @@ export default function MarketingBlocksPage() {
           {/* SECTION 5: TESTIMONIALS */}
           <section id="testimonials" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <span>Testimonials & Social Proof</span>
-              </h2>
+              <SectionHeading title="Testimonials & Social Proof" />
               <p className="text-sm text-muted-foreground">
                 Quotes, customer avatars, star ratings, and company attributions.
               </p>
@@ -321,9 +312,7 @@ export default function MarketingBlocksPage() {
           {/* SECTION 6.5: STATEMENT & DOT PATTERN */}
           <section id="statement" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <span>Statement Cards & Dot Pattern</span>
-              </h2>
+              <SectionHeading title="Statement Cards & Dot Pattern" />
               <p className="text-sm text-muted-foreground">
                 Atmospheric marketing surfaces — statement cards with glow, gradient, and glass variants, plus a decarative dot-pattern backdrop.
               </p>
@@ -389,9 +378,7 @@ export default function MarketingBlocksPage() {
           {/* SECTION 8: FAQ */}
           <section id="faq" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <span>FAQ Accordion</span>
-              </h2>
+              <SectionHeading title="FAQ Accordion" />
               <p className="text-sm text-muted-foreground">
                 Expandable questions and answers with accessible keyboard control.
               </p>

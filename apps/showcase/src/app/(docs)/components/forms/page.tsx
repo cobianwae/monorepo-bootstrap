@@ -55,6 +55,7 @@ import {
   type FilterFieldDefinition,
   type SavedFilterView,
 } from '@ds/ui';
+import { SectionHeading } from '@/components/section-heading';
 
 interface FormSchema {
   fullName: string;
@@ -282,9 +283,7 @@ export default function FormsPage() {
       {/* 1. Form Field System */}
       <section id="form-primitives" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Form Field System</span>
-          </h2>
+          <SectionHeading title="Form Field System" />
           <p className="text-sm text-muted-foreground">
             Automatic coordination of `id`, `aria-describedby`, and `aria-invalid` between labels, inputs, descriptions, and validation messages.
           </p>
@@ -399,9 +398,7 @@ export default function FormsPage() {
       {/* 2. RadioGroup Primitives */}
       <section id="radio-group" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>RadioGroup Primitives</span>
-          </h2>
+          <SectionHeading title="RadioGroup Primitives" />
           <p className="text-sm text-muted-foreground">
             Accessible single-choice selectors supporting card tiles, descriptions, and keyboard arrow selection.
           </p>
@@ -478,9 +475,7 @@ export default function FormsPage() {
       {/* 3. Basic Form Controls */}
       <section id="forms" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Basic Form Controls</span>
-          </h2>
+          <SectionHeading title="Basic Form Controls" />
           <p className="text-sm text-muted-foreground">
             Fundamental input controls: text input, error state, select menu, textarea, checkbox, and switch.
           </p>
@@ -558,9 +553,7 @@ export default function FormsPage() {
       {/* 3b. Rich text description (S-004.03 demo ringkas 006-05) */}
       <section id="rte-demo" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Rich Text Description</span>
-          </h2>
+          <SectionHeading title="Rich Text Description" />
           <p className="text-sm text-muted-foreground">
             Demo ringkas S-004.03: placeholder + toolbar + counter. Contoh form benar (controlled). Panel demo penuh di{' '}
             <a className="text-highlight underline underline-offset-4" href="/patterns/rich-text-editor">S-005.22</a>.
@@ -582,9 +575,7 @@ export default function FormsPage() {
       {/* 4. File Uploads */}
       <section id="file-uploads" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>File Uploads</span>
-          </h2>
+          <SectionHeading title="File Uploads" />
           <p className="text-sm text-muted-foreground">
             Dropzone terpadu dengan drag & drop, file size validation, multiple file list dengan removal feedback.
           </p>
@@ -668,9 +659,7 @@ export default function FormsPage() {
       {/* 5. Form Sections & Error Summary */}
       <section id="form-sections" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Form Sections & Error Summary</span>
-          </h2>
+          <SectionHeading title="Form Sections & Error Summary" />
           <p className="text-sm text-muted-foreground">
             High-level layout wrappers for grouping related form fields and announcing multiple errors at the top of long forms.
           </p>
@@ -709,9 +698,7 @@ export default function FormsPage() {
       {/* 6. Combobox / Autocomplete */}
       <section id="combobox" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Combobox / Autocomplete</span>
-          </h2>
+          <SectionHeading title="Combobox / Autocomplete" />
           <p className="text-sm text-muted-foreground">
             Search-as-you-type across label, description & keywords, plus multi select with chips, async loading, and creatable modes.
           </p>
@@ -801,9 +788,7 @@ export default function FormsPage() {
       {/* 7. Tag Input */}
       <section id="tags" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Tag Input</span>
-          </h2>
+          <SectionHeading title="Tag Input" />
           <p className="text-sm text-muted-foreground">
             Free-form tag entry with Enter to add, Backspace to remove, paste support, and max-tag validation.
           </p>
@@ -836,9 +821,7 @@ export default function FormsPage() {
       {/* 8. Date & Range Pickers */}
       <section id="date" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Date & Range Pickers</span>
-          </h2>
+          <SectionHeading title="Date & Range Pickers" />
           <p className="text-sm text-muted-foreground">
             Clearable calendars with Indonesian locale, presets, and range validation.
           </p>
@@ -898,9 +881,7 @@ export default function FormsPage() {
       {/* 9. Time & OTP Inputs */}
       <section id="time" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Time & OTP Inputs</span>
-          </h2>
+          <SectionHeading title="Time & OTP Inputs" />
           <p className="text-sm text-muted-foreground">
             Spin-button segmented time input with clamping, plus auto-advance OTP with paste support.
           </p>
@@ -951,9 +932,7 @@ export default function FormsPage() {
       {/* 10. Filter Builder */}
       <section id="filter-builder" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Filter Builder</span>
-          </h2>
+          <SectionHeading title="Filter Builder" />
           <p className="text-sm text-muted-foreground">
             Build complex filter queries from field/operator/value rows, then save and reapply them as reusable views.
           </p>

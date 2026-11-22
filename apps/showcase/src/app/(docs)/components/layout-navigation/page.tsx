@@ -24,6 +24,7 @@ import {
   Bell,
   ChevronDown,
 } from 'lucide-react';
+import { SectionHeading } from '@/components/section-heading';
 import {
   PageHeader,
   Card,
@@ -190,9 +191,7 @@ export default function LayoutNavigationPage() {
 
       <section id="sidebar-system" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Sidebar System</span>
-          </h2>
+          <SectionHeading title="Sidebar System" />
           <p className="text-sm text-muted-foreground">
             A composable, responsive sidebar layout system supporting icon collapse, floating and inset variants, mobile drawer sheets, and standardized keyboard navigation.
           </p>
@@ -563,9 +562,7 @@ export default function LayoutNavigationPage() {
 
       <section id="mega-menu" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Mega Menu (Multi-Column Dropdown)</span>
-          </h2>
+          <SectionHeading title="Mega Menu (Multi-Column Dropdown)" />
           <p className="text-sm text-muted-foreground">
             Enterprise navigation menu featuring multi-column categories, rich items with icons, badges, descriptions, and featured promo cards.
           </p>
@@ -672,9 +669,7 @@ export default function LayoutNavigationPage() {
 
       <section id="navbar" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Navbar System</span>
-          </h2>
+          <SectionHeading title="Navbar System" />
           <p className="text-sm text-muted-foreground">
             Responsive header navigation bar supporting sticky, blurred glass, and floating variants with mobile drawer integration.
           </p>
@@ -731,9 +726,7 @@ export default function LayoutNavigationPage() {
 
       <section id="app-shell" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>AppShell Primitives</span>
-          </h2>
+          <SectionHeading title="AppShell Primitives" />
           <p className="text-sm text-muted-foreground">
             Standardized application shells coordinating headers, insets, scrolling containers, and footers with dvh-safe height calculations.
           </p>
@@ -773,9 +766,7 @@ export default function LayoutNavigationPage() {
 
       <section id="resizable" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Resizable Split Panels</span>
-          </h2>
+          <SectionHeading title="Resizable Split Panels" />
           <p className="text-sm text-muted-foreground">
             Drag-to-resize split panes powered by react-resizable-panels, supporting horizontal and vertical directions, drag handles, and keyboard accessibility.
           </p>
@@ -816,9 +807,7 @@ export default function LayoutNavigationPage() {
 
       <section id="tabs-accordion" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Tabs & Accordion</span>
-          </h2>
+          <SectionHeading title="Tabs & Accordion" />
           <p className="text-sm text-muted-foreground">
             Tabs navigation variants (pills, underline, enclosed) and collapsible accordion patterns for FAQ and disclosure workflows.
           </p>
@@ -959,9 +948,7 @@ export default function LayoutNavigationPage() {
 
       <section id="collapsible-breadcrumb" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Collapsible & Breadcrumb</span>
-          </h2>
+          <SectionHeading title="Collapsible & Breadcrumb" />
           <p className="text-sm text-muted-foreground">
             Accessible expand/collapse triggers with animated content, truncated breadcrumb navigation paths, and table sub-parts with caption and footer.
           </p>
@@ -1067,9 +1054,7 @@ export default function LayoutNavigationPage() {
 
       <section id="pagination" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Pagination Navigation</span>
-          </h2>
+          <SectionHeading title="Pagination Navigation" />
           <p className="text-sm text-muted-foreground">
             Standardized pagination component suite supporting previous/next arrows, page indicators, and ellipses for large page counts.
           </p>
@@ -1142,9 +1127,7 @@ export default function LayoutNavigationPage() {
 
       <section id="footer" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Footer System</span>
-          </h2>
+          <SectionHeading title="Footer System" />
           <p className="text-sm text-muted-foreground">
             Multi-column marketing footers with external links, badges, legal text, and bottom bars.
           </p>
@@ -1190,9 +1173,7 @@ export default function LayoutNavigationPage() {
 
       <section id="bottom-nav" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Bottom Mobile Navigation & Drawer</span>
-          </h2>
+          <SectionHeading title="Bottom Mobile Navigation & Drawer" />
           <p className="text-sm text-muted-foreground">
             Touch-optimized mobile shell containers with safe-area padding, notification badges, active state indicators, and sheet drawer integration.
           </p>
@@ -1264,9 +1245,7 @@ export default function LayoutNavigationPage() {
 
       <section id="menubar" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Desktop Menubar</span>
-          </h2>
+          <SectionHeading title="Desktop Menubar" />
           <p className="text-sm text-muted-foreground">
             Native OS-style top menu bar powered by Radix UI with submenus, keyboard shortcuts, and checkbox/radio items.
           </p>
@@ -1325,9 +1304,7 @@ export default function LayoutNavigationPage() {
 
       <section id="aspect-ratio-skip-link" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Aspect Ratio & Skip Link</span>
-          </h2>
+          <SectionHeading title="Aspect Ratio & Skip Link" />
           <p className="text-sm text-muted-foreground">
             Media aspect ratio containers and accessibility bypass links.
           </p>

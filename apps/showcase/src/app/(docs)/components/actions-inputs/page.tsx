@@ -33,6 +33,7 @@ import {
   Plus,
   Underline as UnderlineIcon,
 } from 'lucide-react';
+import { SectionHeading } from '@/components/section-heading';
 
 export default function ActionsInputsPage() {
   const [switchActive, setSwitchActive] = React.useState(true);
@@ -64,9 +65,7 @@ export default function ActionsInputsPage() {
       {/* 1. Buttons & Actions */}
       <section id="buttons" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Buttons & Actions</span>
-          </h2>
+          <SectionHeading title="Buttons & Actions" />
           <p className="text-sm text-muted-foreground">
             Action trigger dengan variant status, ukuran, ikon, tombol toggle, dan keyboard shortcut (Kbd).
           </p>
@@ -144,9 +143,7 @@ export default function ActionsInputsPage() {
       {/* 2. Badges & Status */}
       <section id="badges" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Badges & Status</span>
-          </h2>
+          <SectionHeading title="Badges & Status" />
           <p className="text-sm text-muted-foreground">
             Label status kecil dengan variant filled, outline, dan semantic token untuk success, warning, destructive, serta info.
           </p>
@@ -176,9 +173,7 @@ export default function ActionsInputsPage() {
       {/* 3. Rating & Star Feedback */}
       <section id="ratings" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Rating & Star Feedback</span>
-          </h2>
+          <SectionHeading title="Rating & Star Feedback" />
           <p className="text-sm text-muted-foreground">
             Komponen review interaktif dengan hover preview, precision half-star, keyboard navigation, dan read-only display mode.
           </p>
@@ -217,9 +212,7 @@ export default function ActionsInputsPage() {
       {/* 4. Toggle & Toggle Group */}
       <section id="toggles" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Toggle & Toggle Group</span>
-          </h2>
+          <SectionHeading title="Toggle & Toggle Group" />
           <p className="text-sm text-muted-foreground">
             Tombol toggle terisolasi dengan variant outline/ghost, ukuran, dan status pressed yang dapat dikontrol. Untuk grup eksklusif gunakan SegmentedControl (berbasis Radix ToggleGroup).
           </p>
@@ -320,9 +313,7 @@ export default function ActionsInputsPage() {
       {/* 5. Switch & Checkbox */}
       <section id="switch-checkbox" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Switch & Checkbox</span>
-          </h2>
+          <SectionHeading title="Switch & Checkbox" />
           <p className="text-sm text-muted-foreground">
             Switch untuk preferensi on/off dan Checkbox untuk multi-seleksi dalam daftar opsi.
           </p>
@@ -397,9 +388,7 @@ export default function ActionsInputsPage() {
       {/* 6. Radio Group */}
       <section id="radio-group" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Radio Group</span>
-          </h2>
+          <SectionHeading title="Radio Group" />
           <p className="text-sm text-muted-foreground">
             Seleksi tunggal eksklusif dalam daftar vertikal dengan keyboard arrow navigation.
           </p>
@@ -453,9 +442,7 @@ export default function ActionsInputsPage() {
       {/* 7. Slider */}
       <section id="slider" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Slider</span>
-          </h2>
+          <SectionHeading title="Slider" />
           <p className="text-sm text-muted-foreground">
             Slider single value dan range berbasis Radix dengan keyboard arrow support dan touch-friendly thumb.
           </p>
@@ -499,9 +486,7 @@ export default function ActionsInputsPage() {
       {/* 8. Segmented Control */}
       <section id="segmented-control" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Segmented Control</span>
-          </h2>
+          <SectionHeading title="Segmented Control" />
           <p className="text-sm text-muted-foreground">
             Kontrol grup eksklusif berbasis Radix ToggleGroup untuk mode tampilan, durasi, atau scope.
           </p>
@@ -546,9 +531,7 @@ export default function ActionsInputsPage() {
       {/* 9. Number Input */}
       <section id="number-input" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Number Input</span>
-          </h2>
+          <SectionHeading title="Number Input" />
           <p className="text-sm text-muted-foreground">
             Stepper input numerik dengan tombol increment/decrement, keyboard arrow, clamping, prefix & suffix.
           </p>
@@ -591,9 +574,7 @@ export default function ActionsInputsPage() {
       {/* 10. Search Input */}
       <section id="search-input" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Search Input</span>
-          </h2>
+          <SectionHeading title="Search Input" />
           <p className="text-sm text-muted-foreground">
             Input pencarian dengan ikon, clear button, dan shortcut Kbd; tersedia 3 ukuran.
           </p>
@@ -633,9 +614,7 @@ export default function ActionsInputsPage() {
       {/* 11. OTP Input */}
       <section id="otp-input" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>OTP Input</span>
-          </h2>
+          <SectionHeading title="OTP Input" />
           <p className="text-sm text-muted-foreground">
             Input kode verifikasi 6 digit dengan auto-focus berpindah, backspace navigation, dan paste support.
           </p>

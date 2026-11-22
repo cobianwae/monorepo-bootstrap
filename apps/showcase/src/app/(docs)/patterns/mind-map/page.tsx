@@ -21,6 +21,7 @@ import { MindMapRecipe } from './_components/mind-map-recipe';
 import { MindMapShortcuts } from './_components/mind-map-shortcuts';
 import { MindMapUseCases } from './_components/mind-map-use-cases';
 import { EXAMPLE, LARGE, STEPS, type DemoState } from './_components/mind-map-demo-data';
+import { SectionHeading } from '@/components/section-heading';
 
 export default function MindMapPatternPage() {
   const [data, setData] = React.useState<MindNodeFlat[]>(EXAMPLE);
@@ -115,9 +116,7 @@ export default function MindMapPatternPage() {
       <section aria-labelledby="mind-demo">
         <Card>
           <CardHeader className="space-y-1 pb-4">
-            <h2 id="mind-demo" className="font-display text-2xl font-bold text-foreground">
-              <span>Demo interaktif</span>
-            </h2>
+            <SectionHeading id="mind-demo" title="Demo interaktif" />
             <CardDescription>
               Pilih status data atau tampilan di panel, lalu coba langsung di kanvas.
             </CardDescription>
@@ -161,9 +160,7 @@ export default function MindMapPatternPage() {
 
       <section aria-labelledby="mind-steps" className="space-y-3">
         <div className="space-y-1">
-          <h2 id="mind-steps" className="font-display text-2xl font-bold text-foreground">
-            <span>Alur brainstorming</span>
-          </h2>
+          <SectionHeading id="mind-steps" title="Alur brainstorming" />
           <p className="text-sm text-muted-foreground">
             Ikuti enam langkah ini untuk mengembangkan ide pusat menjadi rencana yang terstruktur.
           </p>

@@ -55,7 +55,8 @@ Verifikasi:
 - Diff: 4 baris ditambah, 123 dihapus (kelas `flex items-center gap-2` di h2 dihapus; h2 tetap manual).
 - `pnpm --filter @ds/showcase build:types`, `lint`, `visual-language-guard` (4/4): hijau.
 - Screenshot dark Atelier/Pulse: `components/states-feedback`, `patterns/settings` tampak rapi; `patterns/mind-map` belum terkonfirmasi dark (probe tidak menerapkan dark).
-- Belum: `SectionHeading` belum dipakai di 11 halaman ini (prop `id` untuk `aria-labelledby` belum ada); 122 `<h2` manual di docs non-foundations belum dimigrasikan; light mode belum diverifikasi untuk semua 11 halaman.
+- Migrasi lanjutan: 78 `<h2>` di 11 halaman diganti `SectionHeading` (prop `id` ditambahkan ke `SectionHeading` untuk `aria-labelledby`). h2 tersisa di 11 halaman: 0. Verifikasi: build:types, lint, guard hijau; screenshot dark forms dan data-display rapi.
+- Belum: 44 `<h2` manual di halaman docs non-foundations lain; light mode untuk 11 halaman belum diverifikasi.
 - Catatan proses: pertama kali skrip menghapus koma import dan import yang masih dipakai; keduanya sudah diperbaiki sebelum commit.
 
 - [ ] CR disetujui user.

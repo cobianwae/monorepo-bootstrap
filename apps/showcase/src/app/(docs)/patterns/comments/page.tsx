@@ -43,6 +43,7 @@ import {
   ChevronDown,
   MessageCircleOff,
 } from 'lucide-react';
+import { SectionHeading } from '@/components/section-heading';
 
 interface Person {
   id: string;
@@ -936,9 +937,7 @@ export default function CommentsPage() {
       />
 
       <section id="composer" className="space-y-4 scroll-mt-20">
-        <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-          <span>Comment Composer</span>
-        </h2>
+        <SectionHeading title="Comment Composer" />
 
         <Card className="border-border">
           <CardHeader className="gap-1.5">
@@ -955,9 +954,7 @@ export default function CommentsPage() {
       </section>
 
       <section id="discussion" className="space-y-4 scroll-mt-20">
-        <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-          <span>Threaded Discussion</span>
-        </h2>
+        <SectionHeading title="Threaded Discussion" />
 
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <SegmentedControl

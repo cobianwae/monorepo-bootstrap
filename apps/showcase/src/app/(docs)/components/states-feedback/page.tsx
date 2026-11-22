@@ -35,6 +35,7 @@ import {
   Inbox,
   Info,
 } from 'lucide-react';
+import { SectionHeading } from '@/components/section-heading';
 
 export default function StatesFeedbackPage() {
   const [progress, setProgress] = React.useState(13);
@@ -62,9 +63,7 @@ export default function StatesFeedbackPage() {
       {/* 1. Alerts & Banners */}
       <section id="alerts-banners" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Alerts & Banners</span>
-          </h2>
+          <SectionHeading title="Alerts & Banners" />
           <p className="text-sm text-muted-foreground">
             Alert inline dengan variant status (default, success, warning, destructive) dan Banner dismissible untuk announcement.
           </p>
@@ -165,9 +164,7 @@ export default function StatesFeedbackPage() {
       {/* 2. Notifications & Activity Feed */}
       <section id="notifications" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Notifications & Activity Feed</span>
-          </h2>
+          <SectionHeading title="Notifications & Activity Feed" />
           <p className="text-sm text-muted-foreground">
             Pola feed notifikasi dengan unread indicator dot, timestamp, tindakan langsung, dan dismissal.
           </p>
@@ -231,9 +228,7 @@ export default function StatesFeedbackPage() {
       {/* 3. Spinners & Loading Indicators */}
       <section id="spinners" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Spinners & Loading Indicators</span>
-          </h2>
+          <SectionHeading title="Spinners & Loading Indicators" />
           <p className="text-sm text-muted-foreground">
             Accessible loading spinner dengan customizable sizes, status tokens, dan role=&quot;status&quot; screen reader announcements.
           </p>
@@ -276,9 +271,7 @@ export default function StatesFeedbackPage() {
       {/* 4. Skeleton Loading Placeholders */}
       <section id="skeletons" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Skeleton Loading Placeholders</span>
-          </h2>
+          <SectionHeading title="Skeleton Loading Placeholders" />
           <p className="text-sm text-muted-foreground">
             Non-interactive placeholder blocks mirroring the exact shape of incoming content. Uses `animate-pulse` with the `muted` surface token, and respects `prefers-reduced-motion`.
           </p>
@@ -366,9 +359,7 @@ export default function StatesFeedbackPage() {
       {/* 5. Progress */}
       <section id="progress" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Progress</span>
-          </h2>
+          <SectionHeading title="Progress" />
           <p className="text-sm text-muted-foreground">
             Progress bar determinate berbasis Radix untuk status pengerjaan, upload, atau tugas berjangka.
           </p>
@@ -410,9 +401,7 @@ export default function StatesFeedbackPage() {
       {/* 6. Empty State */}
       <section id="empty-state" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Empty State</span>
-          </h2>
+          <SectionHeading title="Empty State" />
           <p className="text-sm text-muted-foreground">
             Placeholder konten kosong dengan ikon, judul, deskripsi, dan primary/secondary action.
           </p>
@@ -436,9 +425,7 @@ export default function StatesFeedbackPage() {
       {/* 7. Error Page */}
       <section id="error-page" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Error Page</span>
-          </h2>
+          <SectionHeading title="Error Page" />
           <p className="text-sm text-muted-foreground">
             Error boundary UI dengan pesan error terformat, tombol reset, dan reload.
           </p>

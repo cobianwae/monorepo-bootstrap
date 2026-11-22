@@ -55,6 +55,7 @@ import {
   Trash2,
   Activity,
 } from 'lucide-react';
+import { SectionHeading } from '@/components/section-heading';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -312,9 +313,7 @@ export default function BillingPage() {
 
       <section id="current-plan" className="space-y-4 scroll-mt-20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Current Plan</span>
-          </h2>
+          <SectionHeading title="Current Plan" />
           <SegmentedControl
             type="single"
             value={billingCycle}
@@ -430,9 +429,7 @@ export default function BillingPage() {
 
       <section id="invoices" className="space-y-4 scroll-mt-20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Invoices</span>
-          </h2>
+          <SectionHeading title="Invoices" />
           <SegmentedControl
             type="single"
             value={invoiceFilter}
@@ -533,9 +530,7 @@ export default function BillingPage() {
 
       <section id="payment-method" className="space-y-4 scroll-mt-20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Payment Method</span>
-          </h2>
+          <SectionHeading title="Payment Method" />
           <Dialog open={addCardOpen} onOpenChange={setAddCardOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm" className="gap-1.5 self-start sm:self-auto">
@@ -714,9 +709,7 @@ export default function BillingPage() {
       </section>
 
       <section id="billing-details" className="space-y-4 scroll-mt-20">
-        <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-          <span>Billing Details</span>
-        </h2>
+        <SectionHeading title="Billing Details" />
 
         <Card>
           <CardHeader>

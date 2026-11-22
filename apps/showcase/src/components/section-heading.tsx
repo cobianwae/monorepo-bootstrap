@@ -2,6 +2,8 @@ import type * as React from 'react';
 import { cn } from '@ds/ui';
 
 export interface SectionHeadingProps {
+  /** id untuk h2, dipakai `aria-labelledby` pada section. */
+  id?: string;
   title: React.ReactNode;
   /**
    * Satu kalimat penjelas di bawah judul. Opsional: isi hanya bila menambah informasi
@@ -19,11 +21,13 @@ export interface SectionHeadingProps {
  * (Type Scale + Section Heading). `text-2xl font-bold font-display` agar art direction terlihat.
  * Sengaja tanpa ikon dan tanpa level sub: belum ada kebutuhan nyata (aturan 3x, CR-037).
  */
-export function SectionHeading({ title, description, actions, className }: SectionHeadingProps) {
+export function SectionHeading({ id, title, description, actions, className }: SectionHeadingProps) {
   return (
     <div className={cn('flex items-start justify-between gap-4', className)}>
       <div className="space-y-1">
-        <h2 className="text-2xl font-bold text-foreground font-display">{title}</h2>
+        <h2 id={id} className="text-2xl font-bold text-foreground font-display">
+          {title}
+        </h2>
         {description && <p className="text-sm text-muted-foreground">{description}</p>}
       </div>
       {actions && <div className="shrink-0">{actions}</div>}

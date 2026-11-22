@@ -26,6 +26,7 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
+import { SectionHeading } from '@/components/section-heading';
 import {
   PageHeader,
   Banner,
@@ -434,9 +435,7 @@ export default function DataDisplayPage() {
       {/* 1. Card Variants */}
       <section id="card-variants" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Card Variants & Interactive States</span>
-          </h2>
+          <SectionHeading title="Card Variants & Interactive States" />
           <p className="text-sm text-muted-foreground">
             Varian card untuk konteks hierarki konten berbeda: Default, Interactive (hover), Selectable, Glassmorphism, Gradient, and Flat.
           </p>
@@ -524,9 +523,7 @@ export default function DataDisplayPage() {
       {/* 2. Avatars & Avatar Groups */}
       <section id="avatars" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Avatars & Avatar Groups</span>
-          </h2>
+          <SectionHeading title="Avatars & Avatar Groups" />
           <p className="text-sm text-muted-foreground">
             Support 5 ukuran (xs, sm, default, lg, xl), live status indicators (online, away, busy, offline), dan overlapping AvatarGroup.
           </p>
@@ -586,9 +583,7 @@ export default function DataDisplayPage() {
       {/* 3. Carousel Basic */}
       <section id="carousel-basic" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Interactive Carousel</span>
-          </h2>
+          <SectionHeading title="Interactive Carousel" />
           <p className="text-sm text-muted-foreground">
             Touch-swipe and keyboard navigable carousel with navigation arrows and dot indicators.
           </p>
@@ -654,9 +649,7 @@ export default function DataDisplayPage() {
       {/* 4. Carousel Multi */}
       <section id="carousel-multi" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Multi-Card Carousel Grid</span>
-          </h2>
+          <SectionHeading title="Multi-Card Carousel Grid" />
           <p className="text-sm text-muted-foreground">
             Responsive basis sizing (`basis-full md:basis-1/2 lg:basis-1/3`) for multi-item slider decks.
           </p>
@@ -709,9 +702,7 @@ export default function DataDisplayPage() {
       {/* 5. Scroll Area */}
       <section id="scroll-area" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Custom ScrollArea</span>
-          </h2>
+          <SectionHeading title="Custom ScrollArea" />
           <p className="text-sm text-muted-foreground">
             Cross-browser accessible scrolling container with styled scrollbars, keyboard focus support, and horizontal & vertical modes.
           </p>
@@ -795,9 +786,7 @@ export default function DataDisplayPage() {
       {/* 6. Code Blocks */}
       <section id="code-blocks" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Code Blocks & Snippets</span>
-          </h2>
+          <SectionHeading title="Code Blocks & Snippets" />
           <p className="text-sm text-muted-foreground">
             Container syntax dengan copy-to-clipboard, file badge label, dan collapsible option.
           </p>
@@ -824,9 +813,7 @@ export function ActionExample() {
       {/* 7. StatCard Variants & Trends */}
       <section id="stat-cards" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>StatCard Variants & Trends</span>
-          </h2>
+          <SectionHeading title="StatCard Variants & Trends" />
           <p className="text-sm text-muted-foreground">
             Pre-built stat presentations with up/down/neutral trend deltas and highlight hero variant.
           </p>
@@ -867,9 +854,7 @@ export function ActionExample() {
       {/* 8. Timeline */}
       <section id="timeline" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Timeline</span>
-          </h2>
+          <SectionHeading title="Timeline" />
           <p className="text-sm text-muted-foreground">
             Vertical progress timeline with status dots, custom icons, timestamps, and badge slots; supports left and alternate alignment.
           </p>
@@ -904,9 +889,7 @@ export function ActionExample() {
       {/* 9. Description List */}
       <section id="description-list" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Description List</span>
-          </h2>
+          <SectionHeading title="Description List" />
           <p className="text-sm text-muted-foreground">
             Accessible definition list (`dl`) with configurable columns, dividers, and optional hint rows for detail views.
           </p>
@@ -938,9 +921,7 @@ export function ActionExample() {
       {/* 10. Metric Tiles Card */}
       <section id="metric-tiles" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Metric Tiles Card</span>
-          </h2>
+          <SectionHeading title="Metric Tiles Card" />
           <p className="text-sm text-muted-foreground">
             Composite metric strip with three tiles, optional progress bar, tone colors, and footer slot.
           </p>
@@ -970,9 +951,7 @@ export function ActionExample() {
       {/* 11. Bulk Action Bar */}
       <section id="bulk-action-bar" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Bulk Action Bar</span>
-          </h2>
+          <SectionHeading title="Bulk Action Bar" />
           <p className="text-sm text-muted-foreground">
             Sticky selection toolbar that appears above data tables with a count label, action buttons, and a clear-selection control.
           </p>
@@ -1045,9 +1024,7 @@ export function ActionExample() {
       {/* 12. Chart A11y Table */}
       <section id="chart-a11y-table" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Chart Accessibility Table</span>
-          </h2>
+          <SectionHeading title="Chart Accessibility Table" />
           <p className="text-sm text-muted-foreground">
             Screen-reader-only table rendered alongside a visual chart so data remains accessible to assistive technology.
           </p>
@@ -1109,9 +1086,7 @@ export function ActionExample() {
       {/* 13. TreeView */}
       <section id="tree-view" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Hierarchical TreeView</span>
-          </h2>
+          <SectionHeading title="Hierarchical TreeView" />
           <p className="text-sm text-muted-foreground">
             Nested directory explorer with keyboard navigation (arrow keys, enter, home/end), icon slots, and selection callbacks.
           </p>
@@ -1161,9 +1136,7 @@ export function ActionExample() {
       {/* 14. Sortable List */}
       <section id="sortable-list" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>Drag & Drop Sortable List</span>
-          </h2>
+          <SectionHeading title="Drag & Drop Sortable List" />
           <p className="text-sm text-muted-foreground">
             Reorderable list with smooth animations, touch sensors, keyboard sorting, and drag handles built on `@dnd-kit`.
           </p>
@@ -1205,9 +1178,7 @@ export function ActionExample() {
       {/* 15. Chat Suite */}
       <section id="chat-interface" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <span>AI Copilot & Chat Suite</span>
-          </h2>
+          <SectionHeading title="AI Copilot & Chat Suite" />
           <p className="text-sm text-muted-foreground">
             Turnkey AI conversational UI featuring chat threads, bubble sender variants, typing indicators, suggested prompts, and multiline composer.
           </p>
