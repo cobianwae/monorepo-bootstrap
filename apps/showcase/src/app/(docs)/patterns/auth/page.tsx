@@ -327,7 +327,7 @@ export default function AuthPage() {
           <TabsContent value="2fa">
             <Card className="border-border shadow-md text-center">
               <CardHeader className="space-y-1">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-2">
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-highlight/10 text-highlight mb-2">
                   <ShieldCheck className="h-6 w-6" />
                 </div>
                 <CardTitle className="text-xl">Two-Factor Authentication</CardTitle>

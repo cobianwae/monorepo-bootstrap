@@ -30,13 +30,13 @@ Pemakaian varian `info` di showcase: `states-feedback/page.tsx:149` (teks "Sched
 
 ## Tasks (jalur small-fix)
 
-- [ ] Persetujuan user untuk mengubah kelas varian `info` di `packages/ui`.
-- [ ] Hitung rasio final `foreground` (dan `info`) di atas tint 15% untuk 8 tema, light dan dark, lewat `packages/tokens/src/contrast.ts` atau skrip, lalu catat di tabel.
-- [ ] Ubah `banner.tsx:18`.
-- [ ] Tambah tes unit (Banner `info`) bila perlu, atau verifikasi lewat `pnpm test` ui.
-- [ ] Screenshot `components/states-feedback` (light & dark) untuk banner info.
-- [ ] Audit varian `success`, `warning`, `destructive` dengan pola yang sama (tercatat, bukan bagian CR ini kecuali disetujui).
-- [ ] Verifikasi: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm --filter @ds/showcase exec vitest run src/test/visual-language-guard.test.ts`.
+- [x] Persetujuan user untuk mengubah kelas varian `info` di `packages/ui`.
+- [x] Hitung rasio final `foreground` (dan `info`) di atas tint 15% untuk 8 tema, light dan dark, lewat `packages/tokens/src/contrast.ts` atau skrip, lalu catat di tabel.
+- [x] Ubah `banner.tsx:18`.
+- [x] Tambah tes unit (Banner `info`) bila perlu, atau verifikasi lewat `pnpm test` ui.
+- [x] Screenshot `components/states-feedback` (light & dark) untuk banner info.
+- [x] Audit varian `success`, `warning`, `destructive` dengan pola yang sama (tercatat, bukan bagian CR ini kecuali disetujui).
+- [x] Verifikasi: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm --filter @ds/showcase exec vitest run src/test/visual-language-guard.test.ts`.
 
 ## Keputusan
 
@@ -47,11 +47,11 @@ Pemakaian varian `info` di showcase: `states-feedback/page.tsx:149` (teks "Sched
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA (≥ 4,5:1 untuk teks) pada tint.
-- [ ] Perilaku Radix/a11y tidak rusak.
-- [ ] API `cva` dan export tetap konsisten.
-- [ ] Showcase/docs diperbarui bila perlu.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA (≥ 4,5:1 untuk teks) pada tint.
+- [x] Perilaku Radix/a11y tidak rusak.
+- [x] API `cva` dan export tetap konsisten.
+- [x] Showcase/docs diperbarui bila perlu.
 
 ## Eksekusi
 
@@ -75,9 +75,9 @@ Verifikasi:
 - Screenshot dark `warning` belum dikonfirmasi lewat probe (probe gagal menerapkan dark); hasil ini murni hitungan token.
 - Tindak lanjut (dijalankan setelah persetujuan user, 2026-11-22): `Alert` varian `destructive` memakai `text-foreground` (`packages/ui/src/components/feedback/alert.tsx`), ikon dan border tetap `destructive`. Tes `@ds/ui` feedback 10/10 lulus; lint hijau. Ini dicatat di CR-042 (lihat dokumen CR-042).
 
-- [ ] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR disetujui user.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.

@@ -109,6 +109,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-047 | State terpilih dan kotak ikon `bg-primary` (dekoratif) di halaman docs/scenario; pola interaksi, disetujui | approved | `docs/cr/cr-047-state-terpilih-bg-primary.md` |
 | CR-048 | Demo Directional Motion tampil kosong sebelum Play | done | `docs/cr/cr-048-directional-motion-kotak-kosong.md` |
 | CR-049 | State terpilih dan ikon dekoratif `primary` di `clinic`, `crm`, `scenarios` (lanjutan CR-047); tautan dan nilai tetap primary | done | `docs/cr/cr-049-primary-state-dan-ikon-clinic-crm-scenarios.md` |
+| CR-050 | Sisa `primary` dekoratif (onboarding, layout-navigation, consultations, reports, auth), guard solid fill, penutupan deviasi visual | draft | `docs/cr/cr-050-sisa-primary-dan-deviasi-visual.md` |
 
 ## Catatan
 

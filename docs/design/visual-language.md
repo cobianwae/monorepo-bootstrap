@@ -57,10 +57,10 @@ Aturan:
 - Heading section dan sub-section memakai `font-display` agar art direction terlihat.
 - Heading section ditulis lewat `SectionHeading`, bukan class manual.
 
-Deviasi yang diketahui (dicatat, ditunda, bukan blocker):
+Deviasi (diputuskan di CR-050; dokumen mengikuti implementasi, tidak ada perubahan kode):
 
-- `PageHeader` h1 memakai `text-3xl sm:text-4xl` (1.875/2.25rem), bukan 2rem/2.5rem; Tailwind default tidak punya utility 2rem/2.5rem. Mengubahnya = API publik `@ds/ui` → CR terpisah bila diperlukan.
-- Weight scale Heading 2/3 = 600, praktik docs (97 pemakaian) = `font-bold` (700). Praktik menang untuk docs; sinkronisasi nilai token ditunda.
+- `PageHeader` h1 memakai `text-3xl sm:text-4xl` (1.875/2.25rem), bukan 2rem/2.5rem. Keputusan: nilai ini **berlaku** untuk h1 `PageHeader`. Mengubahnya berarti mengubah API publik `@ds/ui`, dan itu hanya dilakukan lewat CR baru bila user memintanya.
+- Weight Heading 2/3 di docs = `font-bold` (700), bukan 600 dari token. Keputusan: docs memakai 700. Nilai token weight 600 tidak diubah; sinkronisasi token hanya lewat CR token terpisah.
 
 ## Section Heading & Callout (halaman docs) ✔
 

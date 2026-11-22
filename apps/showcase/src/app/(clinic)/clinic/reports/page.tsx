@@ -197,8 +197,8 @@ export default function ClinicReportsPage() {
               </p>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-primary/10 border border-primary/20 space-y-1">
-              <span className="font-mono text-xs uppercase font-bold text-primary block">
+            <div className="p-3.5 rounded-xl bg-highlight/10 border border-highlight/30 space-y-1">
+              <span className="font-mono text-xs uppercase font-bold text-foreground block">
                 Dietician High-Protein Protocol
               </span>
               <p className="text-foreground leading-relaxed">

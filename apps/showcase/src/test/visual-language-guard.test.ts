@@ -53,6 +53,12 @@ const RULES: Rule[] = [
     pattern: /\? 'bg-primary text-primary-foreground shadow-xs'/,
     hint: 'Segmented/toggle wajib memakai SegmentedControl dari @ds/ui.',
   },
+  {
+    id: 'solid-primary-fill',
+    pattern: /\bbg-primary text-primary-foreground\b/,
+    hint: 'Fill solid primary hanya untuk tombol aksi (Button). Ikon/state memakai highlight atau bg-background + ring (CR-047, CR-050).',
+    root: SRC,
+  },
 ];
 
 function collectPages(dir: string): string[] {

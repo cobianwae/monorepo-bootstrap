@@ -392,7 +392,7 @@ export default function LayoutNavigationPage() {
                     <span className="text-xs font-bold text-foreground font-display">Apex Inset</span>
                   </div>
                   <div className="space-y-1">
-                    <div className="px-2 py-1.5 rounded-md bg-primary text-primary-foreground text-xs font-medium flex items-center gap-2">
+                    <div className="px-2 py-1.5 rounded-md border border-highlight bg-highlight/10 text-foreground ring-1 ring-highlight text-xs font-medium flex items-center gap-2">
                       <Home className="h-3.5 w-3.5" />
                       <span>Overview</span>
                     </div>

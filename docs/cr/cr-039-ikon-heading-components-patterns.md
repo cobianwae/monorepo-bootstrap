@@ -24,12 +24,12 @@ Catatan: angka sebelumnya di CR-038 (±81 dan ±128) adalah estimasi. Angka hitu
 
 ## Tasks (jalur small-fix, dikerjakan per halaman)
 
-- [ ] Persetujuan user untuk rencana ini (menghapus ikon mengubah tampilan semua halaman terkait).
-- [ ] Daftar 11 file sebagai batch; kerjakan per halaman, bukan sekaligus.
-- [ ] Untuk tiap halaman: ganti heading ke `SectionHeading`, hapus ikon, bersihkan import.
-- [ ] Screenshot per halaman (dark Atelier/Pulse, lalu light) dan catat di CR ini.
-- [ ] Verifikasi: `pnpm --filter @ds/showcase lint`, `build:types`, `visual-language-guard` hijau.
-- [ ] Setelah semua selesai: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build` (dijalankan dari salinan bila dev server aktif).
+- [x] Persetujuan user untuk rencana ini (menghapus ikon mengubah tampilan semua halaman terkait).
+- [x] Daftar 11 file sebagai batch; kerjakan per halaman, bukan sekaligus.
+- [x] Untuk tiap halaman: ganti heading ke `SectionHeading`, hapus ikon, bersihkan import.
+- [x] Screenshot per halaman (dark Atelier/Pulse, lalu light) dan catat di CR ini.
+- [x] Verifikasi: `pnpm --filter @ds/showcase lint`, `build:types`, `visual-language-guard` hijau.
+- [x] Setelah semua selesai: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build` (dijalankan dari salinan bila dev server aktif).
 
 ## Keputusan
 
@@ -40,10 +40,10 @@ Catatan: angka sebelumnya di CR-038 (±81 dan ±128) adalah estimasi. Angka hitu
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode.
-- [ ] Hierarki heading tetap (h1 → h2) dan tidak ada h3 tunggal.
-- [ ] Tidak ada regresi a11y (urutan heading, nama accessible).
-- [ ] Guard `visual-language-guard` tetap hijau.
+- [x] Tidak ada hex/RGB hardcode.
+- [x] Hierarki heading tetap (h1 → h2) dan tidak ada h3 tunggal.
+- [x] Tidak ada regresi a11y (urutan heading, nama accessible).
+- [x] Guard `visual-language-guard` tetap hijau.
 
 ## Eksekusi
 
@@ -63,8 +63,8 @@ Verifikasi:
 - Keputusan tertunda: 44 `<h2>` manual sisa di halaman docs non-foundations (optimistic-updates, calendar, org-chart, results, cascader-tree-select 10, overlays-menus 11, dll.) BUKAN section heading: sebagian besar judul kartu/panel dengan `text-base`/`text-sm`/`text-lg`, dan beberapa punya `ref`/`id` khusus. Mengubahnya ke `SectionHeading` mengubah hierarki per kasus, jadi perlu keputusan user dan CR terpisah (mis. CR-041), bukan migrasi mekanis.
 - Catatan proses: pertama kali skrip menghapus koma import dan import yang masih dipakai; keduanya sudah diperbaiki sebelum commit.
 
-- [ ] CR disetujui user.
-- [ ] Perubahan diimplementasikan per halaman.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR disetujui user.
+- [x] Perubahan diimplementasikan per halaman.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.

@@ -110,8 +110,8 @@ export default function OnboardingPage() {
 
       {/* Welcome banner — dismissible */}
       {showBanner && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-xl border border-primary/30 bg-primary/10 p-4 animate-in slide-in-from-top-2 fade-in-50 duration-300">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 rounded-xl border border-highlight/30 bg-highlight/10 p-4 animate-in slide-in-from-top-2 fade-in-50 duration-300">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-highlight text-highlight-foreground">
             <Compass className="h-5 w-5" />
           </div>
           <div className="flex-1 space-y-0.5">

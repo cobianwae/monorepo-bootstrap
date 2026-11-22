@@ -626,7 +626,7 @@ export default function ConsultationsPage() {
 
                 {/* Energy & Macros Calculator KPI Strip */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 text-center">
+                  <div className="p-3 rounded-xl bg-highlight/5 border border-highlight/30 text-center">
                     <span className="text-xs uppercase font-mono text-muted-foreground block">Target Energy</span>
                     <span className="font-display font-bold text-lg text-primary">{calculatedCalories} kcal</span>
                     <span className="text-xs text-success font-mono block">(-{deficitKcal} deficit)</span>

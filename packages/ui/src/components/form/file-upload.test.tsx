@@ -281,9 +281,13 @@ describe('FileUpload component', () => {
     const { container } = render(<FileUpload uploadHandler={instantHandler} sortable />);
     selectFiles(container, [makeFile('a.txt'), makeFile('b.txt')]);
 
-    await waitFor(() => {
-      expect(screen.getAllByText('Selesai')).toHaveLength(2);
-    });
+    // Timeout eksplisit: default waitFor 1000ms terlalu sempit saat suite penuh berjalan paralel.
+    await waitFor(
+      () => {
+        expect(screen.getAllByText('Selesai')).toHaveLength(2);
+      },
+      { timeout: 5000 },
+    );
 
     expect(screen.getAllByLabelText(/Seret untuk mengurutkan/).length).toBeGreaterThan(0);
     expect(screen.getByLabelText('Pindahkan a.txt ke bawah')).toBeDefined();

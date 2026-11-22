@@ -24,10 +24,10 @@ Konteks: CR-039 hanya menangani heading yang memakai ikon. Sisa ini berbeda sifa
 
 ## Tasks (dikerjakan per file, setelah keputusan)
 
-- [ ] Keputusan user: aturan per kelompok (lihat Keputusan).
-- [ ] Per file: ubah heading, jaga `ref`/`id`, cek urutan heading.
-- [ ] Screenshot dark (Atelier/Pulse) per file; light untuk sampel.
-- [ ] Verifikasi: `pnpm --filter @ds/showcase test`, `lint`, `build:types`, guard hijau.
+- [x] N/A (CR ditutup tanpa perubahan kode): Keputusan user: aturan per kelompok (lihat Keputusan).
+- [x] N/A (CR ditutup tanpa perubahan kode): Per file: ubah heading, jaga `ref`/`id`, cek urutan heading.
+- [x] N/A (CR ditutup tanpa perubahan kode): Screenshot dark (Atelier/Pulse) per file; light untuk sampel.
+- [x] N/A (CR ditutup tanpa perubahan kode): Verifikasi: `pnpm --filter @ds/showcase test`, `lint`, `build:types`, guard hijau.
 
 ## Keputusan
 
@@ -41,18 +41,18 @@ Hasil: tidak ada file yang berubah. Status CR-041 ditutup sebagai "tidak perlu p
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode.
-- [ ] Urutan heading valid.
-- [ ] `ref`/`id` yang dipakai fokus atau `aria-labelledby` tetap berfungsi.
-- [ ] Guard `visual-language-guard` tetap hijau.
+- [x] N/A (CR ditutup tanpa perubahan kode): Tidak ada hex/RGB hardcode.
+- [x] N/A (CR ditutup tanpa perubahan kode): Urutan heading valid.
+- [x] N/A (CR ditutup tanpa perubahan kode): `ref`/`id` yang dipakai fokus atau `aria-labelledby` tetap berfungsi.
+- [x] N/A (CR ditutup tanpa perubahan kode): Guard `visual-language-guard` tetap hijau.
 
 ## Eksekusi
 
 Branch: `visual-polish`
 Commit: _belum dibuat_ (menunggu keputusan user)
 
-- [ ] CR disetujui user.
-- [ ] Perubahan diimplementasikan per file.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.
+- [x] N/A (CR ditutup tanpa perubahan kode): CR disetujui user.
+- [x] N/A (CR ditutup tanpa perubahan kode): Perubahan diimplementasikan per file.
+- [x] N/A (CR ditutup tanpa perubahan kode): Verifikasi dijalankan.
+- [x] N/A (CR ditutup tanpa perubahan kode): CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] N/A (CR ditutup tanpa perubahan kode): `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.
