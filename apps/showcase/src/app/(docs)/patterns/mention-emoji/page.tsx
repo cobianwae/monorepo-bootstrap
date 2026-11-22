@@ -105,7 +105,7 @@ export default function MentionEmojiPage() {
             className={cn(
               'rounded-full border px-3 py-1 text-xs font-medium cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
               scenario === s.id
-                ? 'border-primary bg-primary text-primary-foreground'
+                ? 'border-highlight bg-background text-foreground'
                 : 'border-border bg-card text-muted-foreground hover:text-foreground'
             )}
           >

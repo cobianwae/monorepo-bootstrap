@@ -245,7 +245,7 @@ export default function OverlaysMenusPage() {
                   onClick={() => setActiveSection(sec.id)}
                   className={`rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap transition-colors ${
                     activeSection === sec.id
-                      ? 'bg-primary text-primary-foreground shadow-xs'
+                      ? 'bg-background text-foreground shadow-xs'
                       : 'bg-muted/60 text-muted-foreground hover:bg-accent hover:text-foreground'
                   }`}
                 >

@@ -49,7 +49,7 @@ export default function TransferListPatternPage() {
             aria-pressed={demoState === s}
             className={
               demoState === s
-                ? 'rounded-md bg-primary px-3 py-1.5 text-sm text-primary-foreground'
+                ? 'rounded-md bg-highlight/10 ring-1 ring-highlight px-3 py-1.5 text-sm text-foreground'
                 : 'rounded-md border border-border px-3 py-1.5 text-sm text-foreground'
             }
           >

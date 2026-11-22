@@ -66,7 +66,7 @@ function FileExplorer({
                   onClick={() => onSelect(file.name)}
                   className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-xs transition-colors cursor-pointer ${
                     isSelected
-                      ? 'bg-primary text-primary-foreground font-medium shadow-xs'
+                      ? 'bg-background text-foreground font-medium shadow-xs'
                       : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                   }`}
                 >

@@ -179,7 +179,7 @@ export default function DashboardPage() {
                   onClick={() => setTimeRange(range)}
                   className={`rounded-md px-2.5 py-1 text-xs font-medium uppercase transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                     timeRange === range
-                      ? 'bg-primary text-primary-foreground shadow-xs'
+                      ? 'bg-background text-foreground shadow-xs'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >

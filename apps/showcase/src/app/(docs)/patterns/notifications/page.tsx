@@ -168,12 +168,12 @@ export default function NotificationCenterPage() {
             type="button"
             onClick={() => toggleRead(n.id)}
             className={`flex w-full items-start gap-3 p-4 text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring ${
-              n.read ? '' : 'bg-primary/[0.04]'
+              n.read ? '' : 'bg-highlight/[0.04]'
             }`}
           >
             <span
               className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${
-                n.read ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary'
+                n.read ? 'bg-muted text-muted-foreground' : 'bg-highlight/10 text-highlight'
               }`}
             >
               {React.createElement(KIND_ICON[n.kind], { className: 'h-4 w-4' })}

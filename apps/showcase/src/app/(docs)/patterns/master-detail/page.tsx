@@ -373,7 +373,7 @@ export default function MasterDetailPage() {
                           className={cn(
                             'flex w-full flex-col gap-1 px-4 py-3 text-left transition-colors cursor-pointer',
                             isSelected
-                              ? 'bg-primary/10 border-l-2 border-l-primary'
+                              ? 'bg-highlight/10 border-l-2 border-l-highlight'
                               : 'hover:bg-accent/50 border-l-2 border-l-transparent'
                           )}
                         >

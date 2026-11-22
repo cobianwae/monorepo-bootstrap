@@ -421,7 +421,7 @@ export default function DataDisplayPage() {
                 onClick={() => setActiveSection(sec.id)}
                 className={`rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap transition-colors ${
                   activeSection === sec.id
-                    ? 'bg-primary text-primary-foreground shadow-xs'
+                    ? 'bg-background text-foreground shadow-xs'
                     : 'bg-muted/60 text-muted-foreground hover:bg-accent hover:text-foreground'
                 }`}
               >
@@ -985,7 +985,7 @@ export function ActionExample() {
                   {bulkRows.map((row) => (
                     <TableRow
                       key={row.id}
-                      className={selectedIds.includes(row.id) ? 'bg-primary/5' : undefined}
+                      className={selectedIds.includes(row.id) ? 'bg-highlight/5' : undefined}
                     >
                       <TableCell>
                         <Checkbox

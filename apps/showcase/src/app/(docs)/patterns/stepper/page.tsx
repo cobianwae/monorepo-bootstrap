@@ -147,9 +147,9 @@ export default function StepperPage() {
       />
 
       {/* Cross-Link Banner to Clinic Scenario */}
-      <div className="flex items-center justify-between rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 to-transparent p-4 shadow-xs">
+      <div className="flex items-center justify-between rounded-xl border border-highlight/30 bg-gradient-to-r from-highlight/10 to-transparent p-4 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-highlight text-highlight-foreground">
             <HeartPulse className="h-5 w-5" />
           </div>
           <div>
@@ -314,7 +314,7 @@ export default function StepperPage() {
                       onClick={() => setSelectedPlan(plan.id)}
                       className={`cursor-pointer text-left rounded-xl border-2 p-5 transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                         selectedPlan === plan.id
-                          ? 'border-primary bg-primary/5 shadow-md'
+                          ? 'border-highlight bg-highlight/5 shadow-md'
                           : 'border-border bg-card hover:border-border/80'
                       }`}
                     >

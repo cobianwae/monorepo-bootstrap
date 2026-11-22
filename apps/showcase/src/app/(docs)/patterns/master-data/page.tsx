@@ -278,9 +278,9 @@ export default function MasterDataPage() {
       />
 
       {/* Cross-Link Banner to Clinic Treatments Scenario */}
-      <div className="flex items-center justify-between rounded-xl border border-primary/30 bg-gradient-to-r from-primary/10 to-transparent p-4 shadow-xs">
+      <div className="flex items-center justify-between rounded-xl border border-highlight/30 bg-gradient-to-r from-highlight/10 to-transparent p-4 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-highlight text-highlight-foreground">
             <Stethoscope className="h-5 w-5" />
           </div>
           <div>
