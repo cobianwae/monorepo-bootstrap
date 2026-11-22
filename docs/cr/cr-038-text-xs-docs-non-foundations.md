@@ -25,7 +25,10 @@
 - [x] Perluas guard ke seluruh `app/(docs)` untuk aturan px-only.
 - [x] `pnpm --filter @ds/showcase exec vitest run src/test/visual-language-guard.test.ts` hijau 4/4.
 - [x] `pnpm --filter @ds/showcase lint` dan `build:types` hijau.
-- [x] Verifikasi visual (sebagian): screenshot Chrome headless (`--screenshot`, 1440px, dev server :4000, default Atelier/Pulse dark) untuk `components/layout-navigation`, `components/data-display`, `patterns/data-table`. Tidak ada label `text-xs` yang terpotong atau tumpang tindih; tabel dan badge tetap terbaca. Belum: light mode dan halaman lain (`patterns/*` padat, `components/states-feedback`, `components/forms`).
+- [x] Verifikasi visual (dark, Atelier/Pulse, dev server :4000, Chrome headless `--screenshot` 1440px): `components/layout-navigation`, `components/data-display`, `patterns/data-table`, `patterns/master-data`, `patterns/workspace`, `components/states-feedback`, `components/forms`. Tidak ada label `text-xs` yang terpotong atau tumpang tindih.
+  - Catatan terbuka (belum dibandingkan dengan HEAD sebelumnya): teks di banner info biru `states-feedback` ("Scheduled maintenance window…" dan banner baris atas) tampak redup di atas latar biru. Bukan perubahan ukuran; perlu cek kontras terpisah.
+  - Indikator "1 Issue" di pojok kiri bawah saat `/components/forms` adalah overlay dev Next.js, bukan bagian halaman.
+- [ ] Belum: light mode, dan halaman `patterns/*` lain yang padat.
 - [ ] `pnpm test` penuh, `pnpm typecheck`, `pnpm -C apps/showcase build` belum dijalankan dalam CR ini.
 
 ## Keputusan
