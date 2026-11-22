@@ -28,7 +28,10 @@
 - [x] Verifikasi visual (dark, Atelier/Pulse, dev server :4000, Chrome headless `--screenshot` 1440px): `components/layout-navigation`, `components/data-display`, `patterns/data-table`, `patterns/master-data`, `patterns/workspace`, `components/states-feedback`, `components/forms`. Tidak ada label `text-xs` yang terpotong atau tumpang tindih.
   - Catatan terbuka (belum dibandingkan dengan HEAD sebelumnya): teks di banner info biru `states-feedback` ("Scheduled maintenance window…" dan banner baris atas) tampak redup di atas latar biru. Bukan perubahan ukuran; perlu cek kontras terpisah.
   - Indikator "1 Issue" di pojok kiri bawah saat `/components/forms` adalah overlay dev Next.js, bukan bagian halaman.
-- [ ] Belum: light mode, dan halaman `patterns/*` lain yang padat.
+- [x] Verifikasi visual light mode (Atelier/Pulse) pada 7 halaman yang sama. Tidak ada label `text-xs` terpotong atau tumpang tindih.
+  - Regresi yang ditemukan dan diperbaiki (commit `eaf5fcf`): `patterns/workspace` nama file dan ukuran file menempel (ukuran naik dari 10px ke 12px). Diperbaiki dengan `truncate`, `shrink-0 pl-2`.
+  - Kontras banner info (`text-info-foreground` di atas `info/15`) pudar di light dan dark, bukan akibat CR ini. Dicatat sebagai CR-040 (draft).
+- [ ] Belum: halaman `patterns/*` lain yang padat, palet/art direction selain Atelier/Pulse.
 - [ ] `pnpm test` penuh, `pnpm typecheck`, `pnpm -C apps/showcase build` belum dijalankan dalam CR ini.
 
 ## Keputusan
