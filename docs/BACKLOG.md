@@ -96,6 +96,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-034 | Aturan visual docs showcase (`visual-language.md`) + penyambungan ke AI (`instructions`, AGENTS, ARCHITECTURE, CONVENTIONS) + pagar guard | draft | `docs/cr/cr-034-aturan-visual-dan-penyambungan-ai.md` |
 | CR-035 | Seragamkan 7 halaman `foundations`: `SectionHeading`, teks mikro → `text-xs`, `primary` dekoratif → `highlight`, `SegmentedControl` | draft | `docs/cr/cr-035-seragamkan-halaman-foundations.md` |
 | CR-036 | Bug konten `foundations`: klaim WCAG dihitung, "3-step", demo durasi satu easing, label arah, "Play All", badge Ratio dark mode | draft | `docs/cr/cr-036-bug-konten-halaman-foundations.md` |
+| CR-037 | Sederhanakan `SectionHeading`: tanpa ikon, tanpa level sub (mengoreksi keputusan CR-034 #2; opsi A pilihan user) | draft | `docs/cr/cr-037-sederhanakan-section-heading-tanpa-ikon.md` |
 
 ## Catatan
 
