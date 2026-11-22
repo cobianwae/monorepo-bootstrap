@@ -27,6 +27,7 @@
 - [x] Ganti 25 kemunculan di 14 file (skrip memverifikasi jumlah sebelum menulis; `/tmp/vl-calc/cr049.mjs`).
 - [x] `pnpm --filter @ds/showcase lint` hijau (exit 0).
 - [x] `pnpm --filter @ds/showcase build:types` hijau (exit 0).
+- [x] `next build` produksi lulus dari salinan sementara `apps/.showcase-build` (commit 987b257).
 - [x] `visual-language-guard` hijau 4/4.
 - [x] Screenshot `clinic/pos` dark (Atelier/Pulse): tender terpilih terbaca, tidak ada teks terpotong.
 - [x] Verifikasi visual (Atelier/Pulse, 1440px, jeda 9 detik agar data termuat): `clinic/registration` light; `clinic/patients` light; `clinic` dark; `crm` dark dan light (chart tampil penuh); `crm/ai` light (tab terpilih memakai permukaan background + shadow). Semua rapi, tidak ada teks terpotong.
