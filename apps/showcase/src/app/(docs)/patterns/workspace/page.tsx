@@ -70,11 +70,11 @@ function FileExplorer({
                       : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <Icon className="h-3.5 w-3.5" />
-                    <span>{file.name}</span>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <Icon className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">{file.name}</span>
                   </div>
-                  <span className="text-xs opacity-70 font-mono">{file.size}</span>
+                  <span className="shrink-0 pl-2 text-xs opacity-70 font-mono">{file.size}</span>
                 </button>
               </li>
             );
