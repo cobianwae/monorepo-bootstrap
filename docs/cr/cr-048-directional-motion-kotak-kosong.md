@@ -19,7 +19,7 @@
 
 - [x] Opsi (a) dipilih: posisi awal terlihat.
 - [x] `motion/page.tsx`: hapus `opacity-0` dari keadaan awal Slide In dan Slide Up; Scale Fade memakai `scale-90 opacity-60` sebagai awal. Slide Up `translate-y-8` → `translate-y-4` karena elemen terpotong di kotak `h-20`.
-- [ ] Verifikasi Play berjalan di browser: belum diuji interaktif (hanya state awal yang di-screenshot).
+- [x] Verifikasi Play di browser (Chrome headless, klik tombol "Play Animations", baca computed style): Slide In `translate` -96px → 0; Slide Up 16px → 0; Scale Fade `scale` 0,9 → 1 dan `opacity` 0,6 → 1. Sampel tengah animasi (120 ms) sudah di state akhir, jadi kurva intermediate belum tertangkap; durasi 250 ms dari token.
 - [x] Screenshot light Atelier/Pulse: tiga demo terlihat, tidak terpotong.
 - [x] `pnpm --filter @ds/showcase lint` dan `build:types` hijau; `vitest src/test` 4/4 hijau.
 
