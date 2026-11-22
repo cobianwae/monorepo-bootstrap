@@ -36,7 +36,7 @@ import {
   DotPattern,
   TableOfContents,
 } from '@ds/ui';
-import { SectionHeading } from '@/components/section-heading';
+import { SectionHeading } from '../../../../components/section-heading';
 
 export default function MarketingBlocksPage() {
   const [billingInterval, setBillingInterval] = React.useState<'monthly' | 'yearly'>('monthly');

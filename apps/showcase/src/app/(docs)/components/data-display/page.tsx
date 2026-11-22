@@ -26,7 +26,7 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
-import { SectionHeading } from '@/components/section-heading';
+import { SectionHeading } from '../../../../components/section-heading';
 import {
   PageHeader,
   Banner,

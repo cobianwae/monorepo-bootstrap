@@ -35,7 +35,7 @@ import {
   Inbox,
   Info,
 } from 'lucide-react';
-import { SectionHeading } from '@/components/section-heading';
+import { SectionHeading } from '../../../../components/section-heading';
 
 export default function StatesFeedbackPage() {
   const [progress, setProgress] = React.useState(13);

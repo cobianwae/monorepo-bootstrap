@@ -33,7 +33,7 @@ import {
   Plus,
   Underline as UnderlineIcon,
 } from 'lucide-react';
-import { SectionHeading } from '@/components/section-heading';
+import { SectionHeading } from '../../../../components/section-heading';
 
 export default function ActionsInputsPage() {
   const [switchActive, setSwitchActive] = React.useState(true);

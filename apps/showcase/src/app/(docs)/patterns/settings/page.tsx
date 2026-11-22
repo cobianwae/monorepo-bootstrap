@@ -74,7 +74,7 @@ import {
   Clock,
   RotateCcw,
 } from 'lucide-react';
-import { SectionHeading } from '@/components/section-heading';
+import { SectionHeading } from '../../../../components/section-heading';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

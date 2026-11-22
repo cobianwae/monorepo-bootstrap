@@ -49,7 +49,7 @@ import {
   Download,
   ImageOff,
 } from 'lucide-react';
-import { SectionHeading } from '@/components/section-heading';
+import { SectionHeading } from '../../../../components/section-heading';
 
 type GalleryCategory = 'Screenshot' | 'Diagram' | 'Mockup';
 

@@ -55,7 +55,7 @@ import {
   type FilterFieldDefinition,
   type SavedFilterView,
 } from '@ds/ui';
-import { SectionHeading } from '@/components/section-heading';
+import { SectionHeading } from '../../../../components/section-heading';
 
 interface FormSchema {
   fullName: string;

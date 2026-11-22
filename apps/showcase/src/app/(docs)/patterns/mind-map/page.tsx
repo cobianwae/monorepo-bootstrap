@@ -21,7 +21,7 @@ import { MindMapRecipe } from './_components/mind-map-recipe';
 import { MindMapShortcuts } from './_components/mind-map-shortcuts';
 import { MindMapUseCases } from './_components/mind-map-use-cases';
 import { EXAMPLE, LARGE, STEPS, type DemoState } from './_components/mind-map-demo-data';
-import { SectionHeading } from '@/components/section-heading';
+import { SectionHeading } from '../../../../components/section-heading';
 
 export default function MindMapPatternPage() {
   const [data, setData] = React.useState<MindNodeFlat[]>(EXAMPLE);
