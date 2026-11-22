@@ -57,6 +57,9 @@ Verifikasi:
 - Screenshot dark Atelier/Pulse: `components/states-feedback`, `patterns/settings` tampak rapi; `patterns/mind-map` belum terkonfirmasi dark (probe tidak menerapkan dark).
 - Migrasi lanjutan: 78 `<h2>` di 11 halaman diganti `SectionHeading` (prop `id` ditambahkan ke `SectionHeading` untuk `aria-labelledby`). h2 tersisa di 11 halaman: 0. Verifikasi: build:types, lint, guard hijau; screenshot dark forms dan data-display rapi.
 - Belum: 44 `<h2` manual di halaman docs non-foundations lain; light mode untuk 11 halaman belum diverifikasi.
+- Impor `SectionHeading` di 11 halaman memakai jalur relatif (`../../../../components/section-heading`), karena `vitest.config.ts` tidak punya alias `@/` dan tes `mind-map/page.test.tsx` gagal resolve. Tidak mengubah konfigurasi test.
+- Verifikasi akhir: `pnpm --filter @ds/showcase test` 78/78; `lint` dan `build:types` hijau; `pnpm typecheck` root hanya 12 error baseline `flow-editor.test.tsx`; `pnpm test` penuh: tokens 10/10, ui 706/707 (AC-02 flow-editor batas stack undo 50 gagal di run penuh, lulus 49/49 saat file dijalankan sendiri; diduga flaky di bawah beban, belum dibuktikan berulang); `pnpm -C apps/showcase build` dijalankan dari salinan sementara `apps/.showcase-build` (76/76 halaman statis, lulus); salinan sudah dihapus.
+- Light mode terverifikasi (Atelier/Pulse): `components/states-feedback`, `components/forms`. `patterns/settings` light tertangkap saat skeleton (belum sah).
 - Catatan proses: pertama kali skrip menghapus koma import dan import yang masih dipakai; keduanya sudah diperbaiki sebelum commit.
 
 - [ ] CR disetujui user.
