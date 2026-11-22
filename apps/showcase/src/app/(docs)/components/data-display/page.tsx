@@ -619,7 +619,7 @@ export default function DataDisplayPage() {
                                 <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground">
                                   {item.category}
                                 </span>
-                                <h3 className="text-lg font-bold font-display text-foreground">
+                                <h3 className="text-xl font-bold font-display text-foreground">
                                   {item.title}
                                 </h3>
                                 <p className="text-xs text-muted-foreground leading-relaxed">

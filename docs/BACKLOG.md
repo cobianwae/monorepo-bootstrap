@@ -102,6 +102,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-040 | Kontras teks varian `info` dan `warning` di `Banner` (`text-foreground` di atas tint); audit 8 tema | draft | `docs/cr/cr-040-kontras-banner-info.md` |
 | CR-041 | 44 `<h2>` manual sisa di docs non-foundations: diperiksa, tidak perlu perubahan tag (tidak ada section `h2` induk) | draft | `docs/cr/cr-041-h2-manual-docs-non-foundations.md` |
 | CR-042 | Kontras teks varian `destructive` pada Alert (dark 4,17–4,58:1); teks memakai `foreground` | draft | `docs/cr/cr-042-kontras-alert-destructive-dark.md` |
+| CR-043 | Heading section tanpa ikon di `overlays-menus` (11 h2) dan `text-xl` untuk h3 manual di `data-display` dan `layout-navigation` | draft | `docs/cr/cr-043-heading-overlays-data-display-layout.md` |
 
 ## Catatan
 

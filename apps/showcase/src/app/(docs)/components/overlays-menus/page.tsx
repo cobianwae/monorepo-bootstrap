@@ -77,33 +77,9 @@ import {
   AvatarImage,
   AvatarFallback,
 } from '@ds/ui';
-import {
-  Settings2,
-  FolderLock,
-  Trash2,
-  AlertTriangle,
-  RotateCcw,
-  SlidersHorizontal,
-  MessageSquare,
-  AtSign,
-  MousePointer2,
-  MoreHorizontal,
-  HelpCircle,
-  Command,
-  Megaphone,
-  Bell,
-  Sparkles,
-  Pencil,
-  Copy,
-  Share2,
-  UserRound,
-  Palette,
-  FolderOpen,
-  FileText,
-  Sun,
-  Moon,
-} from 'lucide-react';
+import { Settings2, FolderLock, Trash2, AlertTriangle, RotateCcw, SlidersHorizontal, AtSign, MoreHorizontal, Command, Megaphone, Bell, Sparkles, Pencil, Copy, Share2, Palette, FolderOpen, FileText, Sun, Moon } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
+import { SectionHeading } from '../../../../components/section-heading';
 
 const SECTIONS = [
   { id: 'dialogs', label: 'Dialogs' },
@@ -281,10 +257,7 @@ export default function OverlaysMenusPage() {
         </div>
 
         <section id="dialogs" className="space-y-4 scroll-mt-20">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Settings2 className="h-6 w-6 text-primary" />
-            <span>Dialogs &amp; Content Modals</span>
-          </h2>
+          <SectionHeading title="Dialogs &amp; Content Modals" />
           <p className="text-sm text-muted-foreground">
             Standard modal dialogs with interactive form elements, accessible focus trap, and
             escape-dismiss behavior for content and settings flows.
@@ -395,10 +368,7 @@ export default function OverlaysMenusPage() {
         </section>
 
         <section id="alert-dialog" className="space-y-4 scroll-mt-20">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <AlertTriangle className="h-6 w-6 text-primary" />
-            <span>Destructive Alert Dialog</span>
-          </h2>
+          <SectionHeading title="Destructive Alert Dialog" />
           <p className="text-sm text-muted-foreground">
             WCAG-conforming alertdialog requiring deliberate user confirmation for irreversible
             operations, with a type-to-confirm guard rail.
@@ -463,10 +433,7 @@ export default function OverlaysMenusPage() {
         </section>
 
         <section id="sheets" className="space-y-4 scroll-mt-20">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <SlidersHorizontal className="h-6 w-6 text-primary" />
-            <span>Sheets &amp; Drawers</span>
-          </h2>
+          <SectionHeading title="Sheets &amp; Drawers" />
           <p className="text-sm text-muted-foreground">
             Non-modal side drawers for complex configurations and preference management without
             losing page context.
@@ -563,10 +530,7 @@ export default function OverlaysMenusPage() {
         </section>
 
         <section id="popover" className="space-y-4 scroll-mt-20">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <MessageSquare className="h-6 w-6 text-primary" />
-            <span>Popover</span>
-          </h2>
+          <SectionHeading title="Popover" />
           <p className="text-sm text-muted-foreground">
             Dismissible floating panel anchored to a trigger, ideal for lightweight settings and
             contextual forms that do not require modal focus trapping.
@@ -612,10 +576,7 @@ export default function OverlaysMenusPage() {
         </section>
 
         <section id="hover-card" className="space-y-4 scroll-mt-20">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <UserRound className="h-6 w-6 text-primary" />
-            <span>Hover Card</span>
-          </h2>
+          <SectionHeading title="Hover Card" />
           <p className="text-sm text-muted-foreground">
             Rich preview card that appears on hover or focus, giving contextual user and entity
             details without navigating away.
@@ -664,10 +625,7 @@ export default function OverlaysMenusPage() {
         </section>
 
         <section id="context-menu" className="space-y-4 scroll-mt-20">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <MousePointer2 className="h-6 w-6 text-primary" />
-            <span>Context Menu</span>
-          </h2>
+          <SectionHeading title="Context Menu" />
           <p className="text-sm text-muted-foreground">
             Right-click menu with checkbox items and nested submenus, fully keyboard navigable via
             the context menu key.
@@ -740,10 +698,7 @@ export default function OverlaysMenusPage() {
         </section>
 
         <section id="dropdown-menu" className="space-y-4 scroll-mt-20">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <MoreHorizontal className="h-6 w-6 text-primary" />
-            <span>Dropdown Menu</span>
-          </h2>
+          <SectionHeading title="Dropdown Menu" />
           <p className="text-sm text-muted-foreground">
             Click-triggered action menu with grouped items, separator, nested submenu, and a radio
             group for single-choice state.
@@ -815,10 +770,7 @@ export default function OverlaysMenusPage() {
         </section>
 
         <section id="tooltip" className="space-y-4 scroll-mt-20">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <HelpCircle className="h-6 w-6 text-primary" />
-            <span>Tooltip</span>
-          </h2>
+          <SectionHeading title="Tooltip" />
           <p className="text-sm text-muted-foreground">
             Compact hints that appear on hover and keyboard focus, dismissible with Escape and
             screen-reader friendly.
@@ -856,10 +808,7 @@ export default function OverlaysMenusPage() {
         </section>
 
         <section id="command-palette" className="space-y-4 scroll-mt-20">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Command className="h-6 w-6 text-primary" />
-            <span>Command Palette</span>
-          </h2>
+          <SectionHeading title="Command Palette" />
           <p className="text-sm text-muted-foreground">
             Keyboard-driven dialog for searching and executing actions, navigable with arrow keys
             and Enter, and opened with ⌘K / Ctrl+K.
@@ -885,10 +834,7 @@ export default function OverlaysMenusPage() {
         </section>
 
         <section id="banner" className="space-y-4 scroll-mt-20">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Megaphone className="h-6 w-6 text-primary" />
-            <span>Banner</span>
-          </h2>
+          <SectionHeading title="Banner" />
           <p className="text-sm text-muted-foreground">
             Page-level announcement strips with optional action links and dismissible state that can
             persist via storage key.
@@ -927,10 +873,7 @@ export default function OverlaysMenusPage() {
         </section>
 
         <section id="toast-triggers" className="space-y-4 scroll-mt-20">
-          <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Bell className="h-6 w-6 text-primary" />
-            <span>Toast Feedback Triggers</span>
-          </h2>
+          <SectionHeading title="Toast Feedback Triggers" />
           <p className="text-sm text-muted-foreground">
             Simulate stackable notifications with persistent errors and undo action support via the
             centralized toast system.

@@ -346,7 +346,7 @@ export default function LayoutNavigationPage() {
               <div className="flex-1 flex flex-col min-w-0 bg-background p-6">
                 <div className="flex items-center justify-between pb-4 border-b border-border">
                   <div className="space-y-0.5">
-                    <h3 className="text-lg font-bold font-display capitalize text-foreground">
+                    <h3 className="text-xl font-bold font-display capitalize text-foreground">
                       {activeItem} View
                     </h3>
                     <p className="text-xs text-muted-foreground">
