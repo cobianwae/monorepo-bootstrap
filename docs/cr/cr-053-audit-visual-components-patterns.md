@@ -1,6 +1,6 @@
 # CR-053 — Audit visual components/ dan patterns/ (docs showcase)
 
-**Status:** draft (hanya user yang menetapkan `approved` dan `done`)
+**Status:** approved (disetujui user 2026-11-22; `done` belum ditetapkan)
 **Sumber:** pertanyaan user 2026-11-22 "buat cr buat periksa patterns/ components/ atau ini udah ada cr nya?". Belum ada CR khusus; CR-039 hanya menghapus ikon heading.
 **Ref:** `docs/design/visual-language.md` (Section Heading, Color Roles, Type Scale), `apps/showcase/src/test/visual-language-guard.test.ts`, CR-039, CR-041, CR-049, CR-052
 
@@ -67,7 +67,7 @@ Angka mentah. Sebagian hasil adalah false positive (hover, ikon kotak, dan teks 
 
 ## Tasks (jalur small-fix, per kelompok)
 
-- [x] Persetujuan user untuk rencana (Kelompok 1-3 dan perluasan guard).
+- [x] CR disetujui user (2026-11-22).
 - [x] Kelompok 1: ubah teks kecil `text-highlight` (3 item) ke `text-foreground`; screenshot.
 - [x] Kelompok 2: `onboarding` heading ke `SectionHeading`; cek urutan heading.
 - [x] Kelompok 3: keputusan user dicatat di tabel Keputusan.
@@ -116,4 +116,4 @@ Angka mentah. Sebagian hasil adalah false positive (hover, ikon kotak, dan teks 
 - Verifikasi: guard `visual-language-guard.test.ts` 5/5 hijau; `@ds/showcase lint` exit 0; `@ds/showcase build:types` exit 0.
 - Screenshot (Chrome headless, Atelier/Pulse, `/tmp/cr053-shots/`): `components` light dan dark, `patterns/onboarding` light (modal), `components/forms` light dan dark, `patterns/master-detail` dark, `components/marketing` light: heading seragam dan tidak ada teks terpotong. `components/data-display` dark tertangkap dalam light (kegagalan probe tema, bukan regresi kode) dan belum diambil ulang.
 - Belum dicakup: palet/art direction selain Atelier/Pulse untuk halaman components/patterns; `pnpm test` penuh dan build produksi tidak dijalankan ulang untuk CR-053.
-- Status CR tetap `draft` sampai user menetapkan approved/done.
+- Status: approved oleh user 2026-11-22. `done` menunggu penetapan user.
