@@ -12,11 +12,13 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 - Mind Map CR-020–033 `done` atas approval user, ter-merge ke `dev` (`eeb7a6b`); status push tidak diverifikasi (terakhir tercatat belum di-push). Pembaca layar bersuara native belum diuji.
 - Visual docs showcase CR-034/035/036/037: `draft`, dieksekusi atas instruksi user (2026-11-22), di-commit di `visual-polish`. `SectionHeading` (h2 tanpa ikon, tanpa level sub — CR-037) + 7 halaman `foundations` diseragamkan; guard `visual-language-guard.test.ts`. Terverifikasi: lint, `pnpm test` penuh (tokens 10, ui 707, showcase 77), `next build` 76/76 dari salinan sementara (bukan `pnpm -C apps/showcase build` langsung), screenshot dark+light Atelier/Pulse ketujuh halaman, typography+motion di Aurora dan Blueprint. Belum: halaman lain di Aurora/Blueprint, palet selain Pulse, "Play All" interaktif.
 
+- Visual CR-038..050 (`draft`, dieksekusi atas instruksi user 2026-11-22, di-commit di `visual-polish`, push ke origin): `text-[Npx]` hilang di seluruh `src` (guard); heading ikon dihapus di components/patterns (CR-039); kontras banner info/warning dan Alert destructive (CR-040/042); eyebrow PageHeader text-foreground (CR-046); state terpilih & primary dekoratif → highlight (CR-043..044, 047..050). Verifikasi terakhir CR-050: typecheck baseline 12 error FlowEditor, build produksi 76/76 (salinan), showcase test 78/78, guard 4/4.
+
 ## Next
 
-1. User menetapkan `approved`/`done` untuk CR-034/035/036/037 dan `visual-language.md` (bagian ○ layout, surfaces, component targets belum dikunci).
+1. User menetapkan `approved`/`done` untuk CR-034..050 dan `visual-language.md` (bagian ○ layout, surfaces, component targets belum dikunci).
 2. CR terpisah bila disetujui: kontras `text-highlight` pada teks kecil di light mode (eyebrow `PageHeader` di `@ds/ui`, themes hero, breakpoints), deviasi `PageHeader` h1 vs Heading 1, Directional Motion kosong sebelum Play.
-3. Rapikan `components/` dan `patterns/` (ikon heading pola lama ±81, sesuai CR-037: heading tanpa ikon; `text-[Npx]` sudah diganti CR-038, guard menjaganya), lalu perluas guard heading ke sana. Verifikasi visual CR-038 (layout `text-xs`) masih tertunda.
+3. Sisa terbuka: eyebrow PageHeader di `@ds/ui` (API publik, CR terpisah bila disetujui), tes flaky `rte-link-save` (baseline), perluas guard heading ke `components/` & `patterns/` bila user setuju.
 4. Baseline baru pengganti CR-015 — verifikasi 12 error tipe FlowEditor + smoke RTE + timing worker (CR baru bila perlu).
 5. Antrean implementasi satu per sesi: 013-01, 015-03. Sinkron sitemap S-005.30/S-005.31 `planned` → `implemented`; S-005.41 `in-design` (018).
 
