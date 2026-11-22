@@ -1,6 +1,6 @@
 # CR-039 — Hapus ikon heading manual di `components/` dan `patterns/`
 
-**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
+**Status:** done (disetujui user 2026-11-22; checklist selesai, branch digabung di visual-polish)
 **Sumber:** review / docs (lanjutan CR-037 untuk halaman di luar foundations)
 **Ref:** `docs/design/visual-language.md` (Section Heading & Callout: heading tanpa ikon), `docs/cr/cr-037-sederhanakan-section-heading-tanpa-ikon.md`, `docs/cr/cr-038-text-xs-docs-non-foundations.md`
 

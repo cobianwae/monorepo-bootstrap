@@ -98,8 +98,8 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-036 | Bug konten `foundations`: klaim WCAG dihitung, "3-step", demo durasi satu easing, label arah, "Play All", badge Ratio dark mode | approved | `docs/cr/cr-036-bug-konten-halaman-foundations.md` |
 | CR-037 | Sederhanakan `SectionHeading`: tanpa ikon, tanpa level sub (mengoreksi keputusan CR-034 #2; opsi A pilihan user) | approved | `docs/cr/cr-037-sederhanakan-section-heading-tanpa-ikon.md` |
 | CR-038 | Ganti `text-[9/10/11px]` → `text-xs` di `app/(docs)` non-foundations (99 pemakaian, 29 file); guard px diperluas ke seluruh docs | approved | `docs/cr/cr-038-text-xs-docs-non-foundations.md` |
-| CR-039 | Hapus ikon heading manual di `components/` dan `patterns/` (78 baris, 11 file) | approved | `docs/cr/cr-039-ikon-heading-components-patterns.md` |
-| CR-040 | Kontras teks varian `info` dan `warning` di `Banner` (`text-foreground` di atas tint); audit 8 tema | approved | `docs/cr/cr-040-kontras-banner-info.md` |
+| CR-039 | Hapus ikon heading manual di `components/` dan `patterns/` (78 baris, 11 file) | done | `docs/cr/cr-039-ikon-heading-components-patterns.md` |
+| CR-040 | Kontras teks varian `info` dan `warning` di `Banner` (`text-foreground` di atas tint); audit 8 tema | done | `docs/cr/cr-040-kontras-banner-info.md` |
 | CR-041 | 44 `<h2>` manual sisa di docs non-foundations: diperiksa, tidak perlu perubahan tag (tidak ada section `h2` induk) | done | `docs/cr/cr-041-h2-manual-docs-non-foundations.md` |
 | CR-042 | Kontras teks varian `destructive` pada Alert (dark 4,17–4,58:1); teks memakai `foreground` | approved | `docs/cr/cr-042-kontras-alert-destructive-dark.md` |
 | CR-043 | Heading section tanpa ikon di `overlays-menus` (11 h2) dan `text-xl` untuk h3 manual di `data-display` dan `layout-navigation` | done | `docs/cr/cr-043-heading-overlays-data-display-layout.md` |

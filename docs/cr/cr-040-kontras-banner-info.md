@@ -1,6 +1,6 @@
 # CR-040 — Kontras teks varian `info` pada Banner
 
-**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
+**Status:** done (disetujui user 2026-11-22; checklist selesai, branch digabung di visual-polish)
 **Sumber:** a11y / bug
 **Ref:** `packages/ui/src/components/feedback/banner.tsx:18`, `apps/showcase/src/app/(docs)/components/states-feedback/page.tsx:149`, `docs/design/visual-language.md` (Color Roles, aturan kontras teks)
 
@@ -76,7 +76,6 @@ Verifikasi:
 - Tindak lanjut (dijalankan setelah persetujuan user, 2026-11-22): `Alert` varian `destructive` memakai `text-foreground` (`packages/ui/src/components/feedback/alert.tsx`), ikon dan border tetap `destructive`. Tes `@ds/ui` feedback 10/10 lulus; lint hijau. Ini dicatat di CR-042 (lihat dokumen CR-042).
 
 - [x] CR disetujui user.
-- [x] Branch dibuat.
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan.
 - [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
