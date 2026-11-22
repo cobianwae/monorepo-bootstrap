@@ -1,6 +1,6 @@
 # CR-046 — Kontras eyebrow `PageHeader` (text-highlight kecil)
 
-**Status:** draft
+**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
 **Sumber:** audit halaman tidak koheren (2026-11-22), temuan terbuka
 **Ref:** `docs/design/visual-language.md` (Color Roles; aturan teks kecil tidak memakai `text-highlight`; daftar pelanggaran lama)
 
@@ -21,11 +21,12 @@
 
 ## Tasks
 
-- [ ] Persetujuan user untuk mengubah `PageHeader` (API publik internal style).
-- [ ] Ubah kelas eyebrow.
-- [ ] Verifikasi kontras 8 tema light dan dark (`packages/tokens`).
-- [ ] Screenshot `components/layout-navigation`, `patterns/*` yang memakai `PageHeader`.
-- [ ] `pnpm --filter @ds/ui test`, `pnpm --filter @ds/ui lint`, `pnpm --filter @ds/ui typecheck` (atau root `pnpm typecheck`; baseline 12 error FlowEditor).
+- [x] Persetujuan user untuk mengubah `PageHeader` (disetujui 2026-11-22).
+- [x] Ubah kelas eyebrow: teks `text-foreground`, ikon tetap `text-highlight` lewat `[&>svg]:text-highlight`. Props dan export tidak berubah.
+- [ ] Verifikasi kontras 8 tema light dan dark: belum diukur ulang secara formal. Dasar: teks foreground di atas `highlight/10` (rasio jauh di atas 4,5:1 karena foreground kontras tinggi terhadap surface).
+- [x] `pnpm --filter @ds/ui test` layout 9/9 hijau; `pnpm --filter @ds/ui lint` hijau.
+- [ ] Screenshot `PageHeader` eyebrow: belum dilakukan.
+- [ ] Root `pnpm typecheck`, `pnpm test` penuh: belum dijalankan setelah CR-046.
 
 ## Keputusan
 

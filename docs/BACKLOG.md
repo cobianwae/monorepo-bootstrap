@@ -105,9 +105,9 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-043 | Heading section tanpa ikon di `overlays-menus` (11 h2) dan `text-xl` untuk h3 manual di `data-display` dan `layout-navigation` | draft | `docs/cr/cr-043-heading-overlays-data-display-layout.md` |
 | CR-044 | `primary` dekoratif ke `highlight` di halaman docs (ikon kartu, callout informatif, identitas; 25 kemunculan, 14 file); aksi dan state terpilih tidak diubah | draft | `docs/cr/cr-044-primary-dekoratif-ke-highlight.md` |
 | CR-045 | `text-[9/10/11px]` di luar `app/(docs)` ke `text-xs` (154 kemunculan, 33 file); guard memindai seluruh `src` | draft | `docs/cr/cr-045-text-xs-luar-docs.md` |
-| CR-046 | Kontras eyebrow `PageHeader` (`text-highlight` kecil di `packages/ui`); API publik, menunggu persetujuan | draft | `docs/cr/cr-046-eyebrow-pageheader-kontras.md` |
-| CR-047 | State terpilih dan kotak ikon `bg-primary` (dekoratif) di halaman docs/scenario; pola interaksi, menunggu persetujuan | draft | `docs/cr/cr-047-state-terpilih-bg-primary.md` |
-| CR-048 | Demo Directional Motion tampil kosong sebelum Play | draft | `docs/cr/cr-048-directional-motion-kotak-kosong.md` |
+| CR-046 | Kontras eyebrow `PageHeader` (`text-highlight` kecil di `packages/ui`); API publik, disetujui | approved | `docs/cr/cr-046-eyebrow-pageheader-kontras.md` |
+| CR-047 | State terpilih dan kotak ikon `bg-primary` (dekoratif) di halaman docs/scenario; pola interaksi, disetujui | approved | `docs/cr/cr-047-state-terpilih-bg-primary.md` |
+| CR-048 | Demo Directional Motion tampil kosong sebelum Play | approved | `docs/cr/cr-048-directional-motion-kotak-kosong.md` |
 
 ## Catatan
 

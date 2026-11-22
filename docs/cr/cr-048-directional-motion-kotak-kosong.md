@@ -1,6 +1,6 @@
 # CR-048 — Demo Directional Motion tampil kosong sebelum Play
 
-**Status:** draft
+**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
 **Sumber:** temuan CR-035 (di luar scope saat itu), dikonfirmasi screenshot 2026-11-22
 **Ref:** `docs/design/visual-language.md` (Motion: token `MOTION_TOKENS` 150/250/400ms, `ease-smooth`, hormati `prefers-reduced-motion`), `apps/showcase/src/app/(docs)/foundations/motion/page.tsx`
 
@@ -17,17 +17,18 @@
 
 ## Tasks
 
-- [ ] Pilih opsi (a) atau (b) (rekomendasi: a, agar kotak selalu terlihat).
-- [ ] Ubah `motion/page.tsx` pada bagian Directional Motion.
-- [ ] Verifikasi Play tetap berjalan (interaksi di browser; belum diuji otomatis).
-- [ ] Screenshot dark & light.
-- [ ] `pnpm --filter @ds/showcase lint`, `build:types`, guard test.
+- [x] Opsi (a) dipilih: posisi awal terlihat.
+- [x] `motion/page.tsx`: hapus `opacity-0` dari keadaan awal Slide In dan Slide Up; Scale Fade memakai `scale-90 opacity-60` sebagai awal. Slide Up `translate-y-8` → `translate-y-4` karena elemen terpotong di kotak `h-20`.
+- [ ] Verifikasi Play berjalan di browser: belum diuji interaktif (hanya state awal yang di-screenshot).
+- [x] Screenshot light Atelier/Pulse: tiga demo terlihat, tidak terpotong.
+- [x] `pnpm --filter @ds/showcase lint` dan `build:types` hijau; `vitest src/test` 4/4 hijau.
 
 ## Keputusan
 
 | # | Keputusan | Alasan |
 |---|---|---|
-| 1 | Belum dieksekusi; rekomendasi opsi (a) | Perubahan kecil di docs; menunggu persetujuan user agar tidak mengubah demo tanpa dasar |
+| 1 | Opsi (a): keadaan awal terlihat; animasi Play tetap | Kotak tidak lagi kosong; arah tetap terbaca dari posisi awal |
+| 2 | Scale Fade awal `opacity-60` (bukan 0) dan Slide Up awal `translate-y-4` | Supaya contoh tetap terlihat dan tidak keluar kotak |
 
 ## Design System Checks
 

@@ -1,6 +1,6 @@
 # CR-047 — State terpilih dan fill ikon `bg-primary` di halaman docs/scenario
 
-**Status:** draft
+**Status:** approved (disetujui user 2026-11-22; `done` menunggu user). Cakupan: `app/(docs)` saja; `clinic`/`crm`/`scenarios` tidak disentuh (lanjutan terpisah).
 **Sumber:** audit halaman tidak koheren (2026-11-22), temuan terbuka dari CR-044
 **Ref:** `docs/design/visual-language.md` (Color Roles: `primary` = aksi, fokus; state terpilih: kontrol segmented wajib `SegmentedControl`; item aktif kumpulan pilihan visual memakai ring `highlight`)
 
@@ -25,18 +25,22 @@ Mengubah state terpilih mengubah cara pengguna membaca pilihan aktif. Itu keputu
 
 ## Tasks
 
-- [ ] Persetujuan user untuk pola state terpilih (SegmentedControl vs ring vs bg-accent).
-- [ ] Inventaris dan klasifikasi per baris (tabel di atas bisa berubah).
-- [ ] Ubah per kasus.
-- [ ] Guard: tambah aturan `handmade-segmented-selected` untuk pola `bg-primary` pada item terpilih bila pola stabil.
-- [ ] Screenshot per halaman (dark & light).
-- [ ] `pnpm --filter @ds/showcase lint`, `build:types`, guard test.
+- [x] Persetujuan user untuk pola state terpilih (disetujui 2026-11-22, rekomendasi).
+- [x] Inventaris dan klasifikasi per baris (grep `bg-primary` di `app/(docs)`).
+- [x] Ubah per kasus: 12 file (lihat Keputusan).
+- [ ] Guard: aturan `handmade-segmented-selected` belum diperluas (pola `bg-primary` pada item terpilih belum dijadikan aturan).
+- [~] Screenshot: `patterns/workspace` (light, Atelier/Pulse) sudah dilihat dan rapi. Halaman lain belum dilihat (stepper, master-data, transfer-list, data-display dark).
+- [x] `pnpm --filter @ds/showcase lint` dan `build:types` hijau; `vitest src/test` 4/4 hijau.
 
 ## Keputusan
 
 | # | Keputusan | Alasan |
 |---|---|---|
-| 1 | Belum dieksekusi; menunggu persetujuan | Mengubah pola interaksi; perlu keputusan user |
+| 1 | Tombol segmented/toggle terpilih: `bg-primary text-primary-foreground` → `bg-background text-foreground shadow-xs` (state `on` SegmentedControl). Dipakai di workspace, dashboard, layout-navigation, data-display, overlays-menus, mention-emoji (`border-highlight bg-background`) | Sesuai visual-language (state on = permukaan `background` + `shadow-xs`); `primary` tidak lagi menandai state |
+| 2 | Item pilihan (transfer-list, cascader): `bg-highlight/10 ring-1 ring-highlight` | Ring highlight untuk item pilihan visual |
+| 3 | Callout dekoratif stepper dan master-data: `border-highlight/30 bg-gradient from-highlight/10`, ikon `bg-highlight text-highlight-foreground` | Dekorasi dan identitas = highlight; pasangan `highlight-foreground` sudah ada di token |
+| 4 | Baris terpilih/aktif (master-detail, stepper card, data-display selectedIds) dan notifikasi unread → `highlight` | Konsisten dengan item pilihan |
+| 5 | `clinic`, `crm`, dan `scenarios` (±20 kasus `bg-primary/5`, `bg-primary text-primary-foreground`) belum diubah | Di luar cakupan CR; lanjutan terpisah bila disetujui |
 
 ## Design System Checks
 
