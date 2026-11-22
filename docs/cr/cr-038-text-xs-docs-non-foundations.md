@@ -25,7 +25,7 @@
 - [x] Perluas guard ke seluruh `app/(docs)` untuk aturan px-only.
 - [x] `pnpm --filter @ds/showcase exec vitest run src/test/visual-language-guard.test.ts` hijau 4/4.
 - [x] `pnpm --filter @ds/showcase lint` dan `build:types` hijau.
-- [ ] Verifikasi visual: **belum**. Percobaan screenshot via Chrome headless CDP (`components/layout-navigation`, `patterns/data-table`, Atelier/Pulse light) tidak menghasilkan berkas; penyebab belum diketahui. Risiko: `text-xs` (12px) lebih besar dari 10/11px, bisa memotong label padat (badge, tabel, grid ikon).
+- [x] Verifikasi visual (sebagian): screenshot Chrome headless (`--screenshot`, 1440px, dev server :4000, default Atelier/Pulse dark) untuk `components/layout-navigation`, `components/data-display`, `patterns/data-table`. Tidak ada label `text-xs` yang terpotong atau tumpang tindih; tabel dan badge tetap terbaca. Belum: light mode dan halaman lain (`patterns/*` padat, `components/states-feedback`, `components/forms`).
 - [ ] `pnpm test` penuh, `pnpm typecheck`, `pnpm -C apps/showcase build` belum dijalankan dalam CR ini.
 
 ## Keputusan
