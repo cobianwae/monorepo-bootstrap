@@ -33,8 +33,11 @@ Konteks: CR-039 hanya menangani heading yang memakai ikon. Sisa ini berbeda sifa
 
 | # | Keputusan | Alasan |
 |---|---|---|
-| 1 | Belum ditetapkan: kartu/panel memakai `h3` atau dibiarkan `div` | Mengubah hierarki per kasus; perlu persetujuan user. |
-| 2 | Migrasi per file, bukan sekaligus | Mengikuti aturan satu CR = satu cluster dan memudahkan verifikasi. |
+| 1 | Tidak ada perubahan tag. `h2` di bawah `h1` tetap `h2`. | Pemeriksaan (2026-11-22): 12 file yang akan diubah ke `h3` ternyata tidak punya `h2` induk, sehingga `h3` akan melompati level. Rekomendasi `h3` sebelumnya salah untuk kasus ini. |
+| 2 | Hanya ubah ke `h3` bila file sudah punya section `h2` (SectionHeading) sebagai induk | Aturan urutan heading; belum ada file yang memenuhi syarat. |
+| 3 | Perbedaan gaya (`text-sm font-semibold` vs `SectionHeading`) bukan urusan tag | Ditangani terpisah bila perlu, tanpa mengubah hierarki. |
+
+Hasil: tidak ada file yang berubah. Status CR-041 ditutup sebagai "tidak perlu perubahan", kecuali ada file yang nanti memakai `SectionHeading` sebagai induk.
 
 ## Design System Checks
 

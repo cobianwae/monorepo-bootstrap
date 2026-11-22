@@ -73,6 +73,7 @@ Verifikasi:
   - `success` Alert: 5,6–6,5:1 (lolos, semua tema).
   - `destructive` Alert (teks di atas `destructive/10`): light 4,58:1 (lolos); dark 4,17–4,58:1 (gagal di sunset 4,17, botanic 4,34, pulse 4,32, nebula 4,47, lagoon 4,49, ink 4,50; lolos midnight 4,58, graphite 4,56). Belum diubah: `Alert` adalah komponen lain. Usul CR-042 bila disetujui.
 - Screenshot dark `warning` belum dikonfirmasi lewat probe (probe gagal menerapkan dark); hasil ini murni hitungan token.
+- Tindak lanjut (dijalankan setelah persetujuan user, 2026-11-22): `Alert` varian `destructive` memakai `text-foreground` (`packages/ui/src/components/feedback/alert.tsx`), ikon dan border tetap `destructive`. Tes `@ds/ui` feedback 10/10 lulus; lint hijau. Ini dicatat di CR-042 (lihat dokumen CR-042).
 
 - [ ] CR disetujui user.
 - [ ] Branch dibuat.
