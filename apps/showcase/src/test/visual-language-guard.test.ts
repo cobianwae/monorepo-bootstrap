@@ -33,6 +33,11 @@ const RULES: Rule[] = [
     hint: 'Heading section ditulis lewat <SectionHeading />, bukan class manual.',
   },
   {
+    id: 'manual-heading-with-icon',
+    pattern: /<h2 className="[^"]*flex items-center/,
+    hint: 'Heading section tanpa ikon dan tanpa class manual. Pakai <SectionHeading />.',
+  },
+  {
     id: 'decorative-primary-callout',
     pattern: /border-primary\/30 bg-primary\/5/,
     hint: 'primary hanya untuk aksi. Panel/callout memakai border-highlight/30 bg-highlight/5.',

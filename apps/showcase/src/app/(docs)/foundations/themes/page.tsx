@@ -28,8 +28,6 @@ import {
   Code2,
   Eye,
   Wand2,
-  Layers,
-  Palette,
 } from 'lucide-react';
 import { PageHeader, useTheme } from '@ds/ui';
 import { SectionHeading } from '@/components/section-heading';
@@ -156,7 +154,6 @@ export default function ThemesPage() {
       {/* 3 Art Directions */}
       <div className="space-y-4">
         <SectionHeading
-          icon={Layers}
           title="Art Direction Library"
           actions={
             <span className="text-xs text-muted-foreground font-mono">
@@ -234,7 +231,7 @@ export default function ThemesPage() {
       
       {/* Color Tones for Active Art Direction */}
       <div className="space-y-4">
-        <SectionHeading icon={Palette} title={`Color Tones for ${activeDirectionDef.name}`} />
+        <SectionHeading title={`Color Tones for ${activeDirectionDef.name}`} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {activeTones.map((theme) => {

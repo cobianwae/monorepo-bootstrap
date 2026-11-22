@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { MOTION_TOKENS } from '@ds/tokens';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Button, Badge, Banner } from '@ds/ui';
-import { Play, Sparkles, Timer, Zap, MoveRight } from 'lucide-react';
+import { Play, Timer } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
 import { SectionHeading } from '@/components/section-heading';
 
@@ -50,7 +50,6 @@ export default function MotionPage() {
       {/* Duration Scale */}
       <section id="durations" className="space-y-4 scroll-mt-20">
         <SectionHeading
-          icon={Timer}
           title="Duration Scale"
           description="Fast for micro-interactions, normal for UI transitions, slow for large structural movement. All three share one easing so only duration differs."
           actions={
@@ -105,7 +104,6 @@ export default function MotionPage() {
       {/* Easing Curves */}
       <section id="easings" className="space-y-4 scroll-mt-20">
         <SectionHeading
-          icon={Zap}
           title="Easing Curves"
           description="Spring for entry & emphasis, smooth for exits and neutral movement. Both curves run at the same duration so only the curve differs."
         />
@@ -148,7 +146,6 @@ export default function MotionPage() {
       {/* Directional Motion */}
       <section id="direction" className="space-y-4 scroll-mt-20">
         <SectionHeading
-          icon={MoveRight}
           title="Directional Motion"
           description="Movement should mirror spatial relationships: content enters from where it will live, exits toward where it came from."
         />
@@ -184,7 +181,6 @@ export default function MotionPage() {
       {/* Reduced Motion */}
       <section id="reduced-motion" className="space-y-4 scroll-mt-20">
         <SectionHeading
-          icon={Sparkles}
           title="Reduced Motion Support"
           description={
             <>

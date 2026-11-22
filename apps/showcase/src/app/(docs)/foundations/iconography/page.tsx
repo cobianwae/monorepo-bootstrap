@@ -57,7 +57,7 @@ import {
   Search as SearchIcon,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Badge, CodeBlock } from '@ds/ui';
-import { Shapes, Sparkles as SparklesIcon } from 'lucide-react';
+import { Shapes } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
 import type { LucideIcon } from 'lucide-react';
 import { SectionHeading } from '@/components/section-heading';
@@ -109,7 +109,6 @@ export default function IconographyPage() {
       {/* Size Scale */}
       <section id="sizes" className="space-y-4 scroll-mt-20">
         <SectionHeading
-          icon={Layers}
           title="Size Scale"
           description="Four standardized sizes — never scale icons arbitrarily."
         />
@@ -135,7 +134,6 @@ export default function IconographyPage() {
       {/* Curated Set */}
       <section id="gallery" className="space-y-4 scroll-mt-20">
         <SectionHeading
-          icon={SparklesIcon}
           title="Curated Icon Set"
           description="The approved vocabulary for product UIs. Prefer these over ad-hoc imports to keep the system coherent."
         />
@@ -161,7 +159,6 @@ export default function IconographyPage() {
       {/* Usage */}
       <section id="usage" className="space-y-4 scroll-mt-20">
         <SectionHeading
-          icon={FileText}
           title="Usage & Accessibility"
           description="Decorative icons hide from screen readers; meaningful icons require an accessible name."
         />

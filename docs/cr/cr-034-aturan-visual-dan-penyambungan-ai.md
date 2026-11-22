@@ -36,7 +36,7 @@
 | # | Keputusan | Alasan |
 |---|---|---|
 | 1 | `primary` = aksi; `highlight` = aksen/identitas | Praktik dominan: `text-highlight` 168 vs `text-primary` 70 di docs. Dipilih user. |
-| 2 | Heading section = Heading 2 `text-2xl font-bold font-display` + ikon `highlight`; sub = `text-xl` | 97 pemakaian vs 9; sesuai langkah scale. Dipilih user. |
+| 2 | Heading section = Heading 2 `text-2xl font-bold font-display` + ikon `highlight`; sub = `text-xl` (**ikon dan helper `level="sub"` dicabut di CR-037**) | 97 pemakaian vs 9; sesuai langkah scale. Dipilih user. |
 | 3 | Teks mikro digabung ke `text-xs` | Caption/Meta 0.75rem sudah ada; tanpa token baru. Dipilih user. |
 | 4 | Motion invariant antar art direction | Sederhana; tidak ada dasar membedakan. |
 | 5 | State terpilih segmented = komponen `SegmentedControl` | Komponen DS sudah ada; draft awal salah menduga fill `primary`. |

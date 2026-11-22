@@ -2,7 +2,7 @@
 
 import { BREAKPOINT_TOKENS, Z_INDEX_TOKENS } from '@ds/tokens';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, Badge, Banner } from '@ds/ui';
-import { MonitorSmartphone, Layers } from 'lucide-react';
+import { MonitorSmartphone } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
 import { SectionHeading } from '@/components/section-heading';
 
@@ -55,7 +55,6 @@ export default function BreakpointsPage() {
       {/* Breakpoint Scale */}
       <section id="scale" className="space-y-4 scroll-mt-20">
         <SectionHeading
-          icon={MonitorSmartphone}
           title="Breakpoint Scale"
           description="Each token represents the minimum viewport width where the modifier applies."
         />
@@ -86,7 +85,6 @@ export default function BreakpointsPage() {
       {/* Responsive Patterns */}
       <section id="patterns" className="space-y-4 scroll-mt-20">
         <SectionHeading
-          icon={Layers}
           title="Responsive Composition Patterns"
           description="Standard recipes for grids, spacing, and tables that adapt gracefully across breakpoints."
         />
@@ -116,7 +114,6 @@ export default function BreakpointsPage() {
       {/* Z-Index Scale */}
       <section id="z-index" className="space-y-4 scroll-mt-20">
         <SectionHeading
-          icon={Layers}
           title="Z-Index Scale"
           description="A disciplined stacking order prevents overlay collisions. Components must not invent ad-hoc z-values."
         />

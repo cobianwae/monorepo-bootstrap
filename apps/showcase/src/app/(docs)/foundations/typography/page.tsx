@@ -15,7 +15,7 @@ import {
   SegmentedControl,
   SegmentedControlItem,
 } from '@ds/ui';
-import { BookOpen, Sliders, Ruler, LayoutTemplate, ScrollText } from 'lucide-react';
+import { BookOpen, Sliders } from 'lucide-react';
 import { PageHeader, useTheme } from '@ds/ui';
 import { SectionHeading } from '@/components/section-heading';
 
@@ -283,7 +283,6 @@ export default function TypographyPage() {
       {/* Structured Scale Specimen List */}
       <div className="space-y-4">
         <SectionHeading
-          icon={Ruler}
           title="Typographic Hierarchy Scale"
           actions={
             <span className="font-mono text-xs text-muted-foreground">
@@ -335,7 +334,7 @@ export default function TypographyPage() {
 
       {/* Practical Typographic Pairing Recipes */}
       <div className="space-y-4">
-        <SectionHeading icon={LayoutTemplate} title="Real-World Typographic Pairings" />
+        <SectionHeading title="Real-World Typographic Pairings" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {PAIRING_EXAMPLES.map((pair) => (
             <Card key={pair.title} className="border-border">
@@ -367,7 +366,6 @@ export default function TypographyPage() {
       {/* Long-Form Reading (Prose) */}
       <div className="space-y-4">
         <SectionHeading
-          icon={ScrollText}
           title="Long-Form Reading Surface"
           description={
             <>

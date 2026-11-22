@@ -44,7 +44,7 @@ Sumber nilai: `TYPOGRAPHY_SCALE` di `packages/tokens/src/tokens.ts`. Tidak ada l
 | Display | Display | 2.5rem | ○ | Hero landing |
 | Judul halaman | Heading 1 | 2rem | via `PageHeader` | Satu per halaman |
 | Heading section | Heading 2 | 1.5rem | `text-2xl font-bold font-display` | Level 1 dalam halaman |
-| Sub-section | Heading 3 | 1.25rem | `text-xl font-bold font-display` | Level 2 dalam section |
+| Sub-section | Heading 3 | 1.25rem | `text-xl font-bold font-display` | Hanya bila ada ≥2 kelompok paralel (lihat Section Heading) |
 | Lead | Body Large | 1.125rem | `text-lg` | Paragraf pembuka |
 | Body | Body Default | 1rem | `text-base` | Isi |
 | Deskripsi/UI padat | Body Small | 0.875rem | `text-sm` | Deskripsi kartu, tabel |
@@ -64,8 +64,10 @@ Deviasi yang diketahui (dicatat, ditunda, bukan blocker):
 
 ## Section Heading & Callout (halaman docs) ✔
 
-- Heading section: `SectionHeading` (`apps/showcase/src/components/section-heading.tsx`) — Heading 2 + ikon berwarna `highlight` + satu kalimat deskripsi `text-sm text-muted-foreground`; `actions` opsional di kanan.
-- Sub-section: `SectionHeading level="sub"` (Heading 3, tanpa ikon).
+- Heading section: `SectionHeading` (`apps/showcase/src/components/section-heading.tsx`) — Heading 2, **tanpa ikon**; `actions` opsional di kanan. Hierarki sudah dibawa ukuran, bobot, dan `font-display`; ikon di tiap heading hanya saluran ganda, memutus garis kiri teks, dan (dari audit CR-037) 9 dari 15 ikon lama dekoratif/acak.
+- Deskripsi satu kalimat (`text-sm text-muted-foreground`) **opsional**: isi hanya bila menambah informasi yang tidak ada di judul (cara membaca, kapan dipakai). Jangan mengulang judul.
+- Ikon tempatnya di navigasi, callout/status, dan kartu fitur, bukan di heading section. Bila kelak ada ≥3 kasus ikon dengan makna tetap lintas halaman (mis. demo, kode, a11y, peringatan), tambahkan prop bertipe union (`kind`), bukan `icon` bebas (CR terpisah).
+- Sub-section (Heading 3, `text-xl font-bold font-display`): hanya bila satu section punya ≥2 kelompok paralel yang perlu label dan lebih panjang dari satu layar. Jangan pernah h3 tunggal; kedalaman maksimal `PageHeader` h1 → h2 → h3. Belum ada helper (0 pemakaian; aturan 3x) — tulis `<h3>` manual bila perlu, jadikan helper setelah muncul tiga kali.
 - Callout pesan singkat: `Banner variant="highlight"`.
 - Panel berbingkai (mis. tester interaktif): `border-highlight/30 bg-highlight/5`, bukan `primary`.
 - Helper berada di showcase, bukan `@ds/ui`, agar tidak menambah API publik.
@@ -97,7 +99,7 @@ Diturunkan dari praktik dominan (39 halaman memakai root yang sama; 99 section m
 | Token | Peran | Boleh untuk | Tidak boleh untuk |
 |---|---|---|---|
 | `primary` | Aksi | Button utama, link aksi, fokus | Dekorasi, callout, label meta |
-| `highlight` | Aksen dan identitas | Eyebrow, ikon section, kartu/pilihan aktif (ring), badge identitas, callout | Aksi utama |
+| `highlight` | Aksen dan identitas | Eyebrow, ikon dalam callout/kartu, kartu/pilihan aktif (ring), badge identitas, callout | Aksi utama |
 | `muted` | Sekunder | Teks bantu, disabled, permukaan tenang | — |
 | `destructive` | Error dan aksi berbahaya | — | Dekorasi |
 | `success`, `warning`, `info` | Status | Feedback status | Dekorasi |
@@ -138,7 +140,8 @@ State terpilih:
 ## Pagar Otomatis
 
 `apps/showcase/src/test/visual-language-guard.test.ts` menggagalkan `text-[Npx]` dan heading section manual
-(`text-lg font-bold`, `text-2xl font-bold … font-display` di tag heading) di `app/(docs)/foundations`.
+(`text-lg font-bold`, `text-2xl font-bold …`, `<h2>` dengan `flex items-center` = pola ikon+judul manual)
+di `app/(docs)/foundations`. Larangan ikon di `SectionHeading` dijaga typecheck (prop `icon` tidak ada).
 Cakupan diperluas bertahap ke `components/`, `patterns/`, dll. setelah halamannya dirapikan.
 
 ## Changelog
@@ -148,3 +151,4 @@ Cakupan diperluas bertahap ke `components/`, `patterns/`, dll. setelah halamanny
 | 2026-11-19 | Dokumen dibuat sebagai draft | draft |
 | 2026-11-22 | Isi Art Direction, Type Scale, Section Heading & Callout, Color Roles dari keputusan sesi `/design-language` | draft |
 | 2026-11-22 | Finalkan keputusan: motion invariant, state terpilih mengikuti `SegmentedControl`, spacing dari praktik dominan, deviasi `PageHeader`/weight dicatat (CR-034) | draft |
+| 2026-11-22 | Koreksi keputusan: heading section **tanpa ikon**, deskripsi opsional, sub-section hanya bila ≥2 kelompok paralel (helper `level="sub"` dihapus, 0 pemakaian); dikunci user lewat pilihan A (CR-037) | draft |
