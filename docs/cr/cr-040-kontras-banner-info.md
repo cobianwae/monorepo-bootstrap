@@ -63,7 +63,11 @@ Verifikasi:
 - Hitung kontras (Pulse, pendekatan): sebelum ≈1,20:1 light / 1,33:1 dark; sesudah ≈15,24:1 light / 13,58:1 dark.
 - `pnpm --filter @ds/ui exec vitest run src/components/feedback`: 10/10 lulus.
 - Screenshot dark Atelier/Pulse `components/states-feedback`: teks "Scheduled maintenance window…" terbaca.
-- Belum: audit 8 tema penuh; varian success/warning/destructive belum diukur.
+- Audit varian lain (Pulse, OKLCH, tint 10–20% di atas card):
+  - `warning` Banner (`text-warning-foreground` di atas `warning/20`): light 15,45:1 (lolos); dark 1,48:1 (gagal). Diperbaiki: `warning` memakai `text-foreground` (commit terkait CR-040).
+  - `success` Alert (teks `success` di atas `success/10`): light 5,61:1; dark 6,07:1 (lolos).
+  - `destructive` Alert (teks `destructive` di atas `destructive/10`): light 4,58:1 (lolos tipis); dark 4,32:1 (gagal tipis). Belum diubah; `Alert` adalah komponen lain, perlu CR tersendiri bila disetujui.
+- Belum: audit 8 tema penuh; screenshot dark ulang untuk `warning` belum terkonfirmasi (probe mode gagal menerapkan dark pada percobaan terakhir).
 
 - [ ] CR disetujui user.
 - [ ] Branch dibuat.
