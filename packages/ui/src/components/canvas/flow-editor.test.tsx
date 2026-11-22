@@ -723,7 +723,7 @@ describe('FlowEditor undo/redo + toolbar (005-05)', () => {
     fireEvent.click(add);
     expect(countNodes()).toBe(6);
     expect(screen.getByTestId('flow-toolbar-redo').disabled).toBe(true);
-  });
+  }, 30000); // 105+ klik di jsdom; melampaui 5 detik default saat suite penuh berjalan
 
   it('AC-03: toolbar + keyboard (Ctrl+Z / Ctrl+Y) setara + disabled + live region', () => {
     renderUndo();
