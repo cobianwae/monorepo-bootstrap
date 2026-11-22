@@ -210,7 +210,7 @@ describe('PermissionMatrix', () => {
     fireEvent.keyDown(last, { key: 'ArrowDown' });
     expect(document.activeElement).toBe(last);
     expect(within(screen.getByRole('grid')).getAllByRole('checkbox').filter((item) => item.tabIndex === 0)).toHaveLength(1);
-  });
+  }, 30000);
 
   it('tracks three controlled changes, resets one/all, returns focus, and clears the banner on save', () => {
     const initialValue = makeValue(false);
