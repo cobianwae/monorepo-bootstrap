@@ -29,8 +29,9 @@
 - [x] `pnpm --filter @ds/showcase build:types` hijau (exit 0).
 - [x] `visual-language-guard` hijau 4/4.
 - [x] Screenshot `clinic/pos` dark (Atelier/Pulse): tender terpilih terbaca, tidak ada teks terpotong.
-- [ ] Screenshot halaman lain yang berubah (registration, clinic, leads, crm/ai, crm-stats-grid, clinic ai drawer) belum dilakukan.
-- [ ] Light mode belum diverifikasi untuk halaman ini.
+- [x] Verifikasi visual (Atelier/Pulse, 1440px, jeda 9 detik agar data termuat): `clinic/registration` light; `clinic/patients` light; `clinic` dark; `crm` dark dan light (chart tampil penuh); `crm/ai` light (tab terpilih memakai permukaan background + shadow). Semua rapi, tidak ada teks terpotong.
+- [ ] Belum diambil: `clinic` light, `clinic/registration` dark, `crm/ai` dark, `clinic/patients` dark, `crm/leads` (terisi), dan clinic ai drawer (interaksi buka).
+- Catatan metode: jeda 3,5 detik membuat chart CRM kosong dan halaman dark tertangkap skeleton. Jeda 9 detik menyelesaikan keduanya; ini bukan regresi CR-049.
 
 ## Keputusan
 
