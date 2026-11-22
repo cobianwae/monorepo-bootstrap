@@ -52,7 +52,7 @@ Hanya konten/klaim/demo di tiga halaman; tidak ada perubahan token, `@ds/ui`, at
 Branch: `visual-polish` (integrasi pekerjaan visual, dari `dev` `e57f7ea`; belum push/PR)
 Commit: lihat CR-035 (satu commit bersama; file halaman yang sama dan saling tumpang tindih)
 
-- [ ] CR disetujui user.
+- [x] CR disetujui user (instruksi 2026-11-22: "setuju semua CR kecuali CR-012 dan CR-013").
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi targeted dijalankan.
 - [x] `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/STATUS-LOG.md` diperbarui.

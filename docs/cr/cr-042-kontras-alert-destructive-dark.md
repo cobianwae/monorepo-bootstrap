@@ -46,7 +46,7 @@ Hitungan: `/tmp/vl-calc/audit3.mjs` (OKLCH dari `packages/tokens/src/tokens.css`
 Branch: `visual-polish`
 Commit: `fix: teks Alert destructive memakai foreground agar kontras dark lolos [CR-042]`
 
-- [ ] CR disetujui user.
+- [x] CR disetujui user (instruksi 2026-11-22: "setuju semua CR kecuali CR-012 dan CR-013").
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi penuh dijalankan (lihat CR-052).
 - [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.

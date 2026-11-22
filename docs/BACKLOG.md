@@ -109,9 +109,10 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-047 | State terpilih dan kotak ikon `bg-primary` (dekoratif) di halaman docs/scenario; pola interaksi, disetujui | approved | `docs/cr/cr-047-state-terpilih-bg-primary.md` |
 | CR-048 | Demo Directional Motion tampil kosong sebelum Play | done | `docs/cr/cr-048-directional-motion-kotak-kosong.md` |
 | CR-049 | State terpilih dan ikon dekoratif `primary` di `clinic`, `crm`, `scenarios` (lanjutan CR-047); tautan dan nilai tetap primary | done | `docs/cr/cr-049-primary-state-dan-ikon-clinic-crm-scenarios.md` |
-| CR-050 | Sisa `primary` dekoratif (onboarding, layout-navigation, consultations, reports, auth), guard solid fill, penutupan deviasi visual | draft | `docs/cr/cr-050-sisa-primary-dan-deviasi-visual.md` |
-| CR-051 | PageHeader: eyebrow sudah selesai (CR-046); deviasi h1 `text-3xl sm:text-4xl` dan weight dipertahankan sebagai keputusan; perubahan API publik butuh persetujuan | draft | `docs/cr/cr-051-pageheader-deviasi.md` |
-| CR-052 | Perluas guard `text-lg font-bold` sebagai heading ke seluruh `app/(docs)`; sisa di `guidelines` ke `SectionHeading` | draft | `docs/cr/cr-052-perluas-guard-heading.md` |
+| CR-050 | Sisa `primary` dekoratif (onboarding, layout-navigation, consultations, reports, auth), guard solid fill, penutupan deviasi visual | approved | `docs/cr/cr-050-sisa-primary-dan-deviasi-visual.md` |
+| CR-051 | PageHeader: eyebrow sudah selesai (CR-046); deviasi h1 `text-3xl sm:text-4xl` dan weight dipertahankan sebagai keputusan; perubahan API publik butuh persetujuan | approved | `docs/cr/cr-051-pageheader-deviasi.md` |
+| CR-052 | Perluas guard `text-lg font-bold` sebagai heading ke seluruh `app/(docs)`; sisa di `guidelines` ke `SectionHeading` | approved | `docs/cr/cr-052-perluas-guard-heading.md` |
+| CR-053 | Audit visual `components/` dan `patterns/` (46 halaman): text-highlight pada teks kecil, primary dekoratif, h2/h3 manual, text-lg/text-2xl font-bold manual; cakupan palet selain Atelier/Pulse | draft | `docs/cr/cr-053-audit-visual-components-patterns.md` |
 
 ## Catatan
 

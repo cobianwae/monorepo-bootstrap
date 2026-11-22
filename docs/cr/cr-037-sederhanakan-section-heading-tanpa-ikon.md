@@ -59,7 +59,7 @@
 Branch: `visual-polish` (integrasi pekerjaan visual; belum push/PR)
 Commit: `refactor: sederhanakan SectionHeading tanpa ikon dan level sub [CR-037]`
 
-- [ ] CR disetujui user.
+- [x] CR disetujui user (instruksi 2026-11-22: "setuju semua CR kecuali CR-012 dan CR-013").
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi targeted dijalankan.
 - [x] `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/STATUS-LOG.md` diperbarui.

@@ -1,6 +1,6 @@
 # CR-050 — Sisa `primary` dekoratif, guard solid fill, dan penutupan deviasi visual
 
-**Status:** draft (hanya user yang menetapkan `approved` dan `done`)
+**Status:** approved (hanya user yang menetapkan `approved` dan `done`)
 **Sumber:** permintaan user "bereskan skaligus, jangan tanya-tanya" atas daftar sisa dari audit halaman showcase
 **Ref:** `docs/design/visual-language.md` (Color Roles, Deviasi), `docs/cr/cr-047-state-terpilih-bg-primary.md`, `docs/cr/cr-049-primary-state-dan-ikon-clinic-crm-scenarios.md`
 
@@ -47,7 +47,7 @@
 - [x] `pnpm -C apps/showcase build` dijalankan dari salinan sementara `apps/.showcase-build` (dev server memakai `.next` yang sama): 76/76 halaman lulus. Salinan sudah dihapus.
 - [x] `pnpm --filter @ds/showcase test`: 15 file, 78/78 tes lulus.
 - [x] Screenshot light Atelier/Pulse: `clinic/consultations`, `clinic/reports`, `patterns/auth` (`/tmp/cr050-shots/`). Rapi, tidak ada teks terpotong.
-- [ ] Persetujuan user untuk status `approved` dan `done` (hak user).
+- [x] CR disetujui user (instruksi 2026-11-22: "setuju semua CR kecuali CR-012 dan CR-013").
 
 ## Eksekusi
 

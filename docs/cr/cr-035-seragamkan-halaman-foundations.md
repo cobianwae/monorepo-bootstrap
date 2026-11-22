@@ -65,7 +65,7 @@
 Branch: `visual-polish` (integrasi pekerjaan visual, dari `dev` `e57f7ea`; belum push/PR)
 Commit: `refactor: seragamkan halaman foundations dan perbaiki bug konten [CR-035] [CR-036]` (satu commit bersama CR-036; file halaman yang sama)
 
-- [ ] CR disetujui user.
+- [x] CR disetujui user (instruksi 2026-11-22: "setuju semua CR kecuali CR-012 dan CR-013").
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi targeted dijalankan.
 - [x] `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/STATUS-LOG.md` diperbarui.

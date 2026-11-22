@@ -1,6 +1,6 @@
 # CR-051 — PageHeader: status temuan dan keputusan API
 
-**Status:** draft (hanya user yang menetapkan `approved` dan `done`)
+**Status:** approved (hanya user yang menetapkan `approved` dan `done`)
 **Sumber:** audit visual-polish; `docs/design/visual-language.md` (Type Scale, Color Roles, Deviasi)
 **Ref:** CR-046 (eyebrow kontras), `packages/ui/src/components/layout/page-header.tsx`
 
@@ -28,7 +28,7 @@
 
 - [x] Verifikasi temuan 1 (kode dan kontras) lewat CR-046.
 - [x] Catat keputusan temuan 2 dan 3 di `docs/design/visual-language.md` (bagian Deviasi).
-- [ ] Persetujuan user untuk mengubah h1 `PageHeader` (hanya bila diminta; saat ini tidak ada perubahan kode).
+- [x] CR disetujui user (instruksi 2026-11-22: "setuju semua CR kecuali CR-012 dan CR-013").
 - [ ] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.
 
 ## Eksekusi
