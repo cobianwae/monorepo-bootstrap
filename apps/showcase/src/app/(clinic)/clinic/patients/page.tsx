@@ -300,7 +300,7 @@ export default function PatientsDirectoryPage() {
 
                     <TableCell>
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2 font-mono text-xs">
+                        <div className="flex items-center gap-2 font-mono text-xs whitespace-nowrap">
                           <span className="text-muted-foreground">{patient.startWeight}</span>
                           <span>→</span>
                           <span className="font-bold text-foreground">{patient.currentWeight} kg</span>
@@ -314,7 +314,7 @@ export default function PatientsDirectoryPage() {
 
                     <TableCell>
                       <div className="space-y-1">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 whitespace-nowrap">
                           <span className="font-mono text-xs font-bold text-foreground">
                             BMI {patient.bmi}
                           </span>
