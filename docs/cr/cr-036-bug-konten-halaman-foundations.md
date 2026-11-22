@@ -1,6 +1,6 @@
 # CR-036 — Bug konten halaman `foundations` (klaim, label, demo motion)
 
-**Status:** draft
+**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
 **Sumber:** bug — ditemukan saat membandingkan `motion`, `typography`, `themes` dengan token (2026-11-22)
 **Ref:** `apps/showcase/src/app/(docs)/foundations/{motion,themes,typography}/page.tsx`, `packages/tokens/src/tokens.ts:186-217`, `packages/tokens/src/contrast.ts:10-17`
 

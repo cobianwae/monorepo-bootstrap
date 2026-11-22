@@ -1,6 +1,6 @@
 # CR-041 — Rapikan `<h2>` manual sisa di halaman docs non-foundations
 
-**Status:** draft
+**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
 **Sumber:** review / docs (lanjutan CR-039)
 **Ref:** `docs/design/visual-language.md` (Section Heading & Callout), `docs/cr/cr-039-ikon-heading-components-patterns.md`
 

@@ -1,6 +1,6 @@
 # CR-038 — Ganti `text-[Npx]` di `app/(docs)` non-foundations dengan `text-xs`
 
-**Status:** draft
+**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
 **Sumber:** audit lanjutan CR-035/037 — 99 pemakaian `text-[10px]`/`text-[11px]`/`text-[9px]` di halaman docs di luar foundations
 **Ref:** `docs/design/visual-language.md` (Type Scale: teks terkecil `text-xs`), `apps/showcase/src/test/visual-language-guard.test.ts`
 

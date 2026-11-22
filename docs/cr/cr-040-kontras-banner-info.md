@@ -1,6 +1,6 @@
 # CR-040 — Kontras teks varian `info` pada Banner
 
-**Status:** draft
+**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
 **Sumber:** a11y / bug
 **Ref:** `packages/ui/src/components/feedback/banner.tsx:18`, `apps/showcase/src/app/(docs)/components/states-feedback/page.tsx:149`, `docs/design/visual-language.md` (Color Roles, aturan kontras teks)
 

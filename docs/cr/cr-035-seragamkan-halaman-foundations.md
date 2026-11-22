@@ -1,6 +1,6 @@
 # CR-035 — Seragamkan halaman `foundations` (heading, teks mikro, warna aksen, kontrol)
 
-**Status:** draft
+**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
 **Sumber:** review — `/improve-ui` tidak formal; temuan dari pertanyaan user 2026-11-22
 **Ref:** `apps/showcase/src/app/(docs)/foundations/*/page.tsx`, `apps/showcase/src/components/section-heading.tsx`, `docs/design/visual-language.md`
 

@@ -1,6 +1,6 @@
 # CR-044 — `primary` dekoratif ke `highlight` (ikon kartu dan callout informatif)
 
-**Status:** draft
+**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
 **Sumber:** audit halaman tidak koheren (2026-11-22), usulan urutan 2
 **Ref:** `docs/design/visual-language.md` (Color Roles: `primary` = aksi, `highlight` = aksen dan identitas; dekorasi dilarang untuk `primary`), `docs/cr/cr-035-seragamkan-halaman-foundations.md`
 

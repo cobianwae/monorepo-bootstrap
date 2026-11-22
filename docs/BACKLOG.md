@@ -93,22 +93,22 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-031 | Mind Map: pakai Kbd dan Timeline, restyle resep (logika salin dipertahankan) | done | `docs/cr/cr-031-mind-map-komponen-ds-kbd-timeline-resep.md` |
 | CR-032 | Mind Map: section "Kapan dipakai" (opsional, konten baru) | done | `docs/cr/cr-032-mind-map-kapan-dipakai.md` |
 | CR-033 | Token: scope tema bersarang tidak me-resolve ulang `--color-*` (dark mode kanvas mind-map; dikerjakan lebih dulu) | done | `docs/cr/cr-033-token-scope-tema-bersarang.md` |
-| CR-034 | Aturan visual docs showcase (`visual-language.md`) + penyambungan ke AI (`instructions`, AGENTS, ARCHITECTURE, CONVENTIONS) + pagar guard | draft | `docs/cr/cr-034-aturan-visual-dan-penyambungan-ai.md` |
-| CR-035 | Seragamkan 7 halaman `foundations`: `SectionHeading`, teks mikro → `text-xs`, `primary` dekoratif → `highlight`, `SegmentedControl` | draft | `docs/cr/cr-035-seragamkan-halaman-foundations.md` |
-| CR-036 | Bug konten `foundations`: klaim WCAG dihitung, "3-step", demo durasi satu easing, label arah, "Play All", badge Ratio dark mode | draft | `docs/cr/cr-036-bug-konten-halaman-foundations.md` |
-| CR-037 | Sederhanakan `SectionHeading`: tanpa ikon, tanpa level sub (mengoreksi keputusan CR-034 #2; opsi A pilihan user) | draft | `docs/cr/cr-037-sederhanakan-section-heading-tanpa-ikon.md` |
-| CR-038 | Ganti `text-[9/10/11px]` → `text-xs` di `app/(docs)` non-foundations (99 pemakaian, 29 file); guard px diperluas ke seluruh docs | draft | `docs/cr/cr-038-text-xs-docs-non-foundations.md` |
-| CR-039 | Hapus ikon heading manual di `components/` dan `patterns/` (78 baris, 11 file) | draft | `docs/cr/cr-039-ikon-heading-components-patterns.md` |
-| CR-040 | Kontras teks varian `info` dan `warning` di `Banner` (`text-foreground` di atas tint); audit 8 tema | draft | `docs/cr/cr-040-kontras-banner-info.md` |
-| CR-041 | 44 `<h2>` manual sisa di docs non-foundations: diperiksa, tidak perlu perubahan tag (tidak ada section `h2` induk) | draft | `docs/cr/cr-041-h2-manual-docs-non-foundations.md` |
-| CR-042 | Kontras teks varian `destructive` pada Alert (dark 4,17–4,58:1); teks memakai `foreground` | draft | `docs/cr/cr-042-kontras-alert-destructive-dark.md` |
-| CR-043 | Heading section tanpa ikon di `overlays-menus` (11 h2) dan `text-xl` untuk h3 manual di `data-display` dan `layout-navigation` | draft | `docs/cr/cr-043-heading-overlays-data-display-layout.md` |
-| CR-044 | `primary` dekoratif ke `highlight` di halaman docs (ikon kartu, callout informatif, identitas; 25 kemunculan, 14 file); aksi dan state terpilih tidak diubah | draft | `docs/cr/cr-044-primary-dekoratif-ke-highlight.md` |
-| CR-045 | `text-[9/10/11px]` di luar `app/(docs)` ke `text-xs` (154 kemunculan, 33 file); guard memindai seluruh `src` | draft | `docs/cr/cr-045-text-xs-luar-docs.md` |
+| CR-034 | Aturan visual docs showcase (`visual-language.md`) + penyambungan ke AI (`instructions`, AGENTS, ARCHITECTURE, CONVENTIONS) + pagar guard | approved | `docs/cr/cr-034-aturan-visual-dan-penyambungan-ai.md` |
+| CR-035 | Seragamkan 7 halaman `foundations`: `SectionHeading`, teks mikro → `text-xs`, `primary` dekoratif → `highlight`, `SegmentedControl` | approved | `docs/cr/cr-035-seragamkan-halaman-foundations.md` |
+| CR-036 | Bug konten `foundations`: klaim WCAG dihitung, "3-step", demo durasi satu easing, label arah, "Play All", badge Ratio dark mode | approved | `docs/cr/cr-036-bug-konten-halaman-foundations.md` |
+| CR-037 | Sederhanakan `SectionHeading`: tanpa ikon, tanpa level sub (mengoreksi keputusan CR-034 #2; opsi A pilihan user) | approved | `docs/cr/cr-037-sederhanakan-section-heading-tanpa-ikon.md` |
+| CR-038 | Ganti `text-[9/10/11px]` → `text-xs` di `app/(docs)` non-foundations (99 pemakaian, 29 file); guard px diperluas ke seluruh docs | approved | `docs/cr/cr-038-text-xs-docs-non-foundations.md` |
+| CR-039 | Hapus ikon heading manual di `components/` dan `patterns/` (78 baris, 11 file) | approved | `docs/cr/cr-039-ikon-heading-components-patterns.md` |
+| CR-040 | Kontras teks varian `info` dan `warning` di `Banner` (`text-foreground` di atas tint); audit 8 tema | approved | `docs/cr/cr-040-kontras-banner-info.md` |
+| CR-041 | 44 `<h2>` manual sisa di docs non-foundations: diperiksa, tidak perlu perubahan tag (tidak ada section `h2` induk) | approved | `docs/cr/cr-041-h2-manual-docs-non-foundations.md` |
+| CR-042 | Kontras teks varian `destructive` pada Alert (dark 4,17–4,58:1); teks memakai `foreground` | approved | `docs/cr/cr-042-kontras-alert-destructive-dark.md` |
+| CR-043 | Heading section tanpa ikon di `overlays-menus` (11 h2) dan `text-xl` untuk h3 manual di `data-display` dan `layout-navigation` | approved | `docs/cr/cr-043-heading-overlays-data-display-layout.md` |
+| CR-044 | `primary` dekoratif ke `highlight` di halaman docs (ikon kartu, callout informatif, identitas; 25 kemunculan, 14 file); aksi dan state terpilih tidak diubah | approved | `docs/cr/cr-044-primary-dekoratif-ke-highlight.md` |
+| CR-045 | `text-[9/10/11px]` di luar `app/(docs)` ke `text-xs` (154 kemunculan, 33 file); guard memindai seluruh `src` | approved | `docs/cr/cr-045-text-xs-luar-docs.md` |
 | CR-046 | Kontras eyebrow `PageHeader` (`text-highlight` kecil di `packages/ui`); API publik, disetujui | approved | `docs/cr/cr-046-eyebrow-pageheader-kontras.md` |
 | CR-047 | State terpilih dan kotak ikon `bg-primary` (dekoratif) di halaman docs/scenario; pola interaksi, disetujui | approved | `docs/cr/cr-047-state-terpilih-bg-primary.md` |
 | CR-048 | Demo Directional Motion tampil kosong sebelum Play | approved | `docs/cr/cr-048-directional-motion-kotak-kosong.md` |
-| CR-049 | State terpilih dan ikon dekoratif `primary` di `clinic`, `crm`, `scenarios` (lanjutan CR-047); tautan dan nilai tetap primary | draft | `docs/cr/cr-049-primary-state-dan-ikon-clinic-crm-scenarios.md` |
+| CR-049 | State terpilih dan ikon dekoratif `primary` di `clinic`, `crm`, `scenarios` (lanjutan CR-047); tautan dan nilai tetap primary | approved | `docs/cr/cr-049-primary-state-dan-ikon-clinic-crm-scenarios.md` |
 
 ## Catatan
 

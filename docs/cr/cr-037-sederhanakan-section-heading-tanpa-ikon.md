@@ -1,6 +1,6 @@
 # CR-037 — Sederhanakan `SectionHeading`: tanpa ikon, tanpa level sub
 
-**Status:** draft
+**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
 **Sumber:** review — pertanyaan user 2026-11-22 ("apakah sub heading selalu ada? apakah ikon di setiap halaman tidak berlebihan?") + audit kode
 **Ref:** `apps/showcase/src/components/section-heading.tsx`, `apps/showcase/src/app/(docs)/foundations/*/page.tsx`, `docs/design/visual-language.md` (Section Heading & Callout)
 

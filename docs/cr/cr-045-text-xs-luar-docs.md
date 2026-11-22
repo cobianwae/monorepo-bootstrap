@@ -1,6 +1,6 @@
 # CR-045 — `text-[9/10/11px]` di luar `app/(docs)` ke `text-xs`
 
-**Status:** draft
+**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
 **Sumber:** audit halaman tidak koheren (2026-11-22), usulan urutan 3
 **Ref:** `docs/design/visual-language.md` (Type Scale: dilarang `text-[Npx]`, teks terkecil `text-xs`), `docs/cr/cr-038-text-xs-docs-non-foundations.md` (cakupan docs)
 
