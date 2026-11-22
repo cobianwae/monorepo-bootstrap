@@ -294,7 +294,7 @@ export default function AuthPage() {
                         />
                       </div>
 
-                      <ul className="grid grid-cols-2 gap-1 text-[11px] text-muted-foreground pt-1">
+                      <ul className="grid grid-cols-2 gap-1 text-xs text-muted-foreground pt-1">
                         <li className={`flex items-center gap-1 ${hasMinLength ? 'text-success font-medium' : ''}`}>
                           <CheckCircle2 className="h-3 w-3" /> 8+ Characters
                         </li>

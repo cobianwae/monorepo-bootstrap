@@ -140,7 +140,7 @@ export default function ResultsPage() {
           <SegmentedControlItem value="forbidden">403</SegmentedControlItem>
           <SegmentedControlItem value="error">Error</SegmentedControlItem>
         </SegmentedControl>
-        <Badge variant="secondary" className="text-[10px]">
+        <Badge variant="secondary" className="text-xs">
           Preview: {state}
         </Badge>
       </div>

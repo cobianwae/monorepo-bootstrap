@@ -16,7 +16,7 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 1. User menetapkan `approved`/`done` untuk CR-034/035/036/037 dan `visual-language.md` (bagian ○ layout, surfaces, component targets belum dikunci).
 2. CR terpisah bila disetujui: kontras `text-highlight` pada teks kecil di light mode (eyebrow `PageHeader` di `@ds/ui`, themes hero, breakpoints), deviasi `PageHeader` h1 vs Heading 1, Directional Motion kosong sebelum Play.
-3. Rapikan `components/` dan `patterns/` (±98 `text-[10/11px]` + ±81 ikon heading pola lama, sesuai CR-037: heading tanpa ikon), lalu perluas guard ke sana.
+3. Rapikan `components/` dan `patterns/` (ikon heading pola lama ±81, sesuai CR-037: heading tanpa ikon; `text-[Npx]` sudah diganti CR-038, guard menjaganya), lalu perluas guard heading ke sana. Verifikasi visual CR-038 (layout `text-xs`) masih tertunda.
 4. Baseline baru pengganti CR-015 — verifikasi 12 error tipe FlowEditor + smoke RTE + timing worker (CR baru bila perlu).
 5. Antrean implementasi satu per sesi: 013-01, 015-03. Sinkron sitemap S-005.30/S-005.31 `planned` → `implemented`; S-005.41 `in-design` (018).
 

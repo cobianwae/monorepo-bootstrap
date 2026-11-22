@@ -519,7 +519,7 @@ export default function MasterDataPage() {
                     <TableCell className="text-xs text-muted-foreground">
                       <div className="flex flex-col">
                         <span>{item.updatedAt}</span>
-                        <span className="text-[11px] opacity-75">{item.updatedBy}</span>
+                        <span className="text-xs opacity-75">{item.updatedBy}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
@@ -605,20 +605,20 @@ export default function MasterDataPage() {
             <div className="space-y-4 pt-2">
               <div className="border-l-2 border-primary pl-3 space-y-1">
                 <span className="text-xs font-semibold text-foreground">Record Status Activated</span>
-                <p className="text-[11px] text-muted-foreground">Changed status from Draft to Active by Sarah (Admin)</p>
-                <span className="text-[10px] text-muted-foreground font-mono">2025-02-10 14:20:00 UTC</span>
+                <p className="text-xs text-muted-foreground">Changed status from Draft to Active by Sarah (Admin)</p>
+                <span className="text-xs text-muted-foreground font-mono">2025-02-10 14:20:00 UTC</span>
               </div>
 
               <div className="border-l-2 border-border pl-3 space-y-1">
                 <span className="text-xs font-semibold text-foreground">Description Updated</span>
-                <p className="text-[11px] text-muted-foreground">Updated statutory reference notes by Finance Bot</p>
-                <span className="text-[10px] text-muted-foreground font-mono">2025-01-28 09:15:22 UTC</span>
+                <p className="text-xs text-muted-foreground">Updated statutory reference notes by Finance Bot</p>
+                <span className="text-xs text-muted-foreground font-mono">2025-01-28 09:15:22 UTC</span>
               </div>
 
               <div className="border-l-2 border-border pl-3 space-y-1">
                 <span className="text-xs font-semibold text-foreground">Initial Creation</span>
-                <p className="text-[11px] text-muted-foreground">Created initial record schema by System Bootstrap</p>
-                <span className="text-[10px] text-muted-foreground font-mono">2024-12-01 00:00:00 UTC</span>
+                <p className="text-xs text-muted-foreground">Created initial record schema by System Bootstrap</p>
+                <span className="text-xs text-muted-foreground font-mono">2024-12-01 00:00:00 UTC</span>
               </div>
             </div>
           </div>

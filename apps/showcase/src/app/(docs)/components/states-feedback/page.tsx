@@ -252,19 +252,19 @@ export default function StatesFeedbackPage() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col items-center justify-center gap-2">
                 <Spinner size="sm" variant="default" />
-                <span className="text-[11px] font-mono text-muted-foreground">size=&quot;sm&quot;</span>
+                <span className="text-xs font-mono text-muted-foreground">size=&quot;sm&quot;</span>
               </div>
               <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col items-center justify-center gap-2">
                 <Spinner size="default" variant="primary" />
-                <span className="text-[11px] font-mono text-muted-foreground">variant=&quot;primary&quot;</span>
+                <span className="text-xs font-mono text-muted-foreground">variant=&quot;primary&quot;</span>
               </div>
               <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col items-center justify-center gap-2">
                 <Spinner size="md" variant="success" />
-                <span className="text-[11px] font-mono text-muted-foreground">variant=&quot;success&quot;</span>
+                <span className="text-xs font-mono text-muted-foreground">variant=&quot;success&quot;</span>
               </div>
               <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col items-center justify-center gap-2">
                 <Spinner size="lg" variant="destructive" />
-                <span className="text-[11px] font-mono text-muted-foreground">size=&quot;lg&quot; destructive</span>
+                <span className="text-xs font-mono text-muted-foreground">size=&quot;lg&quot; destructive</span>
               </div>
             </div>
 
@@ -304,20 +304,20 @@ export default function StatesFeedbackPage() {
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-1/2" />
-                  <span className="text-[11px] font-mono text-muted-foreground mt-1">text lines</span>
+                  <span className="text-xs font-mono text-muted-foreground mt-1">text lines</span>
                 </div>
                 <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col items-center justify-center gap-2">
                   <Skeleton className="h-12 w-12 rounded-full" />
-                  <span className="text-[11px] font-mono text-muted-foreground">circle avatar</span>
+                  <span className="text-xs font-mono text-muted-foreground">circle avatar</span>
                 </div>
                 <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col justify-center gap-2">
                   <Skeleton className="h-24 w-full rounded-lg" />
-                  <span className="text-[11px] font-mono text-muted-foreground mt-1">rectangle card</span>
+                  <span className="text-xs font-mono text-muted-foreground mt-1">rectangle card</span>
                 </div>
                 <div className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col justify-center gap-2">
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-2/3" />
-                  <span className="text-[11px] font-mono text-muted-foreground mt-1">paragraph block</span>
+                  <span className="text-xs font-mono text-muted-foreground mt-1">paragraph block</span>
                 </div>
               </div>
             </div>

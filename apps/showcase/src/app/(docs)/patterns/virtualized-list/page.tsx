@@ -214,7 +214,7 @@ export default function VirtualizedListPage() {
         ) : (
           <div className="p-0">
             {/* Header */}
-            <div className={`grid grid-cols-[110px_minmax(0,1fr)_140px_110px_130px_140px] gap-3 border-b border-border/60 bg-muted/10 px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground font-mono`}>
+            <div className={`grid grid-cols-[110px_minmax(0,1fr)_140px_110px_130px_140px] gap-3 border-b border-border/60 bg-muted/10 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-muted-foreground font-mono`}>
               <span>SKU</span>
               <span>Product</span>
               <span>Category</span>
@@ -247,7 +247,7 @@ export default function VirtualizedListPage() {
                         <span className="truncate text-xs text-muted-foreground">{product.category}</span>
                         <span className="font-mono text-xs text-foreground">${product.price.toFixed(2)}</span>
                         <span>
-                          <Badge variant={meta.badge} className="text-[10px] px-2 py-0.5 font-mono">
+                          <Badge variant={meta.badge} className="text-xs px-2 py-0.5 font-mono">
                             {meta.label}
                           </Badge>
                         </span>

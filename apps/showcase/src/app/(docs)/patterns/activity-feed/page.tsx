@@ -338,7 +338,7 @@ export default function ActivityFeedPage() {
                         </p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <Badge variant={meta.badge} className="text-[10px] px-2 py-0.5 font-mono gap-1">
+                        <Badge variant={meta.badge} className="text-xs px-2 py-0.5 font-mono gap-1">
                           <Icon className="h-3 w-3" />
                           {meta.label}
                         </Badge>
@@ -420,7 +420,7 @@ export default function ActivityFeedPage() {
                   <p className="text-sm font-bold text-foreground">{detail.actor}</p>
                   <p className="text-xs text-muted-foreground font-mono">{formatDistanceToNow(detail.timestamp, { addSuffix: true })}</p>
                 </div>
-                <Badge variant={CATEGORY_META[detail.category].badge} className="ml-auto text-[10px] font-mono">
+                <Badge variant={CATEGORY_META[detail.category].badge} className="ml-auto text-xs font-mono">
                   {CATEGORY_META[detail.category].label}
                 </Badge>
               </div>

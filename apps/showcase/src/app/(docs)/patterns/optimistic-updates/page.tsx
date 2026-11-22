@@ -220,7 +220,7 @@ export default function OptimisticUpdatesPage() {
           <CardContent className="p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-base font-semibold text-foreground">Feature Flags</h2>
-              <Badge variant="outline" className="text-[10px]">
+              <Badge variant="outline" className="text-xs">
                 ~75% success rate
               </Badge>
             </div>
@@ -264,7 +264,7 @@ export default function OptimisticUpdatesPage() {
           <CardContent className="p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-base font-semibold text-foreground">Starred Files</h2>
-              <Badge variant="outline" className="text-[10px]">
+              <Badge variant="outline" className="text-xs">
                 ~70% success rate
               </Badge>
             </div>

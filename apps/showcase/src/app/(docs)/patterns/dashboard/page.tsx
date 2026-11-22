@@ -326,7 +326,7 @@ export default function DashboardPage() {
                     <div className="flex-1 space-y-0.5">
                       <div className="flex items-center justify-between">
                         <span className="font-semibold text-foreground">{item.title}</span>
-                        <span className="text-[10px] text-muted-foreground">{item.time}</span>
+                        <span className="text-xs text-muted-foreground">{item.time}</span>
                       </div>
                       <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
                     </div>

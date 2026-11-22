@@ -408,7 +408,7 @@ export default function MediaGalleryPage() {
                         <p className="truncate text-xs font-semibold text-foreground">
                           {item.filename}
                         </p>
-                        <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                        <p className="text-xs uppercase tracking-wide text-muted-foreground">
                           {item.category}
                         </p>
                       </div>

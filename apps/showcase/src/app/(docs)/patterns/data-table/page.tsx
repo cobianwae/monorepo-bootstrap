@@ -559,7 +559,7 @@ function buildColumns(): ColumnDef<User, any>[] {
     columnHelper.accessor('role', {
       header: 'Role',
       cell: ({ getValue }) => (
-        <Badge variant={ROLE_BADGE[String(getValue())]} className="capitalize text-[11px]">
+        <Badge variant={ROLE_BADGE[String(getValue())]} className="capitalize text-xs">
           {String(getValue())}
         </Badge>
       ),
@@ -567,7 +567,7 @@ function buildColumns(): ColumnDef<User, any>[] {
     columnHelper.accessor('status', {
       header: 'Status',
       cell: ({ getValue }) => (
-        <Badge variant={STATUS_BADGE[String(getValue())]} className="capitalize text-[11px]">
+        <Badge variant={STATUS_BADGE[String(getValue())]} className="capitalize text-xs">
           {String(getValue())}
         </Badge>
       ),

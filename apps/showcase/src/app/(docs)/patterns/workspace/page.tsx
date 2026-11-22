@@ -49,7 +49,7 @@ function FileExplorer({
       <div className="space-y-3">
         <div className="flex items-center justify-between px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
           <span>Explorer</span>
-          <Badge variant="outline" className="text-[10px] h-4 px-1">
+          <Badge variant="outline" className="text-xs h-4 px-1">
             Git main
           </Badge>
         </div>
@@ -74,7 +74,7 @@ function FileExplorer({
                     <Icon className="h-3.5 w-3.5" />
                     <span>{file.name}</span>
                   </div>
-                  <span className="text-[10px] opacity-70 font-mono">{file.size}</span>
+                  <span className="text-xs opacity-70 font-mono">{file.size}</span>
                 </button>
               </li>
             );
@@ -88,7 +88,7 @@ function FileExplorer({
             <span>Container Status</span>
             <CheckCircle className="h-3.5 w-3.5 text-success" />
           </div>
-          <p className="text-[11px] text-muted-foreground">Memory: 412 MB / 1 GB</p>
+          <p className="text-xs text-muted-foreground">Memory: 412 MB / 1 GB</p>
         </div>
       )}
     </div>
@@ -171,7 +171,7 @@ export default function WorkspacePage() {
             >
               <Search className="h-3.5 w-3.5 shrink-0" />
               <span className="hidden sm:inline">Search files or commands...</span>
-              <kbd className="ml-auto hidden rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono border sm:inline">
+              <kbd className="ml-auto hidden rounded bg-muted px-1.5 py-0.5 text-xs font-mono border sm:inline">
                 ⌘K
               </kbd>
             </button>
@@ -252,13 +252,13 @@ export default function WorkspacePage() {
             </div>
 
             {/* Bottom Terminal Drawer */}
-            <div className="h-28 border-t border-border bg-card/90 p-3 font-mono text-[11px]">
+            <div className="h-28 border-t border-border bg-card/90 p-3 font-mono text-xs">
               <div className="flex items-center justify-between text-muted-foreground pb-2 border-b border-border/50">
                 <div className="flex items-center gap-2">
                   <Terminal className="h-3.5 w-3.5" />
                   <span className="font-semibold uppercase tracking-wider">Terminal Output</span>
                 </div>
-                <span className="text-[10px] text-success">● Live (port 4000)</span>
+                <span className="text-xs text-success">● Live (port 4000)</span>
               </div>
               <div className="pt-2 text-muted-foreground space-y-0.5">
                 <p>

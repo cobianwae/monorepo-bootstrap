@@ -50,7 +50,7 @@ export default function GuidelinesPage() {
               • <strong>Weight over Color:</strong> Use font weight (regular vs semibold) to establish hierarchy before resorting to multiple saturated colors.
             </p>
             <p>
-              • <strong>Surface Layering:</strong> Background (<code className="font-mono text-[11px] bg-muted px-1.5 py-0.5 rounded text-foreground">--background</code>) → Container Card (<code className="font-mono text-[11px] bg-muted px-1.5 py-0.5 rounded text-foreground">--card</code>) → Popover/Modal (<code className="font-mono text-[11px] bg-muted px-1.5 py-0.5 rounded text-foreground">--popover</code>) creates natural optical depth.
+              • <strong>Surface Layering:</strong> Background (<code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded text-foreground">--background</code>) → Container Card (<code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded text-foreground">--card</code>) → Popover/Modal (<code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded text-foreground">--popover</code>) creates natural optical depth.
             </p>
           </CardContent>
         </Card>
@@ -92,10 +92,10 @@ export default function GuidelinesPage() {
           </CardHeader>
           <CardContent className="space-y-3 text-xs text-muted-foreground leading-relaxed">
             <p>
-              • <strong>Tinted Charcoal Surfaces:</strong> Avoid pure #000000 black canvas. Use tinted OKLCH dark slate (<code className="font-mono text-[11px] bg-muted px-1.5 py-0.5 rounded text-foreground">oklch(0.14 0.015 260)</code>) to prevent high-glare eye fatigue.
+              • <strong>Tinted Charcoal Surfaces:</strong> Avoid pure #000000 black canvas. Use tinted OKLCH dark slate (<code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded text-foreground">oklch(0.14 0.015 260)</code>) to prevent high-glare eye fatigue.
             </p>
             <p>
-              • <strong>Elevation via Lightness:</strong> Higher layered elements (cards, dialogs) use slightly lighter lightness (<code className="font-mono text-[11px] bg-muted px-1.5 py-0.5 rounded text-foreground">oklch(0.18)</code>) rather than heavy drop shadows.
+              • <strong>Elevation via Lightness:</strong> Higher layered elements (cards, dialogs) use slightly lighter lightness (<code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded text-foreground">oklch(0.18)</code>) rather than heavy drop shadows.
             </p>
             <p>
               • <strong>Desaturated Accents:</strong> Primary colors in dark mode use slightly reduced chroma and higher lightness for readability.
@@ -116,13 +116,13 @@ export default function GuidelinesPage() {
           </CardHeader>
           <CardContent className="space-y-3 text-xs text-muted-foreground leading-relaxed">
             <p>
-              • <strong>Spring Curves:</strong> Use natural spring easing (<code className="font-mono text-[11px] bg-muted px-1.5 py-0.5 rounded text-foreground">cubic-bezier(0.16, 1, 0.3, 1)</code>) rather than linear motion.
+              • <strong>Spring Curves:</strong> Use natural spring easing (<code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded text-foreground">cubic-bezier(0.16, 1, 0.3, 1)</code>) rather than linear motion.
             </p>
             <p>
               • <strong>Duration Scale:</strong> Micro-interactions at 150ms, dropdowns/modals at 250ms, screen transitions at 400ms max.
             </p>
             <p>
-              • <strong>Respect User Preferences:</strong> Honor <code className="font-mono text-[11px] bg-muted px-1.5 py-0.5 rounded text-foreground">prefers-reduced-motion</code> media query automatically.
+              • <strong>Respect User Preferences:</strong> Honor <code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded text-foreground">prefers-reduced-motion</code> media query automatically.
             </p>
           </CardContent>
         </Card>
@@ -141,7 +141,7 @@ export default function GuidelinesPage() {
               </div>
             </CardHeader>
             <CardContent className="space-y-2 text-xs text-foreground/90">
-              <p>✓ Use semantic tokens (<code className="font-mono text-[11px] bg-muted/60 px-1 py-0.5 rounded">--primary</code>, <code className="font-mono text-[11px] bg-muted/60 px-1 py-0.5 rounded">--muted</code>) instead of hardcoded hex values.</p>
+              <p>✓ Use semantic tokens (<code className="font-mono text-xs bg-muted/60 px-1 py-0.5 rounded">--primary</code>, <code className="font-mono text-xs bg-muted/60 px-1 py-0.5 rounded">--muted</code>) instead of hardcoded hex values.</p>
               <p>✓ Provide visible keyboard focus rings on all interactive elements.</p>
               <p>✓ Use loading skeletons matching the exact shape of incoming content.</p>
               <p>✓ Keep spacing consistent using the 4px rhythm multiplier.</p>

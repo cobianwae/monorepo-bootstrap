@@ -5,15 +5,20 @@ import { describe, expect, it } from 'vitest';
 
 /**
  * Pagar docs/design/visual-language.md untuk halaman docs showcase.
- * Cakupan awal: app/(docs)/foundations. Perluas ROOTS setelah halaman lain dirapikan.
+ * - Aturan `arbitrary-px-text` berlaku untuk seluruh app/(docs) (CR-038).
+ * - Aturan heading/callout/segmented hanya berlaku di app/(docs)/foundations.
+ *   Perluas ke components/ dan patterns/ setelah halamannya dirapikan (CR-039).
  */
 const SRC = fileURLToPath(new URL('..', import.meta.url));
-const ROOTS = [join(SRC, 'app', '(docs)', 'foundations')];
+const DOCS = join(SRC, 'app', '(docs)');
+const FOUNDATIONS = join(DOCS, 'foundations');
 
 interface Rule {
   id: string;
   pattern: RegExp;
   hint: string;
+  /** Akar yang dipindai; default foundations. */
+  root?: string;
 }
 
 const RULES: Rule[] = [
@@ -21,6 +26,7 @@ const RULES: Rule[] = [
     id: 'arbitrary-px-text',
     pattern: /text-\[\d+px\]/,
     hint: 'Teks terkecil adalah text-xs (Caption/Meta). Dilarang text-[Npx].',
+    root: DOCS,
   },
   {
     id: 'manual-heading-lg-bold',
@@ -57,12 +63,12 @@ function collectPages(dir: string): string[] {
   });
 }
 
-function findViolations(files: string[]): string[] {
+function findViolations(files: string[], rules: Rule[]): string[] {
   const violations: string[] = [];
   for (const file of files) {
     const lines = readFileSync(file, 'utf8').split('\n');
     lines.forEach((line, index) => {
-      for (const rule of RULES) {
+      for (const rule of rules) {
         if (rule.pattern.test(line)) {
           violations.push(`${relative(SRC, file)}:${index + 1} [${rule.id}] ${rule.hint}`);
         }
@@ -72,18 +78,27 @@ function findViolations(files: string[]): string[] {
   return violations;
 }
 
-describe('visual-language guard — halaman docs', () => {
-  const files = ROOTS.flatMap(collectPages);
+const foundationFiles = collectPages(FOUNDATIONS);
+const docsFiles = collectPages(DOCS);
+const foundationRules = RULES.filter((rule) => rule.root === undefined);
+const docsRules = RULES.filter((rule) => rule.root === DOCS);
 
+describe('visual-language guard — halaman docs', () => {
   it('menemukan halaman yang dipindai', () => {
-    expect(files.length).toBeGreaterThanOrEqual(7);
+    expect(foundationFiles.length).toBeGreaterThanOrEqual(7);
+    expect(docsFiles.length).toBeGreaterThanOrEqual(foundationFiles.length);
   });
 
-  it('tidak melanggar aturan visual-language', () => {
-    expect(findViolations(files)).toEqual([]);
+  it('foundations tidak melanggar aturan visual-language', () => {
+    expect(findViolations(foundationFiles, [...foundationRules, ...docsRules])).toEqual([]);
+  });
+
+  it('seluruh app/(docs) tidak memakai text-[Npx]', () => {
+    expect(findViolations(docsFiles, docsRules)).toEqual([]);
   });
 
   it('SectionHeading dipakai di halaman yang punya heading section', () => {
+    const files = foundationFiles;
     const missing = files
       .filter((file) => /<SectionHeading\b/.test(readFileSync(file, 'utf8')) === false)
       .filter((file) => /<section\b[^>]*id=/.test(readFileSync(file, 'utf8')))

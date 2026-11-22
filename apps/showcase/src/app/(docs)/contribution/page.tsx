@@ -77,7 +77,7 @@ export default function ContributionPage() {
             'Run pnpm lint, pnpm build:types, and pnpm test.',
           ].map((step, i) => (
             <div key={i} className="flex items-start gap-3">
-              <Badge variant="outline" className="shrink-0 font-mono text-[10px] mt-0.5">
+              <Badge variant="outline" className="shrink-0 font-mono text-xs mt-0.5">
                 {i + 1}
               </Badge>
               <span className="text-xs text-muted-foreground leading-relaxed">{step}</span>

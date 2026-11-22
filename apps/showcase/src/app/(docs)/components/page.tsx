@@ -153,12 +153,12 @@ export default function ComponentsIndexPage() {
                         <Icon className="h-4 w-4" />
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] font-mono text-muted-foreground">
+                        <span className="text-xs font-mono text-muted-foreground">
                           #{String(idx + 1).padStart(2, '0')}
                         </span>
                         <Badge
                           variant="outline"
-                          className="text-[10px] px-2 py-0 border-border group-hover:border-highlight/30 group-hover:text-highlight transition-colors"
+                          className="text-xs px-2 py-0 border-border group-hover:border-highlight/30 group-hover:text-highlight transition-colors"
                         >
                           {category.badge}
                         </Badge>
@@ -178,7 +178,7 @@ export default function ComponentsIndexPage() {
                       {category.highlights.map((h) => (
                         <span
                           key={h}
-                          className="rounded-md bg-muted/60 px-2 py-0.5 text-[10px] font-mono text-muted-foreground group-hover:bg-highlight/10 group-hover:text-highlight transition-colors"
+                          className="rounded-md bg-muted/60 px-2 py-0.5 text-xs font-mono text-muted-foreground group-hover:bg-highlight/10 group-hover:text-highlight transition-colors"
                         >
                           {h}
                         </span>

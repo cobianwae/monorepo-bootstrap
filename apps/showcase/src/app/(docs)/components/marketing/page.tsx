@@ -214,7 +214,7 @@ export default function MarketingBlocksPage() {
                   }`}
                 >
                   <span>Annual Billing</span>
-                  <Badge variant="highlight" className="text-[10px] py-0 px-1 font-mono">
+                  <Badge variant="highlight" className="text-xs py-0 px-1 font-mono">
                     Save 20%
                   </Badge>
                 </button>

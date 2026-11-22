@@ -178,16 +178,16 @@ pnpm build:types  # typecheck every package (tsc --noEmit)`}
             maxHeight="200px"
           />
           <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="font-mono text-[10px]">
+            <Badge variant="outline" className="font-mono text-xs">
               Tailwind v4
             </Badge>
-            <Badge variant="outline" className="font-mono text-[10px]">
+            <Badge variant="outline" className="font-mono text-xs">
               Radix primitives
             </Badge>
-            <Badge variant="outline" className="font-mono text-[10px]">
+            <Badge variant="outline" className="font-mono text-xs">
               cva + cn()
             </Badge>
-            <Badge variant="outline" className="font-mono text-[10px]">
+            <Badge variant="outline" className="font-mono text-xs">
               OKLCH tokens
             </Badge>
           </div>

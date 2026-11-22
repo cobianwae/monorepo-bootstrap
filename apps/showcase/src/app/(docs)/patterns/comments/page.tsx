@@ -302,7 +302,7 @@ function MentionTextarea({
         />
       </PopoverTrigger>
       <PopoverContent align="start" side="bottom" sideOffset={4} className="w-64 p-1.5">
-        <p className="px-2 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+        <p className="px-2 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Suggestions
         </p>
         <div className="space-y-0.5">
@@ -322,7 +322,7 @@ function MentionTextarea({
                   </AvatarFallback>
                 </Avatar>
                 <span className="font-medium text-foreground">{person.name}</span>
-                <span className="ml-auto text-[10px] text-muted-foreground">
+                <span className="ml-auto text-xs text-muted-foreground">
                   @{person.handle}
                 </span>
               </button>
@@ -389,7 +389,7 @@ function CommentComposer({ onPost }: CommentComposerProps) {
               <Paperclip className="h-4 w-4" />
               Attach
             </Button>
-            <span className="hidden items-center gap-1 text-[11px] text-muted-foreground sm:inline-flex">
+            <span className="hidden items-center gap-1 text-xs text-muted-foreground sm:inline-flex">
               <AtSign className="h-3 w-3" />
               Type <Kbd>@</Kbd> to mention someone
             </span>
@@ -544,7 +544,7 @@ function ReplyItem({
               {reply.author.role}
             </Badge>
           )}
-          <span className="text-[11px] text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             · {reply.createdAtLabel}
           </span>
         </div>
@@ -674,7 +674,7 @@ function CommentCard({
                   {comment.author.role}
                 </Badge>
               )}
-              <span className="text-[11px] text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 · {comment.createdAtLabel}
               </span>
             </div>

@@ -97,6 +97,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-035 | Seragamkan 7 halaman `foundations`: `SectionHeading`, teks mikro → `text-xs`, `primary` dekoratif → `highlight`, `SegmentedControl` | draft | `docs/cr/cr-035-seragamkan-halaman-foundations.md` |
 | CR-036 | Bug konten `foundations`: klaim WCAG dihitung, "3-step", demo durasi satu easing, label arah, "Play All", badge Ratio dark mode | draft | `docs/cr/cr-036-bug-konten-halaman-foundations.md` |
 | CR-037 | Sederhanakan `SectionHeading`: tanpa ikon, tanpa level sub (mengoreksi keputusan CR-034 #2; opsi A pilihan user) | draft | `docs/cr/cr-037-sederhanakan-section-heading-tanpa-ikon.md` |
+| CR-038 | Ganti `text-[9/10/11px]` → `text-xs` di `app/(docs)` non-foundations (99 pemakaian, 29 file); guard px diperluas ke seluruh docs | draft | `docs/cr/cr-038-text-xs-docs-non-foundations.md` |
 
 ## Catatan
 

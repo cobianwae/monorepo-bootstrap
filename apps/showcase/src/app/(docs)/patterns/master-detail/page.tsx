@@ -198,7 +198,7 @@ export default function MasterDetailPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="font-mono text-[11px]">
+          <Badge variant="outline" className="font-mono text-xs">
             {selected.id}
           </Badge>
           <Badge
@@ -209,7 +209,7 @@ export default function MasterDetailPage() {
                 ? 'warning'
                 : 'secondary'
             }
-            className="text-[11px] capitalize"
+            className="text-xs capitalize"
           >
             {selected.status}
           </Badge>
@@ -232,7 +232,7 @@ export default function MasterDetailPage() {
 
       {/* Thread */}
       <div className="space-y-3 rounded-lg border border-border bg-card/40 p-4">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Conversation
         </p>
         <div className="space-y-3 text-sm">
@@ -381,7 +381,7 @@ export default function MasterDetailPage() {
                             <span className="truncate text-sm font-semibold text-foreground">
                               {ticket.subject}
                             </span>
-                            <span className="shrink-0 text-[10px] text-muted-foreground font-mono">
+                            <span className="shrink-0 text-xs text-muted-foreground font-mono">
                               {ticket.id}
                             </span>
                           </div>
@@ -390,7 +390,7 @@ export default function MasterDetailPage() {
                               {ticket.requester} · {ticket.updated}
                             </span>
                             <Badge
-                              className={cn('shrink-0 text-[10px] capitalize', PRIORITY_STYLE[ticket.priority])}
+                              className={cn('shrink-0 text-xs capitalize', PRIORITY_STYLE[ticket.priority])}
                             >
                               {ticket.priority}
                             </Badge>

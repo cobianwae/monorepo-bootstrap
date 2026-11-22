@@ -129,7 +129,7 @@ export default function GlobalSearchPage() {
               aria-controls="global-search-results"
               aria-expanded={showResults}
             />
-            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-border bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
               <Command className="mr-0.5 inline h-2.5 w-2.5" />
               K
             </kbd>

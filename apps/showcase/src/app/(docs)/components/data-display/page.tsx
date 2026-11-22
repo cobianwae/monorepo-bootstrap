@@ -417,7 +417,7 @@ export default function DataDisplayPage() {
       <div className="sticky top-16 z-10 -mx-6 md:-mx-10 px-6 md:px-10 py-2.5 bg-background/90 backdrop-blur-md">
         <div className="border-b border-border/80 pb-2">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-2 px-2">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider shrink-0 pl-1">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider shrink-0 pl-1">
               Jump To:
             </span>
             {SECTIONS.map((sec) => (
@@ -688,7 +688,7 @@ export default function DataDisplayPage() {
                               <div className="flex h-8 w-8 items-center justify-center rounded-md border border-border bg-muted/40 text-foreground">
                                 <Icon className="h-4 w-4 text-highlight" />
                               </div>
-                              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                              <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                                 {item.badge}
                               </span>
                             </div>
@@ -699,7 +699,7 @@ export default function DataDisplayPage() {
                               {item.description}
                             </p>
                           </div>
-                          <div className="pt-2 border-t border-border/50 text-[11px] font-semibold text-highlight flex items-center gap-1">
+                          <div className="pt-2 border-t border-border/50 text-xs font-semibold text-highlight flex items-center gap-1">
                             <span>Explore docs</span>
                             <ArrowRight className="h-3 w-3" />
                           </div>
@@ -750,9 +750,9 @@ export default function DataDisplayPage() {
                     >
                       <div className="space-y-0.5">
                         <span className="font-semibold text-foreground">v2.{12 - i}.0 Release</span>
-                        <p className="text-[11px] text-muted-foreground">Fixed layout alignment & added tokens</p>
+                        <p className="text-xs text-muted-foreground">Fixed layout alignment & added tokens</p>
                       </div>
-                      <Badge variant="outline" className="text-[10px] font-mono">
+                      <Badge variant="outline" className="text-xs font-mono">
                         Aug {16 - i}
                       </Badge>
                     </div>
@@ -1038,7 +1038,7 @@ export function ActionExample() {
                       <TableCell>
                         <Badge
                           variant={row.status === 'Synced' ? 'success' : row.status === 'Draft' ? 'warning' : 'info'}
-                          className="text-[10px]"
+                          className="text-xs"
                         >
                           {row.status}
                         </Badge>
@@ -1100,7 +1100,7 @@ export function ActionExample() {
                 </div>
               ))}
             </div>
-            <div className="flex justify-center gap-4 text-[11px] text-muted-foreground">
+            <div className="flex justify-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-primary" /> North America
               </span>
@@ -1212,7 +1212,7 @@ export function ActionExample() {
                       <CheckCircle2 className="h-4 w-4 text-highlight shrink-0" />
                       <span className="text-xs font-medium text-foreground">{item.title}</span>
                     </div>
-                    <Badge variant="outline" className="text-[10px] font-mono shrink-0">
+                    <Badge variant="outline" className="text-xs font-mono shrink-0">
                       {item.tag}
                     </Badge>
                   </div>
@@ -1245,10 +1245,10 @@ export function ActionExample() {
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs font-bold text-foreground font-display">Apex Copilot</span>
-                    <span className="text-[10px] text-muted-foreground font-mono">Active Model: Gemini 2.0</span>
+                    <span className="text-xs text-muted-foreground font-mono">Active Model: Gemini 2.0</span>
                   </div>
                 </div>
-                <Badge variant="highlight" className="text-[10px] font-mono">
+                <Badge variant="highlight" className="text-xs font-mono">
                   Online
                 </Badge>
               </div>

@@ -161,7 +161,7 @@ export default function OnboardingPage() {
             <CardContent className="p-6 space-y-5">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Step 1 of 2 · Let&apos;s get set up
                   </p>
                   <h2 id="onboarding-title" className="text-lg font-bold text-foreground">
@@ -287,7 +287,7 @@ export default function OnboardingPage() {
                 The first-visit flow won&apos;t appear again for this browser.
               </p>
             </div>
-            <Badge variant="outline" className="text-[10px]">
+            <Badge variant="outline" className="text-xs">
               localStorage: {STORAGE_KEY}
             </Badge>
           </CardContent>

@@ -185,8 +185,8 @@ export default function NotificationCenterPage() {
               </div>
               <p className="text-xs text-muted-foreground">{n.description}</p>
               <div className="flex items-center gap-2 pt-0.5">
-                <span className="text-[10px] text-muted-foreground">{n.timestamp}</span>
-                <Badge variant={KIND_BADGE[n.kind]} className="text-[9px] capitalize">
+                <span className="text-xs text-muted-foreground">{n.timestamp}</span>
+                <Badge variant={KIND_BADGE[n.kind]} className="text-xs capitalize">
                   {n.kind}
                 </Badge>
               </div>
@@ -215,7 +215,7 @@ export default function NotificationCenterPage() {
                   <Bell className="h-4 w-4 text-primary" />
                   Inbox
                   {unread > 0 && (
-                    <Badge variant="default" className="text-[10px]">
+                    <Badge variant="default" className="text-xs">
                       {unread} unread
                     </Badge>
                   )}

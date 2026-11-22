@@ -557,12 +557,12 @@ export default function OverviewPage() {
                         <Icon className="h-4 w-4" />
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] font-mono text-muted-foreground">
+                        <span className="text-xs font-mono text-muted-foreground">
                           #{String(idx + 1).padStart(2, '0')}
                         </span>
                         <Badge
                           variant="outline"
-                          className="text-[10px] px-2 py-0 border-border group-hover:border-highlight/30 group-hover:text-highlight transition-colors"
+                          className="text-xs px-2 py-0 border-border group-hover:border-highlight/30 group-hover:text-highlight transition-colors"
                         >
                           {section.badge}
                         </Badge>
@@ -570,7 +570,7 @@ export default function OverviewPage() {
                     </div>
 
                     <div className="space-y-1">
-                      <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-muted-foreground/80">
+                      <span className="text-xs font-mono font-semibold uppercase tracking-wider text-muted-foreground/80">
                         {section.tag}
                       </span>
                       <CardTitle className="text-base font-display group-hover:text-highlight transition-colors">

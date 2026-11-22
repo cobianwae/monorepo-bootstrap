@@ -169,7 +169,7 @@ export default function LayoutNavigationPage() {
       <div className="sticky top-16 z-10 -mx-6 md:-mx-10 px-6 md:px-10 py-2.5 bg-background/90 backdrop-blur-md">
         <div className="border-b border-border/80 pb-2">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-2 px-2">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider shrink-0 pl-1">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider shrink-0 pl-1">
               Jump To:
             </span>
             {SECTIONS.map((sec) => (
@@ -250,7 +250,7 @@ export default function LayoutNavigationPage() {
                       <span className="text-xs font-bold font-display text-foreground truncate">
                         Acme Studio
                       </span>
-                      <span className="text-[10px] font-mono text-muted-foreground truncate">
+                      <span className="text-xs font-mono text-muted-foreground truncate">
                         Enterprise v2.4
                       </span>
                     </div>
@@ -335,7 +335,7 @@ export default function LayoutNavigationPage() {
                         <span className="text-xs font-semibold text-foreground truncate">
                           Jane Doe
                         </span>
-                        <span className="text-[10px] text-muted-foreground truncate">
+                        <span className="text-xs text-muted-foreground truncate">
                           admin@acme.com
                         </span>
                       </div>
@@ -410,7 +410,7 @@ export default function LayoutNavigationPage() {
                     </div>
                   </div>
                 </div>
-                <div className="text-[10px] text-muted-foreground font-mono">
+                <div className="text-xs text-muted-foreground font-mono">
                   data-variant=&quot;inset&quot;
                 </div>
               </div>
@@ -424,14 +424,14 @@ export default function LayoutNavigationPage() {
                     <span>/</span>
                     <span>Analytics</span>
                   </div>
-                  <Badge variant="outline" className="text-[10px] font-mono">
+                  <Badge variant="outline" className="text-xs font-mono">
                     Rounded Inset
                   </Badge>
                 </div>
                 <div className="flex-1 p-4 flex items-center justify-center">
                   <div className="text-center space-y-1">
                     <p className="text-xs font-bold text-foreground">Floating Content Canvas</p>
-                    <p className="text-[11px] text-muted-foreground max-w-xs">
+                    <p className="text-xs text-muted-foreground max-w-xs">
                       Content cards stay visually separated from the background navigation container.
                     </p>
                   </div>
@@ -752,7 +752,7 @@ export default function LayoutNavigationPage() {
                 <AppShellHeader height="sm" sticky={false}>
                   <div className="flex items-center justify-between w-full">
                     <span className="font-bold text-xs font-mono">AppShellHeader</span>
-                    <Badge variant="outline" className="text-[10px]">Sticky Blur</Badge>
+                    <Badge variant="outline" className="text-xs">Sticky Blur</Badge>
                   </div>
                 </AppShellHeader>
                 <AppShellMain fixed={false} className="p-4 bg-muted/10">
@@ -1003,7 +1003,7 @@ export default function LayoutNavigationPage() {
                 <CollapsibleContent className="pt-2 space-y-2">
                   <div className="p-3 rounded-lg border border-border bg-card text-xs font-mono space-y-1">
                     <p className="text-muted-foreground">sk_live_98a72b6c5e4d1f0</p>
-                    <p className="text-[10px] text-muted-foreground">Created Aug 16, 2026 • Full Access</p>
+                    <p className="text-xs text-muted-foreground">Created Aug 16, 2026 • Full Access</p>
                   </div>
                 </CollapsibleContent>
               </Collapsible>
@@ -1054,12 +1054,12 @@ export default function LayoutNavigationPage() {
               <TableBody>
                 <TableRow>
                   <TableCell className="font-mono text-xs">ap-southeast-1a</TableCell>
-                  <TableCell><Badge variant="outline" className="text-[10px]">Healthy</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className="text-xs">Healthy</Badge></TableCell>
                   <TableCell className="text-right font-mono text-xs">4.2 GB</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell className="font-mono text-xs">us-east-1b</TableCell>
-                  <TableCell><Badge variant="outline" className="text-[10px]">Healthy</Badge></TableCell>
+                  <TableCell><Badge variant="outline" className="text-xs">Healthy</Badge></TableCell>
                   <TableCell className="text-right font-mono text-xs">6.8 GB</TableCell>
                 </TableRow>
               </TableBody>

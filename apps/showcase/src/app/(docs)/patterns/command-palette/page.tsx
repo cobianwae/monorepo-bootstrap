@@ -74,23 +74,23 @@ export default function CommandPalettePage() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li className="flex items-center justify-between">
                 <span>Open palette</span>
-                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[11px]">⌘K</kbd>
+                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs">⌘K</kbd>
               </li>
               <li className="flex items-center justify-between">
                 <span>Next item</span>
-                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[11px]">↓</kbd>
+                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs">↓</kbd>
               </li>
               <li className="flex items-center justify-between">
                 <span>Previous item</span>
-                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[11px]">↑</kbd>
+                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs">↑</kbd>
               </li>
               <li className="flex items-center justify-between">
                 <span>Run selection</span>
-                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[11px]">Enter</kbd>
+                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs">Enter</kbd>
               </li>
               <li className="flex items-center justify-between">
                 <span>Close</span>
-                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[11px]">Esc</kbd>
+                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs">Esc</kbd>
               </li>
             </ul>
           </CardContent>

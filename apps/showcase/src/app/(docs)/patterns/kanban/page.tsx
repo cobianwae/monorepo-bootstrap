@@ -76,7 +76,7 @@ export default function KanbanPage() {
       <CardContent className="p-3">
         <p className="text-sm font-medium text-foreground">{item.title}</p>
         {item.label && (
-          <Badge variant={PRIORITY_BADGE[item.label] ?? 'secondary'} className="mt-2 text-[10px] capitalize">
+          <Badge variant={PRIORITY_BADGE[item.label] ?? 'secondary'} className="mt-2 text-xs capitalize">
             {item.label}
           </Badge>
         )}
