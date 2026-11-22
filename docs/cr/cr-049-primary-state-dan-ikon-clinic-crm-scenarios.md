@@ -1,6 +1,6 @@
 # CR-049 — State terpilih dan ikon dekoratif `primary` di clinic, crm, dan scenarios
 
-**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
+**Status:** done (ditetapkan user 2026-11-22)
 **Sumber:** lanjutan CR-047 (cakupan `app/(docs)` saja; sisa `clinic`, `crm`, `scenarios` belum diubah), permintaan user "tuntaskan"
 **Ref:** `docs/design/visual-language.md` (Color Roles: `primary` = aksi dan fokus; `highlight` = aksen dan identitas; state on segmented = `bg-background` + `shadow-xs`)
 

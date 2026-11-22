@@ -1,6 +1,6 @@
 # CR-043 — Heading manual dan ikon di `overlays-menus`, `data-display`, `layout-navigation`
 
-**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
+**Status:** done (ditetapkan user 2026-11-22)
 **Sumber:** audit halaman tidak koheren (2026-11-22), usulan urutan 1 dari audit
 **Ref:** `docs/design/visual-language.md` (Section Heading & Callout: heading tanpa ikon; Type Scale: Heading 3 = `text-xl font-bold font-display`), `docs/cr/cr-039-ikon-heading-components-patterns.md`, `docs/cr/cr-041-h2-manual-docs-non-foundations.md`
 

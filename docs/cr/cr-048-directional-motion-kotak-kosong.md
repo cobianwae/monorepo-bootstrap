@@ -1,6 +1,6 @@
 # CR-048 — Demo Directional Motion tampil kosong sebelum Play
 
-**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
+**Status:** done (ditetapkan user 2026-11-22)
 **Sumber:** temuan CR-035 (di luar scope saat itu), dikonfirmasi screenshot 2026-11-22
 **Ref:** `docs/design/visual-language.md` (Motion: token `MOTION_TOKENS` 150/250/400ms, `ease-smooth`, hormati `prefers-reduced-motion`), `apps/showcase/src/app/(docs)/foundations/motion/page.tsx`
 
