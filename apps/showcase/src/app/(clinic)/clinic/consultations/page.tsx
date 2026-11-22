@@ -260,7 +260,7 @@ export default function ConsultationsPage() {
                   </Label>
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                     <div className="space-y-1">
-                      <Label htmlFor="bp" className="text-[11px]">Blood Pressure</Label>
+                      <Label htmlFor="bp" className="text-xs">Blood Pressure</Label>
                       <Input
                         id="bp"
                         value={bp}
@@ -269,7 +269,7 @@ export default function ConsultationsPage() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label htmlFor="hr" className="text-[11px]">Heart Rate (bpm)</Label>
+                      <Label htmlFor="hr" className="text-xs">Heart Rate (bpm)</Label>
                       <Input
                         id="hr"
                         type="number"
@@ -279,7 +279,7 @@ export default function ConsultationsPage() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label htmlFor="weight" className="text-[11px]">Scale Weight (kg)</Label>
+                      <Label htmlFor="weight" className="text-xs">Scale Weight (kg)</Label>
                       <Input
                         id="weight"
                         type="number"
@@ -290,7 +290,7 @@ export default function ConsultationsPage() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label htmlFor="glucose" className="text-[11px]">Glucose (mg/dL)</Label>
+                      <Label htmlFor="glucose" className="text-xs">Glucose (mg/dL)</Label>
                       <Input
                         id="glucose"
                         type="number"
@@ -300,7 +300,7 @@ export default function ConsultationsPage() {
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label htmlFor="dose" className="text-[11px]">Current Peptide Dose</Label>
+                      <Label htmlFor="dose" className="text-xs">Current Peptide Dose</Label>
                       <Input
                         id="dose"
                         value={glp1Dose}
@@ -370,12 +370,12 @@ export default function ConsultationsPage() {
               <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1">
                 {patientDocNotes.map((note) => (
                   <div key={note.id} className="p-3 rounded-lg bg-muted/30 border border-border/40 text-xs space-y-2">
-                    <div className="flex justify-between items-center text-[11px]">
+                    <div className="flex justify-between items-center text-xs">
                       <span className="font-semibold text-foreground font-display">{note.doctorName.split(',')[0]}</span>
                       <span className="font-mono text-muted-foreground">{note.date}</span>
                     </div>
                     <p className="text-muted-foreground line-clamp-2"><strong>A:</strong> {note.assessment}</p>
-                    <p className="text-muted-foreground line-clamp-2 font-mono text-[11px]"><strong>P:</strong> {note.plan}</p>
+                    <p className="text-muted-foreground line-clamp-2 font-mono text-xs"><strong>P:</strong> {note.plan}</p>
                   </div>
                 ))}
               </div>
@@ -525,7 +525,7 @@ export default function ConsultationsPage() {
                                   active ? prev.filter((t) => t !== trig) : [...prev, trig]
                                 );
                               }}
-                              className={`px-2 py-1 rounded-md text-[11px] border transition-all cursor-pointer ${
+                              className={`px-2 py-1 rounded-md text-xs border transition-all cursor-pointer ${
                                 active
                                   ? 'bg-highlight/15 text-highlight border-highlight/40 font-medium'
                                   : 'bg-card border-border text-muted-foreground hover:bg-muted/40'
@@ -571,13 +571,13 @@ export default function ConsultationsPage() {
               <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1">
                 {patientPsychNotes.map((n) => (
                   <div key={n.id} className="p-3 rounded-lg bg-muted/30 border border-border/40 text-xs space-y-2">
-                    <div className="flex justify-between items-center text-[11px]">
+                    <div className="flex justify-between items-center text-xs">
                       <span className="font-semibold text-foreground font-display">{n.psychologistName.split(',')[0]}</span>
                       <Badge variant={n.riskLevel === 'low' ? 'success' : 'warning'} size="sm">
                         {n.screeningType} Score: {n.score}
                       </Badge>
                     </div>
-                    <p className="text-muted-foreground text-[11px] leading-relaxed">{n.sessionNotes}</p>
+                    <p className="text-muted-foreground text-xs leading-relaxed">{n.sessionNotes}</p>
                   </div>
                 ))}
               </div>
@@ -627,31 +627,31 @@ export default function ConsultationsPage() {
                 {/* Energy & Macros Calculator KPI Strip */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 text-center">
-                    <span className="text-[10px] uppercase font-mono text-muted-foreground block">Target Energy</span>
+                    <span className="text-xs uppercase font-mono text-muted-foreground block">Target Energy</span>
                     <span className="font-display font-bold text-lg text-primary">{calculatedCalories} kcal</span>
-                    <span className="text-[10px] text-success font-mono block">(-{deficitKcal} deficit)</span>
+                    <span className="text-xs text-success font-mono block">(-{deficitKcal} deficit)</span>
                   </div>
 
                   <div className="p-3 rounded-xl bg-muted/30 border border-border/40 text-center">
-                    <span className="text-[10px] uppercase font-mono text-muted-foreground block">Protein Target</span>
+                    <span className="text-xs uppercase font-mono text-muted-foreground block">Protein Target</span>
                     <span className="font-display font-bold text-base text-foreground">{proteinGrams}g</span>
-                    <span className="text-[10px] text-muted-foreground font-mono block">
+                    <span className="text-xs text-muted-foreground font-mono block">
                       ({Math.round((proteinGrams * 4 / calculatedCalories) * 100)}% kcal)
                     </span>
                   </div>
 
                   <div className="p-3 rounded-xl bg-muted/30 border border-border/40 text-center">
-                    <span className="text-[10px] uppercase font-mono text-muted-foreground block">Carbohydrates</span>
+                    <span className="text-xs uppercase font-mono text-muted-foreground block">Carbohydrates</span>
                     <span className="font-display font-bold text-base text-foreground">{carbsGrams}g</span>
-                    <span className="text-[10px] text-muted-foreground font-mono block">
+                    <span className="text-xs text-muted-foreground font-mono block">
                       ({Math.round((carbsGrams * 4 / calculatedCalories) * 100)}% kcal)
                     </span>
                   </div>
 
                   <div className="p-3 rounded-xl bg-muted/30 border border-border/40 text-center">
-                    <span className="text-[10px] uppercase font-mono text-muted-foreground block">Dietary Fat</span>
+                    <span className="text-xs uppercase font-mono text-muted-foreground block">Dietary Fat</span>
                     <span className="font-display font-bold text-base text-foreground">{fatGrams}g</span>
-                    <span className="text-[10px] text-muted-foreground font-mono block">
+                    <span className="text-xs text-muted-foreground font-mono block">
                       ({Math.round((fatGrams * 9 / calculatedCalories) * 100)}% kcal)
                     </span>
                   </div>
@@ -760,12 +760,12 @@ export default function ConsultationsPage() {
               <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1">
                 {patientDietPlans.map((plan) => (
                   <div key={plan.id} className="p-3 rounded-lg bg-muted/30 border border-border/40 text-xs space-y-2">
-                    <div className="flex justify-between items-center text-[11px]">
+                    <div className="flex justify-between items-center text-xs">
                       <span className="font-semibold text-foreground font-display">{plan.planType}</span>
                       <span className="font-mono text-muted-foreground">{plan.date}</span>
                     </div>
-                    <p className="font-mono font-bold text-primary text-[11px]">{plan.targetCalories} kcal (P:{plan.proteinGrams}g C:{plan.carbsGrams}g F:{plan.fatGrams}g)</p>
-                    <p className="text-muted-foreground text-[11px] leading-relaxed line-clamp-2">{plan.notes}</p>
+                    <p className="font-mono font-bold text-primary text-xs">{plan.targetCalories} kcal (P:{plan.proteinGrams}g C:{plan.carbsGrams}g F:{plan.fatGrams}g)</p>
+                    <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">{plan.notes}</p>
                   </div>
                 ))}
               </div>

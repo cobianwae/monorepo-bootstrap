@@ -51,7 +51,7 @@ export function VoiceStage() {
                 )}
               >
                 <div className="flex items-start justify-between">
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
                     Voice 0{i + 1}
                   </span>
                   {isActive && (
@@ -75,7 +75,7 @@ export function VoiceStage() {
 
                 <h3 className="mt-6 font-display text-xl font-bold text-foreground">{dir.name}</h3>
                 <p className="mt-0.5 text-sm font-semibold text-highlight">{dir.tagline}</p>
-                <p className="mt-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <p className="mt-2 font-mono text-xs uppercase tracking-wider text-muted-foreground">
                   {dir.typography.displayName} / {dir.typography.bodyName}
                 </p>
 

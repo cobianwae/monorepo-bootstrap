@@ -129,7 +129,7 @@ function Customer360Content({ conversation, linkedLead, onOpenCopilot }: Custome
             <span className="text-xs font-semibold text-muted-foreground uppercase font-mono tracking-wider">
               Customer CSAT
             </span>
-            <Badge variant="success" className="text-[10px] font-mono">
+            <Badge variant="success" className="text-xs font-mono">
               99.4% SLA
             </Badge>
           </div>

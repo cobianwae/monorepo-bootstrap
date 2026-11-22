@@ -66,7 +66,7 @@ export default function LandingPage() {
                     <CopyInstall />
                   </div>
 
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
                     OKLCH Native · WCAG AAA Audited · 26 UX Patterns
                   </p>
                 </div>

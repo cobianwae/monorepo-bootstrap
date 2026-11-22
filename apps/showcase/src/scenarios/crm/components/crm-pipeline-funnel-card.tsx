@@ -222,7 +222,7 @@ export function CrmPipelineFunnelCard({ className, isLoading = false }: CrmPipel
                     {st.isHotspot && (
                       <Badge
                         variant="highlight"
-                        className="text-[10px] px-1.5 py-0 h-4 uppercase font-mono tracking-wider ml-1 shadow-2xs font-bold"
+                        className="text-xs px-1.5 py-0 h-4 uppercase font-mono tracking-wider ml-1 shadow-2xs font-bold"
                       >
                         {formatCurrency(st.value)} Hotspot
                       </Badge>
@@ -230,13 +230,13 @@ export function CrmPipelineFunnelCard({ className, isLoading = false }: CrmPipel
                   </span>
 
                   {/* Right: Deal Count & Tabular Value */}
-                  <div className="flex items-center gap-2 font-mono text-[11px] shrink-0">
+                  <div className="flex items-center gap-2 font-mono text-xs shrink-0">
                     <span className="text-muted-foreground">({st.count})</span>
                     <span className="font-bold text-foreground tabular-nums">
                       {st.value > 0 ? formatCurrency(st.value) : '$0'}
                     </span>
                     {idx < funnelStages.length - 1 && (
-                      <span className="text-[10px] text-muted-foreground">
+                      <span className="text-xs text-muted-foreground">
                         → {st.passRate}%
                       </span>
                     )}
@@ -262,7 +262,7 @@ export function CrmPipelineFunnelCard({ className, isLoading = false }: CrmPipel
             FOOTER: Clean Summary & Direct Link
             ========================================================================= */}
         <div className="flex items-center justify-between pt-4 border-t border-border/50 text-xs text-muted-foreground">
-          <span className="font-mono text-[11px]">
+          <span className="font-mono text-xs">
             Active: <strong className="text-foreground">{formatCurrency(totalValue)}</strong> ({totalDeals} opportunities)
           </span>
           <Link

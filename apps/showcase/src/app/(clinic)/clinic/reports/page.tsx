@@ -106,7 +106,7 @@ export default function ClinicReportsPage() {
                   Direct comparison between actual revenue vs budget targets.
                 </CardDescription>
               </div>
-              <Badge variant="outline" className="font-mono text-[11px]">
+              <Badge variant="outline" className="font-mono text-xs">
                 Currency: IDR
               </Badge>
             </div>
@@ -180,7 +180,7 @@ export default function ClinicReportsPage() {
           </h3>
           <div className="space-y-3 text-xs">
             <div className="p-3.5 rounded-xl bg-highlight/10 border border-highlight/20 space-y-1">
-              <span className="font-mono text-[10px] uppercase font-bold text-highlight block">
+              <span className="font-mono text-xs uppercase font-bold text-highlight block">
                 Endocrinology GLP-1 Cohort
               </span>
               <p className="text-foreground leading-relaxed">
@@ -189,7 +189,7 @@ export default function ClinicReportsPage() {
             </div>
 
             <div className="p-3.5 rounded-xl bg-success/10 border border-success/20 space-y-1">
-              <span className="font-mono text-[10px] uppercase font-bold text-success block">
+              <span className="font-mono text-xs uppercase font-bold text-success block">
                 CBT-E Psychology Behavioral Impact
               </span>
               <p className="text-foreground leading-relaxed">
@@ -198,7 +198,7 @@ export default function ClinicReportsPage() {
             </div>
 
             <div className="p-3.5 rounded-xl bg-primary/10 border border-primary/20 space-y-1">
-              <span className="font-mono text-[10px] uppercase font-bold text-primary block">
+              <span className="font-mono text-xs uppercase font-bold text-primary block">
                 Dietician High-Protein Protocol
               </span>
               <p className="text-foreground leading-relaxed">

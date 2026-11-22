@@ -179,7 +179,7 @@ export function CrmRevenueStoryCard({
             <CardTitle className="font-display text-lg sm:text-xl font-bold text-foreground tracking-tight">
               Revenue Trajectory & Quota Pacing
             </CardTitle>
-            <Badge variant="outline" className="font-mono text-[10px] border-border/70 shadow-2xs">
+            <Badge variant="outline" className="font-mono text-xs border-border/70 shadow-2xs">
               {timeHorizon === 'mtd' ? 'MTD Pacing' : timeHorizon === 'q1' ? 'Q1 FY25' : 'YTD Horizon'}
             </Badge>
           </div>
@@ -283,7 +283,7 @@ export function CrmRevenueStoryCard({
         <div className="pt-5 border-t border-border/60">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-5">
             <div>
-              <span className="text-[11px] uppercase font-mono tracking-wider text-muted-foreground block font-medium">
+              <span className="text-xs uppercase font-mono tracking-wider text-muted-foreground block font-medium">
                 Closed Revenue
               </span>
               <div className="flex items-baseline gap-1.5 mt-1">
@@ -297,7 +297,7 @@ export function CrmRevenueStoryCard({
             </div>
 
             <div>
-              <span className="text-[11px] uppercase font-mono tracking-wider text-muted-foreground block font-medium">
+              <span className="text-xs uppercase font-mono tracking-wider text-muted-foreground block font-medium">
                 Target Quota
               </span>
               <div className="flex items-baseline gap-1.5 mt-1">
@@ -311,7 +311,7 @@ export function CrmRevenueStoryCard({
             </div>
 
             <div>
-              <span className="text-[11px] uppercase font-mono tracking-wider text-muted-foreground block font-medium">
+              <span className="text-xs uppercase font-mono tracking-wider text-muted-foreground block font-medium">
                 Weighted Pipeline
               </span>
               <div className="flex items-baseline gap-1.5 mt-1">
@@ -325,7 +325,7 @@ export function CrmRevenueStoryCard({
             </div>
 
             <div>
-              <span className="text-[11px] uppercase font-mono tracking-wider text-muted-foreground block font-medium">
+              <span className="text-xs uppercase font-mono tracking-wider text-muted-foreground block font-medium">
                 Plan Pacing
               </span>
               <div className="flex items-baseline gap-1.5 mt-1">

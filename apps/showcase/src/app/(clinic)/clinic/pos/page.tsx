@@ -181,15 +181,15 @@ export default function PosPage() {
               >
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-[10px] text-muted-foreground">{prod.sku}</span>
-                    <Badge variant="outline" size="sm" className="text-[10px] h-4">
+                    <span className="font-mono text-xs text-muted-foreground">{prod.sku}</span>
+                    <Badge variant="outline" size="sm" className="text-xs h-4">
                       Stock: {prod.stock}
                     </Badge>
                   </div>
                   <h4 className="font-display font-bold text-xs text-foreground leading-tight">
                     {prod.name}
                   </h4>
-                  <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                     {prod.description}
                   </p>
                 </div>
@@ -230,7 +230,7 @@ export default function PosPage() {
                     variant="ghost"
                     size="sm"
                     onClick={clearCart}
-                    className="h-6 text-[10px] text-muted-foreground hover:text-destructive"
+                    className="h-6 text-xs text-muted-foreground hover:text-destructive"
                   >
                     Clear All
                   </Button>
@@ -259,7 +259,7 @@ export default function PosPage() {
               <div className="py-12 text-center text-muted-foreground space-y-2">
                 <Package className="h-8 w-8 mx-auto opacity-40" />
                 <p className="text-xs font-mono">Invoice is empty.</p>
-                <p className="text-[11px]">Click items on catalog to add to invoice.</p>
+                <p className="text-xs">Click items on catalog to add to invoice.</p>
               </div>
             ) : (
               <div className="space-y-2.5 max-h-[280px] overflow-y-auto pr-1">
@@ -272,7 +272,7 @@ export default function PosPage() {
                       <p className="font-semibold text-foreground truncate font-display">
                         {item.name}
                       </p>
-                      <span className="font-mono text-[11px] text-muted-foreground block">
+                      <span className="font-mono text-xs text-muted-foreground block">
                         Rp {item.price.toLocaleString()}
                       </span>
                     </div>
@@ -411,7 +411,7 @@ export default function PosPage() {
                 ))}
               </div>
 
-              <div className="border-t border-border/40 pt-2 space-y-1 text-[11px] text-muted-foreground">
+              <div className="border-t border-border/40 pt-2 space-y-1 text-xs text-muted-foreground">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
                   <span>Rp {completedTrx.subtotal.toLocaleString()}</span>
@@ -430,7 +430,7 @@ export default function PosPage() {
                   <span>Total Paid</span>
                   <span>Rp {completedTrx.total.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-[10px] text-muted-foreground pt-1">
+                <div className="flex justify-between text-xs text-muted-foreground pt-1">
                   <span>Method</span>
                   <span>{completedTrx.paymentMethod.toUpperCase()}</span>
                 </div>

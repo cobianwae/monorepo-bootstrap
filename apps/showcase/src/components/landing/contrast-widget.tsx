@@ -33,7 +33,7 @@ export function ContrastWidget() {
             aria-selected={i === activeIndex}
             onClick={() => setActiveIndex(i)}
             className={cn(
-              'rounded-full border px-3 py-1 font-mono text-[10px] font-medium transition-colors',
+              'rounded-full border px-3 py-1 font-mono text-xs font-medium transition-colors',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
               i === activeIndex
                 ? 'border-highlight/50 bg-highlight/10 text-highlight'
@@ -59,7 +59,7 @@ export function ContrastWidget() {
         </Badge>
       </div>
 
-      <div className="flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
+      <div className="flex items-center gap-2 font-mono text-xs text-muted-foreground">
         <span
           className="h-3.5 w-3.5 rounded-full ring-1 ring-border"
           style={{ backgroundColor: fg }}
@@ -75,7 +75,7 @@ export function ContrastWidget() {
         {pair.bgName} {bg}
       </div>
 
-      <p className="mt-auto text-[11px] leading-snug text-muted-foreground">
+      <p className="mt-auto text-xs leading-snug text-muted-foreground">
         Computed live from <span className="font-mono text-highlight">@ds/tokens</span> — switch
         tone or mode and this re-audits instantly.
       </p>

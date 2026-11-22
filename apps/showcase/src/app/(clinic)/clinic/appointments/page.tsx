@@ -139,7 +139,7 @@ export default function AppointmentsPage() {
               {appt.patientAvatar && (
                 <AvatarImage src={appt.patientAvatar} alt={appt.patientName} />
               )}
-              <AvatarFallback className="text-[10px] font-display">
+              <AvatarFallback className="text-xs font-display">
                 {appt.patientName.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
@@ -147,7 +147,7 @@ export default function AppointmentsPage() {
               <p className="font-display font-bold text-xs text-foreground leading-tight">
                 {appt.patientName}
               </p>
-              <span className="text-[10px] font-mono text-muted-foreground block">
+              <span className="text-xs font-mono text-muted-foreground block">
                 {appt.id}
               </span>
             </div>
@@ -163,7 +163,7 @@ export default function AppointmentsPage() {
         </div>
 
         {/* Slot & Room */}
-        <div className="space-y-1 text-[11px] text-muted-foreground font-mono">
+        <div className="space-y-1 text-xs text-muted-foreground font-mono">
           <div className="flex items-center gap-1.5 text-foreground font-medium">
             <Clock className="h-3 w-3 text-primary" />
             <span>{appt.timeSlot}</span>
@@ -178,13 +178,13 @@ export default function AppointmentsPage() {
 
         {/* Type Badge */}
         <div>
-          <Badge variant="outline" size="sm" className="text-[10px] h-4">
+          <Badge variant="outline" size="sm" className="text-xs h-4">
             {appt.type}
           </Badge>
         </div>
 
         {appt.notes && (
-          <p className="text-[11px] text-muted-foreground bg-muted/30 p-2 rounded-md leading-tight line-clamp-2">
+          <p className="text-xs text-muted-foreground bg-muted/30 p-2 rounded-md leading-tight line-clamp-2">
             {appt.notes}
           </p>
         )}
@@ -196,7 +196,7 @@ export default function AppointmentsPage() {
               size="sm"
               variant="outline"
               onClick={() => updateAppointmentStatus(appt.id, 'checked-in')}
-              className="h-6 text-[10px] px-2 gap-1 text-warning border-warning/30 hover:bg-warning/10"
+              className="h-6 text-xs px-2 gap-1 text-warning border-warning/30 hover:bg-warning/10"
             >
               <CheckCircle2 className="h-3 w-3" />
               Check-In
@@ -208,7 +208,7 @@ export default function AppointmentsPage() {
               size="sm"
               variant="highlight"
               onClick={() => updateAppointmentStatus(appt.id, 'in-consult')}
-              className="h-6 text-[10px] px-2 gap-1"
+              className="h-6 text-xs px-2 gap-1"
             >
               <Stethoscope className="h-3 w-3" />
               Call In
@@ -220,7 +220,7 @@ export default function AppointmentsPage() {
               size="sm"
               variant="success"
               onClick={() => updateAppointmentStatus(appt.id, 'completed')}
-              className="h-6 text-[10px] px-2 gap-1"
+              className="h-6 text-xs px-2 gap-1"
             >
               <CheckCircle2 className="h-3 w-3" />
               Finish

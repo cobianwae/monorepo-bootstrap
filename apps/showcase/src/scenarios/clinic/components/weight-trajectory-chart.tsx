@@ -52,7 +52,7 @@ export function WeightTrajectoryChart({
 
         {targetWeight && (
           <div className="mt-4 flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2 text-xs border border-border/40">
-            <span className="font-mono text-muted-foreground text-[11px]">Target Weight Goal</span>
+            <span className="font-mono text-muted-foreground text-xs">Target Weight Goal</span>
             <span className="font-display font-bold text-success text-sm">{targetWeight} kg</span>
           </div>
         )}

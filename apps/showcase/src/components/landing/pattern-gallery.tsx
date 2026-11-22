@@ -63,7 +63,7 @@ export function PatternGallery() {
             className="group flex items-center justify-between gap-3 bg-card px-5 py-4 transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
           >
             <span className="flex min-w-0 items-center gap-3">
-              <span className="font-mono text-[10px] tabular-nums text-muted-foreground">
+              <span className="font-mono text-xs tabular-nums text-muted-foreground">
                 {String(i + 1).padStart(2, '0')}
               </span>
               <span className="truncate text-sm font-medium text-foreground transition-colors group-hover:text-highlight">

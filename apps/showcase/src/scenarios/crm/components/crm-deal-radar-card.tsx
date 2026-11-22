@@ -392,7 +392,7 @@ export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarC
                 </CardTitle>
 
                 {/* Outline Live Beacon */}
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/25 bg-background text-foreground px-2.5 py-0.5 text-[10px] font-mono font-bold shadow-2xs">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-foreground/25 bg-background text-foreground px-2.5 py-0.5 text-xs font-mono font-bold shadow-2xs">
                   <span className="h-1.5 w-1.5 rounded-full bg-success" />
                   LIVE SWEEP
                 </span>
@@ -436,7 +436,7 @@ export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarC
               className="h-7 px-2 text-xs truncate font-mono"
             >
               <span>Hotspots</span>
-              <span className="text-[11px] opacity-75">({lensCounts.all})</span>
+              <span className="text-xs opacity-75">({lensCounts.all})</span>
             </SegmentedControlItem>
 
             <SegmentedControlItem
@@ -444,7 +444,7 @@ export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarC
               className="h-7 px-2 text-xs truncate font-mono"
             >
               <span>Closing</span>
-              <span className="text-[11px] opacity-75">({lensCounts.closing})</span>
+              <span className="text-xs opacity-75">({lensCounts.closing})</span>
             </SegmentedControlItem>
 
             <SegmentedControlItem
@@ -452,7 +452,7 @@ export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarC
               className="h-7 px-2 text-xs truncate font-mono"
             >
               <span>Gates</span>
-              <span className="text-[11px] opacity-75">({lensCounts.risk})</span>
+              <span className="text-xs opacity-75">({lensCounts.risk})</span>
             </SegmentedControlItem>
 
             <SegmentedControlItem
@@ -460,7 +460,7 @@ export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarC
               className="h-7 px-2 text-xs truncate font-mono"
             >
               <span>PLG Fast</span>
-              <span className="text-[11px] opacity-75">({lensCounts.plg})</span>
+              <span className="text-xs opacity-75">({lensCounts.plg})</span>
             </SegmentedControlItem>
           </SegmentedControl>
         </CardHeader>
@@ -501,7 +501,7 @@ export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarC
                         <div className="relative shrink-0">
                           <Avatar className="h-8 w-8 rounded-full border border-border/70 shadow-2xs">
                             <AvatarImage src={lead.avatarUrl} alt={lead.name} className="rounded-full" />
-                            <AvatarFallback className="font-mono text-[11px] font-semibold bg-muted text-foreground rounded-full">
+                            <AvatarFallback className="font-mono text-xs font-semibold bg-muted text-foreground rounded-full">
                               {lead.company
                                 .split(' ')
                                 .map((w) => w[0])
@@ -532,14 +532,14 @@ export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarC
 
                             <Badge
                               variant={signal.badgeVariant}
-                              className="text-[11px] font-mono px-1.5 py-0 h-4 inline-flex items-center gap-1 font-bold"
+                              className="text-xs font-mono px-1.5 py-0 h-4 inline-flex items-center gap-1 font-bold"
                             >
                               <SignalIcon className="h-2.5 w-2.5" />
                               <span>{signal.label}</span>
                             </Badge>
                           </div>
-                          <p className="text-[11px] text-muted-foreground truncate mt-0.5">
-                            {lead.name} · <span className="uppercase font-mono text-[11px]">{lead.stage}</span>
+                          <p className="text-xs text-muted-foreground truncate mt-0.5">
+                            {lead.name} · <span className="uppercase font-mono text-xs">{lead.stage}</span>
                           </p>
                         </div>
                       </div>
@@ -549,7 +549,7 @@ export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarC
                         <div className="font-display font-extrabold text-sm sm:text-base text-foreground tabular-nums">
                           {formatCurrency(lead.dealValue)}
                         </div>
-                        <div className={cn('inline-flex items-center gap-1 text-[11px] font-mono font-bold mt-0.5', tier.textColor)}>
+                        <div className={cn('inline-flex items-center gap-1 text-xs font-mono font-bold mt-0.5', tier.textColor)}>
                           <Flame className="h-2.5 w-2.5 shrink-0" />
                           <span>{lead.aiScore}% Conviction</span>
                         </div>
@@ -567,13 +567,13 @@ export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarC
                       <p className="text-foreground/90 leading-relaxed text-xs">
                         {lead.aiScoreReason}
                       </p>
-                      <p className="text-[11px] text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">
                         <strong className="text-foreground font-medium">Next: </strong>
                         {nba.actionText}
                       </p>
 
                       {/* Inline Meta & Action Triggers */}
-                      <div className="pt-1.5 flex items-center justify-between text-[11px] text-muted-foreground border-t border-border/30">
+                      <div className="pt-1.5 flex items-center justify-between text-xs text-muted-foreground border-t border-border/30">
                         <span className="font-mono">
                           {lead.assignedAgentName.split(' ')[0]} · Touch: {lead.lastContactedAt}
                         </span>
@@ -582,7 +582,7 @@ export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarC
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="h-6 text-[11px] px-2 gap-1 text-muted-foreground hover:text-foreground"
+                            className="h-6 text-xs px-2 gap-1 text-muted-foreground hover:text-foreground"
                             onClick={() => {
                               setSelectedLeadId(lead.id);
                               openAiDrawer({
@@ -599,7 +599,7 @@ export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarC
                           <Button
                             size="sm"
                             variant="ghost"
-                            className="h-6 text-[11px] px-2 gap-1 text-highlight hover:bg-highlight/10 transition-colors font-medium"
+                            className="h-6 text-xs px-2 gap-1 text-highlight hover:bg-highlight/10 transition-colors font-medium"
                             onClick={() => {
                               setSelectedLeadId(lead.id);
                               openAiDrawer({
@@ -633,7 +633,7 @@ export function CrmDealRadarCard({ className, isLoading = false }: CrmDealRadarC
                   {formatCurrency(totalInScopeValue)}
                 </span>
               </span>
-              <span className="text-[11px] font-mono text-muted-foreground hidden sm:inline">
+              <span className="text-xs font-mono text-muted-foreground hidden sm:inline">
                 ({radarLeads.length} deals)
               </span>
             </div>

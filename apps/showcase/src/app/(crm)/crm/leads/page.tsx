@@ -500,7 +500,7 @@ export default function LeadsPage() {
                       <p className="text-xs text-muted-foreground">{lead.company}</p>
                     </div>
                   </div>
-                  <Badge variant={STAGE_CONFIG[lead.stage]?.badgeVariant || 'outline'} className="text-[10px] uppercase font-mono">
+                  <Badge variant={STAGE_CONFIG[lead.stage]?.badgeVariant || 'outline'} className="text-xs uppercase font-mono">
                     {STAGE_CONFIG[lead.stage]?.label}
                   </Badge>
                 </div>
@@ -520,7 +520,7 @@ export default function LeadsPage() {
                 </div>
                 <div className="flex flex-wrap gap-1 pt-1">
                   {lead.tags.map((t) => (
-                    <Badge key={t} variant="secondary" className="text-[10px]">
+                    <Badge key={t} variant="secondary" className="text-xs">
                       {t}
                     </Badge>
                   ))}

@@ -81,7 +81,7 @@ export function CrmExecutiveBriefing({
               <h2 className="font-display text-sm font-semibold text-foreground tracking-tight">
                 Executive Overview
               </h2>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-medium text-success border border-success/20">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-success/10 px-2 py-0.5 text-xs font-medium text-success border border-success/20">
                 <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
                 Live Sync
               </span>
@@ -194,7 +194,7 @@ export function CrmExecutiveBriefing({
                 <span className="font-medium group-hover:text-primary transition-colors">
                   {deal.company}
                 </span>
-                <span className="font-mono text-muted-foreground text-[11px]">
+                <span className="font-mono text-muted-foreground text-xs">
                   {formatCurrency(deal.dealValue)}
                 </span>
                 <ArrowUpRight className="h-3 w-3 text-muted-foreground opacity-60 group-hover:opacity-100 group-hover:text-primary transition-all" />

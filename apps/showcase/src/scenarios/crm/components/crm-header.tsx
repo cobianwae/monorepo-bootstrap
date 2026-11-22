@@ -133,7 +133,7 @@ export function CrmHeader({ onOpenCommandPalette }: CrmHeaderProps) {
           >
             <Sparkles className="h-3.5 w-3.5 text-highlight" />
             <span className="hidden md:inline font-semibold">Copilot</span>
-            <Kbd size="sm" className="hidden lg:inline-flex ml-0.5 text-[10px]">
+            <Kbd size="sm" className="hidden lg:inline-flex ml-0.5 text-xs">
               ⌘J
             </Kbd>
           </Button>
@@ -167,7 +167,7 @@ export function CrmHeader({ onOpenCommandPalette }: CrmHeaderProps) {
                 <div className="flex items-center gap-1.5">
                   <span className="text-sm font-semibold text-foreground">Notifications</span>
                   {unreadNotifs.length > 0 && (
-                    <Badge variant="highlight" className="text-[10px] px-1.5 py-0">
+                    <Badge variant="highlight" className="text-xs px-1.5 py-0">
                       {unreadNotifs.length} new
                     </Badge>
                   )}
@@ -176,7 +176,7 @@ export function CrmHeader({ onOpenCommandPalette }: CrmHeaderProps) {
                   <button
                     type="button"
                     onClick={markNotificationsRead}
-                    className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   >
                     <CheckCheck className="h-3 w-3" />
                     Mark all read
@@ -199,7 +199,7 @@ export function CrmHeader({ onOpenCommandPalette }: CrmHeaderProps) {
                     >
                       <div className="flex items-center justify-between">
                         <p className="text-xs font-semibold text-foreground">{n.title}</p>
-                        <span className="text-[10px] text-muted-foreground font-mono">
+                        <span className="text-xs text-muted-foreground font-mono">
                           {n.timestamp}
                         </span>
                       </div>

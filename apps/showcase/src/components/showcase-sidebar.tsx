@@ -56,12 +56,12 @@ export function ShowcaseSidebar() {
               <Sparkles className="h-3 w-3 text-highlight" />
               Theme: {currentTheme.name}
             </span>
-            <span className="text-success font-semibold font-mono text-[11px]">AAA / AA</span>
+            <span className="text-success font-semibold font-mono text-xs">AAA / AA</span>
           </div>
           <div className="h-1.5 w-full bg-border rounded-full overflow-hidden">
             <div className="h-full bg-gradient-to-r from-success to-highlight w-full rounded-full" />
           </div>
-          <p className="text-[10px] text-muted-foreground font-mono">
+          <p className="text-xs text-muted-foreground font-mono">
             160 token pairs verified WCAG
           </p>
         </div>

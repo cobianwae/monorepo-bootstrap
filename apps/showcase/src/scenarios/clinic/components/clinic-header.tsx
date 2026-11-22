@@ -165,7 +165,7 @@ export function ClinicHeader({ onOpenCommandPalette }: ClinicHeaderProps) {
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold font-display">Clinical Notifications</span>
                 {unreadNotifs.length > 0 && (
-                  <Badge variant="highlight" size="sm" className="h-4 text-[10px] px-1">
+                  <Badge variant="highlight" size="sm" className="h-4 text-xs px-1">
                     {unreadNotifs.length} new
                   </Badge>
                 )}
@@ -175,7 +175,7 @@ export function ClinicHeader({ onOpenCommandPalette }: ClinicHeaderProps) {
                   variant="ghost"
                   size="sm"
                   onClick={markNotificationsRead}
-                  className="h-6 text-[10px] gap-1 text-muted-foreground hover:text-foreground"
+                  className="h-6 text-xs gap-1 text-muted-foreground hover:text-foreground"
                 >
                   <CheckCheck className="h-3 w-3" />
                   Mark read
@@ -192,9 +192,9 @@ export function ClinicHeader({ onOpenCommandPalette }: ClinicHeaderProps) {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-foreground font-medium">{notif.title}</p>
-                    <span className="font-mono text-[10px] text-muted-foreground shrink-0">{notif.timestamp}</span>
+                    <span className="font-mono text-xs text-muted-foreground shrink-0">{notif.timestamp}</span>
                   </div>
-                  <p className="mt-1 text-muted-foreground text-[11px] leading-relaxed">{notif.description}</p>
+                  <p className="mt-1 text-muted-foreground text-xs leading-relaxed">{notif.description}</p>
                 </div>
               ))}
             </div>

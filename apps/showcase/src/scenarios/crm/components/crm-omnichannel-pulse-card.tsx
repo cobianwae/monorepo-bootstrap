@@ -178,39 +178,39 @@ export function CrmOmnichannelPulseCard({ className, isLoading = false }: CrmOmn
         {/* Channel Barometer Pills (Clean Horizontal Flow with micro-shadow) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="rounded-lg border border-border/50 bg-card/70 p-3 shadow-2xs">
-            <div className="flex items-center gap-1.5 text-[11px] font-medium text-foreground">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
               <MessageSquare className="h-3.5 w-3.5 text-success" />
               <span>WhatsApp</span>
             </div>
             <p className="font-mono text-xs font-bold text-foreground mt-1">89.2% Open</p>
-            <span className="text-[10px] text-muted-foreground font-mono">14.5% Conv</span>
+            <span className="text-xs text-muted-foreground font-mono">14.5% Conv</span>
           </div>
 
           <div className="rounded-lg border border-border/50 bg-card/70 p-3 shadow-2xs">
-            <div className="flex items-center gap-1.5 text-[11px] font-medium text-foreground">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
               <Mail className="h-3.5 w-3.5 text-primary" />
               <span>Email</span>
             </div>
             <p className="font-mono text-xs font-bold text-foreground mt-1">2.4m SLA</p>
-            <span className="text-[10px] text-muted-foreground font-mono">1,420 sent</span>
+            <span className="text-xs text-muted-foreground font-mono">1,420 sent</span>
           </div>
 
           <div className="rounded-lg border border-border/50 bg-card/70 p-3 shadow-2xs">
-            <div className="flex items-center gap-1.5 text-[11px] font-medium text-foreground">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
               <Radio className="h-3.5 w-3.5 text-highlight" />
               <span>Webchat</span>
             </div>
             <p className="font-mono text-xs font-bold text-foreground mt-1">98.2% CSAT</p>
-            <span className="text-[10px] text-muted-foreground font-mono">&lt;45s Reply</span>
+            <span className="text-xs text-muted-foreground font-mono">&lt;45s Reply</span>
           </div>
 
           <div className="rounded-lg border border-border/50 bg-card/70 p-3 shadow-2xs">
-            <div className="flex items-center gap-1.5 text-[11px] font-medium text-foreground">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
               <Phone className="h-3.5 w-3.5 text-muted-foreground" />
               <span>Voice HD</span>
             </div>
             <p className="font-mono text-xs font-bold text-foreground mt-1">18m Logged</p>
-            <span className="text-[10px] text-muted-foreground font-mono">HIPAA Secured</span>
+            <span className="text-xs text-muted-foreground font-mono">HIPAA Secured</span>
           </div>
         </div>
 
@@ -248,11 +248,11 @@ export function CrmOmnichannelPulseCard({ className, isLoading = false }: CrmOmn
               <div key={agent.id} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Avatar className="h-5 w-5 border border-border/50 shadow-2xs">
                   <AvatarImage src={agent.avatarUrl} alt={agent.name} />
-                  <AvatarFallback className="text-[9px]">
+                  <AvatarFallback className="text-xs">
                     {agent.name[0]}
                   </AvatarFallback>
                 </Avatar>
-                <span className="font-medium text-foreground text-[11px]">
+                <span className="font-medium text-foreground text-xs">
                   {agent.name.split(' ')[0]}
                 </span>
                 <span className="h-1.5 w-1.5 rounded-full bg-success" />

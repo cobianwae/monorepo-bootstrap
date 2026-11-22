@@ -392,7 +392,7 @@ export default function PatientRegistrationPage() {
               {/* Real-time Computed BMI Card */}
               <div className="md:col-span-2 p-3.5 rounded-xl bg-primary/5 border border-primary/20 flex items-center justify-between">
                 <div>
-                  <span className="text-[11px] font-mono uppercase text-muted-foreground block">
+                  <span className="text-xs font-mono uppercase text-muted-foreground block">
                     Computed Baseline BMI
                   </span>
                   <span className="font-display font-bold text-2xl text-primary">
@@ -435,7 +435,7 @@ export default function PatientRegistrationPage() {
                   onChange={(e) => setAllergiesText(e.target.value)}
                   className="h-9 text-xs"
                 />
-                <p className="text-[11px] text-muted-foreground">Leave empty if No Known Drug Allergies (NKDA).</p>
+                <p className="text-xs text-muted-foreground">Leave empty if No Known Drug Allergies (NKDA).</p>
               </div>
 
               <div className="space-y-2">
@@ -501,11 +501,11 @@ export default function PatientRegistrationPage() {
                             {prog.badge}
                           </Badge>
                         </div>
-                        <p className="text-muted-foreground text-[11px] leading-relaxed">
+                        <p className="text-muted-foreground text-xs leading-relaxed">
                           {prog.description}
                         </p>
                       </div>
-                      <span className="font-mono text-[11px] font-semibold text-foreground pt-1 border-t border-border/30">
+                      <span className="font-mono text-xs font-semibold text-foreground pt-1 border-t border-border/30">
                         {prog.monthlyEstimate}
                       </span>
                     </div>
@@ -574,7 +574,7 @@ export default function PatientRegistrationPage() {
 
             <div className="p-3.5 rounded-xl bg-muted/40 border border-border/40 text-xs flex items-center gap-3">
               <FileCheck2 className="h-5 w-5 text-primary shrink-0" />
-              <p className="text-muted-foreground text-[11px] leading-relaxed">
+              <p className="text-muted-foreground text-xs leading-relaxed">
                 By submitting, a new unique patient identifier (e.g. PAT-1009) will be assigned, and notification will be dispatched to the supervising care team.
               </p>
             </div>

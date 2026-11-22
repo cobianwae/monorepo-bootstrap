@@ -118,20 +118,20 @@ export function ClinicAiCoachDrawer() {
             <div className="grid grid-cols-2 gap-3">
               <Card className="p-4 bg-highlight/5 border-highlight/20 space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-[11px] font-mono uppercase text-muted-foreground">Adherence Score</span>
+                  <span className="text-xs font-mono uppercase text-muted-foreground">Adherence Score</span>
                   <Badge variant="highlight" size="sm">
                     {insight.adherenceScore}/100
                   </Badge>
                 </div>
                 <Progress value={insight.adherenceScore} className="h-2 bg-muted" />
-                <p className="text-[10px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Based on weigh-in frequency, appointment attendance & titration pace.
                 </p>
               </Card>
 
               <Card className="p-4 bg-muted/30 border-border space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-[11px] font-mono uppercase text-muted-foreground">Metabolic Velocity</span>
+                  <span className="text-xs font-mono uppercase text-muted-foreground">Metabolic Velocity</span>
                   <Badge variant="success" size="sm">
                     {insight.weightLossVelocityKgPerWeek} kg/wk
                   </Badge>
@@ -151,7 +151,7 @@ export function ClinicAiCoachDrawer() {
                     {insight.metabolicRisk}
                   </strong>
                 </div>
-                <p className="text-[10px] text-muted-foreground">Optimal clinical safety zone: 0.5 - 1.2 kg/wk.</p>
+                <p className="text-xs text-muted-foreground">Optimal clinical safety zone: 0.5 - 1.2 kg/wk.</p>
               </Card>
             </div>
 
@@ -189,7 +189,7 @@ export function ClinicAiCoachDrawer() {
 
             {/* AI Summary Banner */}
             <div className="p-3.5 rounded-xl bg-highlight/10 border border-highlight/20 text-xs space-y-1">
-              <span className="font-mono text-[10px] uppercase tracking-wider font-semibold text-highlight block">
+              <span className="font-mono text-xs uppercase tracking-wider font-semibold text-highlight block">
                 Primary Clinical Recommendation
               </span>
               <p className="text-foreground font-medium">{insight.suggestedAction}</p>

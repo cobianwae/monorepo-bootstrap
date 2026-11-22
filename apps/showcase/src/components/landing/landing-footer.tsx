@@ -52,7 +52,7 @@ export function LandingFooter() {
 
           {FOOTER_COLUMNS.map((column) => (
             <nav key={column.title} aria-label={`Footer — ${column.title}`}>
-              <h3 className="mb-4 font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              <h3 className="mb-4 font-mono text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 {column.title}
               </h3>
               <ul className="space-y-2.5">

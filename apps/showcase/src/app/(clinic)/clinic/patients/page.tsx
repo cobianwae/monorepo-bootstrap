@@ -285,7 +285,7 @@ export default function PatientsDirectoryPage() {
                           <p className="font-display font-semibold text-sm text-foreground">
                             {patient.name}
                           </p>
-                          <p className="text-[11px] text-muted-foreground">
+                          <p className="text-xs text-muted-foreground">
                             {patient.age} y/o {patient.gender} • {patient.email}
                           </p>
                         </div>
@@ -304,9 +304,9 @@ export default function PatientsDirectoryPage() {
                           <span className="text-muted-foreground">{patient.startWeight}</span>
                           <span>→</span>
                           <span className="font-bold text-foreground">{patient.currentWeight} kg</span>
-                          <span className="text-success font-semibold text-[11px]">(-{totalLoss} kg)</span>
+                          <span className="text-success font-semibold text-xs">(-{totalLoss} kg)</span>
                         </div>
-                        <span className="text-[10px] text-muted-foreground font-mono block">
+                        <span className="text-xs text-muted-foreground font-mono block">
                           Goal: {patient.targetWeight} kg
                         </span>
                       </div>
@@ -318,11 +318,11 @@ export default function PatientsDirectoryPage() {
                           <span className="font-mono text-xs font-bold text-foreground">
                             BMI {patient.bmi}
                           </span>
-                          <Badge variant={statusBadge?.variant || 'secondary'} size="sm" className="text-[10px]">
+                          <Badge variant={statusBadge?.variant || 'secondary'} size="sm" className="text-xs">
                             {statusBadge?.label || patient.status}
                           </Badge>
                         </div>
-                        <span className="text-[10px] text-muted-foreground block font-mono">
+                        <span className="text-xs text-muted-foreground block font-mono">
                           {bmiCat.label}
                         </span>
                       </div>
@@ -456,7 +456,7 @@ export default function PatientsDirectoryPage() {
                             <span className="font-semibold text-xs text-foreground font-display">
                               {note.doctorName}
                             </span>
-                            <span className="font-mono text-[11px] text-muted-foreground ml-2">
+                            <span className="font-mono text-xs text-muted-foreground ml-2">
                               {note.date}
                             </span>
                           </div>
@@ -464,7 +464,7 @@ export default function PatientsDirectoryPage() {
                             SOAP
                           </Badge>
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-muted/30 p-2.5 rounded-lg text-[11px] font-mono">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-muted/30 p-2.5 rounded-lg text-xs font-mono">
                           <div>BP: <strong className="text-foreground">{note.objective.bloodPressure}</strong></div>
                           <div>HR: <strong className="text-foreground">{note.objective.heartRate} bpm</strong></div>
                           <div>Glucose: <strong className="text-foreground">{note.objective.fastingGlucose} mg/dL</strong></div>
@@ -498,7 +498,7 @@ export default function PatientsDirectoryPage() {
                             <span className="font-semibold text-xs text-foreground font-display">
                               {note.psychologistName}
                             </span>
-                            <span className="font-mono text-[11px] text-muted-foreground ml-2">
+                            <span className="font-mono text-xs text-muted-foreground ml-2">
                               {note.date}
                             </span>
                           </div>
@@ -530,7 +530,7 @@ export default function PatientsDirectoryPage() {
                             <span className="font-semibold text-xs text-foreground font-display">
                               {plan.planType}
                             </span>
-                            <span className="font-mono text-[11px] text-muted-foreground ml-2">
+                            <span className="font-mono text-xs text-muted-foreground ml-2">
                               by {plan.dieticianName} ({plan.date})
                             </span>
                           </div>
@@ -539,10 +539,10 @@ export default function PatientsDirectoryPage() {
                           </Badge>
                         </div>
                         <div className="grid grid-cols-4 gap-2 bg-muted/30 p-2.5 rounded-lg text-center text-xs font-mono">
-                          <div><span className="text-muted-foreground text-[10px] block">Protein</span><strong>{plan.proteinGrams}g</strong></div>
-                          <div><span className="text-muted-foreground text-[10px] block">Carbs</span><strong>{plan.carbsGrams}g</strong></div>
-                          <div><span className="text-muted-foreground text-[10px] block">Fat</span><strong>{plan.fatGrams}g</strong></div>
-                          <div><span className="text-muted-foreground text-[10px] block">Water</span><strong>{plan.waterIntakeLiters}L</strong></div>
+                          <div><span className="text-muted-foreground text-xs block">Protein</span><strong>{plan.proteinGrams}g</strong></div>
+                          <div><span className="text-muted-foreground text-xs block">Carbs</span><strong>{plan.carbsGrams}g</strong></div>
+                          <div><span className="text-muted-foreground text-xs block">Fat</span><strong>{plan.fatGrams}g</strong></div>
+                          <div><span className="text-muted-foreground text-xs block">Water</span><strong>{plan.waterIntakeLiters}L</strong></div>
                         </div>
                         <ul className="text-xs space-y-1 text-muted-foreground list-disc pl-4">
                           {plan.mealRules.map((r, i) => (
@@ -602,7 +602,7 @@ export default function PatientsDirectoryPage() {
                         <div className="flex justify-between items-center pb-2 border-b border-border/40">
                           <div>
                             <span className="font-mono font-bold text-foreground">{trx.id}</span>
-                            <span className="font-mono text-[11px] text-muted-foreground ml-2">
+                            <span className="font-mono text-xs text-muted-foreground ml-2">
                               {trx.timestamp}
                             </span>
                           </div>
@@ -610,7 +610,7 @@ export default function PatientsDirectoryPage() {
                             {trx.paymentMethod.toUpperCase()} • Rp {trx.total.toLocaleString()}
                           </Badge>
                         </div>
-                        <ul className="space-y-1 text-muted-foreground font-mono text-[11px]">
+                        <ul className="space-y-1 text-muted-foreground font-mono text-xs">
                           {trx.items.map((item, idx) => (
                             <li key={idx} className="flex justify-between">
                               <span>{item.quantity}x {item.name}</span>

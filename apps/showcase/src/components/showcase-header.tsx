@@ -57,7 +57,7 @@ export function ShowcaseHeader() {
         {/* Compliance Badge */}
         <div className="hidden md:flex items-center gap-1.5 rounded-full border border-success/30 bg-success/10 px-2.5 py-1 text-xs font-medium text-success">
           <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
-          <span className="font-mono text-[11px]">WCAG AA/AAA</span>
+          <span className="font-mono text-xs">WCAG AA/AAA</span>
         </div>
 
         {/* Theme Toggle Button */}

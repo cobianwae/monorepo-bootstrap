@@ -185,7 +185,7 @@ export default function ClinicDashboardPage() {
                   Daily income across clinical packages, consultations, and retail supplements.
                 </CardDescription>
               </div>
-              <Badge variant="outline" className="font-mono text-[11px]">
+              <Badge variant="outline" className="font-mono text-xs">
                 Target: Rp 130M / wk
               </Badge>
             </div>
@@ -290,7 +290,7 @@ export default function ClinicDashboardPage() {
                           {appt.status.toUpperCase()}
                         </Badge>
                       </div>
-                      <p className="text-muted-foreground text-[11px] flex items-center gap-2 font-mono">
+                      <p className="text-muted-foreground text-xs flex items-center gap-2 font-mono">
                         <span>{appt.timeSlot}</span>
                         <span>•</span>
                         <span>{appt.room}</span>
@@ -306,7 +306,7 @@ export default function ClinicDashboardPage() {
                           size="sm"
                           variant="outline"
                           onClick={() => updateAppointmentStatus(appt.id, 'checked-in')}
-                          className="h-7 text-[11px] gap-1"
+                          className="h-7 text-xs gap-1"
                         >
                           <CheckCircle2 className="h-3 w-3 text-warning" />
                           Check-In
@@ -317,7 +317,7 @@ export default function ClinicDashboardPage() {
                           size="sm"
                           variant="highlight"
                           onClick={() => updateAppointmentStatus(appt.id, 'in-consult')}
-                          className="h-7 text-[11px] gap-1"
+                          className="h-7 text-xs gap-1"
                         >
                           <Stethoscope className="h-3 w-3" />
                           Start Consult
@@ -328,7 +328,7 @@ export default function ClinicDashboardPage() {
                           size="sm"
                           variant="success"
                           onClick={() => updateAppointmentStatus(appt.id, 'completed')}
-                          className="h-7 text-[11px] gap-1"
+                          className="h-7 text-xs gap-1"
                         >
                           <CheckCircle2 className="h-3 w-3" />
                           Complete
@@ -351,7 +351,7 @@ export default function ClinicDashboardPage() {
                 Clinical Audit & Live Feed
               </h3>
             </div>
-            <span className="text-[11px] font-mono text-muted-foreground">Auto-recorded</span>
+            <span className="text-xs font-mono text-muted-foreground">Auto-recorded</span>
           </div>
 
           <div className="max-h-[380px] overflow-y-auto pr-2">

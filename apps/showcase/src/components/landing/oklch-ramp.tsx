@@ -43,7 +43,7 @@ export function OklchRamp() {
 
         return (
           <div key={channel.label}>
-            <p className="mb-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            <p className="mb-1.5 font-mono text-xs uppercase tracking-widest text-muted-foreground">
               {channel.label} · hue {parsed.h}
             </p>
             <div className="flex h-12 gap-1" role="group" aria-label={`${channel.label} lightness ramp`}>

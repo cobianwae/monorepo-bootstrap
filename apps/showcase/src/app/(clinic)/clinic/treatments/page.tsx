@@ -273,12 +273,12 @@ export default function TreatmentsPage() {
                             {t.name}
                           </p>
                           {t.popular && (
-                            <Badge variant="highlight" size="sm" className="text-[9px] h-3.5 px-1">
+                            <Badge variant="highlight" size="sm" className="text-xs h-3.5 px-1">
                               Popular
                             </Badge>
                           )}
                         </div>
-                        <p className="text-[11px] text-muted-foreground line-clamp-1">
+                        <p className="text-xs text-muted-foreground line-clamp-1">
                           {t.description}
                         </p>
                       </div>
@@ -305,7 +305,7 @@ export default function TreatmentsPage() {
                     </TableCell>
 
                     <TableCell>
-                      <Badge variant={t.active ? 'success' : 'outline'} size="sm" className="text-[10px]">
+                      <Badge variant={t.active ? 'success' : 'outline'} size="sm" className="text-xs">
                         {t.active ? 'Active' : 'Disabled'}
                       </Badge>
                     </TableCell>

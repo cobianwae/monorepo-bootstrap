@@ -104,6 +104,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-042 | Kontras teks varian `destructive` pada Alert (dark 4,17–4,58:1); teks memakai `foreground` | draft | `docs/cr/cr-042-kontras-alert-destructive-dark.md` |
 | CR-043 | Heading section tanpa ikon di `overlays-menus` (11 h2) dan `text-xl` untuk h3 manual di `data-display` dan `layout-navigation` | draft | `docs/cr/cr-043-heading-overlays-data-display-layout.md` |
 | CR-044 | `primary` dekoratif ke `highlight` di halaman docs (ikon kartu, callout informatif, identitas; 25 kemunculan, 14 file); aksi dan state terpilih tidak diubah | draft | `docs/cr/cr-044-primary-dekoratif-ke-highlight.md` |
+| CR-045 | `text-[9/10/11px]` di luar `app/(docs)` ke `text-xs` (154 kemunculan, 33 file); guard memindai seluruh `src` | draft | `docs/cr/cr-045-text-xs-luar-docs.md` |
 
 ## Catatan
 

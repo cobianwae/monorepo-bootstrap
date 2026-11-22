@@ -128,11 +128,11 @@ export function ClinicSidebar({ onNavigateMobile }: ClinicSidebarProps) {
             <div className="flex flex-col min-w-0">
               <span className="font-semibold text-sm tracking-tight text-foreground font-display flex items-center gap-1.5 truncate">
                 Aura Metabolic
-                <Badge variant="highlight" className="text-[10px] px-1.5 py-0 h-4 font-mono">
+                <Badge variant="highlight" className="text-xs px-1.5 py-0 h-4 font-mono">
                   CIS
                 </Badge>
               </span>
-              <span className="text-[10px] text-muted-foreground uppercase font-mono tracking-wider truncate">
+              <span className="text-xs text-muted-foreground uppercase font-mono tracking-wider truncate">
                 Weight Loss Clinic
               </span>
             </div>

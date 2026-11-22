@@ -43,24 +43,24 @@ export function HeroCanvas() {
                 <span className="h-2.5 w-2.5 rounded-full bg-border" />
                 <span className="h-2.5 w-2.5 rounded-full bg-border" />
               </span>
-              <span className="ml-1 font-mono text-[10px] tracking-wide text-muted-foreground">
+              <span className="ml-1 font-mono text-xs tracking-wide text-muted-foreground">
                 arah — analytics
               </span>
-              <Badge variant="success-outline" className="ml-auto font-mono text-[10px]">
+              <Badge variant="success-outline" className="ml-auto font-mono text-xs">
                 Live
               </Badge>
             </div>
             <div className="space-y-3 p-4">
               <div className="flex items-end justify-between gap-3">
                 <div>
-                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
                     Monthly revenue
                   </p>
                   <p className="font-display text-2xl font-extrabold tabular-nums tracking-tight text-foreground">
                     $48.2K
                   </p>
                 </div>
-                <Badge variant="success" className="font-mono text-[10px]">
+                <Badge variant="success" className="font-mono text-xs">
                   +12.4%
                 </Badge>
               </div>
@@ -80,7 +80,7 @@ export function HeroCanvas() {
                 />
               </svg>
               <Progress value={72} aria-label="Quarterly goal progress" />
-              <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
                 Q3 · 72% of goal
               </p>
             </div>
@@ -98,7 +98,7 @@ export function HeroCanvas() {
                 <span className="flex-1 truncate text-xs text-muted-foreground">
                   Search patterns…
                 </span>
-                <Kbd className="text-[10px]">⌘K</Kbd>
+                <Kbd className="text-xs">⌘K</Kbd>
               </div>
               <div className="space-y-0.5 p-2">
                 {[
@@ -149,7 +149,7 @@ export function HeroCanvas() {
       <div className="absolute bottom-[24%] right-[6%]">
         <div data-depth={48} className="will-change-transform">
           <div className="animate-float rotate-3" style={{ animationDelay: '-1s' }}>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-card px-3 py-1.5 font-mono text-[10px] font-semibold text-success shadow-lg">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-success/30 bg-card px-3 py-1.5 font-mono text-xs font-semibold text-success shadow-lg">
               <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
               WCAG AAA
             </span>
@@ -161,15 +161,15 @@ export function HeroCanvas() {
         <div data-depth={44} className="will-change-transform">
           <div className="animate-float rotate-[-6deg]" style={{ animationDelay: '-3.2s' }}>
             <span className="inline-flex items-center gap-1 rounded-xl border border-border/60 bg-card px-2.5 py-2 shadow-lg">
-              <Kbd className="text-[10px]">⌘</Kbd>
-              <Kbd className="text-[10px]">K</Kbd>
+              <Kbd className="text-xs">⌘</Kbd>
+              <Kbd className="text-xs">K</Kbd>
             </span>
           </div>
         </div>
       </div>
 
       {/* Baseline caption */}
-      <p className="absolute -bottom-2 right-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground/70">
+      <p className="absolute -bottom-2 right-2 font-mono text-xs uppercase tracking-widest text-muted-foreground/70">
         Every pixel above is a live component
       </p>
     </div>

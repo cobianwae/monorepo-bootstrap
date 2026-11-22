@@ -26,7 +26,7 @@ const RULES: Rule[] = [
     id: 'arbitrary-px-text',
     pattern: /text-\[\d+px\]/,
     hint: 'Teks terkecil adalah text-xs (Caption/Meta). Dilarang text-[Npx].',
-    root: DOCS,
+    root: SRC,
   },
   {
     id: 'manual-heading-lg-bold',
@@ -63,6 +63,14 @@ function collectPages(dir: string): string[] {
   });
 }
 
+function collectSources(dir: string): string[] {
+  return readdirSync(dir).flatMap((name) => {
+    const full = join(dir, name);
+    if (statSync(full).isDirectory()) return collectSources(full);
+    return name.endsWith('.tsx') && !name.endsWith('.test.tsx') ? [full] : [];
+  });
+}
+
 function findViolations(files: string[], rules: Rule[]): string[] {
   const violations: string[] = [];
   for (const file of files) {
@@ -80,8 +88,9 @@ function findViolations(files: string[], rules: Rule[]): string[] {
 
 const foundationFiles = collectPages(FOUNDATIONS);
 const docsFiles = collectPages(DOCS);
+const sourceFiles = collectSources(SRC);
 const foundationRules = RULES.filter((rule) => rule.root === undefined);
-const docsRules = RULES.filter((rule) => rule.root === DOCS);
+const sourceRules = RULES.filter((rule) => rule.root === SRC);
 
 describe('visual-language guard — halaman docs', () => {
   it('menemukan halaman yang dipindai', () => {
@@ -90,11 +99,12 @@ describe('visual-language guard — halaman docs', () => {
   });
 
   it('foundations tidak melanggar aturan visual-language', () => {
-    expect(findViolations(foundationFiles, [...foundationRules, ...docsRules])).toEqual([]);
+    expect(findViolations(foundationFiles, foundationRules)).toEqual([]);
   });
 
-  it('seluruh app/(docs) tidak memakai text-[Npx]', () => {
-    expect(findViolations(docsFiles, docsRules)).toEqual([]);
+  it('seluruh src (non-test .tsx) tidak memakai text-[Npx] (CR-045)', () => {
+    expect(sourceFiles.length).toBeGreaterThan(docsFiles.length);
+    expect(findViolations(sourceFiles, sourceRules)).toEqual([]);
   });
 
   it('SectionHeading dipakai di halaman yang punya heading section', () => {

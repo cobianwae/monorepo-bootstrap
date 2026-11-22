@@ -265,7 +265,7 @@ export function ShowcaseNavContent({ onNavigate }: ShowcaseNavContentProps) {
                       {item.badge && (
                         <Badge
                           variant={isActive ? 'highlight' : 'outline'}
-                          className="ml-auto shrink-0 text-[10px] px-1.5 py-0.5 font-mono whitespace-nowrap leading-none group-data-[collapsible=icon]:hidden"
+                          className="ml-auto shrink-0 text-xs px-1.5 py-0.5 font-mono whitespace-nowrap leading-none group-data-[collapsible=icon]:hidden"
                         >
                           {item.badge}
                         </Badge>
@@ -308,7 +308,7 @@ export function ShowcaseNavContent({ onNavigate }: ShowcaseNavContentProps) {
               return (
                 <SidebarMenuItem key={subsection.label}>
                   <div
-                    className="flex h-7 w-full items-center gap-2 rounded-md px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 select-none group-data-[collapsible=icon]:hidden"
+                    className="flex h-7 w-full items-center gap-2 rounded-md px-3 text-xs font-bold uppercase tracking-wider text-muted-foreground/70 select-none group-data-[collapsible=icon]:hidden"
                     aria-hidden="true"
                   >
                     {subsection.label}

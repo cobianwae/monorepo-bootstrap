@@ -97,7 +97,7 @@ export function PatientSummaryCard({ patient, className }: PatientSummaryCardPro
               <span>•</span>
               <span>Last Visit: {patient.lastVisit}</span>
             </p>
-            <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-muted-foreground font-mono">
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs text-muted-foreground font-mono">
               <span>
                 Doctor:{' '}
                 <strong className="text-foreground font-sans font-medium">

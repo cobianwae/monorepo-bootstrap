@@ -104,7 +104,7 @@ export function ScenarioPreview() {
 
             <div className="flex flex-1 flex-col gap-4 p-6 md:p-8">
               <div>
-                <p className="font-mono text-[10px] uppercase tracking-widest text-highlight">
+                <p className="font-mono text-xs uppercase tracking-widest text-highlight">
                   {scenario.tagline}
                 </p>
                 <h3 className="mt-1 font-display text-2xl font-bold text-foreground">
@@ -117,7 +117,7 @@ export function ScenarioPreview() {
 
               <div className="flex flex-wrap gap-2">
                 {scenario.features.map((feature) => (
-                  <Badge key={feature} variant="outline" className="font-mono text-[10px]">
+                  <Badge key={feature} variant="outline" className="font-mono text-xs">
                     {feature}
                   </Badge>
                 ))}
