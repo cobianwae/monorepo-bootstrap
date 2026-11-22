@@ -121,7 +121,7 @@ export default function InfiniteScrollPage() {
             {/* Feed header */}
             <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
               <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <InfinityIcon className="h-4 w-4 text-primary" />
+                <InfinityIcon className="h-4 w-4 text-highlight" />
                 Activity Feed
               </div>
               <div className="flex items-center gap-2">

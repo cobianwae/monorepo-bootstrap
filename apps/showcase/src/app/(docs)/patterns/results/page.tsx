@@ -169,7 +169,7 @@ export default function ResultsPage() {
           return (
             <Card key={item.title}>
               <CardContent className="p-4">
-                <Icon className="h-5 w-5 text-primary" />
+                <Icon className="h-5 w-5 text-highlight" />
                 <h3 className="mt-2 text-sm font-semibold text-foreground">{item.title}</h3>
                 <p className="mt-1 text-xs text-muted-foreground">{item.desc}</p>
               </CardContent>

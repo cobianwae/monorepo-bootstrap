@@ -414,9 +414,9 @@ export default function DynamicFormPage() {
               )}
             />
             {watchNotifyEmail && (
-              <div className="rounded-md border border-primary/30 bg-primary/5 p-3 animate-in slide-in-from-top-1 fade-in duration-200">
+              <div className="rounded-md border border-highlight/30 bg-highlight/5 p-3 animate-in slide-in-from-top-1 fade-in duration-200">
                 <div className="flex items-start gap-2">
-                  <Info className="h-4 w-4 text-primary mt-0.5" />
+                  <Info className="h-4 w-4 text-highlight mt-0.5" />
                   <div className="text-xs text-muted-foreground">
                     <p className="font-medium text-foreground">Conditional section revealed</p>
                     <p>
@@ -557,7 +557,7 @@ export default function DynamicFormPage() {
               {isDirty ? (
                 <AlertTriangle className="h-4 w-4 text-warning-text mt-0.5" />
               ) : (
-                <ShieldCheck className="h-4 w-4 text-primary mt-0.5" />
+                <ShieldCheck className="h-4 w-4 text-highlight mt-0.5" />
               )}
               <p className="text-xs text-muted-foreground">
                 {isDirty

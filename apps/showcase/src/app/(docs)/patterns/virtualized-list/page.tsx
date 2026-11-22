@@ -137,7 +137,7 @@ export default function VirtualizedListPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { icon: Database, label: 'Total records', value: rows.length.toLocaleString(), accent: 'text-highlight' },
-          { icon: Box, label: 'DOM nodes mounted', value: renderedCount, accent: 'text-primary' },
+          { icon: Box, label: 'DOM nodes mounted', value: renderedCount, accent: 'text-highlight' },
           { icon: Layers, label: 'Virtual height', value: `${Math.round(rowVirtualizer.getTotalSize() / 1000)}px`, accent: 'text-success' },
           { icon: Zap, label: 'Scroll offset', value: `${Math.round(scrollOffset)}px`, accent: 'text-muted-foreground' },
         ].map((stat) => {

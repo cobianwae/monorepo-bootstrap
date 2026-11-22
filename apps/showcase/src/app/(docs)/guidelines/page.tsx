@@ -35,7 +35,7 @@ export default function GuidelinesPage() {
         <Card className="border-border">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Layers className="h-5 w-5 text-primary" />
+              <Layers className="h-5 w-5 text-highlight" />
               <CardTitle className="text-base">1. Visual Hierarchy & Spatial Rhythm</CardTitle>
             </div>
             <CardDescription className="text-xs">
@@ -83,7 +83,7 @@ export default function GuidelinesPage() {
         <Card className="border-border">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Palette className="h-5 w-5 text-primary" />
+              <Palette className="h-5 w-5 text-highlight" />
               <CardTitle className="text-base">3. Dark Mode Craftsmanship</CardTitle>
             </div>
             <CardDescription className="text-xs">
@@ -107,7 +107,7 @@ export default function GuidelinesPage() {
         <Card className="border-border">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
+              <Sparkles className="h-5 w-5 text-highlight" />
               <CardTitle className="text-base">4. Motion & Micro-Interactions</CardTitle>
             </div>
             <CardDescription className="text-xs">

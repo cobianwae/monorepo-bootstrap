@@ -226,7 +226,7 @@ export default function WorkspacePage() {
             <div className="flex items-center border-b border-border bg-card/50 px-2 h-9">
               <div className="flex items-center gap-1">
                 <div className="flex items-center gap-2 rounded-t-md border-t-2 border-primary bg-background px-3 py-1 text-xs font-medium text-foreground border-x border-border">
-                  <FileCode className="h-3.5 w-3.5 text-primary" />
+                  <FileCode className="h-3.5 w-3.5 text-highlight" />
                   <span>{selectedFile}</span>
                 </div>
               </div>

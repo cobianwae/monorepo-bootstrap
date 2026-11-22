@@ -497,7 +497,7 @@ export default function OverviewPage() {
             <SectionNumber number="02" />
           </div>
           <CardHeader className="pb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary mb-3 group-hover:scale-105 transition-transform">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-highlight/10 text-highlight mb-3 group-hover:scale-105 transition-transform">
               <GitFork className="h-5 w-5" />
             </div>
             <CardTitle className="text-base font-display">

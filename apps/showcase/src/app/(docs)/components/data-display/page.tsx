@@ -445,7 +445,7 @@ export default function DataDisplayPage() {
           <Card variant="default">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Layers className="h-4 w-4 text-primary" />
+                <Layers className="h-4 w-4 text-highlight" />
                 Default Card
               </CardTitle>
               <CardDescription>Standar container berbingkai border token.</CardDescription>
@@ -471,7 +471,7 @@ export default function DataDisplayPage() {
           <Card variant="glass">
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-primary" />
+                <Sparkles className="h-4 w-4 text-highlight" />
                 Glassmorphism Card
               </CardTitle>
               <CardDescription>Backdrop blur dengan translucent background.</CardDescription>

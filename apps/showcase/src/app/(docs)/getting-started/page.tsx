@@ -98,7 +98,7 @@ export default function GettingStartedPage() {
         <Card className="border-border">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Boxes className="h-5 w-5 text-primary" />
+              <Boxes className="h-5 w-5 text-highlight" />
               <CardTitle className="text-base">1. Monorepo Layout</CardTitle>
             </div>
             <CardDescription className="text-xs">
@@ -113,7 +113,7 @@ export default function GettingStartedPage() {
         <Card className="border-border">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Palette className="h-5 w-5 text-primary" />
+              <Palette className="h-5 w-5 text-highlight" />
               <CardTitle className="text-base">2. Install &amp; Theme Setup</CardTitle>
             </div>
             <CardDescription className="text-xs">
@@ -129,7 +129,7 @@ export default function GettingStartedPage() {
         <Card className="border-border">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <Puzzle className="h-5 w-5 text-primary" />
+              <Puzzle className="h-5 w-5 text-highlight" />
               <CardTitle className="text-base">3. Import Patterns</CardTitle>
             </div>
             <CardDescription className="text-xs">
@@ -144,7 +144,7 @@ export default function GettingStartedPage() {
         <Card className="border-border">
           <CardHeader>
             <div className="flex items-center gap-2">
-              <TestTube2 className="h-5 w-5 text-primary" />
+              <TestTube2 className="h-5 w-5 text-highlight" />
               <CardTitle className="text-base">4. Testing Conventions</CardTitle>
             </div>
             <CardDescription className="text-xs">
@@ -160,7 +160,7 @@ export default function GettingStartedPage() {
       <Card className="border-border">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <TerminalSquare className="h-5 w-5 text-primary" />
+            <TerminalSquare className="h-5 w-5 text-highlight" />
             <CardTitle className="text-base">Development Workflow</CardTitle>
           </div>
           <CardDescription className="text-xs">

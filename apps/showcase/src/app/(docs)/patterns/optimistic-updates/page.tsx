@@ -182,7 +182,7 @@ export default function OptimisticUpdatesPage() {
         <Card className="border-border">
           <CardContent className="p-5 space-y-2">
             <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <Zap className="h-4 w-4 text-primary" />
+              <Zap className="h-4 w-4 text-highlight" />
               1. Update instantly
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">

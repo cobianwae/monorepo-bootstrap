@@ -68,7 +68,7 @@ export default function CommandPalettePage() {
         <Card className="border-border">
           <CardContent className="p-6 space-y-4">
             <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <Keyboard className="h-4 w-4 text-primary" />
+              <Keyboard className="h-4 w-4 text-highlight" />
               Keyboard Accessibility
             </div>
             <ul className="space-y-2 text-sm text-muted-foreground">
@@ -99,7 +99,7 @@ export default function CommandPalettePage() {
         <Card className="border-border">
           <CardContent className="p-6 space-y-4">
             <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <Search className="h-4 w-4 text-primary" />
+              <Search className="h-4 w-4 text-highlight" />
               Search &amp; Filtering
             </div>
             <p className="text-sm text-muted-foreground">

@@ -212,7 +212,7 @@ export default function NotificationCenterPage() {
             <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
               <div>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <Bell className="h-4 w-4 text-primary" />
+                  <Bell className="h-4 w-4 text-highlight" />
                   Inbox
                   {unread > 0 && (
                     <Badge variant="default" className="text-xs">

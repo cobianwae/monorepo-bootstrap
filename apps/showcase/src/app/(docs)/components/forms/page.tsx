@@ -89,7 +89,7 @@ const MEMBER_OPTIONS: ComboboxOption[] = [
 const FRAMEWORK_OPTIONS: ComboboxOption[] = [
   // Framework brand marks (Vue/Svelte/Angular) intentionally use their official
   // brand colors as a documented exception — not design-system tokens.
-  { value: 'react', label: 'React', icon: <TextCursorInput className="h-4 w-4 text-primary" /> },
+  { value: 'react', label: 'React', icon: <TextCursorInput className="h-4 w-4 text-highlight" /> },
   { value: 'vue', label: 'Vue', icon: <TextCursorInput className="h-4 w-4 text-emerald-600" /> },
   { value: 'svelte', label: 'Svelte', icon: <TextCursorInput className="h-4 w-4 text-orange-500" /> },
   { value: 'angular', label: 'Angular', icon: <TextCursorInput className="h-4 w-4 text-red-500" /> },
