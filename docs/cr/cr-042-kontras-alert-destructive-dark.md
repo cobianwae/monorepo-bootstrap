@@ -23,7 +23,7 @@ Hitungan: `/tmp/vl-calc/audit3.mjs` (OKLCH dari `packages/tokens/src/tokens.css`
 - [x] `pnpm --filter @ds/ui exec vitest run src/components/feedback`: 10/10 lulus.
 - [x] `pnpm --filter @ds/ui lint`: hijau.
 - [x] Screenshot light `components/states-feedback` (2026-11-22): Alert destructive tampak benar, judul netral, ikon dan border merah.
-- [ ] Screenshot dark belum terkonfirmasi: probe mode gagal menerapkan dark pada percobaan terakhir. Hasil dark hanya dari hitungan token.
+- [x] Screenshot dark terkonfirmasi: components/states-feedback Atelier/Pulse dark, judul dan deskripsi Alert destructive terbaca.
 - [x] `pnpm typecheck` root: hanya 12 error baseline `flow-editor.test.tsx`.
 - [~] `pnpm test` penuh: tokens 10/10; ui 706/707 (AC-02 flow-editor gagal lagi di run penuh; file itu 49/49 saat dijalankan sendiri); showcase 78/78 saat dijalankan sendiri.
 - [x] `pnpm -C apps/showcase build` dari salinan sementara: 76/76. Percobaan pertama gagal di `next/font` (pengambilan font Google, transien); percobaan kedua lulus.
@@ -39,7 +39,7 @@ Hitungan: `/tmp/vl-calc/audit3.mjs` (OKLCH dari `packages/tokens/src/tokens.css`
 
 - [x] Tidak ada hex/RGB baru.
 - [x] Kontras teks ≥ 4,5:1 di light dan dark untuk semua tema (dengan `foreground`).
-- [ ] Screenshot visual belum dijalankan.
+- [x] Screenshot visual dijalankan: dark (states-feedback) dan light (CR-042 sebelumnya).
 
 ## Eksekusi
 
@@ -48,6 +48,6 @@ Commit: `fix: teks Alert destructive memakai foreground agar kontras dark lolos 
 
 - [ ] CR disetujui user.
 - [x] Perubahan diimplementasikan.
-- [ ] Verifikasi penuh dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.
+- [x] Verifikasi penuh dijalankan (lihat CR-052).
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.

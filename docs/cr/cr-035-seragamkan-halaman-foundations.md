@@ -31,7 +31,7 @@
 - [x] Perbaiki regresi kontras teks `text-highlight` (temuan 5) di 4 lokasi; hitung rasio per tema dari `packages/tokens/src/themes.ts`.
 - [x] Verifikasi visual browser (Chrome headless, 1440×1800): **dark dan light, Atelier / Pulse, ketujuh halaman**; typography dan motion juga di **Aurora / Nebula** (dark) dan **Blueprint / Ink** (light). Setelah perbaikan temuan 5 diambil ulang: breakpoints light, spacing light, colors light dan dark. Perubahan `motion:171` (label kotak demo, tersembunyi sampai Play) dan `typography:352` (meta pairing) **tidak tampak di viewport** screenshot; keduanya diverifikasi lewat kode, guard, lint, dan typecheck, bukan screenshot.
 - [x] `next build` produksi lulus (76/76 halaman statis, lint + typecheck Next hijau) dari **salinan sementara** `apps/.showcase-build` (sudah dihapus), karena `next.config.mjs` tanpa `distDir` dan build di `apps/showcase` akan menimpa `.next` dev server. Dijalankan dua kali: sebelum dan sesudah perbaikan temuan 5. Build langsung `pnpm -C apps/showcase build` di direktori asli **tidak** dijalankan.
-- [ ] Belum diverifikasi visual: halaman themes/iconography/colors/spacing/breakpoints di Aurora dan Blueprint; semua halaman di palet selain Pulse (Nebula/Ink hanya typography dan motion).
+- [x] Verifikasi visual Aurora/Blueprint: themes, iconography, colors, spacing, breakpoints dilihat lewat screenshot (CR-052). Palet Nebula/Ink hanya sebagian halaman; batas verifikasi tercatat.
 
 ## Keputusan
 

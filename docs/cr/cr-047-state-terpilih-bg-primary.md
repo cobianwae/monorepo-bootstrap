@@ -28,7 +28,7 @@ Mengubah state terpilih mengubah cara pengguna membaca pilihan aktif. Itu keputu
 - [x] Persetujuan user untuk pola state terpilih (disetujui 2026-11-22, rekomendasi).
 - [x] Inventaris dan klasifikasi per baris (grep `bg-primary` di `app/(docs)`).
 - [x] Ubah per kasus: 12 file (lihat Keputusan).
-- [ ] Guard: aturan `handmade-segmented-selected` belum diperluas (pola `bg-primary` pada item terpilih belum dijadikan aturan).
+- [x] Guard: pola solid `bg-primary text-primary-foreground` kini dijaga aturan `solid-primary-fill` (CR-050) yang memindai seluruh src. Pola handmade segmented tetap di foundations.
 - [~] Screenshot: `patterns/workspace` (light, Atelier/Pulse) sudah dilihat dan rapi. Halaman lain belum dilihat (stepper, master-data, transfer-list, data-display dark).
 - [x] `pnpm --filter @ds/showcase lint` dan `build:types` hijau; `vitest src/test` 4/4 hijau.
 
@@ -44,8 +44,8 @@ Mengubah state terpilih mengubah cara pengguna membaca pilihan aktif. Itu keputu
 
 ## Design System Checks
 
-- [ ] Kontras state terpilih dicek di 8 tema light/dark.
-- [ ] Tidak ada hex/RGB hardcode.
+- [x] Kontras state terpilih: teks memakai text-foreground di atas highlight/10 (CR-046: 8,1–18,5:1 di 8 tema light/dark, lolos 4,5:1).
+- [x] Tidak ada hex/RGB hardcode pada file yang diubah (grep bersih).
 
 ## Eksekusi
 

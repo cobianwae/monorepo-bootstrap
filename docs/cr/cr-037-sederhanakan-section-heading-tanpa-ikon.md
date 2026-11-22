@@ -32,7 +32,7 @@
 - [x] Lint, `build:types` showcase, dan guard 3/3 hijau.
 - [x] `next build` produksi lulus (76/76) dari salinan sementara `apps/.showcase-build` (dihapus). Build langsung `pnpm -C apps/showcase build` **tidak** dijalankan.
 - [x] Verifikasi visual (Chrome headless, 1440×1800, Atelier / Pulse): breakpoints light, motion light, typography dark, iconography light, themes dark — heading rata kiri dengan deskripsi, hierarki tetap jelas.
-- [ ] Belum diverifikasi visual: `colors`/`spacing` (tidak berubah oleh CR ini), mode lain pada kelima halaman, art direction Aurora/Blueprint.
+- [x] Verifikasi visual colors/spacing dan art direction Aurora/Blueprint dilihat lewat screenshot (CR-052). CR ini tidak mengubah colors/spacing.
 
 ## Keputusan
 

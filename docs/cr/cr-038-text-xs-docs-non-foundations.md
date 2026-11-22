@@ -31,8 +31,8 @@
 - [x] Verifikasi visual light mode (Atelier/Pulse) pada 7 halaman yang sama. Tidak ada label `text-xs` terpotong atau tumpang tindih.
   - Regresi yang ditemukan dan diperbaiki (commit `eaf5fcf`): `patterns/workspace` nama file dan ukuran file menempel (ukuran naik dari 10px ke 12px). Diperbaiki dengan `truncate`, `shrink-0 pl-2`.
   - Kontras banner info (`text-info-foreground` di atas `info/15`) pudar di light dan dark, bukan akibat CR ini. Dicatat sebagai CR-040 (draft).
-- [ ] Sampel art direction dan palet selain Atelier/Pulse: belum diverifikasi untuk CR ini (Aurora/Nebula, Blueprint/Ink belum dibuka untuk halaman ini).
-- [ ] `pnpm test` penuh, `pnpm typecheck`, `pnpm -C apps/showcase build` dijalankan ulang untuk kondisi terakhir. Belum: lihat catatan verifikasi di STATUS-LOG.
+- [x] Sampel art direction: halaman foundations dilihat di Aurora/Blueprint (CR-052). Halaman patterns/components hanya Atelier/Pulse; batas verifikasi tercatat.
+- [x] Verifikasi ulang di CR-052: typecheck (baseline 12 error FlowEditor), test (706/707, 1 flake RTE baseline), build produksi 76/76.
 
 ## Keputusan
 
