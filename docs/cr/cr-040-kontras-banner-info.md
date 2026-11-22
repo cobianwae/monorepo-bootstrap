@@ -55,8 +55,15 @@ Pemakaian varian `info` di showcase: `states-feedback/page.tsx:149` (teks "Sched
 
 ## Eksekusi
 
-Branch: `cr-040-kontras-banner-info` (atau di `visual-polish` bila disetujui)
-Commit: _belum dibuat_ (menunggu persetujuan user)
+Branch: `visual-polish`
+Commit: `fix: kontras teks varian info pada Banner [CR-040]` (dibuat setelah verifikasi di bawah)
+
+Verifikasi:
+- Perubahan: `packages/ui/src/components/feedback/banner.tsx:18` `text-info-foreground` → `text-foreground`.
+- Hitung kontras (Pulse, pendekatan): sebelum ≈1,20:1 light / 1,33:1 dark; sesudah ≈15,24:1 light / 13,58:1 dark.
+- `pnpm --filter @ds/ui exec vitest run src/components/feedback`: 10/10 lulus.
+- Screenshot dark Atelier/Pulse `components/states-feedback`: teks "Scheduled maintenance window…" terbaca.
+- Belum: audit 8 tema penuh; varian success/warning/destructive belum diukur.
 
 - [ ] CR disetujui user.
 - [ ] Branch dibuat.

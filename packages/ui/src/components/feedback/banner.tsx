@@ -15,7 +15,7 @@ export const bannerVariants = cva(
           'bg-gradient-to-r from-highlight/20 via-primary/15 to-highlight/20 text-foreground border-b border-highlight/30',
         primary: 'bg-primary text-primary-foreground',
         warning: 'bg-warning/20 text-warning-foreground border-b border-warning/30',
-        info: 'bg-info/15 text-info-foreground border-b border-info/30',
+        info: 'bg-info/15 text-foreground border-b border-info/30',
       },
     },
     defaultVariants: {
