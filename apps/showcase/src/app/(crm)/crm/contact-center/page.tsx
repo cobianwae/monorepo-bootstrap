@@ -367,7 +367,7 @@ export default function ContactCenterPage() {
                 }}
                 className={`p-3.5 space-y-1.5 cursor-pointer transition-colors outline-none focus-visible:bg-accent focus-visible:ring-2 focus-visible:ring-ring ${
                   isSelected
-                    ? 'bg-primary/10 border-l-2 border-l-primary'
+                    ? 'bg-highlight/10 border-l-2 border-l-highlight'
                     : 'hover:bg-accent/50'
                 }`}
               >

@@ -188,7 +188,7 @@ export function CrmOmnichannelPulseCard({ className, isLoading = false }: CrmOmn
 
           <div className="rounded-lg border border-border/50 bg-card/70 p-3 shadow-2xs">
             <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
-              <Mail className="h-3.5 w-3.5 text-primary" />
+              <Mail className="h-3.5 w-3.5 text-highlight" />
               <span>Email</span>
             </div>
             <p className="font-mono text-xs font-bold text-foreground mt-1">2.4m SLA</p>

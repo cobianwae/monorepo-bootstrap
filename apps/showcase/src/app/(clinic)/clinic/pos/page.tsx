@@ -162,7 +162,7 @@ export default function PosPage() {
                   onClick={() => setSelectedCat(cat.id)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                     selectedCat === cat.id
-                      ? 'bg-primary text-primary-foreground shadow-xs'
+                      ? 'bg-background text-foreground shadow-xs'
                       : 'bg-muted/40 text-muted-foreground hover:bg-muted/80 hover:text-foreground'
                   }`}
                 >
@@ -220,7 +220,7 @@ export default function PosPage() {
             <div className="space-y-3 pb-3 border-b border-border/40">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <ShoppingBag className="h-4 w-4 text-primary" />
+                  <ShoppingBag className="h-4 w-4 text-highlight" />
                   <h3 className="font-display font-bold text-base text-foreground">
                     Current Register Invoice
                   </h3>
@@ -328,7 +328,7 @@ export default function PosPage() {
                       onClick={() => setPaymentMethod(pm.id as PaymentMethod)}
                       className={`p-2 rounded-lg border text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer font-medium ${
                         isSelected
-                          ? 'bg-primary text-primary-foreground border-primary shadow-xs'
+                          ? 'bg-background text-foreground border-highlight shadow-xs'
                           : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted/70'
                       }`}
                     >

@@ -187,7 +187,7 @@ export function ClinicHeader({ onOpenCommandPalette }: ClinicHeaderProps) {
                 <div
                   key={notif.id}
                   className={`p-3 text-xs transition-colors ${
-                    notif.read ? 'bg-background opacity-70' : 'bg-primary/5 font-medium'
+                    notif.read ? 'bg-background opacity-70' : 'bg-highlight/5 font-medium'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">

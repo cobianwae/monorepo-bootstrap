@@ -137,7 +137,7 @@ export function ClinicAiCoachDrawer() {
                   </Badge>
                 </div>
                 <div className="flex items-center gap-1.5 pt-1 text-xs font-medium">
-                  <Activity className="h-3.5 w-3.5 text-primary" />
+                  <Activity className="h-3.5 w-3.5 text-highlight" />
                   <span>Risk Level: </span>
                   <strong
                     className={
@@ -158,13 +158,13 @@ export function ClinicAiCoachDrawer() {
             {/* Key Clinical Insights */}
             <Card className="p-4 space-y-3 bg-card border-border">
               <h4 className="text-xs font-semibold font-display uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4 text-primary" />
+                <ShieldCheck className="h-4 w-4 text-highlight" />
                 Trajectory Insights
               </h4>
               <ul className="space-y-2 text-xs">
                 {insight.keyInsights.map((ki, i) => (
                   <li key={i} className="flex items-start gap-2 text-muted-foreground">
-                    <span className="h-1.5 w-1.5 rounded-full bg-primary mt-1.5 shrink-0" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-highlight mt-1.5 shrink-0" />
                     <span className="leading-relaxed">{ki}</span>
                   </li>
                 ))}

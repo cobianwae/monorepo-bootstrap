@@ -1273,7 +1273,7 @@ export default function LeadsPage() {
                         onClick={() => moveLeadStage(activeLead.id, st)}
                         className={`rounded-md border p-2 text-xs font-medium capitalize transition-all cursor-pointer ${
                           activeLead.stage === st
-                            ? 'border-primary bg-primary/10 text-foreground font-bold shadow-xs ring-1 ring-primary'
+                            ? 'border-highlight bg-highlight/10 text-foreground font-bold shadow-xs ring-1 ring-highlight'
                             : 'border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground'
                         }`}
                       >

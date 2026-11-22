@@ -659,7 +659,7 @@ export default function CampaignsPage() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold text-foreground flex items-center gap-2">
-              <Megaphone className="h-5 w-5 text-primary" />
+              <Megaphone className="h-5 w-5 text-highlight" />
               Campaign Builder Studio
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">

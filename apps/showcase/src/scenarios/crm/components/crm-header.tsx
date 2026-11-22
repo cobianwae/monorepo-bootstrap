@@ -194,7 +194,7 @@ export function CrmHeader({ onOpenCommandPalette }: CrmHeaderProps) {
                     <div
                       key={n.id}
                       className={`p-3 space-y-1 transition-colors ${
-                        n.read ? 'bg-transparent opacity-80' : 'bg-primary/5'
+                        n.read ? 'bg-transparent opacity-80' : 'bg-highlight/5'
                       }`}
                     >
                       <div className="flex items-center justify-between">

@@ -390,7 +390,7 @@ export default function PatientRegistrationPage() {
               </div>
 
               {/* Real-time Computed BMI Card */}
-              <div className="md:col-span-2 p-3.5 rounded-xl bg-primary/5 border border-primary/20 flex items-center justify-between">
+              <div className="md:col-span-2 p-3.5 rounded-xl bg-highlight/5 border border-highlight/20 flex items-center justify-between">
                 <div>
                   <span className="text-xs font-mono uppercase text-muted-foreground block">
                     Computed Baseline BMI
@@ -449,7 +449,7 @@ export default function PatientRegistrationPage() {
                         onClick={() => toggleCondition(cond)}
                         className={`flex items-center gap-2.5 p-3 rounded-lg border text-xs cursor-pointer transition-all ${
                           isChecked
-                            ? 'bg-primary/5 border-primary text-foreground font-medium'
+                            ? 'bg-highlight/5 border-highlight text-foreground font-medium'
                             : 'bg-card border-border text-muted-foreground hover:bg-muted/40'
                         }`}
                       >
@@ -573,7 +573,7 @@ export default function PatientRegistrationPage() {
             <DescriptionList items={reviewItems} columns={2} className="text-xs" />
 
             <div className="p-3.5 rounded-xl bg-muted/40 border border-border/40 text-xs flex items-center gap-3">
-              <FileCheck2 className="h-5 w-5 text-primary shrink-0" />
+              <FileCheck2 className="h-5 w-5 text-highlight shrink-0" />
               <p className="text-muted-foreground text-xs leading-relaxed">
                 By submitting, a new unique patient identifier (e.g. PAT-1009) will be assigned, and notification will be dispatched to the supervising care team.
               </p>

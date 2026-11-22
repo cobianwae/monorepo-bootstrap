@@ -55,14 +55,14 @@ export function CrmStatsGrid({ isLoading = false }: CrmStatsGridProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {/* 1. Active Pipeline (Subtly Highlighted Hero Card) */}
-      <Card className="relative flex flex-col justify-between p-6 rounded-2xl border border-primary/35 bg-gradient-to-b from-primary/[0.06] via-card to-card shadow-xs transition-all duration-200 hover:border-primary/60 hover:shadow-sm">
+      <Card className="relative flex flex-col justify-between p-6 rounded-2xl border border-highlight/35 bg-gradient-to-b from-highlight/[0.06] via-card to-card shadow-xs transition-all duration-200 hover:border-highlight/60 hover:shadow-sm">
         {/* Subtle Top Hairline Highlight */}
         <div className="absolute inset-x-0 top-0 h-[2px] rounded-t-2xl bg-gradient-to-r from-transparent via-primary/70 to-transparent" />
 
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary ring-1 ring-primary/20 animate-float">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-highlight/15 text-highlight ring-1 ring-highlight/20 animate-float">
                 <DollarSign className="h-4 w-4" />
               </div>
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider font-mono">

@@ -211,7 +211,7 @@ export default function AiStudioPage() {
               <CardHeader className="pb-3 border-b border-border/40">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <Sliders className="h-4 w-4 text-primary" />
+                    <Sliders className="h-4 w-4 text-highlight" />
                     <CardTitle className="text-base font-semibold text-foreground">
                       Predictive Scoring Parameter Sandbox
                     </CardTitle>
@@ -376,7 +376,7 @@ export default function AiStudioPage() {
               <Card className="shadow-xs">
                 <CardHeader className="pb-3 border-b border-border/40">
                   <CardTitle className="text-sm font-bold text-foreground flex items-center gap-2">
-                    <Bot className="h-4 w-4 text-primary" />
+                    <Bot className="h-4 w-4 text-highlight" />
                     Preset Prompt Library
                   </CardTitle>
                 </CardHeader>

@@ -165,7 +165,7 @@ export default function AppointmentsPage() {
         {/* Slot & Room */}
         <div className="space-y-1 text-xs text-muted-foreground font-mono">
           <div className="flex items-center gap-1.5 text-foreground font-medium">
-            <Clock className="h-3 w-3 text-primary" />
+            <Clock className="h-3 w-3 text-highlight" />
             <span>{appt.timeSlot}</span>
           </div>
           <div className="flex items-center gap-1.5">

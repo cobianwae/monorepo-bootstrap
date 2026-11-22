@@ -159,7 +159,7 @@ export default function ClinicDashboardPage() {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-              <Scale className="h-3.5 w-3.5 text-primary" />
+              <Scale className="h-3.5 w-3.5 text-highlight" />
               Patient Focus Spotlight (EMR Active Selection)
             </span>
             <Link
@@ -235,7 +235,7 @@ export default function ClinicDashboardPage() {
         <Card className="border-border bg-card p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-border/40">
             <div className="flex items-center gap-2">
-              <CalendarClock className="h-4 w-4 text-primary" />
+              <CalendarClock className="h-4 w-4 text-highlight" />
               <h3 className="font-display font-bold text-base text-foreground">
                 Today&apos;s Schedule ({todayAppointments.length})
               </h3>
@@ -264,7 +264,7 @@ export default function ClinicDashboardPage() {
                     key={appt.id}
                     className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 rounded-xl border text-xs transition-all ${
                       isCurrent
-                        ? 'bg-primary/5 border-primary/40 ring-1 ring-primary/30'
+                        ? 'bg-highlight/5 border-highlight/40 ring-1 ring-highlight/30'
                         : isDone
                         ? 'bg-muted/20 border-border/40 opacity-70'
                         : 'bg-card border-border hover:border-border/80'
@@ -346,7 +346,7 @@ export default function ClinicDashboardPage() {
         <Card className="border-border bg-card p-6 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-border/40">
             <div className="flex items-center gap-2">
-              <ActivityIcon className="h-4 w-4 text-primary" />
+              <ActivityIcon className="h-4 w-4 text-highlight" />
               <h3 className="font-display font-bold text-base text-foreground">
                 Clinical Audit & Live Feed
               </h3>

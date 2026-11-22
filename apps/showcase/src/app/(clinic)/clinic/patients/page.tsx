@@ -441,7 +441,7 @@ export default function PatientsDirectoryPage() {
                 {/* Doctor SOAP Notes */}
                 <div className="space-y-3">
                   <h4 className="text-xs font-semibold font-display uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                    <Stethoscope className="h-4 w-4 text-primary" />
+                    <Stethoscope className="h-4 w-4 text-highlight" />
                     Doctor SOAP Notes ({patientDoctorNotes.length})
                   </h4>
                   {patientDoctorNotes.length === 0 ? (
