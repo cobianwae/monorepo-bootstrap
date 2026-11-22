@@ -5,24 +5,17 @@ import {
   ArrowRight,
   AlertTriangle,
   Archive,
-  BarChart3,
   Bot,
   Box,
   CheckCircle2,
-  Code2,
   Cpu,
   Database,
   DollarSign,
   FileCode2,
   FileText,
   Folder,
-  Gauge,
-  GitCommit,
   Globe,
   Layers,
-  List,
-  ListChecks,
-  ListTree,
   Rocket,
   ShieldCheck,
   Sparkles,
@@ -442,7 +435,6 @@ export default function DataDisplayPage() {
       <section id="card-variants" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Layers className="h-6 w-6 text-highlight" />
             <span>Card Variants & Interactive States</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -533,7 +525,6 @@ export default function DataDisplayPage() {
       <section id="avatars" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Users className="h-6 w-6 text-highlight" />
             <span>Avatars & Avatar Groups</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -596,7 +587,6 @@ export default function DataDisplayPage() {
       <section id="carousel-basic" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-highlight" />
             <span>Interactive Carousel</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -665,7 +655,6 @@ export default function DataDisplayPage() {
       <section id="carousel-multi" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Layers className="h-6 w-6 text-highlight" />
             <span>Multi-Card Carousel Grid</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -721,7 +710,6 @@ export default function DataDisplayPage() {
       <section id="scroll-area" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <FileText className="h-6 w-6 text-highlight" />
             <span>Custom ScrollArea</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -808,7 +796,6 @@ export default function DataDisplayPage() {
       <section id="code-blocks" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Code2 className="h-6 w-6 text-highlight" />
             <span>Code Blocks & Snippets</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -838,7 +825,6 @@ export function ActionExample() {
       <section id="stat-cards" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <DollarSign className="h-6 w-6 text-highlight" />
             <span>StatCard Variants & Trends</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -882,7 +868,6 @@ export function ActionExample() {
       <section id="timeline" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <GitCommit className="h-6 w-6 text-highlight" />
             <span>Timeline</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -920,7 +905,6 @@ export function ActionExample() {
       <section id="description-list" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <List className="h-6 w-6 text-highlight" />
             <span>Description List</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -955,7 +939,6 @@ export function ActionExample() {
       <section id="metric-tiles" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Gauge className="h-6 w-6 text-highlight" />
             <span>Metric Tiles Card</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -988,7 +971,6 @@ export function ActionExample() {
       <section id="bulk-action-bar" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <ListChecks className="h-6 w-6 text-highlight" />
             <span>Bulk Action Bar</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -1064,7 +1046,6 @@ export function ActionExample() {
       <section id="chart-a11y-table" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <BarChart3 className="h-6 w-6 text-highlight" />
             <span>Chart Accessibility Table</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -1129,7 +1110,6 @@ export function ActionExample() {
       <section id="tree-view" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <ListTree className="h-6 w-6 text-highlight" />
             <span>Hierarchical TreeView</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -1182,7 +1162,6 @@ export function ActionExample() {
       <section id="sortable-list" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Layers className="h-6 w-6 text-highlight" />
             <span>Drag & Drop Sortable List</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -1227,7 +1206,6 @@ export function ActionExample() {
       <section id="chat-interface" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Bot className="h-6 w-6 text-highlight" />
             <span>AI Copilot & Chat Suite</span>
           </h2>
           <p className="text-sm text-muted-foreground">

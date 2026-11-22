@@ -4,13 +4,9 @@ import * as React from 'react';
 import {
   Sparkles,
   Zap,
-  ShieldCheck,
-  Layers,
   ArrowRight,
-  CheckCircle2,
   Bot,
   Database,
-  Code2,
 } from 'lucide-react';
 import {
   PageHeader,
@@ -78,7 +74,6 @@ export default function MarketingBlocksPage() {
           <section id="hero" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
               <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <Sparkles className="h-6 w-6 text-highlight" />
                 <span>Hero Section</span>
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -125,7 +120,6 @@ export default function MarketingBlocksPage() {
           <section id="features" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
               <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <Layers className="h-6 w-6 text-highlight" />
                 <span>Feature Grid</span>
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -163,7 +157,6 @@ export default function MarketingBlocksPage() {
           <section id="stats" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
               <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <Zap className="h-6 w-6 text-highlight" />
                 <span>Stats & Metrics Band</span>
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -183,7 +176,6 @@ export default function MarketingBlocksPage() {
           <section id="pricing" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
               <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <ShieldCheck className="h-6 w-6 text-highlight" />
                 <span>Pricing Matrix</span>
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -278,7 +270,6 @@ export default function MarketingBlocksPage() {
           <section id="testimonials" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
               <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <CheckCircle2 className="h-6 w-6 text-highlight" />
                 <span>Testimonials & Social Proof</span>
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -331,7 +322,6 @@ export default function MarketingBlocksPage() {
           <section id="statement" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
               <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <Sparkles className="h-6 w-6 text-highlight" />
                 <span>Statement Cards & Dot Pattern</span>
               </h2>
               <p className="text-sm text-muted-foreground">
@@ -400,7 +390,6 @@ export default function MarketingBlocksPage() {
           <section id="faq" className="space-y-4 scroll-mt-20">
             <div className="space-y-1">
               <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                <Code2 className="h-6 w-6 text-highlight" />
                 <span>FAQ Accordion</span>
               </h2>
               <p className="text-sm text-muted-foreground">

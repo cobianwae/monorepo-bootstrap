@@ -48,9 +48,7 @@ import {
 } from '@ds/ui';
 import {
   CreditCard,
-  Zap,
   ReceiptText,
-  Building2,
   Download,
   Plus,
   CheckCircle2,
@@ -315,7 +313,6 @@ export default function BillingPage() {
       <section id="current-plan" className="space-y-4 scroll-mt-20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Zap className="h-6 w-6 text-highlight" />
             <span>Current Plan</span>
           </h2>
           <SegmentedControl
@@ -434,7 +431,6 @@ export default function BillingPage() {
       <section id="invoices" className="space-y-4 scroll-mt-20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <ReceiptText className="h-6 w-6 text-highlight" />
             <span>Invoices</span>
           </h2>
           <SegmentedControl
@@ -538,7 +534,6 @@ export default function BillingPage() {
       <section id="payment-method" className="space-y-4 scroll-mt-20">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <CreditCard className="h-6 w-6 text-highlight" />
             <span>Payment Method</span>
           </h2>
           <Dialog open={addCardOpen} onOpenChange={setAddCardOpen}>
@@ -720,7 +715,6 @@ export default function BillingPage() {
 
       <section id="billing-details" className="space-y-4 scroll-mt-20">
         <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-          <Building2 className="h-6 w-6 text-highlight" />
           <span>Billing Details</span>
         </h2>
 

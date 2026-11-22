@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ListOrdered, Network, Search } from 'lucide-react';
+import { Network, Search } from 'lucide-react';
 import {
   Badge,
   Card,
@@ -115,8 +115,7 @@ export default function MindMapPatternPage() {
       <section aria-labelledby="mind-demo">
         <Card>
           <CardHeader className="space-y-1 pb-4">
-            <h2 id="mind-demo" className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-              <Network aria-hidden="true" className="h-6 w-6 text-highlight" />
+            <h2 id="mind-demo" className="font-display text-2xl font-bold text-foreground">
               <span>Demo interaktif</span>
             </h2>
             <CardDescription>
@@ -162,8 +161,7 @@ export default function MindMapPatternPage() {
 
       <section aria-labelledby="mind-steps" className="space-y-3">
         <div className="space-y-1">
-          <h2 id="mind-steps" className="flex items-center gap-2 font-display text-2xl font-bold text-foreground">
-            <ListOrdered aria-hidden="true" className="h-6 w-6 text-highlight" />
+          <h2 id="mind-steps" className="font-display text-2xl font-bold text-foreground">
             <span>Alur brainstorming</span>
           </h2>
           <p className="text-sm text-muted-foreground">

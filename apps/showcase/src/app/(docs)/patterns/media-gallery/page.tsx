@@ -39,7 +39,6 @@ import {
   Network,
   PenTool,
   LayoutGrid,
-  Expand,
   Maximize2,
   ChevronLeft,
   ChevronRight,
@@ -268,7 +267,6 @@ export default function MediaGalleryPage() {
 
       <section id="gallery" className="space-y-4 scroll-mt-20">
         <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-          <LayoutGrid className="h-6 w-6 text-highlight" />
           <span>Gallery Grid</span>
         </h2>
 
@@ -438,7 +436,6 @@ export default function MediaGalleryPage() {
 
       <section id="lightbox" className="space-y-4 scroll-mt-20">
         <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-          <Expand className="h-6 w-6 text-highlight" />
           <span>Lightbox &amp; Keyboard Navigation</span>
         </h2>
 

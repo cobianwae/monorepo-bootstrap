@@ -443,7 +443,6 @@ export default function SettingsPage() {
             <TabsContent value="profile">
               <section id="profile" className="space-y-4 scroll-mt-20">
                 <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                  <User className="h-6 w-6 text-highlight" />
                   <span>Profile</span>
                 </h2>
 
@@ -575,7 +574,6 @@ export default function SettingsPage() {
             <TabsContent value="workspace">
               <section id="workspace" className="space-y-4 scroll-mt-20">
                 <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                  <Building2 className="h-6 w-6 text-highlight" />
                   <span>Workspace</span>
                 </h2>
 
@@ -753,7 +751,6 @@ export default function SettingsPage() {
             <TabsContent value="appearance">
               <section id="appearance" className="space-y-4 scroll-mt-20">
                 <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                  <Palette className="h-6 w-6 text-highlight" />
                   <span>Appearance</span>
                 </h2>
 
@@ -878,7 +875,6 @@ export default function SettingsPage() {
             <TabsContent value="security">
               <section id="security" className="space-y-4 scroll-mt-20">
                 <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                  <Shield className="h-6 w-6 text-highlight" />
                   <span>Security</span>
                 </h2>
 
@@ -1098,7 +1094,6 @@ export default function SettingsPage() {
             <TabsContent value="danger-zone">
               <section id="danger-zone" className="space-y-4 scroll-mt-20">
                 <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-                  <AlertTriangle className="h-6 w-6 text-highlight" />
                   <span>Danger Zone</span>
                 </h2>
 

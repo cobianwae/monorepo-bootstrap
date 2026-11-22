@@ -13,8 +13,6 @@ import {
   FileText,
   BarChart3,
   LayoutGrid,
-  Sidebar as SidebarIcon,
-  Compass,
   ShieldCheck,
   Zap,
   Bot,
@@ -193,7 +191,6 @@ export default function LayoutNavigationPage() {
       <section id="sidebar-system" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <PanelLeft className="h-6 w-6 text-highlight" />
             <span>Sidebar System</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -567,7 +564,6 @@ export default function LayoutNavigationPage() {
       <section id="mega-menu" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-highlight" />
             <span>Mega Menu (Multi-Column Dropdown)</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -677,7 +673,6 @@ export default function LayoutNavigationPage() {
       <section id="navbar" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Globe className="h-6 w-6 text-highlight" />
             <span>Navbar System</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -737,7 +732,6 @@ export default function LayoutNavigationPage() {
       <section id="app-shell" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <LayoutGrid className="h-6 w-6 text-highlight" />
             <span>AppShell Primitives</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -780,7 +774,6 @@ export default function LayoutNavigationPage() {
       <section id="resizable" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <SidebarIcon className="h-6 w-6 text-highlight" />
             <span>Resizable Split Panels</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -824,7 +817,6 @@ export default function LayoutNavigationPage() {
       <section id="tabs-accordion" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <LayoutGrid className="h-6 w-6 text-highlight" />
             <span>Tabs & Accordion</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -968,7 +960,6 @@ export default function LayoutNavigationPage() {
       <section id="collapsible-breadcrumb" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <ChevronDown className="h-6 w-6 text-highlight" />
             <span>Collapsible & Breadcrumb</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -1077,7 +1068,6 @@ export default function LayoutNavigationPage() {
       <section id="pagination" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Compass className="h-6 w-6 text-highlight" />
             <span>Pagination Navigation</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -1153,7 +1143,6 @@ export default function LayoutNavigationPage() {
       <section id="footer" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Compass className="h-6 w-6 text-highlight" />
             <span>Footer System</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -1202,7 +1191,6 @@ export default function LayoutNavigationPage() {
       <section id="bottom-nav" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Home className="h-6 w-6 text-highlight" />
             <span>Bottom Mobile Navigation & Drawer</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -1277,7 +1265,6 @@ export default function LayoutNavigationPage() {
       <section id="menubar" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Code2 className="h-6 w-6 text-highlight" />
             <span>Desktop Menubar</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -1339,7 +1326,6 @@ export default function LayoutNavigationPage() {
       <section id="aspect-ratio-skip-link" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <ShieldCheck className="h-6 w-6 text-highlight" />
             <span>Aspect Ratio & Skip Link</span>
           </h2>
           <p className="text-sm text-muted-foreground">

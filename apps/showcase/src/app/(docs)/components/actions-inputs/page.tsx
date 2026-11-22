@@ -25,22 +25,12 @@ import {
   Toggle,
 } from '@ds/ui';
 import {
-  BadgeCheck,
   Bold,
   Check,
-  Hash,
   Italic,
-  KeyRound,
-  LayoutGrid,
-  ListChecks,
-  ListOrdered,
   Mail,
   MousePointerClick,
   Plus,
-  Search,
-  SlidersHorizontal,
-  Star,
-  ToggleRight,
   Underline as UnderlineIcon,
 } from 'lucide-react';
 
@@ -75,7 +65,6 @@ export default function ActionsInputsPage() {
       <section id="buttons" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <MousePointerClick className="h-6 w-6 text-highlight" />
             <span>Buttons & Actions</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -156,7 +145,6 @@ export default function ActionsInputsPage() {
       <section id="badges" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <BadgeCheck className="h-6 w-6 text-highlight" />
             <span>Badges & Status</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -189,7 +177,6 @@ export default function ActionsInputsPage() {
       <section id="ratings" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Star className="h-6 w-6 text-highlight" />
             <span>Rating & Star Feedback</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -231,7 +218,6 @@ export default function ActionsInputsPage() {
       <section id="toggles" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <ToggleRight className="h-6 w-6 text-highlight" />
             <span>Toggle & Toggle Group</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -335,7 +321,6 @@ export default function ActionsInputsPage() {
       <section id="switch-checkbox" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <ListChecks className="h-6 w-6 text-highlight" />
             <span>Switch & Checkbox</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -413,7 +398,6 @@ export default function ActionsInputsPage() {
       <section id="radio-group" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <ListOrdered className="h-6 w-6 text-highlight" />
             <span>Radio Group</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -470,7 +454,6 @@ export default function ActionsInputsPage() {
       <section id="slider" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <SlidersHorizontal className="h-6 w-6 text-highlight" />
             <span>Slider</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -517,7 +500,6 @@ export default function ActionsInputsPage() {
       <section id="segmented-control" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <LayoutGrid className="h-6 w-6 text-highlight" />
             <span>Segmented Control</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -565,7 +547,6 @@ export default function ActionsInputsPage() {
       <section id="number-input" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Hash className="h-6 w-6 text-highlight" />
             <span>Number Input</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -611,7 +592,6 @@ export default function ActionsInputsPage() {
       <section id="search-input" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Search className="h-6 w-6 text-highlight" />
             <span>Search Input</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -654,7 +634,6 @@ export default function ActionsInputsPage() {
       <section id="otp-input" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <KeyRound className="h-6 w-6 text-highlight" />
             <span>OTP Input</span>
           </h2>
           <p className="text-sm text-muted-foreground">

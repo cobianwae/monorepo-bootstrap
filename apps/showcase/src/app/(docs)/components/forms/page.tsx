@@ -6,17 +6,8 @@ import { id } from 'date-fns/locale';
 import {
   Wand2,
   CheckCircle2,
-  Layers,
-  Sparkles,
-  ShieldCheck,
   Send,
   TextCursorInput,
-  Upload,
-  User,
-  Tags,
-  Calendar,
-  Clock,
-  Filter as FilterIcon,
 } from 'lucide-react';
 import {
   PageHeader,
@@ -292,7 +283,6 @@ export default function FormsPage() {
       <section id="form-primitives" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-highlight" />
             <span>Form Field System</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -410,7 +400,6 @@ export default function FormsPage() {
       <section id="radio-group" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Layers className="h-6 w-6 text-highlight" />
             <span>RadioGroup Primitives</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -490,7 +479,6 @@ export default function FormsPage() {
       <section id="forms" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <TextCursorInput className="h-6 w-6 text-highlight" />
             <span>Basic Form Controls</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -571,7 +559,6 @@ export default function FormsPage() {
       <section id="rte-demo" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <TextCursorInput className="h-6 w-6 text-highlight" />
             <span>Rich Text Description</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -596,7 +583,6 @@ export default function FormsPage() {
       <section id="file-uploads" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Upload className="h-6 w-6 text-highlight" />
             <span>File Uploads</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -683,7 +669,6 @@ export default function FormsPage() {
       <section id="form-sections" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <ShieldCheck className="h-6 w-6 text-highlight" />
             <span>Form Sections & Error Summary</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -725,7 +710,6 @@ export default function FormsPage() {
       <section id="combobox" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <User className="h-6 w-6 text-highlight" />
             <span>Combobox / Autocomplete</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -818,7 +802,6 @@ export default function FormsPage() {
       <section id="tags" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Tags className="h-6 w-6 text-highlight" />
             <span>Tag Input</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -854,7 +837,6 @@ export default function FormsPage() {
       <section id="date" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Calendar className="h-6 w-6 text-highlight" />
             <span>Date & Range Pickers</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -917,7 +899,6 @@ export default function FormsPage() {
       <section id="time" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Clock className="h-6 w-6 text-highlight" />
             <span>Time & OTP Inputs</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -971,7 +952,6 @@ export default function FormsPage() {
       <section id="filter-builder" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <FilterIcon className="h-6 w-6 text-highlight" />
             <span>Filter Builder</span>
           </h2>
           <p className="text-sm text-muted-foreground">

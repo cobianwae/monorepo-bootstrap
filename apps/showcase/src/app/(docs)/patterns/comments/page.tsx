@@ -34,7 +34,6 @@ import {
 } from '@ds/ui';
 import {
   MessagesSquare,
-  PenLine,
   Paperclip,
   AtSign,
   Heart,
@@ -938,7 +937,6 @@ export default function CommentsPage() {
 
       <section id="composer" className="space-y-4 scroll-mt-20">
         <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-          <PenLine className="h-6 w-6 text-highlight" />
           <span>Comment Composer</span>
         </h2>
 
@@ -958,7 +956,6 @@ export default function CommentsPage() {
 
       <section id="discussion" className="space-y-4 scroll-mt-20">
         <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-          <MessagesSquare className="h-6 w-6 text-highlight" />
           <span>Threaded Discussion</span>
         </h2>
 

@@ -47,8 +47,16 @@ Catatan: angka sebelumnya di CR-038 (±81 dan ±128) adalah estimasi. Angka hitu
 
 ## Eksekusi
 
-Branch: `visual-polish` (atau `cr-039-ikon-heading`) setelah disetujui
-Commit: _belum dibuat_ (menunggu persetujuan user)
+Branch: `visual-polish`
+Commit: `refactor: hapus ikon heading manual di components dan patterns [CR-039]` (dibuat setelah verifikasi di bawah)
+
+Verifikasi:
+- Hasil: 78 baris `h-6 w-6 text-highlight` dihapus di 11 file; import lucide yang tak terpakai dibersihkan; 0 sisa.
+- Diff: 4 baris ditambah, 123 dihapus (kelas `flex items-center gap-2` di h2 dihapus; h2 tetap manual).
+- `pnpm --filter @ds/showcase build:types`, `lint`, `visual-language-guard` (4/4): hijau.
+- Screenshot dark Atelier/Pulse: `components/states-feedback`, `patterns/settings` tampak rapi; `patterns/mind-map` belum terkonfirmasi dark (probe tidak menerapkan dark).
+- Belum: `SectionHeading` belum dipakai di 11 halaman ini (prop `id` untuk `aria-labelledby` belum ada); 122 `<h2` manual di docs non-foundations belum dimigrasikan; light mode belum diverifikasi untuk semua 11 halaman.
+- Catatan proses: pertama kali skrip menghapus koma import dan import yang masih dipakai; keduanya sudah diperbaiki sebelum commit.
 
 - [ ] CR disetujui user.
 - [ ] Perubahan diimplementasikan per halaman.

@@ -31,14 +31,9 @@ import {
   Activity,
   AlertCircle,
   AlertTriangle,
-  Bell,
-  BellRing,
-  Blocks,
   CheckCircle2,
-  Gauge,
   Inbox,
   Info,
-  Sparkles,
 } from 'lucide-react';
 
 export default function StatesFeedbackPage() {
@@ -68,7 +63,6 @@ export default function StatesFeedbackPage() {
       <section id="alerts-banners" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <BellRing className="h-6 w-6 text-highlight" />
             <span>Alerts & Banners</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -172,7 +166,6 @@ export default function StatesFeedbackPage() {
       <section id="notifications" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Bell className="h-6 w-6 text-highlight" />
             <span>Notifications & Activity Feed</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -239,7 +232,6 @@ export default function StatesFeedbackPage() {
       <section id="spinners" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-highlight" />
             <span>Spinners & Loading Indicators</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -285,7 +277,6 @@ export default function StatesFeedbackPage() {
       <section id="skeletons" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Blocks className="h-6 w-6 text-highlight" />
             <span>Skeleton Loading Placeholders</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -376,7 +367,6 @@ export default function StatesFeedbackPage() {
       <section id="progress" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Gauge className="h-6 w-6 text-highlight" />
             <span>Progress</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -421,7 +411,6 @@ export default function StatesFeedbackPage() {
       <section id="empty-state" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <Inbox className="h-6 w-6 text-highlight" />
             <span>Empty State</span>
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -448,7 +437,6 @@ export default function StatesFeedbackPage() {
       <section id="error-page" className="space-y-4 scroll-mt-20">
         <div className="space-y-1">
           <h2 className="text-2xl font-bold text-foreground font-display flex items-center gap-2">
-            <AlertTriangle className="h-6 w-6 text-highlight" />
             <span>Error Page</span>
           </h2>
           <p className="text-sm text-muted-foreground">
