@@ -1,6 +1,6 @@
 # CR-046 — Kontras eyebrow `PageHeader` (text-highlight kecil)
 
-**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
+**Status:** done (disetujui user 2026-11-22; dieksekusi di de97711, diverifikasi di bd54d89)
 **Sumber:** audit halaman tidak koheren (2026-11-22), temuan terbuka
 **Ref:** `docs/design/visual-language.md` (Color Roles; aturan teks kecil tidak memakai `text-highlight`; daftar pelanggaran lama)
 
@@ -41,4 +41,4 @@
 
 ## Eksekusi
 
-Belum dieksekusi. Status tetap `draft` sampai user menyetujui.
+Sudah dieksekusi (de97711) dan diverifikasi kontras (bd54d89).

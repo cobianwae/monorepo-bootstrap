@@ -100,16 +100,18 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-038 | Ganti `text-[9/10/11px]` → `text-xs` di `app/(docs)` non-foundations (99 pemakaian, 29 file); guard px diperluas ke seluruh docs | approved | `docs/cr/cr-038-text-xs-docs-non-foundations.md` |
 | CR-039 | Hapus ikon heading manual di `components/` dan `patterns/` (78 baris, 11 file) | approved | `docs/cr/cr-039-ikon-heading-components-patterns.md` |
 | CR-040 | Kontras teks varian `info` dan `warning` di `Banner` (`text-foreground` di atas tint); audit 8 tema | approved | `docs/cr/cr-040-kontras-banner-info.md` |
-| CR-041 | 44 `<h2>` manual sisa di docs non-foundations: diperiksa, tidak perlu perubahan tag (tidak ada section `h2` induk) | approved | `docs/cr/cr-041-h2-manual-docs-non-foundations.md` |
+| CR-041 | 44 `<h2>` manual sisa di docs non-foundations: diperiksa, tidak perlu perubahan tag (tidak ada section `h2` induk) | done | `docs/cr/cr-041-h2-manual-docs-non-foundations.md` |
 | CR-042 | Kontras teks varian `destructive` pada Alert (dark 4,17–4,58:1); teks memakai `foreground` | approved | `docs/cr/cr-042-kontras-alert-destructive-dark.md` |
 | CR-043 | Heading section tanpa ikon di `overlays-menus` (11 h2) dan `text-xl` untuk h3 manual di `data-display` dan `layout-navigation` | done | `docs/cr/cr-043-heading-overlays-data-display-layout.md` |
 | CR-044 | `primary` dekoratif ke `highlight` di halaman docs (ikon kartu, callout informatif, identitas; 25 kemunculan, 14 file); aksi dan state terpilih tidak diubah | done | `docs/cr/cr-044-primary-dekoratif-ke-highlight.md` |
 | CR-045 | `text-[9/10/11px]` di luar `app/(docs)` ke `text-xs` (154 kemunculan, 33 file); guard memindai seluruh `src` | done | `docs/cr/cr-045-text-xs-luar-docs.md` |
-| CR-046 | Kontras eyebrow `PageHeader` (`text-highlight` kecil di `packages/ui`); API publik, disetujui | approved | `docs/cr/cr-046-eyebrow-pageheader-kontras.md` |
+| CR-046 | Kontras eyebrow `PageHeader` (`text-highlight` kecil di `packages/ui`); API publik, disetujui | done | `docs/cr/cr-046-eyebrow-pageheader-kontras.md` |
 | CR-047 | State terpilih dan kotak ikon `bg-primary` (dekoratif) di halaman docs/scenario; pola interaksi, disetujui | approved | `docs/cr/cr-047-state-terpilih-bg-primary.md` |
 | CR-048 | Demo Directional Motion tampil kosong sebelum Play | done | `docs/cr/cr-048-directional-motion-kotak-kosong.md` |
 | CR-049 | State terpilih dan ikon dekoratif `primary` di `clinic`, `crm`, `scenarios` (lanjutan CR-047); tautan dan nilai tetap primary | done | `docs/cr/cr-049-primary-state-dan-ikon-clinic-crm-scenarios.md` |
 | CR-050 | Sisa `primary` dekoratif (onboarding, layout-navigation, consultations, reports, auth), guard solid fill, penutupan deviasi visual | draft | `docs/cr/cr-050-sisa-primary-dan-deviasi-visual.md` |
+| CR-051 | PageHeader: eyebrow sudah selesai (CR-046); deviasi h1 `text-3xl sm:text-4xl` dan weight dipertahankan sebagai keputusan; perubahan API publik butuh persetujuan | draft | `docs/cr/cr-051-pageheader-deviasi.md` |
+| CR-052 | Perluas guard `text-lg font-bold` sebagai heading ke seluruh `app/(docs)`; sisa di `guidelines` ke `SectionHeading` | draft | `docs/cr/cr-052-perluas-guard-heading.md` |
 
 ## Catatan
 
