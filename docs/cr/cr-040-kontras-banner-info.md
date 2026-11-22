@@ -67,7 +67,12 @@ Verifikasi:
   - `warning` Banner (`text-warning-foreground` di atas `warning/20`): light 15,45:1 (lolos); dark 1,48:1 (gagal). Diperbaiki: `warning` memakai `text-foreground` (commit terkait CR-040).
   - `success` Alert (teks `success` di atas `success/10`): light 5,61:1; dark 6,07:1 (lolos).
   - `destructive` Alert (teks `destructive` di atas `destructive/10`): light 4,58:1 (lolos tipis); dark 4,32:1 (gagal tipis). Belum diubah; `Alert` adalah komponen lain, perlu CR tersendiri bila disetujui.
-- Belum: audit 8 tema penuh; screenshot dark ulang untuk `warning` belum terkonfirmasi (probe mode gagal menerapkan dark pada percobaan terakhir).
+- Audit 8 tema penuh (light & dark, 2026-11-22; semantik dari blok Pulse, permukaan dari tiap tema):
+  - `warning` Banner, pola lama (`warning-foreground` di atas `warning/20`): dark 1,36–1,53:1 di semua tema (gagal); light 15,45:1.
+  - `warning` Banner, pola baru (`foreground` di atas `warning/20`): dark 11,4–13,5:1; light 14,6–16,2:1 (lolos, semua tema).
+  - `success` Alert: 5,6–6,5:1 (lolos, semua tema).
+  - `destructive` Alert (teks di atas `destructive/10`): light 4,58:1 (lolos); dark 4,17–4,58:1 (gagal di sunset 4,17, botanic 4,34, pulse 4,32, nebula 4,47, lagoon 4,49, ink 4,50; lolos midnight 4,58, graphite 4,56). Belum diubah: `Alert` adalah komponen lain. Usul CR-042 bila disetujui.
+- Screenshot dark `warning` belum dikonfirmasi lewat probe (probe gagal menerapkan dark); hasil ini murni hitungan token.
 
 - [ ] CR disetujui user.
 - [ ] Branch dibuat.

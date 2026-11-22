@@ -99,7 +99,8 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-037 | Sederhanakan `SectionHeading`: tanpa ikon, tanpa level sub (mengoreksi keputusan CR-034 #2; opsi A pilihan user) | draft | `docs/cr/cr-037-sederhanakan-section-heading-tanpa-ikon.md` |
 | CR-038 | Ganti `text-[9/10/11px]` → `text-xs` di `app/(docs)` non-foundations (99 pemakaian, 29 file); guard px diperluas ke seluruh docs | draft | `docs/cr/cr-038-text-xs-docs-non-foundations.md` |
 | CR-039 | Hapus ikon heading manual di `components/` dan `patterns/` (78 baris, 11 file) | draft | `docs/cr/cr-039-ikon-heading-components-patterns.md` |
-| CR-040 | Kontras teks varian `info` di `Banner` (`text-info-foreground` di atas `info/15` ≈ 1,2:1); usulan `text-foreground` | draft | `docs/cr/cr-040-kontras-banner-info.md` |
+| CR-040 | Kontras teks varian `info` dan `warning` di `Banner` (`text-foreground` di atas tint); audit 8 tema | draft | `docs/cr/cr-040-kontras-banner-info.md` |
+| CR-041 | Rapikan 44 `<h2>` manual sisa di docs non-foundations (judul kartu/panel, bukan section); butuh keputusan level per kelompok | draft | `docs/cr/cr-041-h2-manual-docs-non-foundations.md` |
 
 ## Catatan
 
