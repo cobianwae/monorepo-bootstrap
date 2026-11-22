@@ -59,7 +59,8 @@ Verifikasi:
 - Belum: 44 `<h2` manual di halaman docs non-foundations lain; light mode untuk 11 halaman belum diverifikasi.
 - Impor `SectionHeading` di 11 halaman memakai jalur relatif (`../../../../components/section-heading`), karena `vitest.config.ts` tidak punya alias `@/` dan tes `mind-map/page.test.tsx` gagal resolve. Tidak mengubah konfigurasi test.
 - Verifikasi akhir: `pnpm --filter @ds/showcase test` 78/78; `lint` dan `build:types` hijau; `pnpm typecheck` root hanya 12 error baseline `flow-editor.test.tsx`; `pnpm test` penuh: tokens 10/10, ui 706/707 (AC-02 flow-editor batas stack undo 50 gagal di run penuh, lulus 49/49 saat file dijalankan sendiri; diduga flaky di bawah beban, belum dibuktikan berulang); `pnpm -C apps/showcase build` dijalankan dari salinan sementara `apps/.showcase-build` (76/76 halaman statis, lulus); salinan sudah dihapus.
-- Light mode terverifikasi (Atelier/Pulse): `components/states-feedback`, `components/forms`. `patterns/settings` light tertangkap saat skeleton (belum sah).
+- Light mode terverifikasi (Atelier/Pulse): `components/states-feedback`, `components/forms`, `components/data-display`. `patterns/settings` light tertangkap saat skeleton (belum sah). `patterns/mind-map` light sudah diambil tapi belum dilihat.
+- Keputusan tertunda: 44 `<h2>` manual sisa di halaman docs non-foundations (optimistic-updates, calendar, org-chart, results, cascader-tree-select 10, overlays-menus 11, dll.) BUKAN section heading: sebagian besar judul kartu/panel dengan `text-base`/`text-sm`/`text-lg`, dan beberapa punya `ref`/`id` khusus. Mengubahnya ke `SectionHeading` mengubah hierarki per kasus, jadi perlu keputusan user dan CR terpisah (mis. CR-041), bukan migrasi mekanis.
 - Catatan proses: pertama kali skrip menghapus koma import dan import yang masih dipakai; keduanya sudah diperbaiki sebelum commit.
 
 - [ ] CR disetujui user.
