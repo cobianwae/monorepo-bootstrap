@@ -23,10 +23,10 @@
 
 - [x] Persetujuan user untuk mengubah `PageHeader` (disetujui 2026-11-22).
 - [x] Ubah kelas eyebrow: teks `text-foreground`, ikon tetap `text-highlight` lewat `[&>svg]:text-highlight`. Props dan export tidak berubah.
-- [ ] Verifikasi kontras 8 tema light dan dark: belum diukur ulang secara formal. Dasar: teks foreground di atas `highlight/10` (rasio jauh di atas 4,5:1 karena foreground kontras tinggi terhadap surface).
+- [x] Verifikasi kontras 8 tema light dan dark: `foreground` di atas `highlight/10` (dihitung dari OKLCH `packages/tokens/src/tokens.css`, `/tmp/vl-calc/cr046.mjs`). Light 16,4–18,5:1; dark 8,1–9,6:1; terendah pulse dark 8,13:1. Semua lolos 4,5:1.
 - [x] `pnpm --filter @ds/ui test` layout 9/9 hijau; `pnpm --filter @ds/ui lint` hijau.
-- [ ] Screenshot `PageHeader` eyebrow: belum dilakukan.
-- [ ] Root `pnpm typecheck`, `pnpm test` penuh: belum dijalankan setelah CR-046.
+- [x] Screenshot `PageHeader` eyebrow: terlihat di screenshot verifikasi CR-049 (clinic dan crm, dark dan light), teks terbaca.
+- [x] Root `pnpm typecheck`: hanya 12 error baseline `flow-editor.test.tsx`. `pnpm test`: tokens 10/10; ui 707/707 pada run kedua (run pertama 1 tes `FileUpload` drag handles gagal, lulus 18/18 saat dijalankan sendiri, flaky).
 
 ## Keputusan
 
@@ -37,7 +37,7 @@
 ## Design System Checks
 
 - [x] Teks kecil tidak memakai `text-highlight` (aturan `visual-language.md`).
-- [ ] Kontras diverifikasi ulang setelah perubahan.
+- [x] Kontras diverifikasi ulang setelah perubahan (16 kombinasi tema × mode, lihat di atas).
 
 ## Eksekusi
 
