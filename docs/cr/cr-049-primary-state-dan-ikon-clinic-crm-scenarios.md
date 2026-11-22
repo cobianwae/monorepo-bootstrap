@@ -30,7 +30,8 @@
 - [x] `visual-language-guard` hijau 4/4.
 - [x] Screenshot `clinic/pos` dark (Atelier/Pulse): tender terpilih terbaca, tidak ada teks terpotong.
 - [x] Verifikasi visual (Atelier/Pulse, 1440px, jeda 9 detik agar data termuat): `clinic/registration` light; `clinic/patients` light; `clinic` dark; `crm` dark dan light (chart tampil penuh); `crm/ai` light (tab terpilih memakai permukaan background + shadow). Semua rapi, tidak ada teks terpotong.
-- [ ] Belum diambil: `clinic` light, `clinic/registration` dark, `crm/ai` dark, `clinic/patients` dark, `crm/leads` (terisi), dan clinic ai drawer (interaksi buka).
+- [x] Tambahan: `clinic` light, `clinic/registration` dark, `crm/ai` dark, `clinic/patients` dark, `crm/leads` light (kanban terisi). Semua rapi.
+- [x] Clinic AI drawer (light, Atelier/Pulse): dibuka lewat klik skrip; rapi, tombol dan badge terbaca.
 - Catatan metode: jeda 3,5 detik membuat chart CRM kosong dan halaman dark tertangkap skeleton. Jeda 9 detik menyelesaikan keduanya; ini bukan regresi CR-049.
 
 ## Keputusan
@@ -49,4 +50,4 @@
 ## Eksekusi
 
 Branch: `visual-polish`
-Commit: `refactor: state terpilih dan ikon dekoratif ke highlight di clinic, crm, scenarios [CR-049]`
+Commit: `refactor: state terpilih dan ikon dekoratif ke highlight di clinic, crm, scenarios [CR-049]` (e2d7711). Verifikasi visual: Atelier/Pulse dark dan light untuk 10 halaman/komponen, jeda 9 detik (b9ce041 dan commit berikut).
