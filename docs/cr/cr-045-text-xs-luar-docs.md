@@ -31,7 +31,8 @@ Total 154 kemunculan di 33 file (sudah dicek ulang: 0 sisa di `apps/showcase/src
 - [x] Guard diperluas ke seluruh `src`; `visual-language-guard` hijau 4/4.
 - [x] `pnpm --filter @ds/showcase lint` hijau (exit 0).
 - [x] `pnpm --filter @ds/showcase build:types` hijau (exit 0).
-- [ ] Verifikasi visual: `text-xs` (12px) lebih besar dari 10/11px. Risiko: badge `h-4`/`h-3.5`, tombol kecil `h-6`, label grid sempit, dan teks yang terpotong. **Belum diverifikasi** lewat screenshot dalam sesi ini.
+- [x] Verifikasi visual sebagian: `clinic/patients` (dark, Atelier/Pulse). Regresi ditemukan: nilai berat di kolom Weight Trajectory dan BMI/Status terbungkus. Diperbaiki dengan `whitespace-nowrap` pada dua baris flex (`app/(clinic)/clinic/patients/page.tsx`, lihat Eksekusi).
+- [ ] Verifikasi visual halaman lain di area ini (crm/leads terisi, clinic lainnya, landing, scenario), terutama badge `h-4`/`h-3.5`, tombol `h-6`, label grid sempit. **Belum diverifikasi.**
 - [ ] `pnpm -C apps/showcase build` belum dijalankan di folder asli (dev server :4000 menimpa `.next`).
 
 ## Keputusan
@@ -55,4 +56,4 @@ Total 154 kemunculan di 33 file (sudah dicek ulang: 0 sisa di `apps/showcase/src
 ## Eksekusi
 
 Branch: `visual-polish`
-Commit: `refactor: text-xs di luar docs [CR-045]` (dibuat setelah verifikasi).
+Commit: `refactor: text-xs di luar docs [CR-045]` (4969a01) dan `fix: cegah wrap nilai berat dan BMI di tabel patients [CR-045]` (perbaikan regresi visual, lihat Tasks).
