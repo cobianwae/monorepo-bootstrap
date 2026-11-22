@@ -32,6 +32,7 @@ const RULES: Rule[] = [
     id: 'manual-heading-lg-bold',
     pattern: /<h[23] className="text-lg font-bold/,
     hint: 'text-lg bukan heading. Pakai <SectionHeading /> (Heading 2/3).',
+    root: DOCS,
   },
   {
     id: 'manual-section-heading',
@@ -96,6 +97,7 @@ const foundationFiles = collectPages(FOUNDATIONS);
 const docsFiles = collectPages(DOCS);
 const sourceFiles = collectSources(SRC);
 const foundationRules = RULES.filter((rule) => rule.root === undefined);
+const docsRules = RULES.filter((rule) => rule.root === DOCS);
 const sourceRules = RULES.filter((rule) => rule.root === SRC);
 
 describe('visual-language guard — halaman docs', () => {
@@ -106,6 +108,10 @@ describe('visual-language guard — halaman docs', () => {
 
   it('foundations tidak melanggar aturan visual-language', () => {
     expect(findViolations(foundationFiles, foundationRules)).toEqual([]);
+  });
+
+  it('seluruh app/(docs) tidak memakai text-lg font-bold sebagai heading (CR-051)', () => {
+    expect(findViolations(docsFiles, docsRules)).toEqual([]);
   });
 
   it('seluruh src (non-test .tsx) tidak memakai text-[Npx] (CR-045)', () => {

@@ -17,6 +17,7 @@ import {
   BookOpen,
 } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
+import { SectionHeading } from '../../../components/section-heading';
 
 export default function GuidelinesPage() {
   return (
@@ -130,7 +131,7 @@ export default function GuidelinesPage() {
 
       {/* Do's and Don'ts Table */}
       <div className="space-y-4">
-        <h2 className="text-lg font-bold text-foreground">Visual Do&apos;s & Don&apos;ts</h2>
+        <SectionHeading title="Visual Do&apos;s & Don&apos;ts" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card className="border-success/30 bg-success/5">
