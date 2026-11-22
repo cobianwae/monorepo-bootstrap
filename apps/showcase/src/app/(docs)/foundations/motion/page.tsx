@@ -153,9 +153,9 @@ export default function MotionPage() {
         <Card className="border-border">
           <CardContent className="p-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { dir: 'Slide In (from left)', from: '-translate-x-24 opacity-0', to: 'translate-x-0 opacity-100' },
-              { dir: 'Slide Up (bottom)', from: 'translate-y-8 opacity-0', to: 'translate-y-0 opacity-100' },
-              { dir: 'Scale Fade (modal)', from: 'scale-90 opacity-0', to: 'scale-100 opacity-100' },
+              { dir: 'Slide In (from left)', from: '-translate-x-24', to: 'translate-x-0' },
+              { dir: 'Slide Up (bottom)', from: 'translate-y-4', to: 'translate-y-0' },
+              { dir: 'Scale Fade (modal)', from: 'scale-90 opacity-60', to: 'scale-100 opacity-100' },
             ].map((item) => (
               <div
                 key={item.dir}
