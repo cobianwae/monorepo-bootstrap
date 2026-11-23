@@ -74,7 +74,7 @@ export default function ThemesPage() {
       <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 max-w-xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-highlight/30 bg-highlight/10 px-3 py-1 text-xs font-semibold text-highlight font-mono">
+            <div className="inline-flex items-center gap-2 rounded-full border border-highlight/30 bg-highlight/10 px-3 py-1 text-xs font-semibold text-foreground font-mono">
               <Sparkles className="h-3 w-3" />
               <span>ACTIVE ART DIRECTION: {activeDirectionDef.name.toUpperCase()}</span>
             </div>
@@ -127,7 +127,7 @@ export default function ThemesPage() {
                 <Button size="sm" className="flex-1 font-medium">
                   Primary Action
                 </Button>
-                <Button size="sm" variant="outline" className="border-highlight text-highlight hover:bg-highlight hover:text-highlight-foreground">
+                <Button size="sm" variant="outline" className="border-highlight text-foreground hover:bg-highlight hover:text-highlight-foreground">
                   Highlight
                 </Button>
               </div>

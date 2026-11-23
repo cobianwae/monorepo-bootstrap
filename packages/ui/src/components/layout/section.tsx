@@ -106,7 +106,7 @@ export const SectionHeader = React.forwardRef<HTMLDivElement, SectionHeaderProps
         {eyebrow && (
           <div
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-full border border-highlight/30 bg-highlight/10 px-3 py-0.5 text-xs font-semibold text-highlight font-mono tracking-wide',
+              'inline-flex items-center gap-1.5 rounded-full border border-highlight/30 bg-highlight/10 px-3 py-0.5 text-xs font-semibold text-foreground font-mono tracking-wide',
               align === 'center' && 'mx-auto'
             )}
           >

@@ -385,7 +385,7 @@ export default function BillingPage() {
                       <span
                         className={cn(
                           'font-mono text-xs',
-                          row.near ? 'font-semibold text-highlight' : 'text-muted-foreground'
+                          row.near ? 'font-semibold text-foreground' : 'text-muted-foreground'
                         )}
                       >
                         {row.used} / {row.limit}
@@ -400,7 +400,7 @@ export default function BillingPage() {
                     <span
                       className={cn(
                         'w-9 shrink-0 text-right font-mono text-xs font-medium',
-                        row.near ? 'text-highlight' : 'text-muted-foreground'
+                        row.near ? 'text-foreground' : 'text-muted-foreground'
                       )}
                     >
                       {row.percent}%

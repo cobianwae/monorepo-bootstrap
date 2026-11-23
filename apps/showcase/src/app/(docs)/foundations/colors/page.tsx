@@ -60,7 +60,7 @@ export default function ColorsPage() {
         }
         actions={
           <Link href="/foundations/themes">
-            <Button variant="outline" size="sm" className="gap-2 border-highlight/30 text-highlight hover:bg-highlight hover:text-highlight-foreground">
+            <Button variant="outline" size="sm" className="gap-2 border-highlight/30 text-foreground hover:bg-highlight hover:text-highlight-foreground">
               <Palette className="h-3.5 w-3.5" />
               <span>Explore 3 Art Directions</span>
               <ArrowRight className="h-3 w-3" />

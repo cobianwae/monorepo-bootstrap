@@ -65,7 +65,7 @@ export default function BreakpointsPage() {
             return (
               <Card key={bp.name} className="border-border">
                 <CardContent className="p-4 flex items-center gap-4">
-                  <span className="w-12 shrink-0 font-mono text-xs font-bold text-highlight">{bp.name}</span>
+                  <span className="w-12 shrink-0 font-mono text-xs font-bold text-foreground">{bp.name}</span>
                   <span className="w-24 shrink-0 font-mono text-xs text-muted-foreground">{bp.value}</span>
                   <div className="h-6 flex-1 rounded-md bg-muted/60 overflow-hidden">
                     <div
@@ -131,7 +131,7 @@ export default function BreakpointsPage() {
               <tbody className="divide-y divide-border/50 font-mono">
                 {Object.entries(Z_INDEX_TOKENS).map(([name, value]) => (
                   <tr key={name}>
-                    <td className="py-2.5 pr-4 text-highlight font-bold">{name}</td>
+                    <td className="py-2.5 pr-4 text-foreground font-bold">{name}</td>
                     <td className="py-2.5 pr-4 text-muted-foreground">{value}</td>
                     <td className="py-2.5 text-muted-foreground font-sans">{zUsage(name)}</td>
                   </tr>

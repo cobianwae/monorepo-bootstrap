@@ -35,6 +35,13 @@ const RULES: Rule[] = [
     root: DOCS,
   },
   {
+    id: 'small-text-highlight',
+    // text-highlight default (bukan text-highlight-foreground, bukan hover:/group-hover:) pada baris yang juga memuat text-xs/text-sm.
+    pattern: /^(?=.*(?<![\w:/-])text-highlight(?![\w/-]))(?=.*\btext-(?:xs|sm)\b)/,
+    hint: 'Teks di bawah 18,5px bold tidak memakai text-highlight (kontras 4,5:1 gagal). Pakai text-foreground/text-primary; highlight untuk ikon/border/tint (CR-055).',
+    root: DOCS,
+  },
+  {
     id: 'manual-section-heading',
     pattern: /<h2 className="text-2xl font-bold/,
     hint: 'Heading section ditulis lewat <SectionHeading />, bukan class manual.',
@@ -110,7 +117,7 @@ describe('visual-language guard — halaman docs', () => {
     expect(findViolations(foundationFiles, foundationRules)).toEqual([]);
   });
 
-  it('seluruh app/(docs) tidak memakai text-lg font-bold sebagai heading (CR-051)', () => {
+  it('seluruh app/(docs) tidak melanggar pola heading dan teks kecil (CR-051, CR-055)', () => {
     expect(findViolations(docsFiles, docsRules)).toEqual([]);
   });
 
