@@ -131,7 +131,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-067 | Uplift halaman Org Chart Studio: demo-first, segmented control, CodeBlock resep, copy English; done dan di-merge ke `visual-polish` | done | `docs/cr/cr-067-org-chart-studio-page-uplift.md` |
 | CR-068 | Org Chart Studio: poles demo (search di state non-data, reset seed, klaim dari data, toast Loading) dan section keyboard (sub-heading, `<kbd>`); 2 cluster A/B | done | `docs/cr/cr-068-org-chart-studio-demo-polish.md` |
 | CR-069 | OrgChartStudio: seluruh copy runtime (label, dialog, toast, live region, pesan validasi, default `emptyActionLabel`) ke English + update test; 4 cluster A–D | done | `docs/cr/cr-069-org-chart-studio-english-copy.md` |
-| CR-070 | CodeBlock syntax highlighting (Shiki): dual-theme light/dark + audit kontras + fallback flat; approved, implementasi selesai | approved | `docs/cr/cr-070-codeblock-shiki-highlighting.md` |
+| CR-070 | CodeBlock syntax highlighting (Shiki): dual-theme light/dark + audit kontras + fallback flat; done atas persetujuan user, visual browser belum diverifikasi | done | `docs/cr/cr-070-codeblock-shiki-highlighting.md` |
 
 ## Catatan
 

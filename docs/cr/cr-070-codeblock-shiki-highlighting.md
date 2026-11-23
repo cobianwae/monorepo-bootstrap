@@ -1,6 +1,6 @@
 # CR-070 — CodeBlock syntax highlighting (Shiki)
 
-**Status:** approved (ditetapkan user 2026-11-23; implementasi selesai, menunggu review user)
+**Status:** done (ditetapkan user 2026-11-23)
 **Sumber:** diskusi user 2026-11-23 ("kok kita flat gitu")
 **Ref:** `packages/ui/src/components/data-display/code-block.tsx:127`, `packages/ui/package.json`, `docs/prd/013-diff-viewer.md FR-003`
 
