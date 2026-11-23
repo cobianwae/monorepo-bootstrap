@@ -23,8 +23,8 @@
 
 ## Tasks
 
-- [ ] Reproduksi manual di `/patterns/product-tour`: buka tur → Esc/Lewati di progres > 1 → pastikan dialog di atas backdrop dan bisa diklik. *(belum dilakukan di browser; lihat catatan eksekusi)*
-- [x] Implementasi perbaikan stacking dialog vs overlay driver (`body[data-tour-confirm]` menyembunyikan `.driver-layer` selama dialog terbuka).
+- [x] Reproduksi manual di `/patterns/product-tour`: klik `Ya, lewati` semula mengenai SVG backdrop. Sesudah perbaikan, klik `Lanjut tur` dan `Ya, lewati` berhasil di Chrome light/dark.
+- [x] Perbaiki stacking dialog vs overlay driver: sembunyikan overlay/popover langsung di `body` maupun `.driver-layer`; pulihkan pointer events untuk tombol dialog.
 - [x] Perbaiki selector + logika `inert` (`.driver-layer`, `[data-tour-layer]`; inert saudara di tiap tingkat dari root tur). Tes unit lulus; verifikasi di browser belum.
 - [x] Tambah `:focus-visible` ring tombol popover (`outline 2px solid var(--primary)`, offset 2). Uji keyboard penuh + SR belum.
 - [ ] Audit visual backdrop light/dark; sesuaikan opacity bila perlu. *(`overlayOpacity` 0.8 → 0.6, override `.driver-overlay` dihapus; belum diaudit visual)*
@@ -54,10 +54,11 @@ Branch: `cr-017-tour-dialog-backdrop`
 Commit: `fix: dialog lewati tur di atas backdrop overlay [CR-017]`
 
 - [x] CR disetujui user.
-- [x] Branch dibuat (`cr-017-tour-dialog-backdrop` dari `visual-polish` `ff07432`).
+- [x] Branch dibuat (`cr-017-tour-dialog-backdrop` dari `visual-polish` `80862a5`).
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan (`tour.test.tsx` 19/19; overlay 30/30; typecheck: 12 error baseline FlowEditor, tidak ada di tour; `pnpm lint` lulus).
-- [ ] Verifikasi browser: stacking dialog di atas backdrop (light/dark), inert pada showcase, fokus keyboard + SR. Belum dilakukan; status CR tetap `approved`.
+- [x] Verifikasi Chrome light/dark: Lanjut, Kembali, buka dialog, batal dan konfirmasi memakai klik browser; fokus kembali ke judul popover atau pemicu sesuai aksi. Kontrol halaman tetap tidak aktif selama tur.
+- [ ] Audit visual opacity dan uji pembaca layar. Status CR tetap `approved`.
 - [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
 - [ ] `docs/STATUS.md` diperbarui bila relevan.
 - [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.

@@ -10,9 +10,16 @@
  * Jangan menambah background pada `.driver-overlay` (SVG): itu menumpuk redup ganda (CR-017).
  */
 
-/* Dialog "Lewati tur?" (Radix, DOM biasa) harus tampil di atas lapisan driver.js (top layer, CR-017). */
-body[data-tour-confirm='true'] .driver-layer {
+/* driver.js meletakkan overlay/popover di body, atau di lapisan khusus saat target di dialog. */
+body[data-tour-confirm='true'] .driver-layer,
+body[data-tour-confirm='true'] > .driver-overlay,
+body[data-tour-confirm='true'] > .ds-tour-popover {
   display: none;
+}
+
+/* Driver menonaktifkan pointer di luar popover, termasuk tombol konfirmasi Radix. */
+body[data-tour-confirm='true'] [data-tour-confirm-dialog] button:not(:disabled) {
+  pointer-events: auto;
 }
 
 .driver-active-element {
@@ -46,7 +53,8 @@ body[data-tour-confirm='true'] .driver-layer {
 }
 
 /* Fokus keyboard tombol popover harus terlihat (§4/§6, CR-017). */
-.ds-tour-popover .driver-popover-footer button:focus-visible {
+.ds-tour-popover .driver-popover-footer button:focus-visible,
+.ds-tour-popover .driver-popover-close-btn:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }

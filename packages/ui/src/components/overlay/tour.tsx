@@ -71,7 +71,7 @@ function setDriverButtonsDisabled(disabled: boolean): void {
  * Lapisan tur yang tidak boleh di-inert: `.driver-layer` (DOM nyata driver.js 1.14, top layer)
  * dan `[data-tour-layer]` (root tur + dialog konfirmasi; Radix Portal tidak memberi atribut sendiri).
  */
-const LAYER_SELECTORS = ['.driver-layer', '[data-tour-layer]'];
+const LAYER_SELECTORS = ['.driver-layer', '.driver-overlay', '#driver-popover-content', '[data-tour-layer]'];
 
 function isTourLayer(el: Element): boolean {
   return LAYER_SELECTORS.some((sel) => el.matches(sel) || el.querySelector(sel) !== null);
@@ -174,6 +174,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
       setLoading(false);
       setDriverButtonsDisabled(false);
       driverRef.current?.destroy();
+      setBackgroundInert(false, null);
       setEnded('finished');
       restoreFocus();
       callbacks.current.onFinish?.(status);
@@ -189,6 +190,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
       setDriverButtonsDisabled(false);
       setConfirmOpen(false);
       driverRef.current?.destroy();
+      setBackgroundInert(false, null);
       setEnded('skipped');
       restoreFocus();
       callbacks.current.onSkip?.(status, atIndex);
@@ -517,7 +519,16 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
             : `Langkah ${safeActive + 1} dari ${stepCount}: ${current.title}${notice ? ` ${notice}` : ''}`}
       </div>
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent data-testid="tour-skip-dialog" data-tour-layer>
+        <AlertDialogContent
+          data-testid="tour-skip-dialog"
+          data-tour-layer
+          data-tour-confirm-dialog
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            if (settledRef.current) restoreFocus();
+            else focusPopoverTitle();
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Lewati tur?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -525,14 +536,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                setConfirmOpen(false);
-                focusPopoverTitle();
-              }}
-            >
-              Lanjut tur
-            </AlertDialogCancel>
+            <AlertDialogCancel>Lanjut tur</AlertDialogCancel>
             <AlertDialogAction onClick={() => skipTour(statusRef.current, activeIndexRef.current)}>
               Ya, lewati
             </AlertDialogAction>

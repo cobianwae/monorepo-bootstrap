@@ -331,7 +331,9 @@ describe('Tour 017-02 (target hilang + keyboard + motion + states)', () => {
   it('CR-017: CSS backdrop tunggal dan ring fokus tombol popover', () => {
     const css = readFileSync(`${import.meta.dirname}/tour.css`, 'utf8');
     expect(css).not.toMatch(/\.driver-overlay\s*\{[^}]*background-color/);
-    expect(css).toMatch(/\.driver-popover-footer button:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--primary\)/);
+    expect(css).toMatch(/\.driver-popover-footer button:focus-visible,[^{]*\.driver-popover-close-btn:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--primary\)/);
+    expect(css).toMatch(/>\s*\.driver-overlay,[^{]*>\s*\.ds-tour-popover\s*\{[^}]*display:\s*none/);
+    expect(css).toMatch(/\[data-tour-confirm-dialog\] button:not\(:disabled\)\s*\{[^}]*pointer-events:\s*auto/);
   });
 
   it('AC-03: Tab cycling di footer popover', async () => {
