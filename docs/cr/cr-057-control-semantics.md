@@ -19,27 +19,34 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Rekonsiliasi daftar lokasi dalam laporan kode; reproduksi dengan keyboard.
-- [ ] Implementasikan role/state/aktivasi/fokus tanpa duplikasi kontrol.
-- [ ] Uji Enter/Space/Tab, selected state, relasi header dan total/index virtual; screen reader best-effort.
-- [ ] Regression tests dan verifikasi sesuai konvensi.
+- [x] Rekonsiliasi daftar lokasi dalam laporan kode; reproduksi dengan keyboard.
+- [x] Implementasikan role/state/aktivasi/fokus tanpa duplikasi kontrol.
+- [x] Uji Enter/Space/Tab, selected state, relasi header dan total/index virtual; screen reader best-effort.
+- [x] Regression tests dan verifikasi sesuai konvensi.
 
 ## Keputusan
 
 | # | Keputusan | Alasan |
 |---|---|---|
 | 1 | Tidak menambah role grid saja | Role tanpa model keyboard tidak menyelesaikan aksesibilitas. |
+| 2 | C10 memakai pola ARIA table (`role="table"`, `rowgroup`, `row`, `columnheader`, `cell`, `aria-rowcount`/`aria-rowindex`) di atas div, bukan `<table>` native | Baris virtual diposisikan absolut; `<table>` native tidak cocok dengan jendela render. Tanpa roving focus, sehingga tidak mengklaim model grid. |
+| 3 | Kartu selectable/interaktif dan lead memakai `role="button"` + `tabIndex={0}` + Enter/Space; kartu selectable memakai `aria-pressed` | Perubahan hanya di halaman showcase; API `Card` tidak diubah (props HTML diteruskan). |
+| 4 | Checkbox komorbiditas dibungkus `<label>` dengan `onCheckedChange` | Nama checkbox berasal dari label; klik label dan checkbox tidak dobel-toggle. |
+| 5 | Status read/unread di notifikasi sebagai teks `sr-only` (tanpa `aria-pressed`) | Label tombol tetap stabil; state tidak hanya warna. |
+
+Catatan: `apps/showcase/src/app/(clinic)/clinic/registration/page.tsx` tidak bisa dimuat di Vitest karena alias `@/` tidak ada di `vitest.config.ts` (ada di `tsconfig.json`). Test registration dibatalkan; perubahan checkbox diverifikasi lewat typecheck/lint/build. Menambah alias ke konfigurasi test butuh konfirmasi.
 
 ## Design System Checks
 
-- [ ] Token/kontras, Radix/a11y, API/export dan state konsisten; showcase diperbarui.
-- [ ] Typecheck/lint/test diverifikasi; baseline dicatat.
+- [x] Token/kontras, Radix/a11y, API/export dan state konsisten; showcase diperbarui. Tidak ada perubahan `packages/ui`.
+- [x] Typecheck/lint/test diverifikasi; baseline dicatat: 12 error FlowEditor (`packages/ui/src/components/canvas/flow-editor.test.tsx`), showcase `tsc` 0 error, lint hijau, showcase test 90/90 (20 file), build showcase sukses.
 
 ## Eksekusi
 
-Branch: `cr-057-control-semantics`
+Branch: `cr-057-control-semantics` (worktree `arah-story`, dari `visual-polish` `4cc9f3e`)
 Commit: `fix: expose control and table semantics [CR-057]`
 
 - [x] Disetujui user (2026-11-23).
-- [ ] Branch dibuat; implementasi dan verifikasi.
-- [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.
+- [x] Branch dibuat; implementasi dan verifikasi.
+- [x] Test baru: `virtualized-list/page.test.tsx`, `notifications/page.test.tsx`, `components/data-display/page.test.tsx`.
+- [ ] Status `done` menunggu user.

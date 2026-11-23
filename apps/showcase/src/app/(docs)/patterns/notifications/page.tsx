@@ -181,7 +181,14 @@ export default function NotificationCenterPage() {
             <div className="min-w-0 flex-1 space-y-0.5">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-medium text-foreground">{n.title}</span>
-                {!n.read && <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />}
+                {n.read ? (
+                  <span className="sr-only">Read</span>
+                ) : (
+                  <>
+                    <span className="sr-only">Unread</span>
+                    <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-primary" />
+                  </>
+                )}
               </div>
               <p className="text-xs text-muted-foreground">{n.description}</p>
               <div className="flex items-center gap-2 pt-0.5">

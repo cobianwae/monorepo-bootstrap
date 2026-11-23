@@ -464,10 +464,19 @@ export default function LeadsPage() {
             <HoverCard>
               <HoverCardTrigger asChild>
                 <div
+                  role="button"
+                  tabIndex={0}
                   className="flex items-center gap-3 py-1 cursor-pointer group"
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedLeadId(lead.id);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedLeadId(lead.id);
+                    }
                   }}
                 >
                   <Avatar className="h-8 w-8 border border-border group-hover:border-primary transition-colors">
@@ -932,7 +941,15 @@ export default function LeadsPage() {
                   <ContextMenu key={lead.id}>
                     <ContextMenuTrigger asChild>
                       <div
+                        role="button"
+                        tabIndex={0}
                         onClick={() => setSelectedLeadId(lead.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setSelectedLeadId(lead.id);
+                          }
+                        }}
                         className="rounded-lg border border-border bg-card p-3.5 shadow-xs hover:shadow-md hover:border-foreground/30 transition-all cursor-pointer space-y-2.5 group"
                       >
                         <div className="flex items-start justify-between gap-1.5">

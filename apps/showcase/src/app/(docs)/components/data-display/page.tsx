@@ -455,7 +455,18 @@ export default function DataDisplayPage() {
             </CardContent>
           </Card>
 
-          <Card variant="interactive" onClick={() => toast({ title: 'Interactive Card Clicked' })}>
+          <Card
+            variant="interactive"
+            role="button"
+            tabIndex={0}
+            onClick={() => toast({ title: 'Interactive Card Clicked' })}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toast({ title: 'Interactive Card Clicked' });
+              }
+            }}
+          >
             <CardHeader>
               <CardTitle className="text-base flex items-center gap-2">
                 <Zap className="h-4 w-4 text-highlight" />
@@ -486,7 +497,16 @@ export default function DataDisplayPage() {
           <Card
             variant="selectable"
             selected={selectedCard === 'card-1'}
+            role="button"
+            tabIndex={0}
+            aria-pressed={selectedCard === 'card-1'}
             onClick={() => setSelectedCard('card-1')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setSelectedCard('card-1');
+              }
+            }}
           >
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -502,7 +522,16 @@ export default function DataDisplayPage() {
           <Card
             variant="selectable"
             selected={selectedCard === 'card-2'}
+            role="button"
+            tabIndex={0}
+            aria-pressed={selectedCard === 'card-2'}
             onClick={() => setSelectedCard('card-2')}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setSelectedCard('card-2');
+              }
+            }}
           >
             <CardHeader>
               <div className="flex items-center justify-between">
