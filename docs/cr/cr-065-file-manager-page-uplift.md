@@ -1,6 +1,6 @@
 # CR-065 — Uplift halaman File Manager: struktur, kontrol demo, dan copy English
 
-**Status:** approved
+**Status:** done
 **Sumber:** visual uplift (`/polish-ui`), audit gap vs `docs/design/visual-language.md` (approved 2026-11-23)
 **Ref:** `apps/showcase/src/app/(docs)/patterns/file-manager/page.tsx`, acuan pola `apps/showcase/src/app/(docs)/components/data-display/page.tsx`, `docs/design/file-manager.md`, temuan terkait `docs/cr/cr-053-audit-visual-components-patterns.md:44`, `docs/reviews/cr-054-visual-audit.md:255`
 
@@ -77,6 +77,6 @@ Commit: `refactor: uplift halaman file manager [CR-065]`
 - [x] Branch dibuat (worktree `arah-cr`, dari `visual-polish` `730887b`).
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
