@@ -1,6 +1,6 @@
 # CR-068 — Org Chart Studio: poles perilaku demo dan section keyboard
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit `/improve-ui` pada `apps/showcase/src/app/(docs)/patterns/org-chart-studio/page.tsx`, tindak lanjut CR-067
 **Ref:** `apps/showcase/src/app/(docs)/patterns/org-chart-studio/page.tsx` + `_components/*`, `docs/cr/cr-067-org-chart-studio-page-uplift.md`, `docs/design/visual-language.md`
 
@@ -86,6 +86,6 @@ Commit: `refactor: poles demo dan section keyboard org chart studio [CR-068]`
 - [x] Branch dibuat (`cr-068-org-chart-studio-demo-polish` dari `visual-polish`, worktree `arah-story`).
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan (lihat Tasks).
-- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui (status kini `approved`; `done` oleh user).
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui (status kini `done` atas persetujuan user).
 - [x] `docs/STATUS.md` diperbarui bila relevan.
 - [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
