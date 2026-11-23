@@ -1,15 +1,15 @@
 import { SectionHeading } from '../../../../../components/section-heading';
 
-const SHORTCUTS: Array<{ keys: string; action: string }> = [
-  { keys: 'Tab', action: 'Focus order: toolbar → search → canvas → cards and handles → controls → panel → accessible tree' },
-  { keys: '← ↑ ↓ →', action: 'Pan the canvas by 40px (when the viewport has focus)' },
-  { keys: '+ − 0 F', action: 'Zoom in, zoom out, reset to 100%, fit view' },
-  { keys: 'Enter', action: 'Select the focused card' },
-  { keys: 'Shift+Enter', action: 'Open the detail panel for the focused card' },
-  { keys: 'F2 / Ctrl+Enter', action: 'Rename the focused card inline (Enter saves, Esc cancels)' },
-  { keys: 'Space', action: 'Expand or collapse the focused card' },
-  { keys: 'Delete', action: 'Delete the focused card after confirmation (the root is protected)' },
-  { keys: 'Ctrl+Z / Ctrl+Y', action: 'Undo or redo (up to 50 steps; toolbar and live region stay in sync)' },
+const SHORTCUTS: Array<{ combos: string[][]; action: string }> = [
+  { combos: [['Tab']], action: 'Focus order: toolbar → search → canvas → cards and handles → controls → panel → accessible tree' },
+  { combos: [['←'], ['↑'], ['↓'], ['→']], action: 'Pan the canvas by 40px (when the viewport has focus)' },
+  { combos: [['+'], ['−'], ['0'], ['F']], action: 'Zoom in, zoom out, reset to 100%, fit view' },
+  { combos: [['Enter']], action: 'Select the focused card' },
+  { combos: [['Shift', 'Enter']], action: 'Open the detail panel for the focused card' },
+  { combos: [['F2'], ['Ctrl', 'Enter']], action: 'Rename the focused card inline (Enter saves, Esc cancels)' },
+  { combos: [['Space']], action: 'Expand or collapse the focused card' },
+  { combos: [['Delete']], action: 'Delete the focused card after confirmation (the root is protected)' },
+  { combos: [['Ctrl', 'Z'], ['Ctrl', 'Y']], action: 'Undo or redo (up to 50 steps; toolbar and live region stay in sync)' },
 ];
 
 const A11Y_NOTES: Array<{ title: string; detail: string }> = [
@@ -34,18 +34,34 @@ const A11Y_NOTES: Array<{ title: string; detail: string }> = [
   },
 ];
 
+const KBD_CLASS = 'rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs text-foreground';
+
 export function StudioShortcuts() {
   return (
     <section id="keyboard-a11y" aria-labelledby="org-studio-shortcuts" className="space-y-4 scroll-mt-20">
       <SectionHeading id="org-studio-shortcuts" title="Keyboard & accessibility" />
+      <h3 className="text-xl font-bold font-display text-foreground">Keyboard shortcuts</h3>
       <dl className="grid gap-2 sm:grid-cols-2">
         {SHORTCUTS.map((row) => (
-          <div key={row.keys} className="rounded-md border border-border bg-card p-3">
-            <dt className="font-mono text-sm font-medium text-foreground">{row.keys}</dt>
+          <div key={row.action} className="rounded-md border border-border bg-card p-3">
+            <dt className="flex flex-wrap items-center gap-1 text-sm font-medium text-foreground">
+              {row.combos.map((combo, comboIndex) => (
+                <span key={combo.join('+')} className="flex items-center gap-1">
+                  {comboIndex > 0 ? <span aria-hidden="true" className="text-muted-foreground">/</span> : null}
+                  {combo.map((key, keyIndex) => (
+                    <span key={key} className="flex items-center gap-1">
+                      {keyIndex > 0 ? <span aria-hidden="true" className="text-muted-foreground">+</span> : null}
+                      <kbd className={KBD_CLASS}>{key}</kbd>
+                    </span>
+                  ))}
+                </span>
+              ))}
+            </dt>
             <dd className="mt-1 text-sm text-muted-foreground">{row.action}</dd>
           </div>
         ))}
       </dl>
+      <h3 className="text-xl font-bold font-display text-foreground">Accessibility notes</h3>
       <ul className="grid gap-3 sm:grid-cols-2">
         {A11Y_NOTES.map((note) => (
           <li key={note.title} className="rounded-md border border-border bg-card p-3">
