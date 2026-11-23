@@ -68,6 +68,20 @@ function mockReducedMotion(matches: boolean) {
   });
 }
 
+/** CR-018: bedakan query responsif <md (§5) dari reduced-motion (K5). */
+function mockMediaQuery(opts: { narrow?: boolean; reduced?: boolean } = {}) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes('767px') ? !!opts.narrow : !!opts.reduced,
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })),
+  });
+}
+
 describe('Tour (017-01 fondasi)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -345,5 +359,50 @@ describe('Tour 017-02 (target hilang + keyboard + motion + states)', () => {
     await settle();
     expect(screen.getByTestId('tour-announcer').getAttribute('aria-busy')).toBeNull();
     expect(document.querySelector('#qn')?.getAttribute('disabled')).toBeNull();
+  });
+});
+
+describe('Tour CR-018 (varian §2.5 + responsif §5)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    document.body.innerHTML = '';
+    mockMediaQuery();
+  });
+
+  it('varian default: stagePadding 8 + popoverClass ds-tour-popover (backward-compat)', () => {
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} />);
+    expect(mockDriver).toHaveBeenCalledTimes(1);
+    expect(getDriverConfig().stagePadding).toBe(8);
+    expect(getDriverConfig().popoverClass).toBe('ds-tour-popover');
+    expect(getPassedSteps()[0].popover?.popoverClass).toBe('ds-tour-popover');
+  });
+
+  it('varian spotlight tight: stagePadding 4', () => {
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} spotlight="tight" />);
+    expect(getDriverConfig().stagePadding).toBe(4);
+  });
+
+  it('spotlight auto: viewport <md → tight', () => {
+    mockMediaQuery({ narrow: true });
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} />);
+    expect(getDriverConfig().stagePadding).toBe(4);
+  });
+
+  it('spotlight eksplisit default menang atas auto <md', () => {
+    mockMediaQuery({ narrow: true });
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} spotlight="default" />);
+    expect(getDriverConfig().stagePadding).toBe(8);
+  });
+
+  it('varian popover compact: class popover compact di config + tiap langkah', () => {
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} popover="compact" />);
+    expect(getDriverConfig().popoverClass).toContain('ds-tour-popover-compact');
+    expect(getPassedSteps()[0].popover?.popoverClass).toContain('ds-tour-popover-compact');
+    expect(getPassedSteps()[4].popover?.popoverClass).toContain('ds-tour-popover-compact');
   });
 });

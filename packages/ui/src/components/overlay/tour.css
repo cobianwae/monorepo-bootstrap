@@ -23,6 +23,23 @@
   max-width: 320px;
 }
 
+/* §2.5 varian popover compact: lebar maks 260px untuk target padat. */
+.ds-tour-popover-compact.driver-popover {
+  max-width: 260px;
+}
+
+/* §5 responsif <md: popover full-width bawah (bottom-sheet), footer stacked. */
+@media (max-width: 767px) {
+  .ds-tour-popover.driver-popover {
+    max-width: calc(100vw - 32px);
+  }
+  .ds-tour-popover .driver-popover-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
 .ds-tour-popover .driver-popover-title {
   color: var(--foreground);
 }

@@ -323,11 +323,6 @@ export default function ProductTourPatternPage() {
           )}
         </CardContent>
       </Card>
-
-      <style>{`@media (max-width: 767px) {
-        .ds-tour-popover.driver-popover { max-width: calc(100vw - 32px); }
-        .ds-tour-popover .driver-popover-footer { display: flex; flex-direction: column; gap: 8px; }
-      }`}</style>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { cva } from 'class-variance-authority';
 import { driver as createDriver, type DriveStep } from 'driver.js';
 import {
   AlertDialog,
@@ -12,10 +13,36 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../feedback/alert-dialog';
-import type { TourProps, TourStepStatus, TourTarget } from './tour-types';
+import type { TourProps, TourSpotlightVariant, TourStepStatus, TourTarget } from './tour-types';
 
 /** Durasi resolusi target antar-langkah; instan bila reduced-motion (K5). */
 const TOUR_RESOLVE_MS = 200;
+
+/**
+ * Varian popover §2.5 via `cva`. Spotlight tidak lewat `cva` karena padang
+ * lubang adalah konfigurasi geometri driver.js (`stagePadding`), bukan CSS —
+ * lihat `TourProps.spotlight` di `tour-types.ts`.
+ */
+export const tourPopoverVariants = cva('ds-tour-popover', {
+  variants: {
+    popover: {
+      default: '',
+      compact: 'ds-tour-popover-compact',
+    },
+  },
+  defaultVariants: {
+    popover: 'default',
+  },
+});
+
+/** Viewport `<md` (§5): popover bottom-sheet + spotlight `tight` otomatis. */
+function isNarrowViewport(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(max-width: 767px)').matches
+  );
+}
 
 function resolveTarget(target: TourTarget): string | Element | undefined {
   if (typeof target === 'string') return target;
@@ -110,7 +137,18 @@ function prefersReducedMotion(): boolean {
  * Scope 017-02: FR-003 target hilang (K4), FR-005 keyboard + fokus + SR (K2),
  * FR-006 reduced-motion (K5), FR-007 state matrix.
  */
-export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepChange }: TourProps) {
+export function Tour({
+  steps,
+  open,
+  initialStep = 0,
+  spotlight,
+  popover = 'default',
+  onFinish,
+  onSkip,
+  onStepChange,
+}: TourProps) {
+  const effectiveSpotlight: TourSpotlightVariant = spotlight ?? (isNarrowViewport() ? 'tight' : 'default');
+  const popoverClass = tourPopoverVariants({ popover });
   const driverRef = React.useRef<ReturnType<typeof createDriver> | null>(null);
   const statusRef = React.useRef<TourStepStatus[]>([]);
   const settledRef = React.useRef(false);
@@ -328,7 +366,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
           prevBtnText: 'Kembali',
           doneBtnText: 'Selesai',
           closeBtnLabel: 'Lewati',
-          popoverClass: 'ds-tour-popover',
+          popoverClass,
           showButtons: ['next', 'previous', 'close'],
           disableButtons: index === 0 ? ['previous'] : [],
           onNextClick: () => {
@@ -389,9 +427,9 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
     const d = createDriver({
       overlayColor: 'var(--background)',
       overlayOpacity: 0.8,
-      stagePadding: 8,
+      stagePadding: effectiveSpotlight === 'tight' ? 4 : 8,
       stageRadius: 8,
-      popoverClass: 'ds-tour-popover',
+      popoverClass,
       showProgress: !isSingle,
       progressText: `${start + 1} dari ${stepCount}`,
       nextBtnText: 'Lanjut',
@@ -416,7 +454,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
       d.destroy();
       if (driverRef.current === d) driverRef.current = null;
     };
-  }, [open, stepCount, initialStep, steps, isSingle, finishTour, skipTour]);
+  }, [open, stepCount, initialStep, steps, isSingle, finishTour, skipTour, effectiveSpotlight, popoverClass]);
 
   if (!open) return null;
 
