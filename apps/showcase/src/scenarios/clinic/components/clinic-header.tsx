@@ -73,9 +73,9 @@ export function ClinicHeader({ onOpenCommandPalette }: ClinicHeaderProps) {
   const currentTitle = SECTION_TITLES[pathname] || 'Clinic System';
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 w-full items-center justify-between border-b border-border bg-background/80 px-4 md:px-6 backdrop-blur-md">
+    <header className="sticky top-0 z-20 flex h-16 w-full min-w-0 items-center justify-between gap-2 border-b border-border bg-background/80 px-4 md:px-6 backdrop-blur-md">
       {/* Left: Sidebar trigger, Collapsed Logo & Breadcrumbs */}
-      <div className="flex items-center gap-3">
+      <div className="flex min-w-0 items-center gap-3">
         <SidebarTrigger className="lg:hidden" />
 
         {/* Collapsed Navbar Logo Mark */}
@@ -109,11 +109,11 @@ export function ClinicHeader({ onOpenCommandPalette }: ClinicHeaderProps) {
       </div>
 
       {/* Right Action Toolbar */}
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 shrink-0 items-center gap-2">
         {/* Global Command Palette / Search Trigger */}
         <button
           onClick={onOpenCommandPalette}
-          className="flex h-9 items-center gap-2 rounded-lg border border-input bg-muted/40 px-3 text-xs text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-all sm:w-64 justify-between cursor-pointer"
+          className="flex h-9 min-w-0 items-center gap-2 rounded-lg border border-input bg-muted/40 px-3 text-xs text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-all sm:w-64 justify-between cursor-pointer"
         >
           <div className="flex items-center gap-2">
             <Search className="h-3.5 w-3.5 text-muted-foreground" />

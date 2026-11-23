@@ -221,7 +221,7 @@ export function TransferList({
     emptyText: string,
     listRef: React.RefObject<HTMLUListElement | null>
   ) => (
-    <section aria-labelledby={labelId} className="flex min-h-0 flex-1 flex-col gap-2">
+    <section aria-labelledby={labelId} className="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
       <div className="flex items-center justify-between gap-2">
         <h3 id={labelId} className="text-sm font-medium text-foreground">
           {panelLabel}
@@ -322,13 +322,13 @@ export function TransferList({
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         ) : null}
-        <div className="flex items-stretch gap-2">
+        <div className="flex min-w-0 w-full flex-col items-stretch gap-2 sm:flex-row">
           {renderPanel(
             'available', availableLabel, 'transfer-available', 'transfer-available-label',
             'transfer-available-search', availableQuery, setAvailableQuery, availableSearchPlaceholder,
             availableItems, visibleAvailable, availableActive, availableEmptyText, availableListRef
           )}
-          <div className="flex flex-col items-center justify-center gap-1.5" aria-hidden="true">
+          <div className="flex flex-row items-center justify-center gap-1.5 sm:flex-col" aria-hidden="true">
             <Skeleton className="h-9 w-9" />
             <Skeleton className="h-9 w-9" />
           </div>
@@ -349,13 +349,13 @@ export function TransferList({
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       ) : null}
-      <div className="flex items-stretch gap-2">
+      <div className="flex min-w-0 w-full flex-col items-stretch gap-2 sm:flex-row">
         {renderPanel(
           'available', availableLabel, 'transfer-available', 'transfer-available-label',
           'transfer-available-search', availableQuery, setAvailableQuery, availableSearchPlaceholder,
           availableItems, visibleAvailable, availableActive, availableEmptyText, availableListRef
         )}
-        <div className="flex flex-col items-center justify-center gap-1.5">
+        <div className="flex shrink-0 flex-row items-center justify-center gap-1.5 sm:flex-col">
           <Button
             type="button"
             variant="outline"

@@ -201,12 +201,12 @@ export default function ImportWizardPage() {
         description="Wizard impor CSV 4 langkah: unggah atau tempel, petakan kolom, validasi, lalu konfirmasi."
       />
 
-      <Card className="mx-auto max-w-4xl" data-testid="iw-card">
+      <Card className="mx-auto w-full min-w-0 max-w-4xl overflow-hidden" data-testid="iw-card">
         <CardHeader>
           <CardTitle>Impor anggota</CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-8">
+        <CardContent className="space-y-8 min-w-0">
           <Stepper
             aria-label="Langkah impor"
             steps={STEP_LABELS.map((title, index) => ({ id: index + 1, title }))}

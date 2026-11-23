@@ -212,19 +212,18 @@ export default function VirtualizedListPage() {
             />
           </CardContent>
         ) : (
-          <div className="p-0">
-            {/* Header */}
-            <div className={`grid grid-cols-[110px_minmax(0,1fr)_140px_110px_130px_140px] gap-3 border-b border-border/60 bg-muted/10 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-muted-foreground font-mono`}>
-              <span>SKU</span>
-              <span>Product</span>
-              <span>Category</span>
-              <span>Price</span>
-              <span>Status</span>
-              <span>Updated</span>
-            </div>
+          <div ref={parentRef} className="h-[480px] overflow-auto overscroll-contain">
+            <div className="min-w-[720px]">
+              {/* Header — sticky inside same scroller so width stays aligned */}
+              <div className="sticky top-0 z-[1] grid grid-cols-[110px_minmax(0,1fr)_140px_110px_130px_140px] gap-3 border-b border-border/60 bg-muted/10 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-muted-foreground font-mono">
+                <span>SKU</span>
+                <span>Product</span>
+                <span>Category</span>
+                <span>Price</span>
+                <span>Status</span>
+                <span>Updated</span>
+              </div>
 
-            {/* Virtualized body */}
-            <div ref={parentRef} className="h-[480px] overflow-auto overscroll-contain">
               <div
                 className="relative w-full"
                 style={{ height: `${rowVirtualizer.getTotalSize()}px` }}

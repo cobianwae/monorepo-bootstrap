@@ -273,25 +273,27 @@ export default function CalendarPage() {
             </p>
           </CardContent>
         </Card>
-        <EventCalendar
-          events={events}
-          view={view}
-          onViewChange={setView}
-          currentDate={date}
-          onDateChange={setDate}
-          locale={locale}
-          weekStartsOn={1}
-          workingHours={workingHours}
-          slotIntervalMinutes={slotInterval}
-          loading={loading}
-          error={error}
-          onRetry={handleRetry}
-          onSelectSlot={handleSelectSlot}
-          onSelectEvent={handleSelectEvent}
-          editable={editable}
-          onEventDrop={handleEventDrop}
-          onAction={handleAction}
-        />
+        <div className="w-full min-w-0 overflow-x-auto">
+          <EventCalendar
+            events={events}
+            view={view}
+            onViewChange={setView}
+            currentDate={date}
+            onDateChange={setDate}
+            locale={locale}
+            weekStartsOn={1}
+            workingHours={workingHours}
+            slotIntervalMinutes={slotInterval}
+            loading={loading}
+            error={error}
+            onRetry={handleRetry}
+            onSelectSlot={handleSelectSlot}
+            onSelectEvent={handleSelectEvent}
+            editable={editable}
+            onEventDrop={handleEventDrop}
+            onAction={handleAction}
+          />
+        </div>
       </section>
 
       <Card>

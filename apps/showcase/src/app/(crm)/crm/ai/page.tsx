@@ -187,7 +187,7 @@ export default function AiStudioPage() {
       {/* Main Studio Tabs */}
       <Tabs defaultValue="scoring" className="space-y-6">
         <div className="border-b border-border pb-2">
-          <TabsList className="grid grid-cols-1 sm:grid-cols-3 w-full max-w-xl h-10">
+          <TabsList className="grid h-auto min-h-10 w-full max-w-xl grid-cols-1 gap-1 sm:grid-cols-3">
             <TabsTrigger value="scoring" className="text-sm gap-2">
               <Sliders className="h-4 w-4" />
               Interactive Scoring
