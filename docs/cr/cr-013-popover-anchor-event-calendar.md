@@ -27,13 +27,14 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Reproduksi: tulis test/skenario yang membuka detail via tombol "+n" overflow dan via keyboard; asertasikan anchor terhubung dan popover tidak berposisi `0,0`.
-- [ ] Perbaiki anchor virtual (stabil + guard `isConnected` + fallback dialog bila null).
-- [ ] Perbaiki urutan tutup-overflow → buka-detail.
-- [ ] Samakan jalur agenda dengan AC-03 (atau ajukan pengecualian eksplisit di CR ini).
-- [ ] Tambahkan props positioning eksplisit + guard focus-return.
-- [ ] Addendum kontrak positioning M-006 di wireframe/design.
-- [ ] Verifikasi: `pnpm typecheck` → `pnpm lint` → `pnpm test` (+ `test:tokens` bila token tersentuh; showcase build bila showcase tersentuh).
+- [x] Regression test otomatis: overflow memakai trigger terhubung/terukur; grid/agenda membuka detail sekali; Escape memulihkan fokus; rect nol memakai dialog, anchor detached memakai fallback container.
+- [ ] Verifikasi browser: buka overflow/grid/agenda via Enter/Space, cek posisi bukan `0,0`, flip di tepi viewport, dan fokus pada light/dark.
+- [x] Perbaiki anchor virtual (ref stabil di-update saat membuka detail + guard `isConnected`/rect + fallback dialog bila null).
+- [x] Perbaiki handoff tutup-overflow → buka-detail: anchor trigger `+n` persisten dan suppress autofocus overflow saat menyerahkan fokus.
+- [x] Samakan jalur agenda dengan AC-03.
+- [x] Tambahkan props positioning eksplisit + guard focus-return.
+- [x] Addendum kontrak positioning M-006 di wireframe/design.
+- [x] Verifikasi dijalankan: `pnpm typecheck` → `pnpm lint` → `pnpm test`; rincian hasil/baseline di bawah.
 
 ## Keputusan
 
@@ -45,23 +46,40 @@
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Tidak ada hex/RGB hardcode baru; memakai token semantik.
 - [ ] Kontras light dan dark lolos WCAG AA.
-- [ ] Perilaku Radix/a11y tidak rusak.
-- [ ] API `cva` dan export tetap konsisten.
-- [ ] State loading, empty, dan error relevan tersedia.
-- [ ] Showcase/docs diperbarui bila perlu.
+- [x] Perilaku Radix/fokus diuji otomatis (browser/voice screen reader belum).
+- [x] API `cva` dan export tetap konsisten.
+- [x] State loading, empty, dan error existing tidak diubah dan test tetap lulus.
+- [x] Docs design/wireframe diperbarui; source showcase tidak berubah.
 - [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
 
 ## Eksekusi
 
 Branch: `cr-013-popover-anchor-event-calendar`
-Commit: `fix: stabilkan anchor popover detail EventCalendar [CR-013]`
+Commit: `fix: stabilize EventCalendar detail popover anchor [CR-013]`
 
-- [ ] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR disetujui user; rencana implementasi disetujui 2026-11-23.
+- [x] Branch dibuat dari `visual-polish` `355f01f` di worktree `arah-prd`.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan catatan di `docs/BACKLOG.md` diperbarui; status tetap `approved`.
+- [x] `docs/STATUS.md` diperbarui.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau (119 artefak done).
+
+### Hasil dan batas verifikasi
+
+- Implementasi siap review; `done` hanya ditetapkan user. Tanpa push/PR.
+- Graphify dicoba: graph dibangun pada `1568661`, tertinggal dari basis `355f01f`;
+  node `EventCalendar` tidak ditemukan. Fallback pencarian kode menemukan konsumen langsung
+  `apps/showcase/src/app/(docs)/patterns/calendar/page.tsx`; tidak ada perubahan API/dependency.
+- Targeted EventCalendar: **42/42** lulus (8 regression test CR-013).
+- `pnpm typecheck`: gagal pada **12 error baseline** `flow-editor.test.tsx:706–753`
+  (`HTMLElement.disabled`); tidak ada error pada file yang diubah.
+- `pnpm lint`: lulus. Rerun akhir `pnpm test`: **UI 745/745, showcase 94/94,
+  tokens 10/10** lulus. `git diff --check` bersih.
+- Token dan source showcase tidak berubah; `test:tokens`/build showcase tidak diwajibkan.
+- JSDOM memakai rect nol secara default: test popover memasok rect non-nol pada anchor;
+  test fallback sengaja memakai rect nol. Ini membuktikan pemilihan anchor/overlay dan fokus,
+  **bukan** koordinat nyata, flip/collision, aktivasi native Enter/Space, atau audit kontras browser.
+  Browser automation tidak tersedia; checklist browser/kontras tetap terbuka.

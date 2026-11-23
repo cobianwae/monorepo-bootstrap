@@ -77,7 +77,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | ID | Judul | Status | File |
 |---|---|---|---|
 | CR-012 | Calendar polish tema & docs showcase | approved | `docs/cr/cr-012-calendar-theme-docs-polish.md` |
-| CR-013 | Anchor popover detail event EventCalendar (M-006) jatuh ke pojok kiri atas | approved | `docs/cr/cr-013-popover-anchor-event-calendar.md` |
+| CR-013 | Anchor popover detail event EventCalendar (M-006) jatuh ke pojok kiri atas — implementasi siap review; browser positioning/keyboard pending | approved | `docs/cr/cr-013-popover-anchor-event-calendar.md` |
 | CR-017 | Tour: perbaikan dialog teruji di Chrome light/dark | done | `docs/cr/cr-017-tour-dialog-backdrop.md` |
 | CR-018 | Tour: varian cva + responsif di komponen + sinkron docs | done | `docs/cr/cr-018-tour-varian-responsif-docs.md` |
 | CR-019 | Flow Editor inspector on-demand tidak mengunci + sesuai AC | done | `docs/cr/cr-019-flow-inspector-on-demand.md` |

@@ -131,6 +131,21 @@ Detail penuh ada di `docs/design/wireframes/calendar-scheduler.md` §5. Inti:
   fokus ring `primary` 2px light & dark; `prefers-reduced-motion` mematikan
   animasi; pembeda tidak pernah warna saja.
 
+### Addendum M-006 — CR-013
+
+- Semua view (termasuk agenda) membuka detail dan memanggil `onSelectEvent` satu kali.
+- Desktop memakai popover hanya jika anchor masih terhubung dan rect memiliki lebar/tinggi positif.
+  Anchor virtual memakai objek ref stabil; jalur overflow menjangkar ke tombol `+n` yang tetap mounted,
+  bukan item daftar yang dilepas ketika overflow ditutup.
+- Posisi awal `bottom`, `align="start"`, collision avoidance aktif, padding viewport 8px,
+  `sticky="partial"`; popover boleh flip ke atas saat ruang bawah tidak cukup.
+- Anchor null/detached/tidak terukur memakai Dialog Radix terpusat, bukan fallback koordinat `0,0`.
+  Jika anchor dilepas saat detail terbuka, detail beralih ke dialog. Mobile tetap Sheet.
+- Escape menutup detail; fokus kembali ke anchor yang masih terhubung (trigger `+n` untuk overflow),
+  atau container kalender jika sumber sudah dilepas. Penutupan overflow dan perpindahan ke dialog
+  tidak boleh merebut fokus detail baru.
+- API publik dan token tidak berubah. Addendum melalui CR-013; status approval spec tetap.
+
 ## 6. Token & Tema
 
 - Hanya token semantik: `background`/`card` (permukaan), `border` (grid),

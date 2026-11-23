@@ -84,6 +84,14 @@ lokasi, kategori, deskripsi, tombol aksi sekunder milik konsumen (edit/hapus via
 `onAction` atau `renderEventActions`). Fokus terperangkap di dialog mobile;
 popover menutup via Esc dan mengembalikan fokus ke event asal.
 
+**Addendum CR-013 (kontrak positioning):** grid dan agenda membuka M-006 dengan anchor
+event yang terhubung dan terukur. Dari overflow, anchor adalah trigger `+n` yang tetap
+mounted; daftar overflow menutup tanpa memulihkan fokus ke trigger sebelum detail siap.
+Desktop: `bottom`/`start`, collision avoidance aktif, padding 8px, `sticky="partial"`;
+flip ke atas bila ruang bawah tidak cukup. Anchor null, detached, atau rect tanpa ukuran
+memakai Dialog Radix terpusat; pelepasan anchor saat terbuka juga beralih ke dialog.
+Mobile tetap Sheet. Bukan popover tanpa acuan di `0,0`.
+
 ## 3. State multi-hari & konflik
 
 - Multi-hari (FR-003): event `start < end` beda hari dipecah per hari kalender;
@@ -107,6 +115,11 @@ popover menutup via Esc dan mengembalikan fokus ke event asal.
 | Success multi-hari | konferensi 3 hari tampil di 3 sel/blok berurutan + badge lanjutan | klik segmen → detail utuh | label "berlanjut" terbaca SR |
 
 ## 5. Keyboard & fokus
+
+- Addendum CR-013: tombol event grid/agenda dan item overflow dapat diaktifkan lewat
+  klik/Enter/Space. Escape menutup M-006; fokus kembali ke event asal yang terhubung,
+  atau trigger `+n` pada jalur overflow, atau container kalender bila anchor sudah dilepas.
+  Peralihan popover → dialog tidak mengembalikan fokus ke luar detail.
 
 - Toolbar: semua kontrol Tab-reachable; switcher view = `radiogroup` panah kiri/kanan;
   tombol periode punya `aria-label` ("Bulan sebelumnya", "Hari ini").
