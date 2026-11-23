@@ -18,10 +18,21 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Tetapkan matriks loaded/loading/empty/error/retry untuk tiap caller.
-- [ ] Implementasi state switch demo dan clear/retry; pisahkan skeleton dari empty.
-- [ ] Uji keyboard/status announcement/fokus pemulihan, serta struktur list.
-- [ ] Regression tests dan verifikasi sesuai konvensi.
+- [x] Tetapkan matriks loaded/loading/empty/error/retry untuk tiap caller.
+- [x] Implementasi state switch demo dan clear/retry; pisahkan skeleton dari empty.
+- [x] Uji keyboard/status announcement/fokus pemulihan, serta struktur list.
+- [x] Regression tests dan verifikasi sesuai konvensi.
+
+Matriks per caller (implementasi):
+
+| Caller | loading | error + retry | empty + CTA |
+|---|---|---|---|
+| `clinic/patients` | skeleton, `role="status"` | Alert + Retry | EmptyState "Clear Filters" (dipertahankan) |
+| `clinic/treatments` | skeleton, `role="status"` | Alert + Retry | EmptyState "Reset Search" (dipertahankan) |
+| `crm/leads` (table) | skeleton via `DataTable` | `DataTable` `error`/`onRetry` | empty "No leads match filters" (dipertahankan) |
+| `(docs)/patterns/master-detail` | — | — | `li` berisi pesan + tombol "Clear search" |
+
+Fokus pemulihan: tombol Reload/Retry memindahkan fokus ke region tabel (`tabIndex={-1}`) setelah loading selesai. Tombol "Test error" dan "Reload" adalah switch demo lokal; tidak ada backend.
 
 ## Keputusan
 
@@ -40,5 +51,7 @@ Branch: `cr-064-data-state-recovery`
 Commit: `fix: demonstrate data state recovery [CR-064]`
 
 - [x] Disetujui user (2026-11-23).
-- [ ] Branch dibuat; implementasi dan verifikasi.
-- [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.
+- [x] Branch dibuat (`cr-064-data-state-recovery`, dari `visual-polish` `b359291`); implementasi dan verifikasi.
+- [x] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.
+- Verifikasi: typecheck showcase 0 error; lint lulus; showcase test 94/94 (22 file) dan build lulus. Satu kegagalan timeout mind-map 5000ms pada run paralel lulus 7/7 saat dijalankan sendiri (baseline timing).
+- Belum diverifikasi di browser: keyboard dan announcement pada layar nyata. Status tetap `approved` sampai user menetapkan `done`.
