@@ -92,7 +92,7 @@ export interface OrgChartStudioProps {
   loading?: boolean; // FR-012
   error?: string | null; // FR-012 eksternal
   onSelect?: (node: OrgStudioNodeNormalized) => void;
-  emptyActionLabel?: string; // default 'Buat root'
+  emptyActionLabel?: string; // default 'Create root'
   onEmptyAction?: () => void;
   minimap?: boolean; // default true (≥md)
   ariaLabel?: string; // default 'Org chart studio'
@@ -158,7 +158,7 @@ export function normalizeStudioInput(data: OrgStudioInput): StudioNormalizedResu
         rootId: null,
         error: {
           code: 'duplicate-id',
-          message: `ID duplikat: "${node.id}" muncul lebih dari sekali.`,
+          message: `Duplicate ID: "${node.id}" appears more than once.`,
           nodeId: node.id,
         },
         isEmpty: false,
@@ -176,7 +176,7 @@ export function normalizeStudioInput(data: OrgStudioInput): StudioNormalizedResu
       rootId: null,
       error: {
         code: 'root-count',
-        message: `Harus tepat satu root, ditemukan ${roots.length}.`,
+        message: `There must be exactly one root, found ${roots.length}.`,
         nodeId: extra ? extra.id : null,
       },
       isEmpty: false,
@@ -192,7 +192,7 @@ export function normalizeStudioInput(data: OrgStudioInput): StudioNormalizedResu
         rootId: null,
         error: {
           code: 'missing-parent',
-          message: `Parent "${node.parentId}" dari node "${node.id}" tidak ditemukan.`,
+          message: `Parent "${node.parentId}" of node "${node.id}" was not found.`,
           nodeId: node.id,
         },
         isEmpty: false,
@@ -243,7 +243,7 @@ export function normalizeStudioInput(data: OrgStudioInput): StudioNormalizedResu
       rootId: null,
       error: {
         code: 'cycle',
-        message: `Siklus terdeteksi pada node "${cycleId}".`,
+        message: `Cycle detected at node "${cycleId}".`,
         nodeId: cycleId,
       },
       isEmpty: false,
@@ -350,12 +350,12 @@ export function isValidMove(
   const byId = new Map(nodes.map((node) => [node.id, node]));
   const source = byId.get(sourceId);
   const target = byId.get(targetId);
-  if (!source || !target) return { valid: false, reason: 'Node tidak ditemukan.' };
-  if (sourceId === targetId) return { valid: false, reason: 'Tidak dapat memindahkan ke diri sendiri.' };
+  if (!source || !target) return { valid: false, reason: 'Node not found.' };
+  if (sourceId === targetId) return { valid: false, reason: "Can't move a node onto itself." };
   if (getDescendants(nodes, sourceId).includes(targetId)) {
-    return { valid: false, reason: 'Tidak dapat memindahkan ke turunannya (siklus).' };
+    return { valid: false, reason: "Can't move a node under its own descendant (cycle)." };
   }
-  if (source.parentId === targetId) return { valid: false, reason: 'Sudah berada di atasan ini.' };
+  if (source.parentId === targetId) return { valid: false, reason: 'Already under this parent.' };
   return { valid: true, reason: null };
 }
 
@@ -551,7 +551,7 @@ export function toStudioFlowEdges(
     for (const childId of node.childIds) {
       if (!visibleIds.has(childId)) continue;
       // 011-04 (FR-010): edge menuju node cocok memakai garis putus primary
-      // (non-warna-saja bersama badge "Cocok" di kartu).
+      // (non-warna-saja bersama badge "Match" di kartu).
       const isMatch = highlightedSet.has(childId);
       edges.push({
         id: `${node.id}>${childId}`,
@@ -778,7 +778,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
         'motion-safe:transition-colors hover:border-primary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
         dropRing ??
           (isHighlighted
-            ? // 011-04 (FR-010): sorotan non-warna-saja — ring + badge "Cocok" + garis putus.
+            ? // 011-04 (FR-010): sorotan non-warna-saja — ring + badge "Match" + garis putus.
               'border-dashed border-primary ring-2 ring-primary'
             : isSelected || isNew || isEditing
               ? 'border-primary ring-2 ring-primary'
@@ -814,7 +814,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
             dropState === 'valid' ? 'bg-success text-success-foreground' : 'bg-destructive text-destructive-foreground',
           )}
         >
-          {dropState === 'valid' ? 'Lepas untuk pindah' : 'Target tidak valid'}
+          {dropState === 'valid' ? 'Drop to move' : 'Invalid target'}
         </span>
       ) : null}
       {isHighlighted ? (
@@ -822,7 +822,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
           data-testid="org-studio-highlight-chip"
           className="absolute -top-2 left-2 z-10 rounded-sm bg-primary px-1 text-[10px] leading-4 text-primary-foreground"
         >
-          Cocok
+          Match
         </span>
       ) : null}
       {node.accent ? (
@@ -835,7 +835,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
       {node.hasChildren && !isEditing ? (
         <button
           type="button"
-          aria-label={isExpanded ? `Collapse ${node.title}` : `Perluas ${node.title}`}
+          aria-label={isExpanded ? `Collapse ${node.title}` : `Expand ${node.title}`}
           aria-expanded={isExpanded}
           onClick={(event) => {
             event.stopPropagation();
@@ -852,7 +852,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
       ) : null}
       <button
         type="button"
-        aria-label={`Detail ${node.title}`}
+        aria-label={`Details for ${node.title}`}
         data-testid={`org-studio-detail-${node.id}`}
         disabled={isEditing}
         onClick={(event) => {
@@ -870,7 +870,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
         {isEditing ? (
           <>
             <label htmlFor={`org-studio-inline-${node.id}`} className="sr-only">
-              Nama node baru
+              New node name
             </label>
             <Input
               ref={inputRef}
@@ -904,10 +904,10 @@ function StudioNode({ data }: { data: StudioNodeData }) {
             />
             {draftInvalid ? (
               <span role="alert" id={`org-studio-inline-err-${node.id}`} className="text-xs text-destructive">
-                Nama tidak boleh kosong.
+                Name can&apos;t be empty.
               </span>
             ) : (
-              <span className="text-xs text-muted-foreground">Enter simpan · Esc batal</span>
+              <span className="text-xs text-muted-foreground">Enter to save · Esc to cancel</span>
             )}
           </>
         ) : (
@@ -930,7 +930,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
         <>
           <StudioAddHandle
             testId={`org-studio-add-child-${node.id}`}
-            label={`Tambah bawahan untuk ${node.title}`}
+            label={`Add report for ${node.title}`}
             onAdd={() => onAddChild(node.id)}
             visible={isSelected || isEditing}
             className="left-1/2 top-full -translate-x-1/2 -translate-y-1/2"
@@ -938,7 +938,7 @@ function StudioNode({ data }: { data: StudioNodeData }) {
           {canAddSibling ? (
             <StudioAddHandle
               testId={`org-studio-add-sibling-${node.id}`}
-              label={`Tambah sejawat untuk ${node.title}`}
+              label={`Add sibling for ${node.title}`}
               onAdd={() => onAddSibling(node.id)}
               visible={isSelected || isEditing}
               className="left-full top-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -968,19 +968,19 @@ function StudioControls({ zoomLabel, zoomDuration }: { zoomLabel: string; zoomDu
       data-testid="org-studio-controls"
       className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-md border border-border bg-card p-1 shadow-sm"
     >
-      <button type="button" aria-label="Perkecil" title="Perkecil" onClick={() => void zoomOut({ duration: zoomDuration })} className={buttonClass}>
+      <button type="button" aria-label="Zoom out" title="Zoom out" onClick={() => void zoomOut({ duration: zoomDuration })} className={buttonClass}>
         <Minus className="h-4 w-4" aria-hidden="true" />
       </button>
       <span aria-live="polite" data-testid="org-studio-zoom-level" className="min-w-12 text-center text-sm text-foreground">
         {zoomLabel}
       </span>
-      <button type="button" aria-label="Perbesar" title="Perbesar" onClick={() => void zoomIn({ duration: zoomDuration })} className={buttonClass}>
+      <button type="button" aria-label="Zoom in" title="Zoom in" onClick={() => void zoomIn({ duration: zoomDuration })} className={buttonClass}>
         <Plus className="h-4 w-4" aria-hidden="true" />
       </button>
       <button
         type="button"
-        aria-label="Atur ulang zoom 100%"
-        title="Atur ulang zoom 100%"
+        aria-label="Reset zoom to 100%"
+        title="Reset zoom to 100%"
         onClick={() => {
           const viewport = getViewport();
           void setViewport({ x: viewport.x, y: viewport.y, zoom: 1 }, { duration: zoomDuration });
@@ -989,7 +989,7 @@ function StudioControls({ zoomLabel, zoomDuration }: { zoomLabel: string; zoomDu
       >
         <RotateCcw className="h-4 w-4" aria-hidden="true" />
       </button>
-      <button type="button" aria-label="Paskan tampilan" title="Paskan tampilan" onClick={() => void fitView({ padding: 0.2, duration: zoomDuration })} className={buttonClass}>
+      <button type="button" aria-label="Fit view" title="Fit view" onClick={() => void fitView({ padding: 0.2, duration: zoomDuration })} className={buttonClass}>
         <Maximize className="h-4 w-4" aria-hidden="true" />
       </button>
     </div>
@@ -1191,8 +1191,8 @@ function StudioDetailPanel({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" aria-describedby={undefined} className="w-80 overflow-y-auto sm:max-w-[320px]">
         <SheetHeader>
-          <SheetTitle>{node ? `Detail ${node.title}` : 'Detail'}</SheetTitle>
-          <SheetDescription>Panel detail on-demand. Tambah tidak pernah membuka panel ini.</SheetDescription>
+          <SheetTitle>{node ? `Details for ${node.title}` : 'Details'}</SheetTitle>
+          <SheetDescription>On-demand details panel. Adding never opens it.</SheetDescription>
         </SheetHeader>
         {node ? (
           <div className="mt-4 space-y-4">
@@ -1219,11 +1219,11 @@ function StudioDetailPanel({
                 </dd>
               </div>
               <div className="flex gap-2">
-                <dt className="shrink-0 text-muted-foreground">Atasan:</dt>
+                <dt className="shrink-0 text-muted-foreground">Parent:</dt>
                 <dd className="break-words text-foreground">{parentTitle ?? '—'}</dd>
               </div>
               <div className="flex gap-2">
-                <dt className="shrink-0 text-muted-foreground">Anak:</dt>
+                <dt className="shrink-0 text-muted-foreground">Children:</dt>
                 <dd className="break-words text-foreground">
                   {childTitles.length > 0 ? childTitles.join(', ') : '—'}
                 </dd>
@@ -1241,7 +1241,7 @@ function StudioDetailPanel({
               }}
             >
               <div className="space-y-2">
-                <Label htmlFor="org-studio-detail-title">Nama</Label>
+                <Label htmlFor="org-studio-detail-title">Name</Label>
                 <Input
                   id="org-studio-detail-title"
                   data-testid="org-studio-detail-title"
@@ -1254,7 +1254,7 @@ function StudioDetailPanel({
                 />
                 {titleInvalid ? (
                   <p role="alert" className="text-sm text-destructive">
-                    Nama tidak boleh kosong.
+                    Name can&apos;t be empty.
                   </p>
                 ) : null}
               </div>
@@ -1302,10 +1302,10 @@ function StudioDetailPanel({
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button type="submit" size="sm" data-testid="org-studio-detail-save">
-                  Simpan
+                  Save
                 </Button>
                 <Button type="button" variant="outline" size="sm" onClick={() => onOpenChange(false)}>
-                  Tutup
+                  Close
                 </Button>
                 <Button
                   type="button"
@@ -1314,22 +1314,22 @@ function StudioDetailPanel({
                   onClick={() => onMove(node)}
                   data-testid="org-studio-detail-move"
                 >
-                  Pindah…
+                  Move…
                 </Button>
                 <Button
                   type="button"
                   variant="destructive"
                   size="sm"
                   disabled={isRoot}
-                  title={isRoot ? 'Root tidak dapat dihapus' : undefined}
+                  title={isRoot ? "The root can't be deleted" : undefined}
                   onClick={() => onDelete(node)}
                   data-testid="org-studio-detail-delete"
                 >
-                  Hapus
+                  Delete
                 </Button>
               </div>
               {isRoot ? (
-                <p className="text-xs text-muted-foreground">Root diproteksi — tidak dapat dihapus.</p>
+                <p className="text-xs text-muted-foreground">The root is protected and can&apos;t be deleted.</p>
               ) : null}
             </form>
           </div>
@@ -1378,9 +1378,9 @@ function StudioMoveDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Pindah node</DialogTitle>
+          <DialogTitle>Move node</DialogTitle>
           <DialogDescription>
-            Pindahkan &quot;{node.title}&quot; ke atasan baru. Node itu sendiri dan turunannya tidak dapat dipilih.
+            Move &quot;{node.title}&quot; under a new parent. The node itself and its descendants can&apos;t be selected.
           </DialogDescription>
         </DialogHeader>
         <RadioGroup value={selection ?? ''} onValueChange={setSelection}>
@@ -1389,7 +1389,7 @@ function StudioMoveDialog({
               const isSelf = candidate.id === node.id;
               const isDescendant = descendantIds.has(candidate.id);
               const disabled = isSelf || isDescendant;
-              const reason = isSelf ? 'Node itu sendiri' : isDescendant ? 'Turunan node ini' : null;
+              const reason = isSelf ? 'The node itself' : isDescendant ? 'Descendant of this node' : null;
               return (
                 <div key={candidate.id} className="flex items-center gap-2">
                   <RadioGroupItem value={candidate.id} id={`org-studio-move-${candidate.id}`} disabled={disabled} />
@@ -1407,13 +1407,13 @@ function StudioMoveDialog({
         </RadioGroup>
         {previewTitles.length > 0 ? (
           <p className="text-sm text-foreground" data-testid="org-studio-move-preview">
-            <span className="text-muted-foreground">Path baru: </span>
+            <span className="text-muted-foreground">New path: </span>
             <span className="break-words">{previewTitles.join(' / ')}</span>
           </p>
         ) : null}
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Batal
+            Cancel
           </Button>
           <Button
             type="button"
@@ -1423,7 +1423,7 @@ function StudioMoveDialog({
             }}
             data-testid="org-studio-move-confirm"
           >
-            Pindahkan
+            Move
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1451,10 +1451,10 @@ function StudioDeleteDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Hapus node</DialogTitle>
+          <DialogTitle>Delete node</DialogTitle>
           <DialogDescription>
-            Hapus &quot;{node.title}&quot;
-            {node.descendantCount > 0 ? ` beserta ${node.descendantCount} turunan` : ''}?
+            Delete &quot;{node.title}&quot;
+            {node.descendantCount > 0 ? ` and its ${node.descendantCount} ${node.descendantCount === 1 ? 'descendant' : 'descendants'}` : ''}?
           </DialogDescription>
         </DialogHeader>
         {node.hasChildren ? (
@@ -1462,18 +1462,18 @@ function StudioDeleteDialog({
             <div className="flex items-center gap-2">
               <RadioGroupItem value="reparent" id="org-studio-delete-reparent" />
               <Label htmlFor="org-studio-delete-reparent">
-                Pindahkan {node.descendantCount} turunan ke atasan di atasnya
+                Move {node.descendantCount} {node.descendantCount === 1 ? 'descendant' : 'descendants'} up to the parent above
               </Label>
             </div>
             <div className="flex items-center gap-2">
               <RadioGroupItem value="subtree" id="org-studio-delete-subtree" />
-              <Label htmlFor="org-studio-delete-subtree">Hapus subtree (node beserta semua anak)</Label>
+              <Label htmlFor="org-studio-delete-subtree">Delete subtree (node and all its children)</Label>
             </div>
           </RadioGroup>
         ) : null}
         <DialogFooter>
           <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-            Batal
+            Cancel
           </Button>
           <Button
             type="button"
@@ -1481,7 +1481,7 @@ function StudioDeleteDialog({
             onClick={() => onConfirm(node.id, mode)}
             data-testid="org-studio-delete-confirm"
           >
-            Hapus
+            Delete
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1645,12 +1645,12 @@ function StudioSrTree({
         <span>
           {node.title}
           {node.subtitle ? ` — ${node.subtitle}` : ''}
-          {isHighlighted ? ' (cocok)' : ''}
+          {isHighlighted ? ' (match)' : ''}
         </span>{' '}
         {node.hasChildren ? (
           <button
             type="button"
-            aria-label={isExpanded ? `Ciutkan ${node.title} (pohon aksesibel)` : `Perluas ${node.title} (pohon aksesibel)`}
+            aria-label={isExpanded ? `Collapse ${node.title} (accessible tree)` : `Expand ${node.title} (accessible tree)`}
             aria-expanded={isExpanded}
             data-testid={`org-studio-sr-toggle-${node.id}`}
             onClick={(event) => {
@@ -1658,85 +1658,85 @@ function StudioSrTree({
               onToggle(node.id);
             }}
           >
-            {isExpanded ? 'Ciutkan' : 'Perluas'}
+            {isExpanded ? 'Collapse' : 'Expand'}
           </button>
         ) : null}{' '}
         <button
           type="button"
-          aria-label={`Tambah bawahan untuk ${node.title} (pohon aksesibel)`}
+          aria-label={`Add report for ${node.title} (accessible tree)`}
           data-testid={`org-studio-sr-add-child-${node.id}`}
           onClick={(event) => {
             event.stopPropagation();
             onAddChild(node.id);
           }}
         >
-          Tambah bawahan
+          Add report
         </button>{' '}
         {node.parentId !== null ? (
           <>
             <button
               type="button"
-              aria-label={`Tambah sejawat untuk ${node.title} (pohon aksesibel)`}
+              aria-label={`Add sibling for ${node.title} (accessible tree)`}
               data-testid={`org-studio-sr-add-sibling-${node.id}`}
               onClick={(event) => {
                 event.stopPropagation();
                 onAddSibling(node.id);
               }}
             >
-              Tambah sejawat
+              Add sibling
             </button>{' '}
           </>
         ) : null}
         <button
           type="button"
-          aria-label={`Ubah ${node.title} (pohon aksesibel)`}
+          aria-label={`Edit ${node.title} (accessible tree)`}
           data-testid={`org-studio-sr-edit-${node.id}`}
           onClick={(event) => {
             event.stopPropagation();
             onEditNode(node);
           }}
         >
-          Ubah
+          Edit
         </button>{' '}
         {node.parentId !== null ? (
           <>
             <button
               type="button"
-              aria-label={`Pindah ${node.title} (pohon aksesibel)`}
+              aria-label={`Move ${node.title} (accessible tree)`}
               data-testid={`org-studio-sr-move-${node.id}`}
               onClick={(event) => {
                 event.stopPropagation();
                 onRequestMove(node);
               }}
             >
-              Pindah
+              Move
             </button>{' '}
             <button
               type="button"
-              aria-label={`Hapus ${node.title} (pohon aksesibel)`}
+              aria-label={`Delete ${node.title} (accessible tree)`}
               data-testid={`org-studio-sr-delete-${node.id}`}
               onClick={(event) => {
                 event.stopPropagation();
                 onRequestDelete(node);
               }}
             >
-              Hapus
+              Delete
             </button>{' '}
           </>
         ) : null}
         <button
           type="button"
-          aria-label={`Detail ${node.title} (pohon aksesibel)`}
+          aria-label={`Details for ${node.title} (accessible tree)`}
           data-testid={`org-studio-sr-detail-${node.id}`}
           onClick={(event) => {
             event.stopPropagation();
             onOpenDetail(node);
           }}
         >
-          Detail
+          Details
         </button>
         {node.hasChildren && node.childIds.length > 0 ? (
-          <div role="group" aria-label={`Anak ${node.title}`}>
+          <div role="group" aria-label={`Children of ${node.title}`}>
             {node.childIds.map((childId) => renderBranch(childId))}
           </div>
         ) : null}
@@ -1752,7 +1752,7 @@ function StudioSrTree({
         id={id}
         tabIndex={-1}
         role="tree"
-        aria-label={`${ariaLabel} pohon aksesibel`}
+        aria-label={`${ariaLabel} accessible tree`}
         data-testid="org-studio-sr-tree"
       >
         {renderBranch(rootId)}
@@ -1775,7 +1775,7 @@ export function OrgChartStudio({
   loading = false,
   error,
   onSelect,
-  emptyActionLabel = 'Buat root',
+  emptyActionLabel = 'Create root',
   onEmptyAction,
   minimap = true,
   ariaLabel = 'Org chart studio',
@@ -1901,7 +1901,7 @@ export function OrgChartStudio({
     emitChange(snapshot);
     setEditingId(null);
     setNewNodeId(null);
-    setAnnouncement('Perubahan dibatalkan.');
+    setAnnouncement('Change undone.');
     syncHistoryLen();
   }, [emitChange, syncHistoryLen]);
 
@@ -1914,7 +1914,7 @@ export function OrgChartStudio({
     emitChange(snapshot);
     setEditingId(null);
     setNewNodeId(null);
-    setAnnouncement('Perubahan diulang.');
+    setAnnouncement('Change redone.');
     syncHistoryLen();
   }, [emitChange, syncHistoryLen]);
 
@@ -1929,11 +1929,11 @@ export function OrgChartStudio({
       setAnnouncement(`${toastTitle}.`);
       toast({
         title: toastTitle,
-        description: 'Urungkan bila salah.',
+        description: 'Undo if this was a mistake.',
         duration: 5000,
         action: (
-          <ToastAction altText="Urungkan" onClick={undo}>
-            Urungkan
+          <ToastAction altText="Undo" onClick={undo}>
+            Undo
           </ToastAction>
         ),
       });
@@ -1952,7 +1952,7 @@ export function OrgChartStudio({
     const hadPrev = prevHighlightKeyRef.current !== '';
     prevHighlightKeyRef.current = highlightKey;
     if (highlightedIds.length === 0) {
-      if (hadPrev) setAnnouncement('Sorotan pencarian dihapus.');
+      if (hadPrev) setAnnouncement('Search highlight cleared.');
       return;
     }
     const path = new Set<string>();
@@ -1966,7 +1966,7 @@ export function OrgChartStudio({
       onExpandedChangeRef.current?.(nextIds);
     }
     setAnnouncement(
-      highlightedIds.length === 1 ? '1 hasil pencarian ditemukan.' : `${highlightedIds.length} hasil pencarian ditemukan.`,
+      highlightedIds.length === 1 ? '1 search result found.' : `${highlightedIds.length} search results found.`,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps -- highlightKey adalah kunci stabil; highlightedIds dibaca sinkron.
   }, [highlightKey, internalFlat, expandedSet, controlledExpanded]);
@@ -2016,7 +2016,7 @@ export function OrgChartStudio({
       setEditingId(null);
       setNewNodeId(nodeId);
       // 011-04: commit edit node lama memakai judul "Diperbarui".
-      commitWithUndo(snapshot, next, isPending ? 'Ditambah' : 'Diperbarui');
+      commitWithUndo(snapshot, next, isPending ? 'Added' : 'Updated');
       setFocusNodeId(nodeId);
     },
     [commitWithUndo, internalFlat],
@@ -2087,14 +2087,14 @@ export function OrgChartStudio({
       const source = flat.find((n) => n.id === sourceId);
       const target = flat.find((n) => n.id === newParentId);
       if (!check.valid) {
-        const message = check.reason ?? 'Target pindah tidak valid.';
+        const message = check.reason ?? 'Invalid move target.';
         if (origin === 'drag') setDragError(message);
         setAnnouncement(message);
         return;
       }
       const next = applyMove(flat, sourceId, newParentId);
-      commitWithUndo(flat, next, 'Dipindah');
-      setAnnouncement(`Node ${source?.title ?? sourceId} dipindah ke ${target?.title ?? newParentId}.`);
+      commitWithUndo(flat, next, 'Moved');
+      setAnnouncement(`Node ${source?.title ?? sourceId} moved to ${target?.title ?? newParentId}.`);
       ensureExpanded(newParentId);
       setDragSourceId(null);
       setDragOverId(null);
@@ -2112,9 +2112,9 @@ export function OrgChartStudio({
       const target = flat.find((n) => n.id === nodeId);
       if (!target || target.parentId === null) return; // root diproteksi
       const next = applyDelete(flat, nodeId, mode);
-      commitWithUndo(flat, next, 'Dihapus');
+      commitWithUndo(flat, next, 'Deleted');
       setAnnouncement(
-        `Node ${target.title} dihapus (${mode === 'reparent' ? 'anak dipindah ke atasan' : 'subtree dihapus'}).`,
+        `Node ${target.title} deleted (${mode === 'reparent' ? 'children moved to parent' : 'subtree deleted'}).`,
       );
       setDeleteNodeId(null);
       if (target.parentId) {
@@ -2293,7 +2293,7 @@ export function OrgChartStudio({
           className,
         )}
       >
-        <p className="sr-only">Memuat struktur organisasi…</p>
+        <p className="sr-only">Loading org structure…</p>
         <div className="flex flex-col items-center gap-4" aria-hidden="true">
           <Skeleton data-testid="org-studio-skeleton-box" className="h-[84px] w-[240px]" />
           <div className="h-8 w-px bg-border" />
@@ -2314,13 +2314,13 @@ export function OrgChartStudio({
   }
 
   if (error || normalized.error !== null) {
-    const message = error ?? normalized.error?.message ?? 'Data organisasi tidak valid.';
+    const message = error ?? normalized.error?.message ?? 'Invalid org chart data.';
     const nodeId = normalized.error?.nodeId;
     const detail = nodeId ? `${message} (node: ${nodeId})` : message;
     return (
       <div role="alert" className={cn('rounded-md border border-border bg-card p-4 text-sm text-foreground', className)}>
         <p>{message}</p>
-        {nodeId ? <p className="mt-1 text-muted-foreground">Node terkait: {nodeId}</p> : null}
+        {nodeId ? <p className="mt-1 text-muted-foreground">Related node: {nodeId}</p> : null}
         <Button
           type="button"
           variant="outline"
@@ -2331,7 +2331,7 @@ export function OrgChartStudio({
             setErrorCopied(true);
           }}
         >
-          {errorCopied ? 'Detail disalin' : 'Salin detail error'}
+          {errorCopied ? 'Details copied' : 'Copy error details'}
         </Button>
       </div>
     );
@@ -2342,8 +2342,8 @@ export function OrgChartStudio({
       <div className={cn('w-full', className)}>
         <EmptyState
           role="status"
-          title="Belum ada data organisasi"
-          description="Sediakan data flat (id/parentId) atau nested (children) dengan tepat satu root."
+          title="No org chart data yet"
+          description="Provide flat (id/parentId) or nested (children) data with exactly one root."
           actionLabel={emptyActionLabel}
           onAction={onEmptyAction}
         />
@@ -2372,7 +2372,7 @@ export function OrgChartStudio({
           onClick={undo}
           data-testid="org-studio-undo"
         >
-          Urungkan
+          Undo
         </Button>
         <Button
           type="button"
@@ -2382,7 +2382,7 @@ export function OrgChartStudio({
           onClick={redo}
           data-testid="org-studio-redo"
         >
-          Ulangi
+          Redo
         </Button>
         <Button
           type="button"
@@ -2392,9 +2392,9 @@ export function OrgChartStudio({
           onClick={() => setShowMinimap((visible) => !visible)}
           data-testid="org-studio-minimap-toggle"
         >
-          {showMinimap ? 'Sembunyikan peta' : 'Tampilkan peta'}
+          {showMinimap ? 'Hide minimap' : 'Show minimap'}
         </Button>
-        <span className="text-xs text-muted-foreground">Ctrl+Z urungkan · Ctrl+Y ulangi · Delete hapus kartu fokus</span>
+        <span className="text-xs text-muted-foreground">Ctrl+Z undo · Ctrl+Y redo · Delete removes the focused card</span>
       </div>
       <div aria-live="polite" role="status" className="sr-only" data-testid="org-studio-live">
         {announcement}
@@ -2412,13 +2412,13 @@ export function OrgChartStudio({
         >
           {dragDropState.state === 'valid' ? (
             <>
-              Lepas untuk pindah
+              Drop to move
               {dragPreviewTitles.length > 0 ? (
-                <span className="ml-2 text-muted-foreground">Path baru: {dragPreviewTitles.join(' / ')}</span>
+                <span className="ml-2 text-muted-foreground">New path: {dragPreviewTitles.join(' / ')}</span>
               ) : null}
             </>
           ) : (
-            dragError ?? 'Target tidak valid.'
+            dragError ?? 'Invalid target.'
           )}
         </p>
       ) : null}
@@ -2450,7 +2450,7 @@ export function OrgChartStudio({
         href={`#${srTreeId}`}
         className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:rounded-sm focus:bg-card focus:px-3 focus:py-2 focus:text-sm focus:text-foreground focus:ring-2 focus:ring-primary"
       >
-        Lewati kanvas ke pohon aksesibel
+        Skip canvas to accessible tree
       </a>
       <StudioSrTree
         id={srTreeId}
