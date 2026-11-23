@@ -29,6 +29,7 @@ import { Calendar } from '../form/date-picker';
 import { SegmentedControl, SegmentedControlItem } from '../form/segmented-control';
 import { Alert, AlertDescription, AlertTitle } from '../feedback/alert';
 import { EmptyState } from '../feedback/empty-state';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '../feedback/dialog';
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../overlay/popover';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../overlay/sheet';
 import type { VariantProps } from 'class-variance-authority';
@@ -620,12 +621,18 @@ function DayOverflow({
   onOpen: (event: CalendarEvent, anchor: HTMLElement | null) => void;
 }) {
   const [open, setOpen] = React.useState(false);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const openingDetailRef = React.useRef(false);
   const extra = segments.length - MAX_VISIBLE;
   if (extra <= 0) return null;
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(next) => {
+      if (next) openingDetailRef.current = false;
+      setOpen(next);
+    }}>
       <PopoverTrigger asChild>
         <Button
+          ref={triggerRef}
           type="button"
           variant="ghost"
           size="sm"
@@ -635,7 +642,13 @@ function DayOverflow({
           +{extra}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="max-h-64 overflow-y-auto p-3">
+      <PopoverContent
+        align="start"
+        className="max-h-64 overflow-y-auto p-3"
+        onCloseAutoFocus={(event) => {
+          if (openingDetailRef.current) event.preventDefault();
+        }}
+      >
         <p className="mb-2 text-xs font-semibold text-foreground">
           {format(day, 'EEEE, d MMMM yyyy', { locale })}
         </p>
@@ -645,9 +658,10 @@ function DayOverflow({
               <button
                 type="button"
                 className="inline-flex w-full items-center gap-1.5 rounded px-1 py-0.5 text-left hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                onClick={(domEvent) => {
+                onClick={() => {
+                  openingDetailRef.current = true;
                   setOpen(false);
-                  onOpen(segment.event, domEvent.currentTarget);
+                  onOpen(segment.event, triggerRef.current);
                 }}
               >
                 <span
@@ -1040,6 +1054,26 @@ export function EventCalendar({
   const [selectedEvent, setSelectedEvent] = React.useState<CalendarEvent | null>(null);
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const anchorRef = React.useRef<HTMLElement | null>(null);
+  const calendarRef = React.useRef<HTMLElement>(null);
+  const detailOpenRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!selectedEvent || !anchorEl) return;
+    const observer = new MutationObserver(() => {
+      if (!anchorEl.isConnected) setAnchorEl(null);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [selectedEvent, anchorEl]);
+
+  const restoreDetailFocus = React.useCallback((event: Event) => {
+    event.preventDefault();
+    // Switching from a popover to the fallback dialog must not steal its focus.
+    if (detailOpenRef.current) return;
+    const anchor = anchorRef.current;
+    if (anchor?.isConnected) anchor.focus();
+    else calendarRef.current?.focus();
+  }, []);
 
   const [dragState, setDragState] = React.useState<DragState | null>(null);
   const [dragPreview, setDragPreview] = React.useState<DragPreview | null>(null);
@@ -1063,14 +1097,14 @@ export function EventCalendar({
   );
 
   const closeDetail = React.useCallback(() => {
-    const anchor = anchorRef.current;
+    detailOpenRef.current = false;
     setSelectedEvent(null);
     setAnchorEl(null);
-    if (anchor) window.setTimeout(() => anchor.focus(), 0);
   }, []);
 
   const openDetail = React.useCallback(
     (event: CalendarEvent, anchor: HTMLElement | null) => {
+      detailOpenRef.current = true;
       anchorRef.current = anchor;
       setAnchorEl(anchor);
       setSelectedEvent(event);
@@ -1245,13 +1279,11 @@ export function EventCalendar({
       }));
   }, [events, activeDate, locale]);
 
-  const virtualAnchor = React.useMemo<React.RefObject<HTMLElement | null>>(
-    () => ({ current: anchorEl }),
-    [anchorEl]
-  );
+  const anchorRect = anchorEl?.isConnected ? anchorEl.getBoundingClientRect() : null;
+  const hasValidAnchor = !!anchorRect && anchorRect.width > 0 && anchorRect.height > 0;
 
   return (
-    <section aria-label={ariaLabel} className={cn('space-y-4', className)}>
+    <section ref={calendarRef} tabIndex={-1} aria-label={ariaLabel} className={cn('space-y-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring', className)}>
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <Button
@@ -1376,7 +1408,7 @@ export function EventCalendar({
                         key={event.id}
                         type="button"
                         disabled={loading}
-                        onClick={() => onSelectEvent?.(event)}
+                        onClick={(domEvent) => handleEventClick(event, domEvent.currentTarget)}
                         className="flex items-center justify-between gap-2 rounded border border-border/50 bg-background px-3 py-2 text-left text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:bg-accent/40"
                         aria-label={formatDetailRange(event, locale)}
                       >
@@ -1454,13 +1486,18 @@ export function EventCalendar({
         </>
       )}
 
-      {selectedEvent && !isMobile && (
+      {selectedEvent && !isMobile && hasValidAnchor && (
         <Popover open onOpenChange={(next) => { if (!next) closeDetail(); }}>
-          <PopoverAnchor virtualRef={virtualAnchor} />
+          <PopoverAnchor virtualRef={anchorRef} />
           <PopoverContent
             role="dialog"
             aria-label={`Event detail: ${selectedEvent.title}`}
             align="start"
+            side="bottom"
+            avoidCollisions
+            collisionPadding={8}
+            sticky="partial"
+            onCloseAutoFocus={restoreDetailFocus}
             className="w-80 space-y-3"
           >
             <EventDetailBody
@@ -1478,9 +1515,29 @@ export function EventCalendar({
         </Popover>
       )}
 
+      {selectedEvent && !isMobile && !hasValidAnchor && (
+        <Dialog open onOpenChange={(next) => { if (!next) closeDetail(); }}>
+          <DialogContent onCloseAutoFocus={restoreDetailFocus} className="max-h-[85vh] overflow-y-auto">
+            <DialogTitle>{`Event detail: ${selectedEvent.title}`}</DialogTitle>
+            <DialogDescription>Event details and available actions.</DialogDescription>
+            <EventDetailBody
+              key={selectedEvent.id}
+              event={selectedEvent}
+              locale={locale}
+              interval={interval}
+              editable={editable}
+              onAction={onAction}
+              renderEventActions={renderEventActions}
+              onEventDrop={onEventDrop}
+              onClose={closeDetail}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
       {selectedEvent && isMobile && (
         <Sheet open onOpenChange={(next) => { if (!next) closeDetail(); }}>
-          <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
+          <SheetContent side="bottom" onCloseAutoFocus={restoreDetailFocus} className="max-h-[85vh] overflow-y-auto">
             <SheetHeader>
               <SheetTitle>Event detail</SheetTitle>
               <SheetDescription>{selectedEvent.title}</SheetDescription>

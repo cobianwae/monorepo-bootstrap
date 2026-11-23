@@ -20,6 +20,8 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 ## Next
 
+CR-013 `done` atas persetujuan user 2026-11-23, implementasi `d900985` dari `cr-013-popover-anchor-event-calendar` diintegrasikan ke `visual-polish`: anchor overflow persisten, agenda detail, dialog fallback, dan focus-return. Browser positioning/Enter/Space/light-dark belum diverifikasi.
+
 CR-069 (copy English OrgChartStudio) done atas persetujuan user; dimerge ke `visual-polish`. Dokumen CR-054 disinkronkan `edd5bea`; CR-054–064 done. CR-068 done atas persetujuan user; diimplementasikan di branch `cr-068-org-chart-studio-demo-polish` (worktree `arah-story`).
 
 1. CR-063–064 done; antrean berikutnya 013-01/015-03 (butir 5). Batas CSS consumer/overflow non-Banner CR-056 tetap tercatat. Status done hanya oleh user.
