@@ -1,4 +1,4 @@
-# CR-066 — Uplift halaman Org Chart Studio: struktur demo-first, kontrol segmented, dan copy English
+# CR-067 — Uplift halaman Org Chart Studio: struktur demo-first, kontrol segmented, dan copy English
 
 **Status:** done
 **Sumber:** visual uplift (`/polish-ui`), audit gap vs `docs/design/visual-language.md` (approved 2026-11-23)
@@ -76,8 +76,8 @@ User menyetujui CR dengan rekomendasi default: copy internal `OrgChartStudio` ti
 
 ## Eksekusi
 
-Branch: `cr-066-org-chart-studio-page-uplift`
-Commit: `refactor: uplift halaman org chart studio [CR-066]`
+Branch: `cr-067-org-chart-studio-page-uplift`
+Commit: `refactor: uplift halaman org chart studio [CR-067]`
 
 - [x] CR disetujui user.
 - [x] Branch dibuat (worktree `arah-story`, dari `visual-polish` `2b319be`).
