@@ -1,6 +1,6 @@
 # CR-055 — Kontras teks kecil lintas tema
 
-**Status:** approved
+**Status:** done (dikonfirmasi user 2026-11-23)
 **Sumber:** audit
 **Ref:** CR-054 C01; `docs/reviews/cr-054-code-audit.md:23`, `docs/design/visual-language.md`
 

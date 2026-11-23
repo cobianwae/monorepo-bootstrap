@@ -20,7 +20,7 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 Dokumen CR-054 sudah disinkronkan dengan cakupan final dan commit audit `edd5bea`; audit CR-054 done, CR-055–064 approved dan implementasi belum dimulai.
 
-1. CR-055 sudah diimplementasikan di branch `cr-055-small-text-contrast` (`arah-story`) dan menunggu review user; kontras computed dan screenshot belum diukur. Lanjut CR-056–064 yang masih approved, satu CR per sesi. Prioritas: CR-062 (home tersembunyi), CR-059 (modal/dua palette), CR-060 (hydration), CR-056/061 (reflow), lalu kontras/form/semantik/state/konsistensi. Status done tetap hanya oleh user.
+1. CR-055 **done atas konfirmasi user pada 2026-11-23**; kontras computed dan screenshot untuk delapan tema belum diukur (batas tercatat di CR-055). Lanjut CR-056–064 yang masih approved, satu CR per sesi. Prioritas: CR-062 (home tersembunyi), CR-059 (modal/dua palette), CR-060 (hydration), CR-056/061 (reflow), lalu kontras/form/semantik/state/konsistensi. Status done tetap hanya oleh user.
 2. Sisa CR lama: CR-036 (verifikasi AA tone), CR-017/018 (implementasi/verifikasi Tour). CR lama lain sebelum 054 sudah done atas keputusan user; tidak dibuka ulang oleh antrean ini.
 3. Jangan membuka ulang temuan yang sudah ditangani: eyebrow PageHeader CR-046 done, Directional Motion CR-048 done, deviasi h1/weight dipertahankan CR-051. Sisa teks kecil → CR-055; guard heading seluruh docs sudah diperluas di CR-052; flaky RTE tetap baseline.
 4. Baseline baru pengganti CR-015 — verifikasi 12 error tipe FlowEditor + smoke RTE + timing worker (CR baru bila perlu).
