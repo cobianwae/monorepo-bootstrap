@@ -1,6 +1,6 @@
 # CR-066 — File Manager: poles halaman demo, copy English komponen, target sentuh segmented
 
-**Status:** approved
+**Status:** done
 **Sumber:** `/improve-ui` (audit `ui-designer`) atas `apps/showcase/src/app/(docs)/patterns/file-manager/page.tsx`
 **Ref:** `docs/cr/cr-065-file-manager-page-uplift.md` (done), `docs/design/file-manager.md`, `docs/stories/002-*`, `packages/ui/src/components/data-display/file-manager.tsx`, `packages/ui/src/components/form/segmented-control.tsx`
 
