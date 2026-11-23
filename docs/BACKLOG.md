@@ -113,6 +113,17 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-051 | PageHeader: eyebrow sudah selesai (CR-046); deviasi h1 `text-3xl sm:text-4xl` dan weight dipertahankan sebagai keputusan; perubahan API publik butuh persetujuan | approved | `docs/cr/cr-051-pageheader-deviasi.md` |
 | CR-052 | Perluas guard `text-lg font-bold` sebagai heading ke seluruh `app/(docs)`; sisa di `guidelines` ke `SectionHeading` | approved | `docs/cr/cr-052-perluas-guard-heading.md` |
 | CR-053 | Audit visual `components/` dan `patterns/` (46 halaman): text-highlight pada teks kecil, primary dekoratif, h2/h3 manual, text-lg/text-2xl font-bold manual; cakupan palet selain Atelier/Pulse | approved | `docs/cr/cr-053-audit-visual-components-patterns.md` |
+| CR-054 | Audit 73 route selesai dengan batas bukti tercatat; 146 dark/mobile dibaca, konsolidasi dan CR-055–064 draft; menunggu keputusan user | draft | `docs/cr/cr-054-audit-components-patterns.md` |
+| CR-055 | Kontras teks kecil lintas tema (C01) | draft | `docs/cr/cr-055-small-text-contrast.md` |
+| CR-056 | Reflow Banner bersama dan audit caller (C11/V02) | draft | `docs/cr/cr-056-banner-reflow.md` |
+| CR-057 | Semantik kontrol, keyboard dan tabel virtual (C02–04/C07/C10) | draft | `docs/cr/cr-057-control-semantics.md` |
+| CR-058 | Label/error, target password dan empty-value form (C05/C09/C12/C13) | draft | `docs/cr/cr-058-form-accessibility.md` |
+| CR-059 | Fokus onboarding dan kepemilikan command palette (C06/C17) | draft | `docs/cr/cr-059-overlay-ownership.md` |
+| CR-060 | Hydration RTE, statistik awal dan asset demo (C14/V01/V03) | draft | `docs/cr/cr-060-rte-hydration.md` |
+| CR-061 | Reflow kontrol/workspace mobile (C15/R01) | draft | `docs/cr/cr-061-responsive-controls.md` |
+| CR-062 | Reveal katalog home mobile tidak mencapai threshold (C16) | draft | `docs/cr/cr-062-home-reveal.md` |
+| CR-063 | Peran warna, heading, segmented dan literal palette (W01–03/W05–07) | draft | `docs/cr/cr-063-visual-consistency.md` |
+| CR-064 | State tabel konsumen dan pemulihan empty master-detail (W04/C08) | draft | `docs/cr/cr-064-data-state-recovery.md` |
 
 ## Catatan
 
