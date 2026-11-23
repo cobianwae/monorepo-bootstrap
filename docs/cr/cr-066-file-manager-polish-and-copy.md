@@ -39,15 +39,15 @@ Hasil A: 6 kontrol segmented menjadi 4 (Sidebar, Content, Quota) + baris Open pr
 
 ## Tasks (jalur small-fix)
 
-- [ ] A1: `openPreviewFor` mereset view/state demo sebelum fokus ke baris.
-- [ ] A2: hapus toast `Folder changed` dan `Opened`.
-- [ ] A3/A4: gabungkan kontrol Quota dan Sidebar; sesuaikan turunan state (`quotaLoading`, `quotaError`, `treeEmpty`).
-- [ ] B1: terjemahkan copy `file-manager.tsx` ke English (string + `aria-label`).
-- [ ] B1: perbarui `file-manager.test.tsx`; grep `Unduh|Pindah|Hapus|Ganti nama|Folder baru|Coba lagi|Kuota` di `apps/` dan `docs/` untuk selector/rujukan lain.
-- [ ] B1: perbarui `docs/design/file-manager.md` dan story 002-* yang menyebut label lama.
-- [ ] C1: tambah `pointer-coarse:min-h-11` pada `SegmentedControlItem`; cek test terkait.
-- [ ] Audit selector e2e/test yang terdampak (showcase page tests, `file-manager.test.tsx`, test segmented).
-- [ ] Verifikasi: `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`; `pnpm typecheck` (baseline 12 error lama FlowEditor dicatat, bukan regresi).
+- [x] A1: `openPreviewFor` mereset view/state demo sebelum fokus ke baris.
+- [x] A2: hapus toast `Folder changed` dan `Opened`.
+- [x] A3/A4: gabungkan kontrol Quota dan Sidebar; sesuaikan turunan state (`quotaLoading`, `quotaError`, `treeEmpty`).
+- [x] B1: terjemahkan copy `file-manager.tsx` ke English (string + `aria-label`).
+- [x] B1: perbarui `file-manager.test.tsx`; grep `Unduh|Pindah|Hapus|Ganti nama|Folder baru|Coba lagi|Kuota` di `apps/` dan `docs/` untuk selector/rujukan lain.
+- [x] B1: perbarui `docs/design/file-manager.md` dan story 002-* yang menyebut label lama.
+- [x] C1: tambah `pointer-coarse:min-h-11` pada `SegmentedControlItem`; cek test terkait.
+- [x] Audit selector e2e/test yang terdampak (showcase page tests, `file-manager.test.tsx`, test segmented).
+- [x] Verifikasi: `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`; `pnpm typecheck` (baseline 12 error lama FlowEditor dicatat, bukan regresi).
 - [ ] Cek browser light/dark, mobile (preview dari view grid, state error/loading) bila memungkinkan.
 
 ## Keputusan
@@ -76,8 +76,12 @@ Commit: `refactor: <deskripsi cluster> [CR-066]`
 
 - [x] CR disetujui user.
 - [x] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
 - [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
 - [ ] `docs/STATUS.md` diperbarui bila relevan.
 - [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+
+## Hasil
+
+Commit: A `refactor: poles kontrol demo dan preview halaman file manager`, B `refactor: terjemahkan copy FileManager ke English`, C `refactor: target sentuh SegmentedControlItem`. Verifikasi: lint lulus; tes tokens 10, ui 737, showcase 94 lulus; build showcase lulus; typecheck 12 error lama FlowEditor (baseline, bukan regresi). Story 002-* tidak diubah (artefak approved; label tampil hanya dikutip dalam prosa). Cek browser light/dark/mobile belum dijalankan.
