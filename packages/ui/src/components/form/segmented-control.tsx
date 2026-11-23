@@ -33,7 +33,7 @@ export const SegmentedControlItem = React.forwardRef<
   <ToggleGroupPrimitive.Item
     ref={ref}
     className={cn(
-      'inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium text-muted-foreground outline-none transition-colors data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-xs hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring',
+      'inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-sm px-3 py-1.5 pointer-coarse:min-h-11 text-sm font-medium text-muted-foreground outline-none transition-colors data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-xs hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring',
       className
     )}
     {...props}

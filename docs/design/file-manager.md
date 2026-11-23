@@ -28,7 +28,7 @@ S-005.27 File Manager (/patterns/file-manager)
 │   ├── Search dalam folder aktif (FR cakupan: filter, bukan search global)
 │   ├── Toggle view: list / grid (pilihan diingat selama sesi)
 │   ├── Sortir (nama, ukuran, tanggal) + filter tipe file (mode list)
-│   └── Aksi: [Upload] [Folder baru]
+│   └── Aksi: [Upload] [New folder]
 ├── Zona A — Sidebar folder tree (S-005.27 bagian navigasi)
 │   └── TreeView (compose dnd/tree-view): expand/collapse, highlight folder aktif
 ├── Zona B — Konten utama (S-005.27.01)
@@ -45,7 +45,7 @@ S-005.27 File Manager (/patterns/file-manager)
 Modal (di atas shell):
 
 - `M-001` File Preview — sheet (desktop) / dialog full-screen (mobile).
-- `M-002` Rename / Folder baru — dialog kecil + validasi nama.
+- `M-002` Rename / New folder — dialog kecil + validasi nama.
 - `M-003` Konfirmasi hapus & pilih folder tujuan move — dialog.
 
 ### 2.2 Responsive breakpoint
@@ -158,8 +158,8 @@ M-001 File Preview
 
 | Zona | Loading | Empty | Error |
 |---|---|---|---|
-| Sidebar tree | Skeleton tree (3–5 baris) | Tree kosong + CTA "Folder baru" | Pesan + retry; `role="alert"` |
-| Konten list/grid | Skeleton tabel/grid | Ilustrasi + "Folder kosong" + CTA Upload / Folder baru | Pesan + tombol Coba lagi; seleksi dibersihkan |
+| Sidebar tree | Skeleton tree (3–5 baris) | Tree kosong + CTA "New folder" | Pesan + retry; `role="alert"` |
+| Konten list/grid | Skeleton tabel/grid | Ilustrasi + "This folder is empty" + CTA Upload / New folder | Pesan + tombol Try again; seleksi dibersihkan |
 | Panel konteks (upload) | Ikuti state `file-upload` PRD 001 | Queue kosong + helper text | Error per file + Ulang (diwarisi PRD 001) |
 | Quota | Skeleton bar | — (disembunyikan bila `quota` absen) | Pesan ringan; tidak memblokir konten |
 | Preview `M-001` | Skeleton media + meta | — | Media gagal dimuat → fallback generik + tombol unduh |
@@ -179,7 +179,7 @@ Catatan a11y per state:
 - List memakai tabel semantik dengan header sortir (`aria-sort`); grid memakai
   `role="grid"`/`listbox` setara dengan posisi item terbaca.
 - Multi-select: checkbox + Shift/Ctrl-klik + Shift+Panah; `bulk-action-bar` muncul
-  diumumkan via `aria-live="polite"` ("5 item dipilih").
+  diumumkan via `aria-live="polite"` ("5 items selected").
 - Context menu terbuka via klik kanan, tombol Menu, dan Shift+F10; semua aksi
   terjangkau keyboard dan memanggil handler yang sama dengan pointer (FR-005).
 - Preview: focus trap + Esc menutup + fokus kembali ke pemicu; media punya label

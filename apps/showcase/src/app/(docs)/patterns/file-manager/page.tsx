@@ -36,16 +36,16 @@ const items: FileItem[] = [
   { id: 'f6', folderId: 'documents', name: 'guidelines.docx', type: 'other', size: 51200, updatedAt: '2026-09-01T00:00:00Z' },
 ];
 
-const sidebarStates = ['normal', 'loading', 'error'] as const;
+const sidebarStates = ['normal', 'loading', 'error', 'empty'] as const;
 type SidebarState = (typeof sidebarStates)[number];
 
 const contentStates = ['normal', 'loading', 'empty', 'error'] as const;
 type ContentState = (typeof contentStates)[number];
 
-const quotaLevels = ['normal', 'warning', 'full'] as const;
-type QuotaLevel = (typeof quotaLevels)[number];
+const quotaStates = ['normal', 'warning', 'full', 'loading', 'error'] as const;
+type QuotaState = (typeof quotaStates)[number];
 
-const quotaByLevel: Record<QuotaLevel, { total: number; used: number }> = {
+const quotaByLevel: Record<'normal' | 'warning' | 'full', { total: number; used: number }> = {
   normal: { total: 10 * 1024 ** 3, used: 2 * 1024 ** 3 },
   warning: { total: 10 * 1024 ** 3, used: 9 * 1024 ** 3 },
   full: { total: 10 * 1024 ** 3, used: 10 * 1024 ** 3 },
@@ -97,9 +97,6 @@ function DemoControl<T extends string>({ label, value, options, onChange }: Demo
   );
 }
 
-const onOff = ['off', 'on'] as const;
-type OnOff = (typeof onOff)[number];
-
 const accessibilityGroups: { title: string; notes: string[] }[] = [
   {
     title: 'Keyboard',
@@ -147,14 +144,15 @@ export default function FileManagerPage() {
   const [contentState, setContentState] = React.useState<ContentState>('normal');
   const [view, setView] = React.useState<FileManagerView>('list');
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
-  const [treeEmpty, setTreeEmpty] = React.useState<OnOff>('off');
-  const [quotaLevel, setQuotaLevel] = React.useState<QuotaLevel>('normal');
-  const [quotaLoading, setQuotaLoading] = React.useState<OnOff>('off');
-  const [quotaError, setQuotaError] = React.useState<OnOff>('off');
+  const [quotaState, setQuotaState] = React.useState<QuotaState>('normal');
 
   // Open the preview through the same keyboard path a user would take:
   // focus the item row, then dispatch Enter (the pattern handles the rest).
+  // Rows only exist in the list view with normal data, so reset those demo states first.
   const openPreviewFor = (item: FileItem) => {
+    setView('list');
+    setSidebarState('normal');
+    setContentState('normal');
     setActiveFolderId(item.folderId);
     setSelectedIds([item.id]);
     window.requestAnimationFrame(() => {
@@ -167,11 +165,6 @@ export default function FileManagerPage() {
   };
 
   const folderName = (folderId: string) => folderList.find((f) => f.id === folderId)?.name ?? folderId;
-
-  const handleFolderChange = (folderId: string) => {
-    setActiveFolderId(folderId);
-    toastAction('Folder changed', `Now viewing ${folderName(folderId)}.`);
-  };
 
   const shownItems = contentState === 'empty' ? [] : itemList;
 
@@ -224,10 +217,7 @@ export default function FileManagerPage() {
           <CardContent className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
             <DemoControl label="Sidebar" value={sidebarState} options={sidebarStates} onChange={setSidebarState} />
             <DemoControl label="Content" value={contentState} options={contentStates} onChange={setContentState} />
-            <DemoControl label="Empty folder tree" value={treeEmpty} options={onOff} onChange={setTreeEmpty} />
-            <DemoControl label="Quota level" value={quotaLevel} options={quotaLevels} onChange={setQuotaLevel} />
-            <DemoControl label="Quota loading" value={quotaLoading} options={onOff} onChange={setQuotaLoading} />
-            <DemoControl label="Quota error" value={quotaError} options={onOff} onChange={setQuotaError} />
+            <DemoControl label="Quota" value={quotaState} options={quotaStates} onChange={setQuotaState} />
 
             <div className="space-y-1.5 md:col-span-2">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -255,7 +245,7 @@ export default function FileManagerPage() {
         </Card>
 
         <FileManager
-          folders={treeEmpty === 'on' ? [] : folderList}
+          folders={sidebarState === 'empty' ? [] : folderList}
           items={shownItems}
           activeFolderId={activeFolderId}
           view={view}
@@ -268,14 +258,13 @@ export default function FileManagerPage() {
                 ? "Couldn't load folder contents. Your selection was cleared."
                 : null
           }
-          onActiveFolderChange={handleFolderChange}
+          onActiveFolderChange={setActiveFolderId}
           onSelectionChange={setSelectedIds}
           onViewChange={setView}
-          quota={quotaByLevel[quotaLevel]}
-          quotaLoading={quotaLoading === 'on'}
-          quotaError={quotaError === 'on' ? "Couldn't load quota. Try again later." : null}
+          quota={quotaByLevel[quotaState === 'loading' || quotaState === 'error' ? 'normal' : quotaState]}
+          quotaLoading={quotaState === 'loading'}
+          quotaError={quotaState === 'error' ? "Couldn't load quota. Try again later." : null}
           uploadHandler={mockUploadHandler}
-          onPreview={(item) => toastAction('Opened', item.name)}
           onDownload={(selected) => toastAction('Download started', plural(selected.length))}
           onMove={handleMove}
           onDelete={handleDelete}
