@@ -1,6 +1,6 @@
 # CR-060 — Hydration dan statistik awal RichTextEditor
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit
 **Ref:** CR-054 C14/V01/V03; `docs/reviews/cr-054-code-audit.md:286`
 
@@ -37,11 +37,13 @@
 ## Eksekusi
 
 Branch: `cr-060-rte-hydration`
-Commit: `fix: stabilize rich text editor hydration [CR-060]`
+Commit: `b35d0a2` (`fix: stabilize rich text editor hydration [CR-060]`)
+Merge: `visual-polish` (setelah commit dokumentasi done)
 
 - [x] Disetujui user (2026-11-23).
 - [x] Branch dibuat; implementasi dan verifikasi.
 - [x] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.
+- [x] Review user dan penetapan done (2026-11-23); di-merge ke `visual-polish` dan di-push.
 
 ### Hasil implementasi
 
@@ -54,4 +56,4 @@ Commit: `fix: stabilize rich text editor hydration [CR-060]`
 - `pnpm test` default: UI 708/710, gagal pada OrgChartEditor `stack undo dibatasi 50` dan FileUpload `retries all failed items collectively` (baseline timing). RTE 33/33 lulus termasuk smoke link yang sebelumnya flaky. Suite showcase terpisah 80/80 lulus.
 - Ulang suite UI `--maxWorkers=2 --testTimeout=30000`: 709/710; OrgChartEditor/FileUpload lulus, baseline smoke RTE `rte-link-save` gagal lagi (`rich-text-editor.test.tsx:587`). Ulang file RTE terisolasi 32/33 dengan kegagalan sama; tes hydration/metadata baru tetap lulus. Tidak mengubah flow link atau melonggarkan tes untuk menyembunyikan baseline.
 - Smoke HTTP build produksi: `/patterns/rich-text-editor`, `/components/forms`, dan aset SVG lokal masing-masing 200; server smoke dihentikan setelah pengecekan. Hydration diuji di jsdom, bukan browser native; tidak mengklaim audit visual seluruh tema/screen reader.
-- Status tetap **approved**, implementasi menunggu review user; tidak menetapkan done otomatis.
+- Review user 2026-11-23: CR ditetapkan **done**, di-merge ke `visual-polish`, dan di-push bersama branch CR.
