@@ -39,7 +39,7 @@ export default function LandingPage() {
                 <div className="space-y-8">
                   <Badge
                     variant="outline"
-                    className="border-highlight/25 bg-highlight/10 px-3.5 py-1 font-mono text-xs font-semibold tracking-wider text-highlight"
+                    className="border-highlight/25 bg-highlight/10 px-3.5 py-1 font-mono text-xs font-semibold tracking-wider text-foreground"
                   >
                     ARAH — DESIGN SYSTEM
                   </Badge>
@@ -249,7 +249,7 @@ export default function LandingPage() {
                 </h2>
               </div>
               <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
-                Every figure below is computed from <span className="font-mono text-highlight">@ds/tokens</span> at
+                Every figure below is computed from <span className="font-mono text-foreground">@ds/tokens</span> at
                 render time. Change a token, and this section changes with it.
               </p>
             </div>

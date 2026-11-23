@@ -509,47 +509,47 @@ export default function LayoutNavigationPage() {
                 </thead>
                 <tbody className="divide-y divide-border/50 text-foreground font-mono">
                   <tr>
-                    <td className="py-2.5 pr-4 text-highlight font-bold">SidebarProvider</td>
+                    <td className="py-2.5 pr-4 text-foreground font-bold">SidebarProvider</td>
                     <td className="py-2.5 pr-4 text-muted-foreground font-sans">Context provider managing open/collapsed states & mobile detection</td>
                     <td className="py-2.5 text-muted-foreground">defaultOpen, open, onOpenChange</td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 pr-4 text-highlight font-bold">Sidebar</td>
+                    <td className="py-2.5 pr-4 text-foreground font-bold">Sidebar</td>
                     <td className="py-2.5 pr-4 text-muted-foreground font-sans">Container element adapting to desktop rail or mobile drawer</td>
                     <td className="py-2.5 text-muted-foreground">side, variant, collapsible</td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 pr-4 text-highlight font-bold">SidebarTrigger</td>
+                    <td className="py-2.5 pr-4 text-foreground font-bold">SidebarTrigger</td>
                     <td className="py-2.5 pr-4 text-muted-foreground font-sans">Accessible button toggling sidebar state via context</td>
                     <td className="py-2.5 text-muted-foreground">ButtonProps</td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 pr-4 text-highlight font-bold">SidebarHeader / Footer</td>
+                    <td className="py-2.5 pr-4 text-foreground font-bold">SidebarHeader / Footer</td>
                     <td className="py-2.5 pr-4 text-muted-foreground font-sans">Pinned top and bottom slots for branding and user profile</td>
                     <td className="py-2.5 text-muted-foreground">HTMLAttributes</td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 pr-4 text-highlight font-bold">SidebarContent</td>
+                    <td className="py-2.5 pr-4 text-foreground font-bold">SidebarContent</td>
                     <td className="py-2.5 pr-4 text-muted-foreground font-sans">Scrollable container for groups and items</td>
                     <td className="py-2.5 text-muted-foreground">HTMLAttributes</td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 pr-4 text-highlight font-bold">SidebarGroup / Label</td>
+                    <td className="py-2.5 pr-4 text-foreground font-bold">SidebarGroup / Label</td>
                     <td className="py-2.5 pr-4 text-muted-foreground font-sans">Categorical section wrapper with uppercase header</td>
                     <td className="py-2.5 text-muted-foreground">HTMLAttributes</td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 pr-4 text-highlight font-bold">SidebarMenu / MenuItem</td>
+                    <td className="py-2.5 pr-4 text-foreground font-bold">SidebarMenu / MenuItem</td>
                     <td className="py-2.5 pr-4 text-muted-foreground font-sans">Semantic unordered list container for navigation buttons</td>
                     <td className="py-2.5 text-muted-foreground">HTMLAttributes</td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 pr-4 text-highlight font-bold">SidebarMenuButton</td>
+                    <td className="py-2.5 pr-4 text-foreground font-bold">SidebarMenuButton</td>
                     <td className="py-2.5 pr-4 text-muted-foreground font-sans">Interactive button with active state styling & icon alignment</td>
                     <td className="py-2.5 text-muted-foreground">isActive, variant, size</td>
                   </tr>
                   <tr>
-                    <td className="py-2.5 pr-4 text-highlight font-bold">SidebarInset</td>
+                    <td className="py-2.5 pr-4 text-foreground font-bold">SidebarInset</td>
                     <td className="py-2.5 pr-4 text-muted-foreground font-sans">Main canvas container with margin offsets and shadow</td>
                     <td className="py-2.5 text-muted-foreground">HTMLAttributes</td>
                   </tr>

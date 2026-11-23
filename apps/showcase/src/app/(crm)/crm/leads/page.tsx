@@ -583,7 +583,7 @@ export default function LeadsPage() {
               ) : (
                 <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
               )}
-              <span className={score >= 80 ? 'font-bold text-highlight' : 'text-foreground'}>
+              <span className={score >= 80 ? 'font-bold text-foreground' : 'text-foreground'}>
                 {score}/100
               </span>
             </div>

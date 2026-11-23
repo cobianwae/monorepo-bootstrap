@@ -466,7 +466,7 @@ export default function FormsPage() {
             </RadioGroup>
 
             <div className="p-3 bg-muted/30 rounded-lg text-xs font-mono text-muted-foreground">
-              Selected plan: <span className="text-highlight font-bold uppercase">{selectedPlan}</span>
+              Selected plan: <span className="text-foreground font-bold uppercase">{selectedPlan}</span>
             </div>
           </CardContent>
         </Card>
@@ -556,7 +556,7 @@ export default function FormsPage() {
           <SectionHeading title="Rich Text Description" />
           <p className="text-sm text-muted-foreground">
             Demo ringkas S-004.03: placeholder + toolbar + counter. Contoh form benar (controlled). Panel demo penuh di{' '}
-            <a className="text-highlight underline underline-offset-4" href="/patterns/rich-text-editor">S-005.22</a>.
+            <a className="text-primary underline underline-offset-4" href="/patterns/rich-text-editor">S-005.22</a>.
           </p>
         </div>
 
@@ -960,8 +960,8 @@ export default function FormsPage() {
               label="Task filters"
             />
             <div className="p-3 bg-muted/30 rounded-lg text-xs font-mono text-muted-foreground">
-              Active chips: <span className="text-highlight font-bold">{filterChips.length}</span> ·{' '}
-              Saved views: <span className="text-highlight font-bold">{savedFilterViews.length}</span>
+              Active chips: <span className="text-foreground font-bold">{filterChips.length}</span> ·{' '}
+              Saved views: <span className="text-foreground font-bold">{savedFilterViews.length}</span>
             </div>
           </CardContent>
         </Card>

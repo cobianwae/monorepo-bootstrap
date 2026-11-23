@@ -467,7 +467,7 @@ export default function DataTablePage() {
             {chips.length > 1 ? 's' : ''} ·{' '}
             <strong className="text-foreground">{filteredData.length}</strong> of {data.length} rows match.
             {activeViewId && (
-              <span className="text-highlight"> · Current view: {views.find((v) => v.id === activeViewId)?.name}</span>
+              <span className="text-foreground"> · Current view: {views.find((v) => v.id === activeViewId)?.name}</span>
             )}
           </p>
         </div>

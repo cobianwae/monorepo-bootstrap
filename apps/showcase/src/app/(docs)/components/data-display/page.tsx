@@ -1121,7 +1121,7 @@ export function ActionExample() {
                 </div>
                 <div className="p-4 rounded-lg bg-card border border-border space-y-2">
                   <p className="text-xs font-semibold text-foreground font-mono">
-                    Node ID: <span className="text-highlight">{selectedNode}</span>
+                    Node ID: <span className="text-foreground">{selectedNode}</span>
                   </p>
                   <p className="text-xs text-muted-foreground">
                     Supports controlled `expandedIds`, custom node icons, and accessible WAI-ARIA tree roles.

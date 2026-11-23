@@ -17,9 +17,17 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Reproduksi lokasi C01 dan ukur kontras aktual delapan tema light/dark, termasuk tint/hover.
-- [ ] Perbaiki kelas teks; pertahankan highlight untuk ikon/border yang sesuai.
-- [ ] Tambah regression guard terarah dan screenshot; jalankan verifikasi sesuai konvensi.
+- [x] Reproduksi lokasi C01 dari daftar audit CR-054 dan periksa setiap baris sebelum diubah. Belum dilakukan: pengukuran kontras computed pasangan foreground/background aktual delapan tema light/dark, termasuk tint/hover (hanya model token dari audit yang tersedia).
+- [x] Perbaiki kelas teks: `text-highlight` pada teks kecil diganti `text-foreground` (atau `text-primary` untuk link aksi); ikon, border, dan tint `highlight` dipertahankan. Hover (`hover:`/`group-hover:text-highlight`) tidak diubah.
+- [x] Tambah regression guard (`apps/showcase/src/test/visual-language-guard.test.ts`, aturan `small-text-highlight`). Screenshot belum dibuat.
+
+## Catatan Implementasi
+
+- Berkas yang diubah: `apps/showcase/src/app/(docs)/{components/forms,components/layout-navigation,components/data-display,patterns/data-table,patterns/billing,patterns/comments,foundations/breakpoints,foundations/themes,foundations/colors}/page.tsx`, `apps/showcase/src/app/(landing)/landing/page.tsx`, `apps/showcase/src/app/(clinic)/clinic/{consultations,reports}/page.tsx`, `apps/showcase/src/app/(crm)/crm/leads/page.tsx`, `packages/ui/src/components/marketing/{hero,hero-band}.tsx`, `packages/ui/src/components/layout/section.tsx`.
+- Tidak ada perubahan props, nama export, varian, atau token.
+- Guard hanya menangkap `text-highlight` dan `text-xs`/`text-sm` pada baris yang sama. Teks yang mewarisi ukuran dari parent tidak tertangkap.
+- Di luar daftar audit, masih ada pola serupa (tidak diubah, perlu keputusan lingkup): `packages/ui/src/components/marketing/cta-band.tsx:64`, `section-number.tsx:19`, `navigation/footer.tsx:112`, `navigation/toc.tsx:85`, `navigation/bottom-nav.tsx:62`, `showcase/src/components/landing/contrast-widget.tsx:79`.
+- Verifikasi (2026-11-23): typecheck — 12 error baseline di `flow-editor.test.tsx` (tidak berubah); lint hijau; test `packages/tokens` 10/10; `packages/ui` 706/707 — satu gagal `rte-link-save` (baseline); showcase 79/79; `pnpm -C apps/showcase build` 76/76.
 
 ## Keputusan
 
