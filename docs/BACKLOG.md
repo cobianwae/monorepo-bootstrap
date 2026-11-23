@@ -95,7 +95,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-033 | Token: scope tema bersarang tidak me-resolve ulang `--color-*` (dark mode kanvas mind-map; dikerjakan lebih dulu) | done | `docs/cr/cr-033-token-scope-tema-bersarang.md` |
 | CR-034 | Aturan visual docs showcase (`visual-language.md`) + penyambungan ke AI (`instructions`, AGENTS, ARCHITECTURE, CONVENTIONS) + pagar guard | done | `docs/cr/cr-034-aturan-visual-dan-penyambungan-ai.md` |
 | CR-035 | Seragamkan 7 halaman `foundations`: `SectionHeading`, teks mikro → `text-xs`, `primary` dekoratif → `highlight`, `SegmentedControl` | done | `docs/cr/cr-035-seragamkan-halaman-foundations.md` |
-| CR-036 | Bug konten `foundations`: klaim WCAG dihitung, "3-step", demo durasi satu easing, label arah, "Play All", badge Ratio dark mode | approved | `docs/cr/cr-036-bug-konten-halaman-foundations.md` |
+| CR-036 | Bug konten `foundations`: klaim WCAG dihitung, "3-step", demo durasi satu easing, label arah, "Play All", badge Ratio dark mode. Verifikasi AA matriks di browser 16/16; menunggu keputusan `done` dari user. | approved | `docs/cr/cr-036-bug-konten-halaman-foundations.md` |
 | CR-037 | Sederhanakan `SectionHeading`: tanpa ikon, tanpa level sub (mengoreksi keputusan CR-034 #2; opsi A pilihan user) | done | `docs/cr/cr-037-sederhanakan-section-heading-tanpa-ikon.md` |
 | CR-038 | Ganti `text-[9/10/11px]` → `text-xs` di `app/(docs)` non-foundations (99 pemakaian, 29 file); guard px diperluas ke seluruh docs | done | `docs/cr/cr-038-text-xs-docs-non-foundations.md` |
 | CR-039 | Hapus ikon heading manual di `components/` dan `patterns/` (78 baris, 11 file) | done | `docs/cr/cr-039-ikon-heading-components-patterns.md` |

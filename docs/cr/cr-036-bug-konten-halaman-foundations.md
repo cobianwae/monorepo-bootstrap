@@ -28,7 +28,9 @@ Hanya konten/klaim/demo di tiga halaman; tidak ada perubahan token, `@ds/ui`, at
 - [x] Perbaiki temuan 1–8.
 - [x] Lint dan `build:types` showcase hijau.
 - [x] Verifikasi visual (screenshot Chrome headless, dark dan light, Atelier / Pulse): badge WCAG di `themes` tampil hijau (`success`) dari data; badge "Ratio" di `colors` terbaca di dark **dan** light setelah perbaikan temuan 8; Banner "Play All" tampil dengan aksi. Pemutaran animasi lewat tombol **tidak** diuji interaktif (screenshot statis); perilaku `onActionClick={triggerAnimation}` diverifikasi dari kode dan typecheck, bukan dijalankan di browser.
-- [~] Hitung AA dari data: badge **hijau** terverifikasi untuk tema aktif Pulse (`aaFailureCount === 0`). Tone lain (sunset, botanic, midnight, nebula, lagoon, ink, graphite) x light/dark **belum** dicek satu per satu di browser; logika memakai `compliance.passAA` dari `auditThemeTokenPairs`, dan jika ada pasangan gagal halaman akan menampilkannya (temuan baru, bukan regresi).
+- [x] Hitung AA dari data: **16/16 kombinasi** (8 tone × light/dark) terverifikasi di Chrome headless lewat kontrol showcase `/foundations/themes`. Untuk tiap kombinasi, tabel tetap menampilkan 20 baris (10 per mode); pasangan token, nilai warna, rasio, dan level WCAG cocok dengan `auditThemeTokenPairs`. Semua tone menampilkan badge `success` “100% WCAG AA Passing (20 pairs)” dan “All Pairs ≥ 4.5:1”.
+
+Rasio minimum per tone (light/dark, dibulatkan seperti di tabel): Pulse 4.64/5.65, Sunset 4.83/6.72, Botanic 4.83/6.60, Midnight 4.83/7.20, Nebula 4.70/6.87, Lagoon 4.83/6.45, Ink 4.83/5.98, Graphite 4.83/7.19. Bukti ini hanya mencakup pasangan dalam matriks dan badge saat semua pasangan lolos; kondisi gagal tidak disimulasikan dan ini bukan audit kontras seluruh antarmuka.
 
 ## Keputusan
 
@@ -50,7 +52,9 @@ Hanya konten/klaim/demo di tiga halaman; tidak ada perubahan token, `@ds/ui`, at
 ## Eksekusi
 
 Branch: `visual-polish` (integrasi pekerjaan visual, dari `dev` `e57f7ea`).
-Commit: `8294a05`, bersama CR-035. Catatan “belum push” adalah posisi awal, bukan status terkini; commit berada dalam riwayat audit `edd5bea` yang sudah di-push. Verifikasi AA seluruh tone di browser tetap terbuka sesuai checklist, tidak otomatis selesai oleh audit screenshot CR-054.
+Commit implementasi: `8294a05`, bersama CR-035, sudah tercakup dalam riwayat audit `edd5bea` yang di-push. Verifikasi browser yang masih terbuka setelah audit CR-054 diselesaikan terpisah di worktree `arah-ord`, branch `cr-036-bug-konten-halaman-foundations` dari `visual-polish` `80862a5`, tanpa perubahan kode.
+
+Verifikasi workspace dari baseline bersih: `pnpm lint` lulus; `pnpm typecheck` gagal dengan 12 error `TS2339` di `flow-editor.test.tsx`; `pnpm test` mencatat tokens 10/10 dan UI 715/729 (14 gagal, 2 error worker Vitest), lalu berhenti sebelum showcase. Guard visual showcase dijalankan terpisah dan lulus 5/5. Kegagalan baseline tidak diperbaiki dalam CR ini.
 
 - [x] CR disetujui user (instruksi 2026-11-22: "setuju semua CR kecuali CR-012 dan CR-013").
 - [x] Perubahan diimplementasikan.
