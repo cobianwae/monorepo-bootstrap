@@ -22,38 +22,48 @@
 
 ## Tasks
 
-- [ ] Putuskan: implementasi `cva` (§2.5) atau revisi desain hapus §2.5 — minta persetujuan user (menyentuh API publik).
-- [ ] Bila implementasi: tambah varian + prop + test; jaga backward-compat default.
-- [ ] Pindahkan rule responsif `<md` ke `tour.css`; hapus `<style>` inline showcase; uji viewport mobile.
-- [ ] Sinkron OQ #2/#3 di PRD dan status PRD/sitemap setelah merge 017-03.
-- [ ] Verifikasi `pnpm typecheck`, `pnpm lint`, `pnpm test` (file terkait) + smoke showcase.
+- [x] Putuskan: implementasi `cva` (§2.5) atau revisi desain hapus §2.5 — minta persetujuan user (menyentuh API publik). Diputuskan user 2026-11-23: **implementasi varian**.
+- [x] Bila implementasi: tambah varian + prop + test; jaga backward-compat default. Props `spotlight` (`default`|`tight`) + `popover` (`default`|`compact`) di `tour-types.ts`; `cva` untuk popover (`tourPopoverVariants`), spotlight via `stagePadding` driver.js (geometri, bukan CSS); default = perilaku 017.
+- [x] Pindahkan rule responsif `<md` ke `tour.css`; hapus `<style>` inline showcase; uji viewport mobile. `tour.css`: `.ds-tour-popover-compact` (260px) + media `<md` (full-width + footer stacked, pindahan rule showcase); `tour.tsx`: spotlight otomatis `tight` di `<md` via `matchMedia` bila prop tidak diisi; test 5 kasus varian/auto.
+- [x] Sinkron OQ #2/#3 di PRD dan status PRD/sitemap setelah merge 017-03. OQ #2/#3 → answered (K2/K3); PRD 017 → `shipped`; sitemap S-005.20 sudah `implemented` (terverifikasi, tanpa perubahan).
+- [x] Verifikasi `pnpm typecheck`, `pnpm lint`, `pnpm test` (file terkait) + smoke showcase. Hasil di Bukti verifikasi.
 
 ## Keputusan
 
 | # | Keputusan | Alasan |
 |---|---|---|
-| 1 | Implementasi `cva` vs hapus §2.5 — menunggu persetujuan user | Menyentuh API publik komponen |
+| 1 | Implementasi `cva` §2.5 (diputuskan user 2026-11-23) | Desain gate 2 utuh; varian murah (`stagePadding` + class); backward-compat default |
 | 2 | Responsif milik komponen (bukan showcase) sebagai default | §5 mensyaratkan fungsi tidak hilang di kecil untuk semua konsumen |
+| 3 | Spotlight tidak lewat `cva`: padang lubang = konfigurasi geometri driver.js (`stagePadding`), bukan CSS; `cva` hanya untuk varian popover yang memang CSS (lebar maks) | `cva` untuk varian visual CSS; spotlight adalah prop geometri bertipe union |
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA.
-- [ ] Perilaku Radix/a11y tidak rusak.
-- [ ] API `cva` dan export tetap konsisten (bila §2.5 diimplementasikan).
-- [ ] State loading, empty, dan error relevan tersedia.
-- [ ] Showcase/docs diperbarui bila perlu.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA (tanpa perubahan token; tour.css hanya lebar/layout).
+- [x] Perilaku Radix/a11y tidak rusak (16 test lama tetap hijau).
+- [x] API `cva` dan export tetap konsisten (§2.5 diimplementasikan; `tourPopoverVariants` di-export via barrel).
+- [x] State loading, empty, dan error relevan tersedia (tidak berubah).
+- [x] Showcase/docs diperbarui bila perlu (`<style>` inline dihapus; PRD 017 sinkron).
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass (hasil di Bukti verifikasi).
 
 ## Eksekusi
 
 Branch: `cr-018-tour-varian-responsif-docs`
 Commit: `refactor: selaraskan varian dan responsif tour dengan desain [CR-018]`
 
-- [ ] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR disetujui user.
+- [x] Branch dibuat (`cr-018-tour-varian-responsif-docs` dari `visual-polish` `80862a5` di worktree `arah-cr`).
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan (hasil di bawah).
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui. (`docs/BACKLOG.md`: status CR-018 tetap `approved` hingga user menetapkan `done`.)
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau (111 artefak done).
+
+## Bukti verifikasi (2026-11-23)
+
+- `tour.test.tsx`: 21/21 hijau (16 lama + 5 varian CR-018: default backward-compat, spotlight tight, auto `<md`, override eksplisit, popover compact).
+- `pnpm typecheck`: hanya 12 error baseline FlowEditor (`flow-editor.test.tsx`, Known Issues); tidak ada error `tour`.
+- `pnpm lint`: hijau semua workspace.
+- `pnpm test` suite penuh (`--maxWorkers=2 --testTimeout=30000`): 733/734 lulus; 1 gagal = smoke RTE (`rte-link-save`) yang flaky di bawah beban — lolos 33/33 saat file dijalankan sendiri di baseline (`git stash`) maupun dengan perubahan CR-018 (54/54 bersama tour), dan diff CR-018 tidak menyentuh `form/`. Bukan regresi.
+- `pnpm -C apps/showcase build`: hijau.
+- `node scripts/check-status-log.mjs`: OK (111 artefak done).

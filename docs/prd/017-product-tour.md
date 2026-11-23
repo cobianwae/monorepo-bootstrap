@@ -1,6 +1,6 @@
 # 017 — Tour / Coach Marks
 
-Status: approved
+Status: shipped
 Owner: —
 Tanggal: 2026-11-21
 Sumber: roadmap RM-16 (`docs/discussions/component-roadmap.md`)
@@ -98,8 +98,8 @@ Skenario utama:
 | # | Pertanyaan | Status |
 |---|---|---|
 | 1 | Penargetan: ref React saja, atau dukung selector string juga? | answered — keduanya; ref prioritas, selector via driver.js |
-| 2 | Konfirmasi saat Lewati — selalu, atau hanya bila progres > 1 langkah? | open |
-| 3 | Apakah mode "coach mark tunggal" (satu sorotan tanpa alur) masuk v1? | open — usulan: ya sebagai `could` bila murah |
+| 2 | Konfirmasi saat Lewati — selalu, atau hanya bila progres > 1 langkah? | answered — hanya bila progres > 1 (K2, wireframe gate 2) |
+| 3 | Apakah mode "coach mark tunggal" (satu sorotan tanpa alur) masuk v1? | answered — ya sebagai `could` murah: `steps.length === 1`, progress disembunyikan (K3, wireframe gate 2) |
 
 ## Changelog
 
@@ -108,3 +108,4 @@ Skenario utama:
 | 2026-11-21 | Draft awal dari roadmap RM-16 |
 | 2026-11-21 | **Approved (gate 1)** — OQ dibawa ke gate 2 sebagai risiko/desain |
 | 2026-11-21 | **Revisi dependency (gate 1)**: driver.js + wrapper DS; OQ#1 answered (ref + selector) |
+| 2026-11-23 | **Shipped** (CR-018): OQ #2/#3 answered merujuk K2/K3 (temuan #3); varian §2.5 diimplementasikan (`spotlight`/`popover`) + responsif §5 milik komponen (`tour.css`), sinkronisasi temuan #4 (CR-018) |
