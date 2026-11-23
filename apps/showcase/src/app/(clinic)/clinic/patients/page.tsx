@@ -171,6 +171,8 @@ export default function PatientsDirectoryPage() {
           <div className="relative w-full md:w-80">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
+              id="patient-search"
+              aria-label="Search patients"
               placeholder="Search by name, ID, or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -181,7 +183,7 @@ export default function PatientsDirectoryPage() {
           {/* Program & Status Filters */}
           <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
             <Select value={selectedProgram} onValueChange={setSelectedProgram}>
-              <SelectTrigger className="h-9 w-44 text-xs">
+              <SelectTrigger aria-label="Filter by program" className="h-9 w-44 text-xs">
                 <SelectValue placeholder="All Programs" />
               </SelectTrigger>
               <SelectContent>
@@ -195,7 +197,7 @@ export default function PatientsDirectoryPage() {
             </Select>
 
             <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger className="h-9 w-36 text-xs">
+              <SelectTrigger aria-label="Filter by status" className="h-9 w-36 text-xs">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>

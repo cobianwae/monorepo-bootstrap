@@ -36,4 +36,35 @@ describe('Combobox component', () => {
     render(<Combobox options={options} disabled />);
     expect((screen.getByRole('combobox') as HTMLButtonElement).disabled).toBe(true);
   });
+
+  // C13: empty string = tidak ada pilihan, placeholder tetap tampil
+  it('treats empty string value as no selection and keeps placeholder', () => {
+    render(<Combobox options={options} value="" placeholder="Select a framework" />);
+    expect(screen.getByText('Select a framework')).toBeDefined();
+    expect(screen.queryByLabelText('Clear selection')).toBeNull();
+  });
+
+  it('filters out empty strings from multiple values', () => {
+    render(<Combobox options={options} value={['', 'react']} multiple />);
+    expect(screen.getByText('React')).toBeDefined();
+    expect(screen.queryByLabelText('Remove ')).toBeNull();
+  });
+
+  // C05: label terasosiasi dan error terhubung ke trigger
+  it('associates label with trigger via htmlFor and id', () => {
+    render(<Combobox options={options} label="Framework" />);
+    const trigger = screen.getByRole('combobox', { name: 'Framework' });
+    const label = screen.getByText('Framework');
+    expect(label.getAttribute('for')).toBe(trigger.id);
+    expect(trigger.id).not.toBe('');
+  });
+
+  it('sets aria-invalid and aria-describedby on trigger when error', () => {
+    render(
+      <Combobox options={options} error aria-describedby="framework-error" />
+    );
+    const trigger = screen.getByRole('combobox');
+    expect(trigger.getAttribute('aria-invalid')).toBe('true');
+    expect(trigger.getAttribute('aria-describedby')).toBe('framework-error');
+  });
 });

@@ -61,6 +61,9 @@ export interface ComboboxProps extends ComboboxBaseProps {
   multiple?: boolean;
   onCreate?: (label: string) => void;
   filterFn?: (option: ComboboxOption, search: string) => boolean;
+  id?: string;
+  'aria-describedby'?: string;
+  'aria-invalid'?: React.AriaAttributes['aria-invalid'];
 }
 
 function defaultFilter(option: ComboboxOption, search: string): boolean {
@@ -98,16 +101,24 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
       clearable = true,
       label,
       children,
+      id,
+      'aria-describedby': ariaDescribedBy,
+      'aria-invalid': ariaInvalid,
     },
     ref
   ) => {
     const [open, setOpen] = React.useState(false);
     const [search, setSearch] = React.useState('');
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const generatedId = React.useId();
+    const triggerId = id ?? generatedId;
 
+    // Empty string berarti "tidak ada pilihan" (C13): jangan render chip kosong
+    // atau menyembunyikan placeholder.
     const values = React.useMemo(() => {
       if (value === undefined || value === null) return [];
-      return Array.isArray(value) ? value : [value];
+      const list = Array.isArray(value) ? value : [value];
+      return list.filter((v): v is string => typeof v === 'string' && v.length > 0);
     }, [value]);
 
     const selectedOptions = React.useMemo(() => {
@@ -161,7 +172,10 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
     return (
       <div className={cn('w-full', className)}>
         {label && (
-          <label className="mb-1.5 block text-sm font-medium text-foreground">
+          <label
+            htmlFor={triggerId}
+            className="mb-1.5 block text-sm font-medium text-foreground"
+          >
             {label}
           </label>
         )}
@@ -169,11 +183,14 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(
           <PopoverTrigger asChild>
             <button
               ref={ref}
+              id={triggerId}
               type="button"
               role="combobox"
               aria-expanded={open}
               aria-haspopup="listbox"
-              aria-label={label ?? 'Combobox'}
+              aria-label={label ?? undefined}
+              aria-describedby={ariaDescribedBy}
+              aria-invalid={ariaInvalid ?? (error ? true : undefined)}
               disabled={disabled}
               className={cn(comboboxVariants({ error, size }), triggerClassName)}
             >

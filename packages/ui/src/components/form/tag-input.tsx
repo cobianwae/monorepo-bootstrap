@@ -64,6 +64,8 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
     const inputRef = React.useRef<HTMLInputElement>(null);
 
     const isFull = maxTags !== undefined && value.length >= maxTags;
+    const generatedId = React.useId();
+    const inputId = props.id ?? generatedId;
 
     const addTags = React.useCallback(
       (raw: string) => {
@@ -121,7 +123,10 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
     return (
       <div className={cn('w-full', className)}>
         {label && (
-          <label className="mb-1.5 block text-sm font-medium text-foreground">
+          <label
+            htmlFor={inputId}
+            className="mb-1.5 block text-sm font-medium text-foreground"
+          >
             {label}
           </label>
         )}
@@ -158,6 +163,7 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
           aria-invalid={!!error}
           className="min-w-[120px] flex-1 bg-transparent py-1 text-sm placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           {...props}
+          id={inputId}
         />
         </div>
       </div>

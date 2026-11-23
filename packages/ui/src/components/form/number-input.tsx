@@ -109,10 +109,18 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       if (clampOnBlur && text !== '') commit(text);
     };
 
+    const generatedId = React.useId();
+    const inputId = props.id ?? generatedId;
+
     return (
       <div className={cn('w-full', className)}>
         {label && (
-          <label className="mb-1.5 block text-sm font-medium text-foreground">{label}</label>
+          <label
+            htmlFor={inputId}
+            className="mb-1.5 block text-sm font-medium text-foreground"
+          >
+            {label}
+          </label>
         )}
         <div
           className={cn(numberInputVariants({ size, error }))}
@@ -127,7 +135,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           value={text}
           placeholder={placeholder}
           disabled={disabled}
-          aria-label={ariaLabel ?? 'Number input'}
+          aria-label={ariaLabel}
           aria-invalid={!!error}
           onChange={(e) => {
             setText(e.target.value);
@@ -148,6 +156,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           }}
           className="h-full w-full bg-transparent px-3 py-1 text-sm placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
           {...props}
+          id={inputId}
         />
         {suffix && (
           <span className="pr-3 text-sm text-muted-foreground">{suffix}</span>

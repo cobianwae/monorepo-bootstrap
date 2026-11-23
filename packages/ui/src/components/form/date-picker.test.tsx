@@ -19,6 +19,21 @@ describe('DatePicker component', () => {
     expect(screen.getByText('Due date')).toBeDefined();
   });
 
+  it('associates label with trigger via htmlFor and id', () => {
+    render(<DatePicker label="Due date" />);
+    const trigger = screen.getByRole('button', { name: 'Due date' });
+    const label = screen.getByText('Due date');
+    expect(label.getAttribute('for')).toBe(trigger.id);
+    expect(trigger.id).not.toBe('');
+  });
+
+  it('sets aria-invalid and aria-describedby on trigger when error', () => {
+    render(<DatePicker error aria-describedby="due-error" />);
+    const trigger = screen.getByRole('button');
+    expect(trigger.getAttribute('aria-invalid')).toBe('true');
+    expect(trigger.getAttribute('aria-describedby')).toBe('due-error');
+  });
+
   it('renders clear button when value present and clearable', () => {
     const date = new Date(2026, 7, 16);
     render(<DatePicker value={date} formatDate={(d) => d.toDateString()} />);

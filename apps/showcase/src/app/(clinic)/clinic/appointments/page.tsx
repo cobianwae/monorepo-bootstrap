@@ -291,6 +291,8 @@ export default function AppointmentsPage() {
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none">
             <Calendar className="h-4 w-4 shrink-0 text-muted-foreground" />
             <Input
+              id="appointment-date-filter"
+              aria-label="Filter by appointment date"
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
@@ -338,9 +340,9 @@ export default function AppointmentsPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-2">
               <div className="space-y-1 sm:col-span-2">
-                <Label className="text-xs">Select Patient *</Label>
+                <Label htmlFor="appointment-patient" className="text-xs">Select Patient *</Label>
                 <Select value={patientId} onValueChange={setPatientId}>
-                  <SelectTrigger className="h-9 text-xs">
+                  <SelectTrigger id="appointment-patient" className="h-9 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

@@ -1,6 +1,6 @@
 # CR-058 — Label, error dan empty value form
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit
 **Ref:** CR-054 C05/C09/C12/C13; `docs/reviews/cr-054-code-audit.md`
 
@@ -20,10 +20,10 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Reproduksi seluruh lokasi C05 serta cold-load filter/rows-per-page.
-- [ ] Uji undefined/empty/valid/multiple, placeholder, clear dan pemilihan keyboard.
-- [ ] Uji submit invalid, relasi pesan, label dan fokus; test target password.
-- [ ] Verifikasi targeted lalu suite sesuai konvensi.
+- [x] Reproduksi seluruh lokasi C05 serta cold-load filter/rows-per-page.
+- [x] Uji undefined/empty/valid/multiple, placeholder, clear dan pemilihan keyboard.
+- [x] Uji submit invalid, relasi pesan, label dan fokus; test target password.
+- [x] Verifikasi targeted lalu suite sesuai konvensi.
 
 ## Keputusan
 
@@ -33,8 +33,8 @@
 
 ## Design System Checks
 
-- [ ] Token/kontras, a11y, API/export dan state konsisten; showcase diperbarui.
-- [ ] Typecheck/lint/test diverifikasi; baseline dicatat.
+- [x] Token/kontras, a11y, API/export dan state konsisten; showcase diperbarui.
+- [x] Typecheck/lint/test diverifikasi; baseline dicatat.
 
 ## Eksekusi
 
@@ -42,5 +42,5 @@ Branch: `cr-058-form-accessibility`
 Commit: `fix: connect form errors and normalize empty values [CR-058]`
 
 - [x] Disetujui user (2026-11-23).
-- [ ] Branch dibuat; implementasi dan verifikasi.
-- [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.
+- [x] Branch dibuat; implementasi dan verifikasi.
+- [x] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.
