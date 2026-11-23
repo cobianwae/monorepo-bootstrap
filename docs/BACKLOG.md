@@ -121,7 +121,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-059 | Fokus onboarding dan kepemilikan command palette (C06/C17) | done | `docs/cr/cr-059-overlay-ownership.md` |
 | CR-060 | Hydration RTE, statistik awal dan asset demo (C14/V01/V03) | approved | `docs/cr/cr-060-rte-hydration.md` |
 | CR-061 | Reflow kontrol/workspace mobile (C15/R01) | approved | `docs/cr/cr-061-responsive-controls.md` |
-| CR-062 | Reveal katalog home mobile tidak mencapai threshold (C16); implementasi selesai, menunggu `done` user | approved | `docs/cr/cr-062-home-reveal.md` |
+| CR-062 | Reveal katalog home mobile tidak mencapai threshold (C16); diperbaiki di `useReveal` dan di-merge ke `visual-polish` | done | `docs/cr/cr-062-home-reveal.md` |
 | CR-063 | Peran warna, heading, segmented dan literal palette (W01–03/W05–07) | approved | `docs/cr/cr-063-visual-consistency.md` |
 | CR-064 | State tabel konsumen dan pemulihan empty master-detail (W04/C08) | approved | `docs/cr/cr-064-data-state-recovery.md` |
 
