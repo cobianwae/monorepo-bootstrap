@@ -21,7 +21,7 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 Dokumen CR-054 disinkronkan `edd5bea`; CR-054–064 done.
 
 1. CR-063–064 done; antrean berikutnya sisa CR lama (butir 2) dan 013-01/015-03 (butir 5). Batas CSS consumer/overflow non-Banner CR-056 tetap tercatat. Status done hanya oleh user.
-2. Sisa CR lama: CR-036 (verifikasi AA tone), CR-017 (implementasi/verifikasi Tour). CR-018 diimplementasikan 2026-11-23 (varian §2.5 + responsif §5 + PRD 017 shipped), menunggu review user sebelum `done`. CR lama lain sebelum 054 sudah done atas keputusan user; tidak dibuka ulang oleh antrean ini.
+2. Sisa CR lama: CR-036 (verifikasi AA tone), CR-017 (implementasi/verifikasi Tour). CR-018 done 2026-11-23 (varian §2.5 + responsif §5 + PRD 017 shipped), di-merge ke `visual-polish`. CR lama lain sebelum 054 sudah done atas keputusan user; tidak dibuka ulang oleh antrean ini.
 3. Jangan membuka ulang temuan yang sudah ditangani: eyebrow PageHeader CR-046 done, Directional Motion CR-048 done, deviasi h1/weight dipertahankan CR-051. Sisa teks kecil → CR-055; guard heading seluruh docs sudah diperluas di CR-052; flaky RTE tetap baseline.
 4. Baseline baru pengganti CR-015 — verifikasi 12 error tipe FlowEditor + smoke RTE + timing worker (CR baru bila perlu).
 5. Antrean implementasi satu per sesi: 013-01, 015-03. Sinkron sitemap S-005.30/S-005.31 `planned` → `implemented`; S-005.41 `in-design` (018).

@@ -1,6 +1,6 @@
 # CR-018 — Tour: varian cva + responsif di komponen + sinkron docs
 
-**Status:** approved
+**Status:** done
 **Sumber:** review artefak 017 (lensa koherensi dokumen + implementation drift)
 **Ref:** `docs/design/wireframes/product-tour.md` (§2.5, §5, K2/K3), `docs/prd/017-product-tour.md`, `docs/stories/017-01-fondasi-wrapper-navigasi-callback.md`, `packages/ui/src/components/overlay/tour.tsx`, `packages/ui/src/components/overlay/tour-types.ts`, `apps/showcase/src/app/(docs)/patterns/product-tour/page.tsx:327-330`
 
