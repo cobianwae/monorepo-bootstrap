@@ -76,7 +76,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 
 | ID | Judul | Status | File |
 |---|---|---|---|
-| CR-012 | Calendar polish tema & docs showcase | approved | `docs/cr/cr-012-calendar-theme-docs-polish.md` |
+| CR-012 | Calendar polish tema & docs showcase | review | `docs/cr/cr-012-calendar-theme-docs-polish.md` |
 | CR-013 | Anchor popover detail event EventCalendar (M-006) jatuh ke pojok kiri atas | approved | `docs/cr/cr-013-popover-anchor-event-calendar.md` |
 | CR-017 | Tour: perbaikan dialog teruji di Chrome light/dark | done | `docs/cr/cr-017-tour-dialog-backdrop.md` |
 | CR-018 | Tour: varian cva + responsif di komponen + sinkron docs | done | `docs/cr/cr-018-tour-varian-responsif-docs.md` |
@@ -131,6 +131,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-067 | Uplift halaman Org Chart Studio: demo-first, segmented control, CodeBlock resep, copy English; done dan di-merge ke `visual-polish` | done | `docs/cr/cr-067-org-chart-studio-page-uplift.md` |
 | CR-068 | Org Chart Studio: poles demo (search di state non-data, reset seed, klaim dari data, toast Loading) dan section keyboard (sub-heading, `<kbd>`); 2 cluster A/B | done | `docs/cr/cr-068-org-chart-studio-demo-polish.md` |
 | CR-069 | OrgChartStudio: seluruh copy runtime (label, dialog, toast, live region, pesan validasi, default `emptyActionLabel`) ke English + update test; 4 cluster A–D | done | `docs/cr/cr-069-org-chart-studio-english-copy.md` |
+| CR-070 | CodeBlock syntax highlighting (Shiki): dual-theme light/dark + audit kontras + fallback flat | draft | `docs/cr/cr-070-codeblock-shiki-highlighting.md` |
 
 ## Catatan
 
