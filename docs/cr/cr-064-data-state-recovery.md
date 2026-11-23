@@ -1,6 +1,6 @@
 # CR-064 — Skenario state data dan pemulihan empty
 
-**Status:** approved
+**Status:** done (disetujui user 2026-11-23)
 **Sumber:** audit
 **Ref:** CR-054 W04/C08; `docs/reviews/cr-054-code-audit.md:112`, `:157`
 
@@ -54,4 +54,4 @@ Commit: `fix: demonstrate data state recovery [CR-064]`
 - [x] Branch dibuat (`cr-064-data-state-recovery`, dari `visual-polish` `b359291`); implementasi dan verifikasi.
 - [x] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.
 - Verifikasi: typecheck showcase 0 error; lint lulus; showcase test 94/94 (22 file) dan build lulus. Satu kegagalan timeout mind-map 5000ms pada run paralel lulus 7/7 saat dijalankan sendiri (baseline timing).
-- Belum diverifikasi di browser: keyboard dan announcement pada layar nyata. Status tetap `approved` sampai user menetapkan `done`.
+- Belum diverifikasi di browser: keyboard dan announcement pada layar nyata. Status `done` atas persetujuan user 2026-11-23; batas verifikasi browser tetap tercatat.
