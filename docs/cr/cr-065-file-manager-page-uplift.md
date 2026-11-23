@@ -1,6 +1,6 @@
 # CR-065 — Uplift halaman File Manager: struktur, kontrol demo, dan copy English
 
-**Status:** draft
+**Status:** done
 **Sumber:** visual uplift (`/polish-ui`), audit gap vs `docs/design/visual-language.md` (approved 2026-11-23)
 **Ref:** `apps/showcase/src/app/(docs)/patterns/file-manager/page.tsx`, acuan pola `apps/showcase/src/app/(docs)/components/data-display/page.tsx`, `docs/design/file-manager.md`, temuan terkait `docs/cr/cr-053-audit-visual-components-patterns.md:44`, `docs/reviews/cr-054-visual-audit.md:255`
 
@@ -33,18 +33,22 @@ Copy: semua string halaman English (data, toast, error, label). Komponen `FileMa
 
 ## Tasks (jalur small-fix)
 
-- [ ] Ganti 4 baris kontrol `Button` dengan `SegmentedControl` berlabel dalam satu Card (aria-label per grup).
-- [ ] Susun ulang struktur: header → demo → accessibility; pola root/section standar.
-- [ ] Terjemahkan seluruh copy halaman ke English (data, toast, error, hero, label).
-- [ ] Rapikan accessibility notes dengan `SectionHeading` dan 4 sub-kelompok ringkas.
-- [ ] Audit selector e2e: grep `file-manager`/label lama di `apps/showcase` e2e dan `*.spec.ts`; sesuaikan bila ada (pra-cek: tidak ada test yang mereferensi halaman ini, hanya `packages/ui/.../file-manager.test.tsx` yang tidak terdampak).
-- [ ] Verifikasi: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`, cek guard `visual-language-guard.test.ts`.
+- [x] Ganti 4 baris kontrol `Button` dengan `SegmentedControl` berlabel dalam satu Card (aria-label per grup).
+- [x] Susun ulang struktur: header → demo → accessibility; pola root/section standar.
+- [x] Terjemahkan seluruh copy halaman ke English (data, toast, error, hero, label).
+- [x] Rapikan accessibility notes dengan `SectionHeading` dan 4 sub-kelompok ringkas.
+- [x] Audit selector e2e: grep `file-manager`/label lama di `apps/showcase` e2e dan `*.spec.ts`; sesuaikan bila ada (pra-cek: tidak ada test yang mereferensi halaman ini, hanya `packages/ui/.../file-manager.test.tsx` yang tidak terdampak).
+- [x] Verifikasi: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`, cek guard `visual-language-guard.test.ts`.
 - [ ] Cek visual light/dark + mobile bila Playwright tersedia (best-effort).
 
 ## Pertanyaan Terbuka
 
 1. Copy internal `FileManager` (Indonesia) — (a) biarkan, CR terpisah untuk lokalisasi komponen + update `file-manager.test.tsx`; (b) sertakan di CR ini. Rekomendasi: (a), karena mengubah string di `packages/ui` menyentuh test dan perilaku publik.
 2. Perluas `visual-language-guard.test.ts` ke `patterns/file-manager`? Rekomendasi: tidak di CR ini (cakupan guard diperluas bertahap lewat CR terpisah).
+
+## Keputusan Pertanyaan Terbuka
+
+No. 1 dan 2 belum dijawab user; default rekomendasi dipakai (copy internal `FileManager` tidak diubah; guard tidak diperluas).
 
 ## Keputusan
 
@@ -69,10 +73,10 @@ Copy: semua string halaman English (data, toast, error, label). Komponen `FileMa
 Branch: `cr-065-file-manager-page-uplift`
 Commit: `refactor: uplift halaman file manager [CR-065]`
 
-- [ ] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR disetujui user.
+- [x] Branch dibuat (worktree `arah-cr`, dari `visual-polish` `730887b`).
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
