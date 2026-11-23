@@ -13,7 +13,7 @@ import {
   RichTextEditor,
 } from '@ds/ui';
 
-const PROSE_EXAMPLE = `<h2>Menulis dengan RichTextEditor</h2><p>Dokumen contoh dengan <strong>tebal</strong>, <em>miring</em>, <u>garis bawah</u>, dan <code>kode sebaris</code>.</p><ul><li>Bullet satu tingkat</li><li>Format via toolbar = hasil shortcut</li></ul><ol><li>Langkah pertama</li><li>Langkah kedua</li></ol><blockquote><p>Kutipan: tulis = terbit, gaya Prose sama.</p></blockquote><pre><code>pnpm -C apps/showcase build</code></pre><p>Baca <a href="https://tiptap.dev">dokumentasi Tiptap</a> dan lihat <a href="/path/lokal">jalur lokal</a>.</p><p><img src="https://contoh.com/gambar.png" alt="Contoh gambar" /></p>`;
+const PROSE_EXAMPLE = `<h2>Menulis dengan RichTextEditor</h2><p>Dokumen contoh dengan <strong>tebal</strong>, <em>miring</em>, <u>garis bawah</u>, dan <code>kode sebaris</code>.</p><ul><li>Bullet satu tingkat</li><li>Format via toolbar = hasil shortcut</li></ul><ol><li>Langkah pertama</li><li>Langkah kedua</li></ol><blockquote><p>Kutipan: tulis = terbit, gaya Prose sama.</p></blockquote><pre><code>pnpm -C apps/showcase build</code></pre><p>Baca <a href="https://tiptap.dev">dokumentasi Tiptap</a> dan lihat <a href="/path/lokal">jalur lokal</a>.</p><p><img src="/examples/rich-text-document.svg" alt="Ilustrasi dokumen dengan judul dan baris teks" /></p>`;
 
 const RECIPE = `const [value, setValue] = useState('<p>Halo</p>');
 <RichTextEditor
@@ -30,7 +30,8 @@ const RECIPE = `const [value, setValue] = useState('<p>Halo</p>');
 
 export default function RichTextEditorPage() {
   const [value, setValue] = React.useState(PROSE_EXAMPLE);
-  const [words, setWords] = React.useState(0);
+  const [words, setWords] = React.useState<number | null>(null);
+  const [imageFailed, setImageFailed] = React.useState(false);
   const [mode, setMode] = React.useState<'editable' | 'readonly' | 'disabled'>('editable');
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -43,6 +44,7 @@ export default function RichTextEditorPage() {
     setMode('editable');
     setMaxLength(10000);
     setValue(PROSE_EXAMPLE);
+    setImageFailed(false);
   }, []);
 
   const resetDemo = React.useCallback(() => {
@@ -82,7 +84,7 @@ export default function RichTextEditorPage() {
               S-005.22
             </Badge>
             <Badge variant="outline" className="font-mono text-xs">
-              {words} kata
+              {words === null ? 'Menghitung kata…' : `${words} kata`}
             </Badge>
           </div>
         }
@@ -121,7 +123,14 @@ export default function RichTextEditorPage() {
             Demo interaktif + panel state
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4 p-6">
+        <CardContent className="space-y-4 p-6" onErrorCapture={(event) => {
+          if (event.target instanceof HTMLImageElement) setImageFailed(true);
+        }}>
+          {imageFailed ? (
+            <p role="status" className="text-sm text-muted-foreground">
+              Gambar contoh tidak tersedia. Ilustrasi menunjukkan dokumen dengan judul dan baris teks; isi editor tetap dapat dibaca.
+            </p>
+          ) : null}
           <RichTextEditor
             value={value}
             onChange={setValue}

@@ -119,7 +119,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-057 | Semantik kontrol, keyboard dan tabel virtual (C02–04/C07/C10) | approved | `docs/cr/cr-057-control-semantics.md` |
 | CR-058 | Label/error, target password dan empty-value form (C05/C09/C12/C13) | approved | `docs/cr/cr-058-form-accessibility.md` |
 | CR-059 | Fokus onboarding dan kepemilikan command palette (C06/C17) | done | `docs/cr/cr-059-overlay-ownership.md` |
-| CR-060 | Hydration RTE, statistik awal dan asset demo (C14/V01/V03) | approved | `docs/cr/cr-060-rte-hydration.md` |
+| CR-060 | Hydration RTE, statistik awal dan asset demo (C14/V01/V03); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-060-rte-hydration.md` |
 | CR-061 | Reflow kontrol/workspace mobile (C15/R01) | approved | `docs/cr/cr-061-responsive-controls.md` |
 | CR-062 | Reveal katalog home mobile tidak mencapai threshold (C16); diperbaiki di `useReveal` dan di-merge ke `visual-polish` | done | `docs/cr/cr-062-home-reveal.md` |
 | CR-063 | Peran warna, heading, segmented dan literal palette (W01–03/W05–07) | approved | `docs/cr/cr-063-visual-consistency.md` |

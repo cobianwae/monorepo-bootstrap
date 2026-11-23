@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="240" viewBox="0 0 480 240" role="img" aria-labelledby="title">
+  <title id="title">Ilustrasi dokumen dengan judul dan baris teks</title>
+  <rect width="480" height="240" rx="16" fill="oklch(0.96 0 0)"/>
+  <g fill="oklch(0.3 0 0)">
+    <rect x="64" y="48" width="220" height="20" rx="4"/>
+    <rect x="64" y="96" width="352" height="8" rx="4"/>
+    <rect x="64" y="120" width="320" height="8" rx="4"/>
+    <rect x="64" y="144" width="352" height="8" rx="4"/>
+    <rect x="64" y="168" width="240" height="8" rx="4"/>
+  </g>
+</svg>

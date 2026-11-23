@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
+import { hydrateRoot } from 'react-dom/client';
+import { act } from '@testing-library/react';
 import { useState } from 'react';
 import { RichTextEditor } from './rich-text-editor';
 
@@ -24,6 +26,48 @@ function ControlledHarness({
 }
 
 describe('RichTextEditor 006-01', () => {
+  it.each(['', '<p>Halo <strong>dunia</strong></p>'])('hydrates server HTML without recoverable errors: %s', async (value) => {
+    // Render SSR tanpa DOM agar tes menangkap initializer yang bergantung document.
+    const originalDocument = globalThis.document;
+    let html: string;
+    vi.stubGlobal('document', undefined);
+    try {
+      html = renderToString(<RichTextEditor value={value} />);
+    } finally {
+      vi.stubGlobal('document', originalDocument);
+    }
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    document.body.append(container);
+    const onRecoverableError = vi.fn();
+    const consoleError = vi.spyOn(console, 'error');
+    let root: ReturnType<typeof hydrateRoot>;
+    try {
+      await act(async () => {
+        root = hydrateRoot(container, <RichTextEditor value={value} />, { onRecoverableError });
+      });
+      await waitFor(() => {
+        expect(container.querySelector('[data-testid="rte-counter"]')?.textContent).toBe(`${value ? 10 : 0}/10000`);
+      });
+      expect(onRecoverableError).not.toHaveBeenCalled();
+      expect(consoleError.mock.calls.flat().join(' ')).not.toMatch(/hydration|didn't match/i);
+    } finally {
+      await act(async () => root?.unmount());
+      container.remove();
+      consoleError.mockRestore();
+    }
+  });
+
+  it('reports initial and externally replaced text stats without emitting onChange', async () => {
+    const onTextChange = vi.fn();
+    const onChange = vi.fn();
+    const { rerender } = render(<RichTextEditor value="<p>Halo dunia</p>" onChange={onChange} onTextChange={onTextChange} />);
+    await waitFor(() => expect(onTextChange).toHaveBeenLastCalledWith('Halo dunia', { chars: 10, words: 2 }));
+    rerender(<RichTextEditor value="" onChange={onChange} onTextChange={onTextChange} />);
+    await waitFor(() => expect(onTextChange).toHaveBeenLastCalledWith('', { chars: 0, words: 0 }));
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it('renders toolbar, content, and live region (SSR-safe)', async () => {
     // SSR does not throw thanks to immediatelyRender:false
     expect(() => renderToString(<RichTextEditor value="<p>Halo</p>" />)).not.toThrow();
