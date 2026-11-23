@@ -1,6 +1,6 @@
 # CR-059 — Fokus modal dan aktivasi command palette
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit
 **Ref:** CR-054 C06/C17; `docs/reviews/cr-054-code-audit.md`
 
@@ -18,11 +18,11 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Reproduksi pointer/shortcut global dan demo, termasuk route overlays-menus bila memasang instance.
-- [ ] Pastikan satu dialog, initial focus, siklus Tab/Shift+Tab, Escape dan return focus.
-- [ ] Uji search/Arrow/Enter command; pertahankan shortcut di halaman tanpa demo.
-- [ ] Selidiki return focus lightbox media: probe Escape menutup tetapi tidak kembali ke pemicu yang sudah difokuskan; belum ditetapkan akar masalah.
-- [ ] Regression tests dan verifikasi sesuai konvensi.
+- [x] Reproduksi pointer/shortcut global dan demo, termasuk route overlays-menus bila memasang instance.
+- [x] Pastikan satu dialog, initial focus, siklus Tab/Shift+Tab, Escape dan return focus.
+- [x] Uji search/Arrow/Enter command; pertahankan shortcut di halaman tanpa demo.
+- [x] Selidiki return focus lightbox media: probe Escape menutup tetapi tidak kembali ke pemicu yang sudah difokuskan; belum ditetapkan akar masalah.
+- [x] Regression tests dan verifikasi sesuai konvensi.
 
 ## Keputusan
 
@@ -32,8 +32,8 @@
 
 ## Design System Checks
 
-- [ ] Token/kontras, Radix/a11y, API/export dan state konsisten; showcase diperbarui.
-- [ ] Typecheck/lint/test diverifikasi; baseline dicatat.
+- [x] Token/kontras, Radix/a11y, API/export dan state konsisten; showcase diperbarui.
+- [x] Typecheck/lint/test diverifikasi; baseline dicatat.
 
 ## Eksekusi
 
@@ -41,5 +41,5 @@ Branch: `cr-059-overlay-ownership`
 Commit: `fix: coordinate overlays and command activation [CR-059]`
 
 - [x] Disetujui user (2026-11-23).
-- [ ] Branch dibuat; implementasi dan verifikasi.
-- [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.
+- [x] Branch dibuat; implementasi dan verifikasi.
+- [x] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.

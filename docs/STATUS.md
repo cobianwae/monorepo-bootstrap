@@ -14,13 +14,13 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 - Bukti historis visual: foundations diseragamkan dan SectionHeading disederhanakan; guard px diperluas ke seluruh src, heading diperluas ke docs, kontras Banner/Alert/eyebrow diperbaiki. CR-053: guard 5/5, showcase 79/79, tokens 10/10, ui 705/707 dengan dua timeout yang lulus 53/53 saat suite terkait dijalankan sendiri; lint/build:types hijau, build 76/76 dari salinan, typecheck tetap 12 error baseline FlowEditor. Ini bukan hasil verifikasi baru atau klaim semua state/palet patuh.
 
-- CR-054 **done atas konfirmasi user pada 2026-11-23**; CR turunan CR-055–064 tetap **approved**. Audit 73 route selesai dalam cakupan kode/visual/triase; 146 dark/mobile dan 37 patterns full-document light dibaca, desktop light seluruh route setidaknya sebagian. Probe mengonfirmasi C16 Reveal home, C17 dua command palette, hydration RTE, empty-value form, reflow dan aksesibilitas kontrol; data-table error/retry/empty/clear serta akhir feed diverifikasi. Implementasi CR turunan belum dimulai; tidak ada perubahan UI. Batas state/zoom/palet/screen reader dan hasil keyboard yang belum terbukti dicatat di `docs/reviews/cr-054-final-audit.md`; ini bukan sertifikasi atau pengujian exhaustive.
+- CR-054 done 2026-11-23; CR-055–064 approved. CR-059 done 2026-11-23: onboarding ke Dialog Radix, CommandPalette controlled (`open/enableGlobalHandlers`), lightbox return focus via trigger ref — sisa CR-055–058,060–064 approved belum diimplementasikan. Audit 73 route probe (146 dark/mobile, 37-patterns light) dan batas state/zoom/palet/screen reader di `cr-054-final-audit.md`; bukan sertifikasi exhaustive.
 
 ## Next
 
-Dokumen CR-054 sudah disinkronkan dengan cakupan final dan commit audit `edd5bea`; audit CR-054 done, CR-055–064 approved dan implementasi belum dimulai.
+Dokumen CR-054 disinkronkan `edd5bea`; CR-054/CR-059 done, sisa CR-055–064 approved belum dimulai.
 
-1. Implementasi CR-055–064 yang sudah approved, satu CR per sesi. Prioritas: CR-062 (home tersembunyi), CR-059 (modal/dua palette), CR-060 (hydration), CR-056/061 (reflow), lalu kontras/form/semantik/state/konsistensi. Status done tetap hanya oleh user.
+1. Implementasi CR-055–058,060–064 approved, satu CR per sesi. Prioritas: CR-062 (home), CR-060 (hydration), CR-056/061 (reflow), lalu kontras/form/semantik/state/konsistensi. Status done hanya oleh user.
 2. Sisa CR lama: CR-036 (verifikasi AA tone), CR-017/018 (implementasi/verifikasi Tour). CR lama lain sebelum 054 sudah done atas keputusan user; tidak dibuka ulang oleh antrean ini.
 3. Jangan membuka ulang temuan yang sudah ditangani: eyebrow PageHeader CR-046 done, Directional Motion CR-048 done, deviasi h1/weight dipertahankan CR-051. Sisa teks kecil → CR-055; guard heading seluruh docs sudah diperluas di CR-052; flaky RTE tetap baseline.
 4. Baseline baru pengganti CR-015 — verifikasi 12 error tipe FlowEditor + smoke RTE + timing worker (CR baru bila perlu).

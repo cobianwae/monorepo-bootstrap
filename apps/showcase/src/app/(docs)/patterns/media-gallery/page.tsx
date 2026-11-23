@@ -174,6 +174,7 @@ export default function MediaGalleryPage() {
   const [lightboxIndex, setLightboxIndex] = React.useState(0);
   const [lightboxOpen, setLightboxOpen] = React.useState(false);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const lightboxTriggerRef = React.useRef<HTMLElement | null>(null);
 
   React.useEffect(() => {
     const timer = window.setTimeout(() => setIsLoading(false), 600);
@@ -199,8 +200,21 @@ export default function MediaGalleryPage() {
   const LightboxIcon = lightboxItem ? CATEGORY_ICONS[lightboxItem.category] : null;
 
   const openLightbox = (index: number) => {
+    lightboxTriggerRef.current = document.activeElement as HTMLElement | null;
     setLightboxIndex(index);
     setLightboxOpen(true);
+  };
+
+  const handleLightboxOpenChange = (open: boolean) => {
+    setLightboxOpen(open);
+    if (!open) {
+      // Radix should restore focus, but conditional DialogContent caused loss; fallback to trigger.
+      window.setTimeout(() => {
+        if (document.activeElement === document.body && lightboxTriggerRef.current?.isConnected) {
+          lightboxTriggerRef.current.focus();
+        }
+      }, 50);
+    }
   };
 
   const goPrev = () => {
@@ -466,9 +480,11 @@ export default function MediaGalleryPage() {
         </Card>
       </section>
 
-      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        {lightboxItem && (
-          <DialogContent className="max-w-[min(48rem,calc(100%_-_2rem))] gap-0 overflow-hidden p-0 text-white sm:rounded-xl">
+      <Dialog open={lightboxOpen} onOpenChange={handleLightboxOpenChange}>
+        <DialogContent className="max-w-[min(48rem,calc(100%_-_2rem))] gap-0 overflow-hidden p-0 text-white sm:rounded-xl">
+          {lightboxItem ? (
+            <>
+              {/* lightbox content - keep DialogContent mounted for focus restoration */}
             <div
               style={{ backgroundImage: lightboxItem.gradient }}
               className="relative flex aspect-video items-center justify-center"
@@ -541,8 +557,9 @@ export default function MediaGalleryPage() {
                 </Button>
               </DialogFooter>
             </div>
-          </DialogContent>
-        )}
+            </>
+          ) : null}
+        </DialogContent>
       </Dialog>
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>

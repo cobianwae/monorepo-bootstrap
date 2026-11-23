@@ -30,13 +30,27 @@ export interface CommandPaletteGroup {
 export interface CommandPaletteProps
   extends React.HTMLAttributes<HTMLDivElement> {
   groups: CommandPaletteGroup[];
+  /** Controlled open state; when defined the palette is controlled. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** When false, ignores global Ctrl/Cmd+K and ds:open-command-palette event. Demo/local instance should set false. Default true. */
+  enableGlobalHandlers?: boolean;
 }
 
 const OPEN_EVENT = 'ds:open-command-palette';
 
 export const CommandPalette = React.forwardRef<HTMLDivElement, CommandPaletteProps>(
-  ({ groups, className, ...props }, ref) => {
-    const [open, setOpen] = React.useState(false);
+  ({ groups, className, open: controlledOpen, onOpenChange, enableGlobalHandlers = true, ...props }, ref) => {
+    const [internalOpen, setInternalOpen] = React.useState(false);
+    const isControlled = controlledOpen !== undefined;
+    const open = isControlled ? controlledOpen : internalOpen;
+    const setOpen = React.useCallback(
+      (next: boolean) => {
+        if (!isControlled) setInternalOpen(next);
+        onOpenChange?.(next);
+      },
+      [isControlled, onOpenChange]
+    );
     const [query, setQuery] = React.useState('');
     const [activeIndex, setActiveIndex] = React.useState(0);
     const inputRef = React.useRef<HTMLInputElement>(null);
@@ -67,9 +81,10 @@ export const CommandPalette = React.forwardRef<HTMLDivElement, CommandPalettePro
       setOpen(true);
       setQuery('');
       setActiveIndex(0);
-    }, []);
+    }, [setOpen]);
 
     React.useEffect(() => {
+      if (!enableGlobalHandlers) return;
       const onKeyDown = (e: KeyboardEvent) => {
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
           e.preventDefault();
@@ -84,7 +99,7 @@ export const CommandPalette = React.forwardRef<HTMLDivElement, CommandPalettePro
         window.removeEventListener('keydown', onKeyDown);
         window.removeEventListener(OPEN_EVENT, onOpenEvent);
       };
-    }, [openPalette]);
+    }, [openPalette, enableGlobalHandlers]);
 
     React.useEffect(() => {
       if (open) {
