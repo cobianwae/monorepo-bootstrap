@@ -67,31 +67,42 @@ function setDriverButtonsDisabled(disabled: boolean): void {
   });
 }
 
-const LAYER_SELECTORS = [
-  '.driver-popover',
-  '#driver-overlay',
-  '#driver-page-overlay',
-  '[data-radix-portal]',
-  '[data-tour-layer]',
-];
+/**
+ * Lapisan tur yang tidak boleh di-inert: `.driver-layer` (DOM nyata driver.js 1.14, top layer)
+ * dan `[data-tour-layer]` (root tur + dialog konfirmasi; Radix Portal tidak memberi atribut sendiri).
+ */
+const LAYER_SELECTORS = ['.driver-layer', '[data-tour-layer]'];
 
 function isTourLayer(el: Element): boolean {
   return LAYER_SELECTORS.some((sel) => el.matches(sel) || el.querySelector(sel) !== null);
 }
 
-/** Konten belakang `inert` + `aria-hidden` saat tur aktif (§4); kembalikan saat tutup. */
-function setBackgroundInert(on: boolean): void {
-  Array.from(document.body.children).forEach((child) => {
-    if (!(child instanceof HTMLElement) || isTourLayer(child)) return;
-    if (on) {
-      child.setAttribute('inert', '');
-      child.setAttribute('aria-hidden', 'true');
-      child.dataset.tourInert = 'true';
-    } else if (child.dataset.tourInert === 'true') {
-      child.removeAttribute('inert');
-      child.removeAttribute('aria-hidden');
-      delete child.dataset.tourInert;
+/**
+ * Konten belakang `inert` + `aria-hidden` saat tur aktif (§4).
+ * Inert saudara di setiap tingkat dari `anchor` (root tur) naik sampai body, sehingga
+ * konten di dalam root app ikut ter-inert. Ancestor `anchor` dan lapisan tur dibiarkan.
+ * Pemulihan (`on = false`) menjangkau semua elemen yang ditandai, tanpa bergantung pada anchor.
+ */
+function setBackgroundInert(on: boolean, anchor: Element | null): void {
+  if (on) {
+    let node: Element | null = anchor;
+    while (node && node !== document.body && node.parentElement) {
+      const parent: HTMLElement = node.parentElement;
+      Array.from(parent.children).forEach((sibling) => {
+        if (sibling === node || !(sibling instanceof HTMLElement)) return;
+        if (sibling.hasAttribute('inert') || isTourLayer(sibling)) return;
+        sibling.setAttribute('inert', '');
+        sibling.setAttribute('aria-hidden', 'true');
+        sibling.dataset.tourInert = 'true';
+      });
+      node = parent;
     }
+    return;
+  }
+  document.querySelectorAll<HTMLElement>('[data-tour-inert="true"]').forEach((el) => {
+    el.removeAttribute('inert');
+    el.removeAttribute('aria-hidden');
+    delete el.dataset.tourInert;
   });
 }
 
@@ -119,6 +130,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
   const triggerRef = React.useRef<HTMLElement | null>(null);
   const loadTimerRef = React.useRef<number | null>(null);
   const confirmOpenRef = React.useRef(false);
+  const layerRef = React.useRef<HTMLDivElement>(null);
   const [active, setActive] = React.useState(initialStep);
   const [confirmOpen, setConfirmOpen] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -136,6 +148,15 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
 
   React.useEffect(() => {
     confirmOpenRef.current = confirmOpen;
+  }, [confirmOpen]);
+
+  // Dialog konfirmasi di atas backdrop (CR-017): sembunyikan lapisan driver.js selama dialog terbuka.
+  React.useEffect(() => {
+    if (!confirmOpen) return;
+    document.body.dataset.tourConfirm = 'true';
+    return () => {
+      delete document.body.dataset.tourConfirm;
+    };
   }, [confirmOpen]);
 
   const stepCount = steps.length;
@@ -203,7 +224,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
   React.useEffect(() => {
     if (!open || stepCount === 0) return;
     triggerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    setBackgroundInert(true);
+    setBackgroundInert(true, layerRef.current);
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -234,7 +255,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
     document.addEventListener('keydown', onKeyDown);
     return () => {
       document.removeEventListener('keydown', onKeyDown);
-      setBackgroundInert(false);
+      setBackgroundInert(false, null);
     };
   }, [open, stepCount]);
 
@@ -388,7 +409,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
 
     const d = createDriver({
       overlayColor: 'var(--background)',
-      overlayOpacity: 0.8,
+      overlayOpacity: 0.6,
       stagePadding: 8,
       stageRadius: 8,
       popoverClass: 'ds-tour-popover',
@@ -423,7 +444,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
   // Empty: langkah kosong — tidak dimulai (FR-007, §3).
   if (stepCount === 0) {
     return (
-      <div data-tour-layer role="status" data-testid="tour-empty">
+      <div ref={layerRef} data-tour-layer role="status" data-testid="tour-empty">
         Belum ada langkah tur.
         <button type="button" disabled>
           Mulai tur
@@ -440,7 +461,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
       skipTour(statusRef.current, activeIndexRef.current);
     };
     return (
-      <div data-tour-layer>
+      <div ref={layerRef} data-tour-layer>
         <div
           ref={alertRef}
           role="alert"
@@ -467,7 +488,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
   // Success: selesai / dilewati — konfirmasi ringan + fokus kembali (§3).
   if (ended) {
     return (
-      <div data-tour-layer>
+      <div ref={layerRef} data-tour-layer>
         <div role="status" data-testid="tour-success">
           {ended === 'finished' ? 'Tur selesai.' : 'Tur dilewati.'}
         </div>
@@ -482,7 +503,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
   const current = steps[safeActive];
 
   return (
-    <div data-tour-layer>
+    <div ref={layerRef} data-tour-layer>
       <div
         aria-live="polite"
         aria-busy={loading || undefined}
@@ -496,7 +517,7 @@ export function Tour({ steps, open, initialStep = 0, onFinish, onSkip, onStepCha
             : `Langkah ${safeActive + 1} dari ${stepCount}: ${current.title}${notice ? ` ${notice}` : ''}`}
       </div>
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent data-testid="tour-skip-dialog">
+        <AlertDialogContent data-testid="tour-skip-dialog" data-tour-layer>
           <AlertDialogHeader>
             <AlertDialogTitle>Lewati tur?</AlertDialogTitle>
             <AlertDialogDescription>

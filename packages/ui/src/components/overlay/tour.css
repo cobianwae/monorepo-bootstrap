@@ -5,8 +5,14 @@
  * Semua warna dari token semantik; tanpa hex hardcode.
  */
 
-.driver-overlay {
-  background-color: color-mix(in oklch, var(--background) 80%, transparent);
+/*
+ * Backdrop diatur satu kali lewat `overlayColor` + `overlayOpacity` (tour.tsx).
+ * Jangan menambah background pada `.driver-overlay` (SVG): itu menumpuk redup ganda (CR-017).
+ */
+
+/* Dialog "Lewati tur?" (Radix, DOM biasa) harus tampil di atas lapisan driver.js (top layer, CR-017). */
+body[data-tour-confirm='true'] .driver-layer {
+  display: none;
 }
 
 .driver-active-element {
@@ -37,6 +43,12 @@
 
 .ds-tour-popover .driver-popover-footer button {
   min-height: 44px;
+}
+
+/* Fokus keyboard tombol popover harus terlihat (§4/§6, CR-017). */
+.ds-tour-popover .driver-popover-footer button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .ds-tour-popover .driver-popover-footer button.driver-popover-next-btn {

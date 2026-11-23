@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import { Tour, isTargetVisible } from './tour';
@@ -290,6 +291,47 @@ describe('Tour 017-02 (target hilang + keyboard + motion + states)', () => {
     expect(bg.getAttribute('aria-hidden')).toBe('true');
     tour.unmount();
     expect(bg.getAttribute('inert')).toBeNull();
+  });
+
+  it('CR-017: saudara di dalam root app ikut inert; lapisan driver.js tidak inert', () => {
+    document.body.insertAdjacentHTML('beforeend', '<div class="driver-layer" data-testid="drv"></div>');
+    render(
+      <div>
+        <header data-testid="app-header">Header</header>
+        <Tour steps={fiveSteps()} open={true} />
+      </div>
+    );
+    renderTargets();
+    expect(screen.getByTestId('app-header').getAttribute('inert')).not.toBeNull();
+    expect(screen.getByTestId('app-header').getAttribute('aria-hidden')).toBe('true');
+    expect(screen.getByTestId('drv').hasAttribute('inert')).toBe(false);
+  });
+
+  it('CR-017: dialog konfirmasi menyembunyikan lapisan driver selama terbuka', () => {
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} />);
+    const passedSteps = getPassedSteps();
+    act(() => {
+      nextAt(passedSteps, 0)?.();
+    });
+    act(() => {
+      nextAt(passedSteps, 1)?.();
+    });
+    act(() => {
+      closeAt(passedSteps, 2)?.();
+    });
+    expect(screen.getByTestId('tour-skip-dialog').hasAttribute('data-tour-layer')).toBe(true);
+    expect(document.body.dataset.tourConfirm).toBe('true');
+    act(() => {
+      fireEvent.click(screen.getByText('Lanjut tur'));
+    });
+    expect(document.body.dataset.tourConfirm).toBeUndefined();
+  });
+
+  it('CR-017: CSS backdrop tunggal dan ring fokus tombol popover', () => {
+    const css = readFileSync(`${import.meta.dirname}/tour.css`, 'utf8');
+    expect(css).not.toMatch(/\.driver-overlay\s*\{[^}]*background-color/);
+    expect(css).toMatch(/\.driver-popover-footer button:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--primary\)/);
   });
 
   it('AC-03: Tab cycling di footer popover', async () => {
