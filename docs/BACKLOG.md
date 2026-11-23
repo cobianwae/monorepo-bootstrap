@@ -122,7 +122,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-060 | Hydration RTE, statistik awal dan asset demo (C14/V01/V03); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-060-rte-hydration.md` |
 | CR-061 | Reflow kontrol/workspace mobile (C15/R01) | done | `docs/cr/cr-061-responsive-controls.md` |
 | CR-062 | Reveal katalog home mobile tidak mencapai threshold (C16); diperbaiki di `useReveal` dan di-merge ke `visual-polish` | done | `docs/cr/cr-062-home-reveal.md` |
-| CR-063 | Peran warna, heading, segmented dan literal palette (W01–03/W05–07) | approved | `docs/cr/cr-063-visual-consistency.md` |
+| CR-063 | Peran warna, heading, segmented dan literal palette (W01–03/W05–07) | done | `docs/cr/cr-063-visual-consistency.md` |
 | CR-064 | State tabel konsumen dan pemulihan empty master-detail (W04/C08); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-064-data-state-recovery.md` |
 
 ## Catatan

@@ -1,6 +1,6 @@
 # CR-063 — Konsistensi peran warna dan hierarki
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit
 **Ref:** CR-054 W01–W03/W05–W07; `docs/reviews/cr-054-code-audit.md:135`
 
