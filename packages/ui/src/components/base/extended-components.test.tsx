@@ -1,5 +1,14 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+
+// Shiki WASM tidak tersedia di jsdom; highlight diganti fixture untuk uji komponen.
+vi.mock('../data-display/code-block-highlight', () => ({
+  highlightCode: vi.fn(async (code: string, language: string) =>
+    language === 'tree'
+      ? null
+      : `<pre class="shiki"><code><span class="line"><span style="--shiki-light:#24292e;--shiki-dark:#e1e4e8">${code}</span></span></code></pre>`
+  ),
+}));
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Card, CardHeader, CardTitle, CardContent } from './card';
 import { Avatar, AvatarFallback, AvatarGroup } from './avatar';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
@@ -129,8 +138,8 @@ describe('Rating Component', () => {
 });
 
 describe('CodeBlock Component', () => {
-  it('renders code and filename', () => {
-    render(
+  it('renders code and filename, highlighted once Shiki resolves', async () => {
+    const { container } = render(
       <CodeBlock
         code="const x = 1;"
         filename="example.ts"
@@ -139,7 +148,24 @@ describe('CodeBlock Component', () => {
       />
     );
     expect(screen.getByText('example.ts')).toBeDefined();
-    expect(screen.getByText('const x = 1;')).toBeDefined();
+    await waitFor(() => expect(container.querySelector('.ds-code-block .shiki')).not.toBeNull());
+    expect(container.textContent).toContain('const x = 1;');
+  });
+
+  it('falls back to flat code for an unknown language', async () => {
+    const { container } = render(<CodeBlock code="plain text" language="tree" />);
+    await waitFor(() => expect(container.querySelector('.ds-code-block')).toBeNull());
+    expect(screen.getByText('plain text')).toBeDefined();
+  });
+
+  it('shows a visible failure state when clipboard write is rejected', async () => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: vi.fn().mockRejectedValue(new Error('denied')) },
+    });
+    render(<CodeBlock code="x" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Salin kode' }));
+    expect(await screen.findByText('Gagal disalin')).toBeDefined();
   });
 });
 

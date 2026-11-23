@@ -6,7 +6,7 @@ class ResizeObserverMock {
 
 globalThis.ResizeObserver = ResizeObserverMock as unknown as typeof ResizeObserver;
 
-if (!window.matchMedia) {
+if (typeof window !== 'undefined' && !window.matchMedia) {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: (query: string) => ({
@@ -22,7 +22,9 @@ if (!window.matchMedia) {
   });
 }
 
-HTMLElement.prototype.scrollIntoView = () => undefined;
+if (typeof HTMLElement !== 'undefined') {
+  HTMLElement.prototype.scrollIntoView = () => undefined;
+}
 
 if (typeof Element !== 'undefined') {
   Element.prototype.getClientRects = () => [] as unknown as DOMRectList;
@@ -57,7 +59,7 @@ if (typeof Range !== 'undefined') {
     }) as unknown as DOMRect;
 }
 
-if (typeof globalThis.PointerEvent === 'undefined') {
+if (typeof globalThis.PointerEvent === 'undefined' && typeof MouseEvent !== 'undefined') {
   class MockPointerEvent extends MouseEvent {
     pointerId = 0;
     pointerType = 'mouse';
@@ -77,7 +79,7 @@ if (typeof globalThis.PointerEvent === 'undefined') {
   globalThis.PointerEvent = MockPointerEvent as unknown as typeof PointerEvent;
 }
 
-if (!window.localStorage || typeof window.localStorage.clear !== 'function') {
+if (typeof window !== 'undefined' && (!window.localStorage || typeof window.localStorage.clear !== 'function')) {
   const store = new Map<string, string>();
   const storage: Storage = {
     get length() {

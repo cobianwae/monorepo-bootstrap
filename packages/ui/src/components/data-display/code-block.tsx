@@ -1,9 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { Check, Copy, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, Copy, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../base/button';
+import { highlightCode } from './code-block-highlight';
 
 export interface CodeBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   code: string;
@@ -15,6 +16,8 @@ export interface CodeBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   defaultExpanded?: boolean;
   maxHeight?: string;
 }
+
+type CopyState = 'idle' | 'copied' | 'failed';
 
 export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
   (
@@ -32,17 +35,31 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
     },
     ref
   ) => {
-    const [copied, setCopied] = React.useState(false);
+    const [copyState, setCopyState] = React.useState<CopyState>('idle');
     const [isExpanded, setIsExpanded] = React.useState(defaultExpanded);
+    const [highlightedHtml, setHighlightedHtml] = React.useState<string | null>(null);
+
+    // Highlight async (Shiki). Selama memuat, dan untuk bahasa tak dikenal, tampil kode flat.
+    React.useEffect(() => {
+      setHighlightedHtml(null);
+      if (!language) return;
+      let active = true;
+      highlightCode(code, language).then((html) => {
+        if (active) setHighlightedHtml(html);
+      });
+      return () => {
+        active = false;
+      };
+    }, [code, language]);
 
     const handleCopy = async () => {
       try {
         await navigator.clipboard.writeText(code);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        setCopyState('copied');
       } catch {
-        // clipboard write error fallback
+        setCopyState('failed');
       }
+      setTimeout(() => setCopyState('idle'), 2000);
     };
 
     const lines = code.split('\n');
@@ -64,15 +81,15 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
                 <span className="font-medium text-foreground">{filename}</span>
               ) : null}
               {language && !filename ? (
-                <span className="uppercase tracking-wider font-semibold text-[10px]">
+                <span className="uppercase tracking-wider font-semibold text-xs">
                   {language}
                 </span>
               ) : null}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" aria-live="polite">
               {language && filename && (
-                <span className="uppercase tracking-wider text-[10px] text-muted-foreground">
+                <span className="uppercase tracking-wider text-xs text-muted-foreground">
                   {language}
                 </span>
               )}
@@ -83,12 +100,23 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
                   size="sm"
                   onClick={handleCopy}
                   className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground gap-1.5"
-                  aria-label={copied ? 'Tersalin' : 'Salin kode'}
+                  aria-label={
+                    copyState === 'copied'
+                      ? 'Tersalin'
+                      : copyState === 'failed'
+                        ? 'Gagal menyalin'
+                        : 'Salin kode'
+                  }
                 >
-                  {copied ? (
+                  {copyState === 'copied' ? (
                     <>
                       <Check className="h-3.5 w-3.5 text-success" />
                       <span className="text-success font-medium">Tersalin</span>
+                    </>
+                  ) : copyState === 'failed' ? (
+                    <>
+                      <X className="h-3.5 w-3.5 text-destructive" />
+                      <span className="text-foreground font-medium">Gagal disalin</span>
                     </>
                   ) : (
                     <>
@@ -113,7 +141,7 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
             collapsible && !isExpanded && 'overflow-hidden'
           )}
         >
-          <pre className="flex">
+          <div className="flex">
             {showLineNumbers && (
               <div
                 aria-hidden="true"
@@ -124,8 +152,18 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
                 ))}
               </div>
             )}
-            <code className="flex-1 text-foreground whitespace-pre">{code}</code>
-          </pre>
+            {highlightedHtml ? (
+              <div
+                className="ds-code-block flex-1 whitespace-pre"
+                // Output Shiki sudah di-escape per token; sumber hanya `code` dari pemanggil.
+                dangerouslySetInnerHTML={{ __html: highlightedHtml }}
+              />
+            ) : (
+              <pre className="flex-1 whitespace-pre">
+                <code className="text-foreground">{code}</code>
+              </pre>
+            )}
+          </div>
         </div>
 
         {/* Expand / Collapse Button if collapsible */}

@@ -1,6 +1,6 @@
 # CR-070 — CodeBlock syntax highlighting (Shiki)
 
-**Status:** draft
+**Status:** done (ditetapkan user 2026-11-23)
 **Sumber:** diskusi user 2026-11-23 ("kok kita flat gitu")
 **Ref:** `packages/ui/src/components/data-display/code-block.tsx:127`, `packages/ui/package.json`, `docs/prd/013-diff-viewer.md FR-003`
 
@@ -24,11 +24,11 @@ Alternatif yang ditolak: regex kata kunci (diputuskan di PRD 013 OQ#2 — rawan 
 
 ## Tasks (jalur small-fix)
 
-- [ ] Kunci pilihan dual-theme Shiki (mis. `github-light` / `github-dark` atau `vitesse-*`) + daftar bahasa awal (tsx, ts, bash, css, json, prisma, tree?).
-- [ ] Definisikan palet syntax light/dark + audit kontras.
-- [ ] Implementasi `code-block.tsx` + test co-located (render token, fallback bahasa tak dikenal, copy tetap jalan).
-- [ ] Update showcase `data-display` + verifikasi light/dark di browser.
-- [ ] Verifikasi: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:tokens`, `pnpm -C apps/showcase build`.
+- [x] Kunci pilihan dual-theme Shiki (mis. `github-light` / `github-dark` atau `vitesse-*`) + daftar bahasa awal (tsx, ts, bash, css, json, prisma, tree?).
+- [x] Definisikan palet syntax light/dark + audit kontras.
+- [x] Implementasi `code-block.tsx` + test co-located (render token, fallback bahasa tak dikenal, copy tetap jalan).
+- [x] Update showcase `data-display` + verifikasi light/dark di browser.
+- [x] Verifikasi: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm test:tokens`, `pnpm -C apps/showcase build`.
 
 ## Keputusan
 
@@ -54,10 +54,21 @@ Branch: `cr-070-codeblock-shiki`
 
 Commit: `feat: tambah syntax highlighting CodeBlock [CR-070]`
 
-- [ ] CR disetujui user.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
+- [x] CR disetujui user.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
 - [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
 - [ ] `docs/STATUS.md` diperbarui bila relevan.
 - [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+
+## Hasil Implementasi
+
+- Dependency: `shiki` 4.6.0 di `@ds/ui` (disetujui user). Entry: `shiki/bundle/web`, dual theme `github-light` / `github-dark` via `defaultColor: false`.
+- `code-block-highlight.ts`: `highlightCode(code, language)`; bahasa tak dikenal → `null` → render flat. Override AA: light `#e36209`→`#b35400` (3,49→5,02:1), dark komentar `#6a737d`→`#8b949e` (3,84→6,02:1) terhadap 8 varian `--card` dark dan putih light.
+- `code-block.tsx`: highlight async (flat saat memuat); `text-[10px]`→`text-xs`; `catch` clipboard kini menampilkan state "Gagal disalin" dalam `aria-live`.
+- `styles.css`: `.ds-code-block` mengikat `--shiki-light` / `--shiki-dark` (`.dark`).
+- Tes: `code-block-highlight.test.ts` (audit kontras pada output Shiki nyata, Node env) + 3 tes CodeBlock di `extended-components.test.tsx`.
+- `src/test/setup.ts`: guard `window`/`HTMLElement`/`MouseEvent` agar setup bisa dimuat di Node env (perilaku jsdom tidak berubah).
+- Verifikasi: ui 742/743 lulus; 1 gagal `rich-text-editor.test.tsx` (`rte-link-save`), tidak mengimpor CodeBlock; belum dipastikan pada base. `build:types` ui: error lama `flow-editor.test.tsx` (tidak disentuh). Lint ui bersih. Showcase `build:types` hijau; guard 5/5.
+- Belum dicek: visual browser light/dark dan `pnpm -C apps/showcase build`.
