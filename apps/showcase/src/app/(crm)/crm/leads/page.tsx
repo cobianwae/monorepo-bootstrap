@@ -153,11 +153,18 @@ export default function LeadsPage() {
 
   // Simulated initial load to showcase skeleton states (table + kanban)
   const [isLoading, setIsLoading] = React.useState(true);
+  const [loadError, setLoadError] = React.useState(false);
 
   React.useEffect(() => {
+    if (!isLoading) return;
     const timer = setTimeout(() => setIsLoading(false), 450);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isLoading]);
+
+  const retryLoad = () => {
+    setLoadError(false);
+    setIsLoading(true);
+  };
 
   // Sorting & Selection state for Table
   const [sortField, setSortField] = React.useState<SortField>('aiScore');
@@ -1046,6 +1053,17 @@ export default function LeadsPage() {
         </div>
       ) : (
         <div className="space-y-4">
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLoadError(true)}
+              disabled={isLoading}
+              className="h-8 text-xs text-muted-foreground hover:text-destructive"
+            >
+              Test error
+            </Button>
+          </div>
           <DataTable
             columns={tableColumns}
             data={paginatedLeads}
@@ -1055,6 +1073,8 @@ export default function LeadsPage() {
             onRowClick={(row) => setSelectedLeadId(row.id)}
             loading={isLoading}
             skeletonRows={5}
+            error={loadError}
+            onRetry={retryLoad}
             emptyTitle="No leads match filters"
             emptyDescription="Try clearing your search query or stage filters to view more opportunities."
           />

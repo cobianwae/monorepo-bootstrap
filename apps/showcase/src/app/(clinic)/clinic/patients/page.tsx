@@ -16,9 +16,13 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import {
+  Alert,
+  AlertTitle,
+  AlertDescription,
   Button,
   Badge,
   Card,
+  Skeleton,
   Input,
   Select,
   SelectTrigger,
@@ -63,6 +67,8 @@ import {
 } from '@/scenarios/clinic/components/patient-summary-card';
 import { WeightTrajectoryChart } from '@/scenarios/clinic/components/weight-trajectory-chart';
 
+type TableStatus = 'ready' | 'loading' | 'error';
+
 export default function PatientsDirectoryPage() {
   const {
     patients,
@@ -83,6 +89,27 @@ export default function PatientsDirectoryPage() {
   const [isRecordWeightOpen, setIsRecordWeightOpen] = React.useState(false);
   const [newWeight, setNewWeight] = React.useState<string>('');
   const [newBodyFat, setNewBodyFat] = React.useState<string>('');
+  const [tableStatus, setTableStatus] = React.useState<TableStatus>('ready');
+  const tableRegionRef = React.useRef<HTMLDivElement>(null);
+  const recoverFocusRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (tableStatus !== 'loading') return;
+    const timer = setTimeout(() => setTableStatus('ready'), 450);
+    return () => clearTimeout(timer);
+  }, [tableStatus]);
+
+  React.useEffect(() => {
+    if (tableStatus === 'ready' && recoverFocusRef.current) {
+      recoverFocusRef.current = false;
+      tableRegionRef.current?.focus();
+    }
+  }, [tableStatus]);
+
+  const reloadTable = () => {
+    recoverFocusRef.current = true;
+    setTableStatus('loading');
+  };
 
   const activePatient = React.useMemo(
     () => patients.find((p) => p.id === selectedPatientId) || patients[0],
@@ -223,13 +250,55 @@ export default function PatientsDirectoryPage() {
                 Reset
               </Button>
             )}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={reloadTable}
+              disabled={tableStatus === 'loading'}
+              className="h-9 text-xs"
+            >
+              Reload
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setTableStatus('error')}
+              className="h-9 text-xs text-muted-foreground hover:text-destructive"
+            >
+              Test error
+            </Button>
           </div>
         </div>
       </Card>
 
       {/* Patient Data Table */}
-      <Card className="border-border bg-card shadow-xs overflow-hidden">
-        {filteredPatients.length === 0 ? (
+      <div
+        ref={tableRegionRef}
+        tabIndex={-1}
+        aria-busy={tableStatus === 'loading'}
+        className="rounded-xl border border-border bg-card shadow-xs overflow-hidden focus:outline-none"
+      >
+        {tableStatus === 'loading' ? (
+          <div role="status" aria-live="polite" className="space-y-3 p-4">
+            <span className="sr-only">Loading patients…</span>
+            {Array.from({ length: 5 }, (_, i) => (
+              <Skeleton key={i} className="h-10 w-full" />
+            ))}
+          </div>
+        ) : tableStatus === 'error' ? (
+          <div className="p-4">
+            <Alert variant="destructive">
+              <AlertTitle>Failed to load patients</AlertTitle>
+              <AlertDescription className="flex items-center justify-between gap-4">
+                <span>The patient service did not respond. Try again.</span>
+                <Button size="sm" variant="outline" onClick={reloadTable} className="h-7 text-xs">
+                  Retry
+                </Button>
+              </AlertDescription>
+            </Alert>
+          </div>
+        ) : filteredPatients.length === 0 ? (
           <div className="p-12">
             <EmptyState
               icon={Users}
@@ -353,7 +422,7 @@ export default function PatientsDirectoryPage() {
             </TableBody>
           </Table>
         )}
-      </Card>
+      </div>
 
       {/* Slide-over Patient EMR Comprehensive Sheet */}
       {activePatient && (
