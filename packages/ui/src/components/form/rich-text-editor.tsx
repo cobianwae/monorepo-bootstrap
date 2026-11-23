@@ -46,13 +46,6 @@ import {
 
 export type RichTextMode = 'editable' | 'readonly' | 'disabled';
 
-function stripHtmlToLength(html: string): number {
-  if (typeof document === 'undefined') return 0;
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  return (div.textContent ?? '').length;
-}
-
 export interface RichTextEditorProps {
   value: string;
   onChange?: (html: string) => void;
@@ -238,9 +231,8 @@ export function RichTextEditor({
 }: RichTextEditorProps) {
   const [, bump] = React.useReducer((x: number) => x + 1, 0);
   const [announce, setAnnounce] = React.useState('');
-  // Counter dihitung dari teks polos (getText); nilai awal diderivasi dari
-  // HTML agar tidak flash 0 — onCreate/onUpdate mengoreksi dari editor.
-  const [chars, setChars] = React.useState(() => stripHtmlToLength(value));
+  // SSR dan render client pertama identik; statistik menunggu editor siap.
+  const [chars, setChars] = React.useState<number | null>(null);
   const overAnnouncedRef = React.useRef(false);
   const counterId = React.useId();
   const [linkOpen, setLinkOpen] = React.useState(false);
@@ -257,6 +249,14 @@ export function RichTextEditor({
   const isMobile = useIsMobile();
   const onChangeRef = React.useRef(onChange);
   const onTextChangeRef = React.useRef(onTextChange);
+  const syncTextStats = React.useCallback((text: string) => {
+    setChars(text.length);
+    const trimmed = text.trim();
+    onTextChangeRef.current?.(text, {
+      chars: text.length,
+      words: trimmed ? trimmed.split(/\s+/).length : 0,
+    });
+  }, []);
   React.useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
@@ -295,17 +295,11 @@ export function RichTextEditor({
       },
     },
     onCreate: ({ editor: e }) => {
-      setChars(e.getText().length);
+      syncTextStats(e.getText());
     },
     onUpdate: ({ editor: e }) => {
       onChangeRef.current?.(e.getHTML());
-      const text = e.getText();
-      const trimmed = text.trim();
-      setChars(text.length);
-      onTextChangeRef.current?.(text, {
-        chars: text.length,
-        words: trimmed ? trimmed.split(/\s+/).length : 0,
-      });
+      syncTextStats(e.getText());
       bump();
     },
     onSelectionUpdate: () => {
@@ -318,9 +312,9 @@ export function RichTextEditor({
     const current = editor.getHTML();
     if (value !== current) {
       editor.commands.setContent(value, { emitUpdate: false });
-      setChars(editor.getText().length);
+      syncTextStats(editor.getText());
     }
-  }, [value, editor]);
+  }, [value, editor, syncTextStats]);
 
   React.useEffect(() => {
     if (!editor || editor.isDestroyed) return;
@@ -342,8 +336,8 @@ export function RichTextEditor({
     }
   }, [editor, nonEditable, isDisabled]);
 
-  const counterStatus = chars > maxLength ? 'over' : chars >= 0.9 * maxLength ? 'near' : 'normal';
-  const overBy = chars - maxLength;
+  const counterStatus = chars !== null && chars > maxLength ? 'over' : chars !== null && chars >= 0.9 * maxLength ? 'near' : 'normal';
+  const overBy = (chars ?? 0) - maxLength;
 
   React.useEffect(() => {
     if (counterStatus === 'over' && !overAnnouncedRef.current) {
@@ -916,7 +910,7 @@ export function RichTextEditor({
             aria-live="polite"
             className={cn('text-xs tabular-nums', counterClass)}
           >
-            {chars}/{maxLength}
+            {chars ?? '…'}/{maxLength}
           </p>
         </div>
       ) : null}
