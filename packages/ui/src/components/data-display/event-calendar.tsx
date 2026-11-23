@@ -133,12 +133,23 @@ const DOT_CLASSES: Record<EventCategory, string> = {
 };
 
 const BLOCK_CLASSES: Record<EventCategory, string> = {
-  primary: 'border-primary/50 bg-primary/10',
-  success: 'border-success/50 bg-success/10',
-  warning: 'border-warning/50 bg-warning/10',
-  info: 'border-info/50 bg-info/10',
-  destructive: 'border-destructive/50 bg-destructive/10',
+  primary: 'border-primary/60 bg-primary/15',
+  success: 'border-success/60 bg-success/15',
+  warning: 'border-warning/60 bg-warning/15',
+  info: 'border-info/60 bg-info/15',
+  destructive: 'border-destructive/60 bg-destructive/15',
 };
+
+function CalendarEmpty() {
+  return (
+    <EmptyState
+      role="status"
+      title="Tidak ada event di periode ini"
+      description="Belum ada jadwal pada periode yang dipilih. Coba ganti view atau periode."
+      actionLabel="Buat event"
+    />
+  );
+}
 
 function clampEnd(event: CalendarEvent): Date {
   return event.end >= event.start ? event.end : event.start;
@@ -896,7 +907,7 @@ function TimeGrid({
                       {segments.map((segment) => {
                         const category = segment.event.category ?? 'primary';
                         const top = (segment.startMinute - minute) * pixelsPerMinute;
-                        const height = Math.max(18, (segment.endMinute - segment.startMinute) * pixelsPerMinute);
+                        const height = Math.max(24, (segment.endMinute - segment.startMinute) * pixelsPerMinute);
                         const widthPercent = 100 / segment.columns;
                         const leftPercent = segment.column * widthPercent;
                         const label = `${segment.event.title}, ${eventTimeRange(segment.event, locale)}${
@@ -924,7 +935,7 @@ function TimeGrid({
                               width: `calc(${widthPercent}% - 4px)`,
                             }}
                             className={cn(
-                              'absolute z-10 overflow-hidden rounded border border-l-2 px-1 py-0.5 text-left text-[10px] leading-tight text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                              'absolute z-10 overflow-hidden rounded border border-l-4 px-1 py-0.5 text-left text-[10px] leading-tight text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                               editable && 'cursor-grab touch-none active:cursor-grabbing',
                               BLOCK_CLASSES[category]
                             )}
@@ -950,7 +961,7 @@ function TimeGrid({
                           aria-hidden
                           style={{
                             top: (differenceInMinutes(preview.start, dayStart) - minute) * pixelsPerMinute,
-                            height: Math.max(18, differenceInMinutes(preview.end, preview.start) * pixelsPerMinute),
+                            height: Math.max(24, differenceInMinutes(preview.end, preview.start) * pixelsPerMinute),
                           }}
                           className="pointer-events-none absolute inset-x-1 z-20 rounded border-2 border-dashed border-primary bg-primary/20 px-1 py-0.5 font-mono text-[10px] text-primary"
                         >
@@ -1304,13 +1315,38 @@ export function EventCalendar({
           role="grid"
           aria-busy="true"
           aria-label={ariaLabel}
-          className="rounded-lg border border-border bg-card min-h-[32rem] flex flex-col items-center justify-center py-10"
+          data-skeleton-view={activeView}
+          className="rounded-lg border border-border bg-card p-4"
         >
-          <div className="flex flex-col items-center gap-3">
-            <Skeleton className="w-24 h-24 rounded-full" />
-            <Skeleton className="w-40 h-4" />
-          </div>
-          <p className="mt-2 text-sm text-muted-foreground">Memuat event…</p>
+          {activeView === 'month' && (
+            <div className="grid w-full grid-cols-7 gap-px overflow-hidden rounded-md border border-border/50" aria-hidden>
+              {Array.from({ length: 42 }).map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full rounded-none" />
+              ))}
+            </div>
+          )}
+          {activeView === 'week' && (
+            <div className="grid w-full grid-cols-7 gap-2" aria-hidden>
+              {Array.from({ length: 7 }).map((_, i) => (
+                <Skeleton key={i} className="h-64 w-full" />
+              ))}
+            </div>
+          )}
+          {activeView === 'day' && (
+            <div className="grid w-full gap-2" aria-hidden>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full" />
+              ))}
+            </div>
+          )}
+          {activeView === 'agenda' && (
+            <div className="w-full space-y-2" aria-hidden>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-14 w-full" />
+              ))}
+            </div>
+          )}
+          <p className="mt-4 text-center text-sm text-muted-foreground">Memuat event…</p>
         </div>
       ) : error ? (
         <Alert variant="destructive" role="alert" className="rounded-lg border border-border">
@@ -1326,9 +1362,9 @@ export function EventCalendar({
         <div className="rounded-lg border border-border bg-card p-4">
           <p className="text-sm font-medium text-foreground">{format(activeDate, 'LLLL yyyy', { locale })}</p>
           {agendaGroups.length === 0 ? (
-            <p className="mt-1 text-sm text-muted-foreground">
-              Tidak ada event pada periode ini.
-            </p>
+            <div className="mt-1">
+              <CalendarEmpty />
+            </div>
           ) : (
             <div className="mt-4 space-y-4" role="list">
               {agendaGroups.map((group) => (
@@ -1364,12 +1400,7 @@ export function EventCalendar({
           )}
         </div>
       ) : events.length === 0 ? (
-        <EmptyState
-          role="status"
-          title="Tidak ada event di periode ini"
-          description="Belum ada jadwal pada periode yang dipilih. Coba ganti view atau periode."
-          actionLabel="Buat event"
-        />
+        <CalendarEmpty />
       ) : (
         <>
           {activeView === 'month' && (

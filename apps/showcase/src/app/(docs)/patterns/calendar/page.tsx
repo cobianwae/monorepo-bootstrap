@@ -46,7 +46,7 @@ const DEMO_EVENTS: CalendarEvent[] = [
     start: new Date(2026, 10, 21, 10, 30),
     end: new Date(2026, 10, 21, 11, 30),
     category: 'warning',
-    location: 'Ruang 2',
+    location: 'Room 2',
   },
   {
     id: 'panel',
@@ -147,7 +147,10 @@ export default function CalendarPage() {
 
       <section className="space-y-3">
         <Card>
-          <CardContent className="flex flex-wrap items-center gap-4 pt-6">
+          <CardContent className="space-y-6 pt-6">
+            <fieldset className="space-y-3 rounded-lg border border-border p-4">
+              <legend className="px-1 text-xs font-semibold text-foreground">View &amp; period</legend>
+            <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
               <Button type="button" variant="outline" size="icon" aria-label="Demo previous" onClick={() => setDate((d) => new Date(d.getFullYear(), d.getMonth(), d.getDate() - 1))}>
                 <ChevronLeft className="h-4 w-4" />
@@ -175,6 +178,11 @@ export default function CalendarPage() {
               ))}
             </SegmentedControl>
 
+            </div>
+            </fieldset>
+            <fieldset className="space-y-3 rounded-lg border border-border p-4">
+              <legend className="px-1 text-xs font-semibold text-foreground">Schedule</legend>
+            <div className="flex flex-wrap items-center gap-4">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-medium text-muted-foreground">Working hours</span>
               {WORKING_HOUR_OPTIONS.map((option) => (
@@ -205,6 +213,11 @@ export default function CalendarPage() {
               ))}
             </div>
 
+            </div>
+            </fieldset>
+            <fieldset className="space-y-3 rounded-lg border border-border p-4">
+              <legend className="px-1 text-xs font-semibold text-foreground">Data &amp; state</legend>
+            <div className="flex flex-wrap items-center gap-4">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-medium text-muted-foreground">Slot interval</span>
               {[30, 60].map((minutes) => (
@@ -248,7 +261,7 @@ export default function CalendarPage() {
               <Switch
                 id="calendar-error"
                 checked={!!error}
-                onCheckedChange={(v) => setError(v ? 'Gagal memuat data dari server' : null)}
+                onCheckedChange={(v) => setError(v ? 'Failed to load data from server' : null)}
                 aria-describedby="calendar-error-hint"
               />
               <label htmlFor="calendar-error" className="text-xs font-medium text-muted-foreground">
@@ -264,20 +277,22 @@ export default function CalendarPage() {
               error:{error ? 'on' : 'off'}
             </p>
             <p id="calendar-editable-hint" className="w-full text-xs text-muted-foreground">
-              Editable menyalakan drag-and-drop blok waktu dan aksi Edit/Delete di detail event. Matikan untuk
-              mode baca-saja; detail tetap dapat dibuka.
+              Editable turns on drag-and-drop of timed blocks and the Edit/Delete actions in event detail. Turn it
+              off for read-only mode; detail can still be opened.
             </p>
             <p id="calendar-loading-hint" className="w-full text-xs text-muted-foreground">
-              Loading menampilkan skeleton grid dengan aria-busy dan menonaktifkan navigasi sementara.
+              Loading shows a per-view skeleton grid with aria-busy and temporarily disables navigation.
             </p>
             <p id="calendar-error-hint" className="w-full text-xs text-muted-foreground">
-              Error menampilkan alert role=&quot;alert&quot; dengan pesan teks dan tombol &quot;Coba lagi&quot; yang memanggil
-              onRetry (handler demo di luar komponen).
+              Error shows an alert role=&quot;alert&quot; with a text message and a retry button that calls
+              onRetry (demo handler outside the component).
             </p>
             <p className="w-full text-sm text-muted-foreground" aria-live="polite">
               Selected slot: {lastSlot ?? 'none yet'} · selected event: {lastEvent ?? 'none yet'} · drop:{' '}
               {lastDrop ?? 'none yet'} · action: {lastAction ?? 'none yet'}
             </p>
+            </div>
+            </fieldset>
           </CardContent>
         </Card>
         <div className="w-full min-w-0 overflow-x-auto">
@@ -319,37 +334,59 @@ export default function CalendarPage() {
               Week and Day render a 24-hour time grid. Click or focus a slot and press Enter/Space to trigger
               onSelectSlot with the exact interval range.
             </li>
-            <li>Working hours shade the off-hours area; slots stay visible and selectable so consumers can validate bookings.</li>
-            <li>All-day events and full 24-hour events live in the strip above the time grid, never mixed with timed blocks.</li>
             <li>
               Multi-day events render one segment per day in month cells and the all-day strip, with ▸/◂ glyphs and
               screen-reader text instead of color alone.
             </li>
             <li>
-              Overlapping timed events share the column width equally and show an &quot;n bentrok&quot; indicator on the
-              slot; keyboard users can Tab to each event.
-            </li>
-            <li>
               Event detail (M-006) opens as a desktop popover or mobile sheet. Escape closes it and returns focus to the
               originating event.
             </li>
-            <li>
-              With Editable on, drag a timed block to another slot for a live preview, or use the keyboard &quot;Move
-              to selected slot&quot; controls inside the detail panel. Both emit the same onEventDrop payload.
-            </li>
-            <li>
-              Agenda view menampilkan event kronologis periode aktif, grup per hari, dengan baris tombol yang
-              memanggil onSelectEvent dengan payload event utuh.
-            </li>
-            <li>
-              State matrix: loading (skeleton grid, aria-busy, navigasi disabled), empty (role=&quot;status&quot; +
-              CTA konsumen), dan error (role=&quot;alert&quot; + pesan teks + tombol Coba lagi → onRetry).
-            </li>
-            <li>
-              Locale en ↔ id mengubah nama hari/bulan dan awal pekan via prop locale (terverifikasi test dan terlihat
-              di weekday header week view).
-            </li>
           </ul>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-muted-foreground">
+              <caption className="py-2 text-left text-xs font-semibold text-foreground">How the demo controls map to the calendar</caption>
+              <thead>
+                <tr className="border-b border-border text-left text-xs text-foreground">
+                  <th scope="col" className="py-1 pr-4 font-semibold">Control</th>
+                  <th scope="col" className="py-1 pr-4 font-semibold">What changes</th>
+                  <th scope="col" className="py-1 font-semibold">Calendar response</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-border/50">
+                  <td className="py-1 pr-4">View switcher</td>
+                  <td className="py-1 pr-4">Month / Week / Day / Agenda</td>
+                  <td className="py-1">Grid re-renders for the active view without losing the active date.</td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="py-1 pr-4">Working hours · Slot interval</td>
+                  <td className="py-1 pr-4">08–18 / 09–17 · 30 / 60 min</td>
+                  <td className="py-1">Off-hours shade and the time grid reflow; empty slots stay selectable.</td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="py-1 pr-4">Locale</td>
+                  <td className="py-1 pr-4">English / Bahasa Indonesia</td>
+                  <td className="py-1">Day and month names and the week start follow the locale prop.</td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="py-1 pr-4">Loading</td>
+                  <td className="py-1 pr-4">On / Off</td>
+                  <td className="py-1">Per-view skeleton (month 7×6, week columns, day rows, agenda rows) with aria-busy.</td>
+                </tr>
+                <tr className="border-b border-border/50">
+                  <td className="py-1 pr-4">Error · Editable</td>
+                  <td className="py-1 pr-4">On / Off</td>
+                  <td className="py-1">Error alert with retry (onRetry); drag-and-drop and Edit/Delete actions.</td>
+                </tr>
+                <tr>
+                  <td className="py-1 pr-4">Agenda (empty)</td>
+                  <td className="py-1 pr-4">No events in period</td>
+                  <td className="py-1">Empty state with role=&quot;status&quot; and a &quot;Buat event&quot; consumer CTA.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
 
@@ -357,15 +394,15 @@ export default function CalendarPage() {
         <CardContent className="space-y-3 pt-6">
           <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
             <UserRound className="h-4 w-4 text-muted-foreground" />
-            Catatan aksesibilitas
+            Accessibility notes
           </h2>
           <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-            <li>Grid pakai role=&quot;grid&quot;, sel role=&quot;gridcell&quot;, dan event berupa tombol bernama (judul + waktu + kategori).</li>
-            <li>Toolbar view switcher pakai radiogroup; perubahan periode/view diumumkan lewat live region (aria-live=&quot;polite&quot;).</li>
-            <li>Fokus ring warna token primary 2px terlihat di mode light dan dark; tab navigasi pada slot dan event dapat dioperasikan keyboard-only.</li>
-            <li>Pembeda status dan kategori tidak pernah mengandalkan warna saja (ada teks/labels serta badge).</li>
-            <li>prefers-reduced-motion dihormati; animasi dinonaktifkan bila pengguna mengaktifkannya.</li>
-            <li>Semua handler pada demo adalah mock (log/toast) di luar komponen; komponen itu sendiri tidak memanggil API.</li>
+            <li>The grid uses role=&quot;grid&quot;, cells role=&quot;gridcell&quot;, and events are named buttons (title + time + category).</li>
+            <li>The view-switcher toolbar uses radiogroup; period and view changes are announced via a live region (aria-live=&quot;polite&quot;).</li>
+            <li>The primary-token focus ring (2px) is visible in light and dark mode; slots and events are keyboard-operable only.</li>
+            <li>Status and category are never conveyed by color alone (there is text, labels, and badges).</li>
+            <li>prefers-reduced-motion is honored; animations are disabled when the user enables it.</li>
+            <li>All demo handlers are mocks (log/toast) outside the component; the component itself never calls an API.</li>
           </ul>
         </CardContent>
       </Card>

@@ -630,7 +630,7 @@ describe('EventCalendar agenda', () => {
     expect((onSelectEvent.mock.calls[0][0] as CalendarEvent).id).toBe('keynote');
   });
 
-  it('AC-04: agenda periode tanpa event menampilkan pesan kosong', () => {
+  it('AC-04: agenda periode tanpa event menampilkan empty-state role status + CTA', () => {
     render(
       <EventCalendar
         events={[]}
@@ -638,7 +638,9 @@ describe('EventCalendar agenda', () => {
         defaultView="agenda"
       />
     );
-    expect(screen.getByText('Tidak ada event pada periode ini.')).toBeDefined();
+    expect(screen.getByRole('status')).toBeDefined();
+    expect(screen.getByText('Tidak ada event di periode ini')).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Buat event' })).toBeDefined();
   });
 });
 
@@ -649,8 +651,23 @@ describe('EventCalendar state matrix', () => {
     );
     const grid = screen.getByRole('grid');
     expect(grid.getAttribute('aria-busy')).toBe('true');
+    expect(grid.getAttribute('data-skeleton-view')).toBe('month');
     expect(screen.getByText('Memuat event…')).toBeDefined();
     expect(screen.getByLabelText('Previous period').getAttribute('disabled')).toBeDefined();
+  });
+
+  it('AC-01: loading menampilkan skeleton sesuai view (week/day/agenda)', () => {
+    const { unmount } = render(
+      <EventCalendar events={[]} defaultDate={CONTEXT_DATE} defaultView="week" loading />
+    );
+    expect(screen.getByRole('grid').getAttribute('data-skeleton-view')).toBe('week');
+    expect(screen.getByText('Memuat event…')).toBeDefined();
+    unmount();
+    render(
+      <EventCalendar events={[]} defaultDate={CONTEXT_DATE} defaultView="day" loading />
+    );
+    expect(screen.getByRole('grid').getAttribute('data-skeleton-view')).toBe('day');
+    expect(screen.getByText('Memuat event…')).toBeDefined();
   });
 
   it('AC-01: error menampilkan alert role alert + pesan + tombol Coba lagi', () => {
