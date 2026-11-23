@@ -41,6 +41,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
+import { SectionHeading } from '../../../../components/section-heading';
 import type { User } from '@shared/types';
 
 const INITIAL_DATA: User[] = [
@@ -430,16 +431,10 @@ export default function DataTablePage() {
       </div>
 
       <section className="space-y-4">
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-foreground">
-            Saved Views &amp; Advanced Filtering
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Combine multi-criteria <code className="font-mono text-xs">FilterBuilder</code> chips with
-            persistent saved views: name your current filter set, apply a preset in one click, update it
-            as criteria change, and undo a deletion via toast.
-          </p>
-        </div>
+        <SectionHeading
+          title="Saved Views & Advanced Filtering"
+          description="Combine multi-criteria FilterBuilder chips with persistent saved views: name your current filter set, apply a preset in one click, update it as criteria change, and undo a deletion via toast."
+        />
 
         <div className="rounded-md border border-border bg-card shadow-xs p-4 space-y-4">
           <FilterBuilder
@@ -474,18 +469,10 @@ export default function DataTablePage() {
       </section>
 
       <section className="space-y-4">
-        <div className="space-y-1">
-          <h2 className="text-xl font-semibold text-foreground">
-            Table Variants &amp; Density
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Use the same <code className="font-mono text-xs">Table</code>{' '}
-            primitives across every module (CRM, Clinic, docs) and pick a
-            standardized <code className="font-mono text-xs">variant</code>{' '}
-            and <code className="font-mono text-xs">size</code> instead of
-            hand-rolled className overrides.
-          </p>
-        </div>
+        <SectionHeading
+          title="Table Variants & Density"
+          description="Use the same Table primitives across every module (CRM, Clinic, docs) and pick a standardized variant and size instead of hand-rolled className overrides."
+        />
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {TABLE_VARIANT_SAMPLES.map((sample) => (

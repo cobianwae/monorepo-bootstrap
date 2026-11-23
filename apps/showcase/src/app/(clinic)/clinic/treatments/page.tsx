@@ -199,7 +199,7 @@ export default function TreatmentsPage() {
         title="Treatment Catalog & Protocol Master Data"
         description="Configure medical weight loss packages, injectable peptide protocols, body contouring sessions, and clinic pricing margins."
         actions={
-          <Button size="sm" variant="highlight" onClick={handleOpenCreate} className="gap-1.5">
+          <Button size="sm" variant="default" onClick={handleOpenCreate} className="gap-1.5">
             <Plus className="h-3.5 w-3.5" />
             New Treatment Protocol
           </Button>

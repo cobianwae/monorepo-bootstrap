@@ -395,7 +395,7 @@ export default function PatientRegistrationPage() {
                   <span className="text-xs font-mono uppercase text-muted-foreground block">
                     Computed Baseline BMI
                   </span>
-                  <span className="font-display font-bold text-2xl text-primary">
+                  <span className="font-display font-bold text-2xl text-foreground">
                     {computedBmi > 0 ? computedBmi : '—'}
                   </span>
                 </div>

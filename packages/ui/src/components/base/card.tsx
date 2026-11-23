@@ -11,7 +11,7 @@ export const cardVariants = cva(
         interactive:
           'border-border bg-card shadow-xs hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10 hover:border-primary/40 cursor-pointer active:scale-[0.99]',
         selectable:
-          'border-border bg-card shadow-xs hover:border-primary/40 cursor-pointer data-[selected=true]:border-primary data-[selected=true]:ring-2 data-[selected=true]:ring-primary/20 data-[selected=true]:bg-primary/[0.02]',
+          'border-border bg-card shadow-xs hover:border-highlight/40 cursor-pointer data-[selected=true]:border-highlight data-[selected=true]:ring-2 data-[selected=true]:ring-highlight/20 data-[selected=true]:bg-highlight/[0.04]',
         glass:
           'border-border/60 bg-card/70 backdrop-blur-md shadow-sm hover:border-border/80',
         gradient:

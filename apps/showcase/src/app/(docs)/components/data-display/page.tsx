@@ -592,7 +592,7 @@ export default function DataDisplayPage() {
               </span>
               <div className="flex items-center gap-6">
                 <AvatarGroup max={4} size="default">
-                  <Avatar><AvatarFallback className="bg-primary/20 text-primary">AR</AvatarFallback></Avatar>
+                  <Avatar><AvatarFallback className="bg-highlight/10 text-foreground">AR</AvatarFallback></Avatar>
                   <Avatar><AvatarFallback className="bg-success/20 text-success">BK</AvatarFallback></Avatar>
                   <Avatar><AvatarFallback className="bg-warning/20 text-warning">CL</AvatarFallback></Avatar>
                   <Avatar><AvatarFallback className="bg-destructive/20 text-destructive">DT</AvatarFallback></Avatar>

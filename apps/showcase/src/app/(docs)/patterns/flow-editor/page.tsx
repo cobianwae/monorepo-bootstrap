@@ -27,6 +27,8 @@ import {
   useTheme,
   PaletteSwitcher,
   toast,
+  SegmentedControl,
+  SegmentedControlItem,
   type FlowEdge,
   type FlowNode,
   type FlowEditorProps,
@@ -514,23 +516,20 @@ function InspectorPanel({
             </div>
             <fieldset className="space-y-1">
               <legend className="text-xs font-medium">Status</legend>
-              <div className="flex flex-wrap gap-1">
-                {STATUS_OPTIONS.map((opt) => {
-                  const active = (node?.data.status ?? 'default') === opt.value;
-                  return (
-                    <Button
-                      key={opt.value}
-                      type="button"
-                      variant={active ? 'default' : 'outline'}
-                      size="sm"
-                      aria-pressed={active}
-                      onClick={() => node && onPatchNode(node.id, { status: opt.value })}
-                    >
-                      {opt.label}
-                    </Button>
-                  );
-                })}
-              </div>
+              <SegmentedControl
+                type="single"
+                value={node?.data.status ?? 'default'}
+                onValueChange={(v) => {
+                  if (v && node) onPatchNode(node.id, { status: v as FlowStatus });
+                }}
+                aria-label="Node status"
+              >
+                {STATUS_OPTIONS.map((opt) => (
+                  <SegmentedControlItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SegmentedControlItem>
+                ))}
+              </SegmentedControl>
             </fieldset>
             <div className="space-y-1">
               <div className="text-xs font-medium">Posisi</div>

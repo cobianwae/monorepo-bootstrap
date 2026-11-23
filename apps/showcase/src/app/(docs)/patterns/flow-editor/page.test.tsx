@@ -117,7 +117,7 @@ describe('FlowEditorPage inspector on-demand (CR-019)', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: 'Seleksi n1' }));
     fireEvent.change(screen.getByLabelText('Deskripsi'), { target: { value: 'Catatan' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Peringatan' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Peringatan' }));
     const nodesJson = screen.getByTestId('flow-stub-nodes').textContent ?? '';
     expect(nodesJson).toContain('"description":"Catatan"');
     expect(nodesJson).toContain('"status":"warning"');

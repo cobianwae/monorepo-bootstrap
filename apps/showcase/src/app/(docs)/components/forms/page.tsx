@@ -373,7 +373,7 @@ export default function FormsPage() {
                   )}
                 />
 
-                <Button type="submit" variant="highlight" className="gap-2">
+                <Button type="submit" variant="default" className="gap-2">
                   <Send className="h-4 w-4" />
                   <span>Submit Application</span>
                 </Button>

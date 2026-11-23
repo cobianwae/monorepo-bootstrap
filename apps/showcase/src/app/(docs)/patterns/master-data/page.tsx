@@ -482,7 +482,7 @@ export default function MasterDataPage() {
                 filteredItems.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>
-                      <span className="font-mono font-semibold text-xs text-primary bg-primary/10 px-2 py-1 rounded">
+                      <span className="font-mono font-semibold text-xs text-foreground bg-highlight/10 px-2 py-1 rounded">
                         {item.code}
                       </span>
                     </TableCell>

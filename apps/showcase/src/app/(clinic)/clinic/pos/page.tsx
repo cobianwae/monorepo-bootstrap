@@ -365,7 +365,7 @@ export default function PosPage() {
 
               <div className="flex justify-between font-display font-bold text-base text-foreground pt-2 border-t border-border/40">
                 <span>Grand Total</span>
-                <span className="text-primary font-mono text-lg">Rp {grandTotal.toLocaleString()}</span>
+                <span className="text-foreground font-mono text-lg">Rp {grandTotal.toLocaleString()}</span>
               </div>
             </div>
 

@@ -324,7 +324,7 @@ export default function LayoutNavigationPage() {
                 <SidebarFooter>
                   <div className="p-2 rounded-lg bg-muted/40 border border-border/50 flex items-center justify-between">
                     <div className="flex items-center gap-2 min-w-0">
-                      <div className="h-7 w-7 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center">
+                      <div className="h-7 w-7 rounded-full bg-highlight/10 text-foreground font-bold text-xs flex items-center justify-center">
                         JD
                       </div>
                       <div className="flex flex-col min-w-0">

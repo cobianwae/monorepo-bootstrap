@@ -226,7 +226,7 @@ export default function AiStudioPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm font-medium">
                     <span className="text-foreground">Deal Value Size ($)</span>
-                    <span className="font-mono text-primary font-semibold">${simDealValue.toLocaleString()}</span>
+                    <span className="font-mono text-foreground font-semibold">${simDealValue.toLocaleString()}</span>
                   </div>
                   <Slider
                     min={10000}
@@ -246,7 +246,7 @@ export default function AiStudioPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm font-medium">
                     <span className="text-foreground">Engagement Velocity (Touches / Week)</span>
-                    <span className="font-mono text-primary font-semibold">{simEngagementScore}%</span>
+                    <span className="font-mono text-foreground font-semibold">{simEngagementScore}%</span>
                   </div>
                   <Slider
                     min={10}
@@ -266,7 +266,7 @@ export default function AiStudioPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm font-medium">
                     <span className="text-foreground">Technical Stack & Architecture Fit</span>
-                    <span className="font-mono text-primary font-semibold">{simTechFit}%</span>
+                    <span className="font-mono text-foreground font-semibold">{simTechFit}%</span>
                   </div>
                   <Slider
                     min={20}
@@ -286,7 +286,7 @@ export default function AiStudioPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm font-medium">
                     <span className="text-foreground">Executive Decision Urgency</span>
-                    <span className="font-mono text-primary font-semibold">{simDecisionUrgency}%</span>
+                    <span className="font-mono text-foreground font-semibold">{simDecisionUrgency}%</span>
                   </div>
                   <Slider
                     min={10}
@@ -456,7 +456,7 @@ export default function AiStudioPage() {
                   <div className="rounded-lg border border-border bg-muted/20 p-4 font-mono text-xs leading-relaxed text-foreground whitespace-pre-wrap">
                     {generatedOutput}
                     {isStreaming && (
-                      <span className="inline-block h-4 w-1.5 bg-primary ml-1" />
+                      <span className="inline-block h-4 w-1.5 bg-highlight ml-1" />
                     )}
                   </div>
                 ) : (

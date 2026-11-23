@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight, FileText, MousePointerClick, UserRound } from 'lucide-react';
-import { PageHeader, Button, Card, CardContent, Switch } from '@ds/ui';
+import { PageHeader, Button, Card, CardContent, Switch, SegmentedControl, SegmentedControlItem } from '@ds/ui';
 import {
   EventCalendar,
   type CalendarEvent,
@@ -160,13 +160,20 @@ export default function CalendarPage() {
               </Button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            <SegmentedControl
+              type="single"
+              value={view}
+              onValueChange={(v) => {
+                if (v) setView(v as CalendarView);
+              }}
+              aria-label="Calendar view"
+            >
               {(['month', 'week', 'day', 'agenda'] as CalendarView[]).map((v) => (
-                <Button key={v} type="button" variant={view === v ? 'default' : 'outline'} size="sm" onClick={() => setView(v)}>
+                <SegmentedControlItem key={v} value={v}>
                   {v.charAt(0).toUpperCase() + v.slice(1)}
-                </Button>
+                </SegmentedControlItem>
               ))}
-            </div>
+            </SegmentedControl>
 
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs font-medium text-muted-foreground">Working hours</span>

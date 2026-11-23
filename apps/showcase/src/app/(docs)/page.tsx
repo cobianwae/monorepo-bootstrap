@@ -57,6 +57,7 @@ import {
   SectionNumber,
 } from '@ds/ui';
 import { Reveal } from '@/components/reveal';
+import { SectionHeading } from '@/components/section-heading';
 
 export default function OverviewPage() {
   const sections = [
@@ -531,19 +532,15 @@ export default function OverviewPage() {
       {/* Showcase Sections Navigation Grid */}
       <Reveal delay={100}>
         <div className="space-y-5">
-        <div className="flex items-center justify-between border-b border-border pb-3">
-          <div>
-            <h2 className="text-xl font-bold tracking-tight text-foreground font-display">
-              Showcase Catalog & Scenarios
-            </h2>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Comprehensive reference library for components, foundations, and interaction patterns
-            </p>
-          </div>
-          <span className="text-xs font-mono text-muted-foreground hidden sm:inline">
-            {sections.length} MODULES
-          </span>
-        </div>
+        <SectionHeading
+          title="Showcase Catalog & Scenarios"
+          description="Comprehensive reference library for components, foundations, and interaction patterns"
+          actions={
+            <span className="text-xs font-mono text-muted-foreground hidden sm:inline">
+              {sections.length} MODULES
+            </span>
+          }
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {sections.map((section, idx) => {

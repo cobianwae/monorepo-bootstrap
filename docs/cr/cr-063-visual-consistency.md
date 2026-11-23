@@ -31,8 +31,8 @@
 
 ## Design System Checks
 
-- [ ] Token/kontras, Radix/a11y, API/export dan state konsisten; showcase diperbarui.
-- [ ] Typecheck/lint/test diverifikasi; baseline dicatat.
+- [x] Token/kontras, Radix/a11y, API/export dan state konsisten; showcase diperbarui.
+- [x] Typecheck/lint/test diverifikasi; baseline dicatat.
 
 ## Eksekusi
 
@@ -40,5 +40,5 @@ Branch: `cr-063-visual-consistency`
 Commit: `fix: align showcase visual roles [CR-063]`
 
 - [x] Disetujui user (2026-11-23).
-- [ ] Branch dibuat; implementasi dan verifikasi.
-- [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.
+- [x] Branch dibuat; implementasi dan verifikasi.
+- [x] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.
