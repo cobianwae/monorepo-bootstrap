@@ -1,6 +1,6 @@
 # CR-061 — Reflow kontrol dan workspace mobile
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit
 **Ref:** CR-054 C15/R01; `docs/reviews/cr-054-code-audit.md:298`–`:306`
 
@@ -19,11 +19,11 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Ukur child minimum kalender/notifikasi dan kontribusi empty toast viewport 448px.
-- [ ] Perbaiki kontrol; semua label, tindakan dan fokus tetap dapat dijangkau.
-- [ ] Uji 320/390/1440, zoom 200–400%, scroll lokal, keyboard, light/dark.
-- [ ] Pastikan tabel pasien/board/canvas dengan scroller sah tidak diubah sebagai false positive.
-- [ ] Regression tests dan verifikasi sesuai konvensi.
+- [x] Ukur child minimum kalender/notifikasi dan kontribusi empty toast viewport 448px.
+- [x] Perbaiki kontrol; semua label, tindakan dan fokus tetap dapat dijangkau.
+- [x] Uji 320/390/1440, zoom 200–400%, scroll lokal, keyboard, light/dark.
+- [x] Pastikan tabel pasien/board/canvas dengan scroller sah tidak diubah sebagai false positive.
+- [x] Regression tests dan verifikasi sesuai konvensi.
 
 ## Keputusan
 
@@ -33,8 +33,8 @@
 
 ## Design System Checks
 
-- [ ] Token/kontras, a11y, API/export dan state konsisten; showcase diperbarui.
-- [ ] Typecheck/lint/test diverifikasi; baseline dicatat.
+- [x] Token/kontras, a11y, API/export dan state konsisten; showcase diperbarui.
+- [x] Typecheck/lint/test diverifikasi; baseline dicatat.
 
 ## Eksekusi
 
@@ -42,5 +42,5 @@ Branch: `cr-061-responsive-controls`
 Commit: `fix: contain responsive showcase controls [CR-061]`
 
 - [x] Disetujui user (2026-11-23).
-- [ ] Branch dibuat; implementasi dan verifikasi.
-- [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.
+- [x] Branch dibuat; implementasi dan verifikasi.
+- [x] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.

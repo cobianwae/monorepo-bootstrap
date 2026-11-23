@@ -33,7 +33,7 @@ export const Stepper = React.forwardRef<HTMLElement, StepperProps>(
         aria-label="Progress"
         className={cn(
           orientation === 'horizontal'
-            ? 'w-full flex items-center justify-between'
+            ? 'w-full max-w-full overflow-x-auto flex items-center justify-between'
             : 'flex flex-col space-y-4',
           className
         )}
@@ -42,7 +42,7 @@ export const Stepper = React.forwardRef<HTMLElement, StepperProps>(
         <ol
           className={cn(
             orientation === 'horizontal'
-              ? 'flex items-center w-full'
+              ? 'flex items-center w-full min-w-max gap-0'
               : 'flex flex-col space-y-4 w-full'
           )}
         >
@@ -75,7 +75,7 @@ export const Stepper = React.forwardRef<HTMLElement, StepperProps>(
                 </span>
 
                 {/* Title and Description */}
-                <div className="flex flex-col text-left">
+                <div className="flex min-w-0 flex-col text-left">
                   <span className="sr-only">
                     {isCompleted ? 'Completed: ' : isCurrent ? 'Current: ' : 'Upcoming: '}
                     Step {index + 1} of {steps.length}:{' '}

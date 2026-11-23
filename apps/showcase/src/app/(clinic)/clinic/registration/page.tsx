@@ -238,7 +238,7 @@ export default function PatientRegistrationPage() {
       />
 
       {/* Stepper Navigation Indicator */}
-      <Card className="p-4 bg-card border-border shadow-xs">
+      <Card className="max-w-full overflow-x-auto p-4 bg-card border-border shadow-xs">
         <Stepper
           steps={STEPS}
           currentStep={currentStep}
