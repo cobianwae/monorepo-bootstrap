@@ -1,14 +1,8 @@
 'use client';
 
+import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  Button,
-  Card,
-  CardContent,
-  CommandPalette,
-  openCommandPalette,
-  toast,
-} from '@ds/ui';
+import { Button, Card, CardContent, CommandPalette, toast } from '@ds/ui';
 import {
   Command,
   Sparkles,
@@ -29,6 +23,7 @@ import { PageHeader } from '@ds/ui';
 
 export default function CommandPalettePage() {
   const router = useRouter();
+  const [demoOpen, setDemoOpen] = React.useState(false);
 
   const navigate = (href: string) => () => router.push(href);
 
@@ -46,7 +41,7 @@ export default function CommandPalettePage() {
         <Button
           size="lg"
           className="gap-2"
-          onClick={openCommandPalette}
+          onClick={() => setDemoOpen(true)}
           aria-haspopup="dialog"
         >
           <Command className="h-4 w-4" />
@@ -107,7 +102,7 @@ export default function CommandPalettePage() {
               “theme”, “dashboard”, or “export” to see fuzzy matches grouped by section.
             </p>
             <div className="flex flex-wrap gap-2">
-              <Button size="sm" variant="outline" onClick={openCommandPalette}>
+              <Button size="sm" variant="outline" onClick={() => setDemoOpen(true)}>
                 Try it
               </Button>
             </div>
@@ -115,8 +110,11 @@ export default function CommandPalettePage() {
         </Card>
       </div>
 
-      {/* Live palette instance for this recipe */}
+      {/* Live palette instance for this recipe — local ownership, global palette remains in layout */}
       <CommandPalette
+        open={demoOpen}
+        onOpenChange={setDemoOpen}
+        enableGlobalHandlers={false}
         groups={[
           {
             heading: 'Navigate',

@@ -8,6 +8,10 @@ import {
   Badge,
   Progress,
   Checkbox,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
   toast,
 } from '@ds/ui';
 import {
@@ -141,42 +145,28 @@ export default function OnboardingPage() {
         </div>
       )}
 
-      {/* Onboarding checklist modal */}
-      {showModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          role="dialog"
-          aria-modal="true"
+      {/* Onboarding checklist modal — Radix Dialog with focus trap, Escape and return focus */}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent
+          className={cn(
+            'max-w-md p-0 gap-0 overflow-hidden sm:rounded-xl',
+            allDone && 'border-success/40'
+          )}
           aria-labelledby="onboarding-title"
         >
-          <div
-            className="absolute inset-0 bg-overlay backdrop-blur-xs"
-            onClick={() => setShowModal(false)}
-          />
-          <Card
-            className={cn(
-              'relative z-10 w-full max-w-md border-border shadow-xl animate-in zoom-in-95 duration-200',
-              allDone && 'border-success/40'
-            )}
-          >
-            <CardContent className="p-6 space-y-5">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Step 1 of 2 · Let&apos;s get set up
-                  </p>
-                  <SectionHeading id="onboarding-title" title={allDone ? 'All set!' : 'Finish your setup'} />
-                </div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 w-8 p-0"
-                  onClick={() => setShowModal(false)}
-                  aria-label="Close onboarding modal"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+          <DialogTitle className="sr-only">{allDone ? 'All set!' : 'Finish your setup'}</DialogTitle>
+          <DialogDescription className="sr-only">
+            Onboarding checklist — complete your profile, invite your team, connect a data source and bookmark a favorite.
+          </DialogDescription>
+          <div className="p-6 space-y-5">
+            <div className="flex items-start justify-between pr-8">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Step 1 of 2 · Let&apos;s get set up
+                </p>
+                <SectionHeading id="onboarding-title" title={allDone ? 'All set!' : 'Finish your setup'} />
               </div>
+            </div>
 
               {/* Progress */}
               <div className="space-y-1.5">
@@ -268,10 +258,9 @@ export default function OnboardingPage() {
                   )}
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </div>
+          </DialogContent>
+        </Dialog>
 
       {/* Completion state */}
       {resolved && !showBanner && !showModal && (
