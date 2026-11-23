@@ -1,6 +1,6 @@
 # CR-050 — Sisa `primary` dekoratif, guard solid fill, dan penutupan deviasi visual
 
-**Status:** approved (hanya user yang menetapkan `approved` dan `done`)
+**Status:** done (ditetapkan user 2026-11-23)
 **Sumber:** permintaan user "bereskan skaligus, jangan tanya-tanya" atas daftar sisa dari audit halaman showcase
 **Ref:** `docs/design/visual-language.md` (Color Roles, Deviasi), `docs/cr/cr-047-state-terpilih-bg-primary.md`, `docs/cr/cr-049-primary-state-dan-ikon-clinic-crm-scenarios.md`
 

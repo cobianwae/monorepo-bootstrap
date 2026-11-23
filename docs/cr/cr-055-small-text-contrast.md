@@ -1,6 +1,6 @@
 # CR-055 — Kontras teks kecil lintas tema
 
-**Status:** draft
+**Status:** approved
 **Sumber:** audit
 **Ref:** CR-054 C01; `docs/reviews/cr-054-code-audit.md:23`, `docs/design/visual-language.md`
 
@@ -38,5 +38,6 @@
 Branch: `cr-055-small-text-contrast`
 Commit: `fix: correct small text contrast [CR-055]`
 
-- [ ] Disetujui user; branch dibuat; perubahan diimplementasikan.
+- [x] Disetujui user (2026-11-23).
+- [ ] Branch dibuat; perubahan diimplementasikan.
 - [ ] Verifikasi dan update BACKLOG/STATUS/STATUS-LOG; `check-status-log` hijau.

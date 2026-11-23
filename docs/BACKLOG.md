@@ -93,39 +93,41 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-031 | Mind Map: pakai Kbd dan Timeline, restyle resep (logika salin dipertahankan) | done | `docs/cr/cr-031-mind-map-komponen-ds-kbd-timeline-resep.md` |
 | CR-032 | Mind Map: section "Kapan dipakai" (opsional, konten baru) | done | `docs/cr/cr-032-mind-map-kapan-dipakai.md` |
 | CR-033 | Token: scope tema bersarang tidak me-resolve ulang `--color-*` (dark mode kanvas mind-map; dikerjakan lebih dulu) | done | `docs/cr/cr-033-token-scope-tema-bersarang.md` |
-| CR-034 | Aturan visual docs showcase (`visual-language.md`) + penyambungan ke AI (`instructions`, AGENTS, ARCHITECTURE, CONVENTIONS) + pagar guard | approved | `docs/cr/cr-034-aturan-visual-dan-penyambungan-ai.md` |
-| CR-035 | Seragamkan 7 halaman `foundations`: `SectionHeading`, teks mikro → `text-xs`, `primary` dekoratif → `highlight`, `SegmentedControl` | approved | `docs/cr/cr-035-seragamkan-halaman-foundations.md` |
+| CR-034 | Aturan visual docs showcase (`visual-language.md`) + penyambungan ke AI (`instructions`, AGENTS, ARCHITECTURE, CONVENTIONS) + pagar guard | done | `docs/cr/cr-034-aturan-visual-dan-penyambungan-ai.md` |
+| CR-035 | Seragamkan 7 halaman `foundations`: `SectionHeading`, teks mikro → `text-xs`, `primary` dekoratif → `highlight`, `SegmentedControl` | done | `docs/cr/cr-035-seragamkan-halaman-foundations.md` |
 | CR-036 | Bug konten `foundations`: klaim WCAG dihitung, "3-step", demo durasi satu easing, label arah, "Play All", badge Ratio dark mode | approved | `docs/cr/cr-036-bug-konten-halaman-foundations.md` |
-| CR-037 | Sederhanakan `SectionHeading`: tanpa ikon, tanpa level sub (mengoreksi keputusan CR-034 #2; opsi A pilihan user) | approved | `docs/cr/cr-037-sederhanakan-section-heading-tanpa-ikon.md` |
-| CR-038 | Ganti `text-[9/10/11px]` → `text-xs` di `app/(docs)` non-foundations (99 pemakaian, 29 file); guard px diperluas ke seluruh docs | approved | `docs/cr/cr-038-text-xs-docs-non-foundations.md` |
+| CR-037 | Sederhanakan `SectionHeading`: tanpa ikon, tanpa level sub (mengoreksi keputusan CR-034 #2; opsi A pilihan user) | done | `docs/cr/cr-037-sederhanakan-section-heading-tanpa-ikon.md` |
+| CR-038 | Ganti `text-[9/10/11px]` → `text-xs` di `app/(docs)` non-foundations (99 pemakaian, 29 file); guard px diperluas ke seluruh docs | done | `docs/cr/cr-038-text-xs-docs-non-foundations.md` |
 | CR-039 | Hapus ikon heading manual di `components/` dan `patterns/` (78 baris, 11 file) | done | `docs/cr/cr-039-ikon-heading-components-patterns.md` |
 | CR-040 | Kontras teks varian `info` dan `warning` di `Banner` (`text-foreground` di atas tint); audit 8 tema | done | `docs/cr/cr-040-kontras-banner-info.md` |
 | CR-041 | 44 `<h2>` manual sisa di docs non-foundations: diperiksa, tidak perlu perubahan tag (tidak ada section `h2` induk) | done | `docs/cr/cr-041-h2-manual-docs-non-foundations.md` |
-| CR-042 | Kontras teks varian `destructive` pada Alert (dark 4,17–4,58:1); teks memakai `foreground` | approved | `docs/cr/cr-042-kontras-alert-destructive-dark.md` |
+| CR-042 | Kontras teks varian `destructive` pada Alert (dark 4,17–4,58:1); teks memakai `foreground` | done | `docs/cr/cr-042-kontras-alert-destructive-dark.md` |
 | CR-043 | Heading section tanpa ikon di `overlays-menus` (11 h2) dan `text-xl` untuk h3 manual di `data-display` dan `layout-navigation` | done | `docs/cr/cr-043-heading-overlays-data-display-layout.md` |
 | CR-044 | `primary` dekoratif ke `highlight` di halaman docs (ikon kartu, callout informatif, identitas; 25 kemunculan, 14 file); aksi dan state terpilih tidak diubah | done | `docs/cr/cr-044-primary-dekoratif-ke-highlight.md` |
 | CR-045 | `text-[9/10/11px]` di luar `app/(docs)` ke `text-xs` (154 kemunculan, 33 file); guard memindai seluruh `src` | done | `docs/cr/cr-045-text-xs-luar-docs.md` |
 | CR-046 | Kontras eyebrow `PageHeader` (`text-highlight` kecil di `packages/ui`); API publik, disetujui | done | `docs/cr/cr-046-eyebrow-pageheader-kontras.md` |
-| CR-047 | State terpilih dan kotak ikon `bg-primary` (dekoratif) di halaman docs/scenario; pola interaksi, disetujui | approved | `docs/cr/cr-047-state-terpilih-bg-primary.md` |
+| CR-047 | State terpilih dan kotak ikon `bg-primary` (dekoratif) di halaman docs/scenario; pola interaksi, disetujui | done | `docs/cr/cr-047-state-terpilih-bg-primary.md` |
 | CR-048 | Demo Directional Motion tampil kosong sebelum Play | done | `docs/cr/cr-048-directional-motion-kotak-kosong.md` |
 | CR-049 | State terpilih dan ikon dekoratif `primary` di `clinic`, `crm`, `scenarios` (lanjutan CR-047); tautan dan nilai tetap primary | done | `docs/cr/cr-049-primary-state-dan-ikon-clinic-crm-scenarios.md` |
-| CR-050 | Sisa `primary` dekoratif (onboarding, layout-navigation, consultations, reports, auth), guard solid fill, penutupan deviasi visual | approved | `docs/cr/cr-050-sisa-primary-dan-deviasi-visual.md` |
-| CR-051 | PageHeader: eyebrow sudah selesai (CR-046); deviasi h1 `text-3xl sm:text-4xl` dan weight dipertahankan sebagai keputusan; perubahan API publik butuh persetujuan | approved | `docs/cr/cr-051-pageheader-deviasi.md` |
-| CR-052 | Perluas guard `text-lg font-bold` sebagai heading ke seluruh `app/(docs)`; sisa di `guidelines` ke `SectionHeading` | approved | `docs/cr/cr-052-perluas-guard-heading.md` |
-| CR-053 | Audit visual `components/` dan `patterns/` (46 halaman): text-highlight pada teks kecil, primary dekoratif, h2/h3 manual, text-lg/text-2xl font-bold manual; cakupan palet selain Atelier/Pulse | approved | `docs/cr/cr-053-audit-visual-components-patterns.md` |
-| CR-054 | Audit 73 route selesai dengan batas bukti tercatat; 146 dark/mobile dibaca, konsolidasi dan CR-055–064 draft; menunggu keputusan user | draft | `docs/cr/cr-054-audit-components-patterns.md` |
-| CR-055 | Kontras teks kecil lintas tema (C01) | draft | `docs/cr/cr-055-small-text-contrast.md` |
-| CR-056 | Reflow Banner bersama dan audit caller (C11/V02) | draft | `docs/cr/cr-056-banner-reflow.md` |
-| CR-057 | Semantik kontrol, keyboard dan tabel virtual (C02–04/C07/C10) | draft | `docs/cr/cr-057-control-semantics.md` |
-| CR-058 | Label/error, target password dan empty-value form (C05/C09/C12/C13) | draft | `docs/cr/cr-058-form-accessibility.md` |
-| CR-059 | Fokus onboarding dan kepemilikan command palette (C06/C17) | draft | `docs/cr/cr-059-overlay-ownership.md` |
-| CR-060 | Hydration RTE, statistik awal dan asset demo (C14/V01/V03) | draft | `docs/cr/cr-060-rte-hydration.md` |
-| CR-061 | Reflow kontrol/workspace mobile (C15/R01) | draft | `docs/cr/cr-061-responsive-controls.md` |
-| CR-062 | Reveal katalog home mobile tidak mencapai threshold (C16) | draft | `docs/cr/cr-062-home-reveal.md` |
-| CR-063 | Peran warna, heading, segmented dan literal palette (W01–03/W05–07) | draft | `docs/cr/cr-063-visual-consistency.md` |
-| CR-064 | State tabel konsumen dan pemulihan empty master-detail (W04/C08) | draft | `docs/cr/cr-064-data-state-recovery.md` |
+| CR-050 | Sisa `primary` dekoratif (onboarding, layout-navigation, consultations, reports, auth), guard solid fill, penutupan deviasi visual | done | `docs/cr/cr-050-sisa-primary-dan-deviasi-visual.md` |
+| CR-051 | PageHeader: eyebrow sudah selesai (CR-046); deviasi h1 `text-3xl sm:text-4xl` dan weight dipertahankan sebagai keputusan; perubahan API publik butuh persetujuan | done | `docs/cr/cr-051-pageheader-deviasi.md` |
+| CR-052 | Perluas guard `text-lg font-bold` sebagai heading ke seluruh `app/(docs)`; sisa di `guidelines` ke `SectionHeading` | done | `docs/cr/cr-052-perluas-guard-heading.md` |
+| CR-053 | Audit visual `components/` dan `patterns/` (46 halaman): text-highlight pada teks kecil, primary dekoratif, h2/h3 manual, text-lg/text-2xl font-bold manual; cakupan palet selain Atelier/Pulse | done | `docs/cr/cr-053-audit-visual-components-patterns.md` |
+| CR-054 | Audit 73 route selesai dengan batas bukti tercatat; done dikonfirmasi user 2026-11-23, perbaikan diteruskan ke CR-055–064 approved | done | `docs/cr/cr-054-audit-components-patterns.md` |
+| CR-055 | Kontras teks kecil lintas tema (C01) | approved | `docs/cr/cr-055-small-text-contrast.md` |
+| CR-056 | Reflow Banner bersama dan audit caller (C11/V02) | approved | `docs/cr/cr-056-banner-reflow.md` |
+| CR-057 | Semantik kontrol, keyboard dan tabel virtual (C02–04/C07/C10) | approved | `docs/cr/cr-057-control-semantics.md` |
+| CR-058 | Label/error, target password dan empty-value form (C05/C09/C12/C13) | approved | `docs/cr/cr-058-form-accessibility.md` |
+| CR-059 | Fokus onboarding dan kepemilikan command palette (C06/C17) | approved | `docs/cr/cr-059-overlay-ownership.md` |
+| CR-060 | Hydration RTE, statistik awal dan asset demo (C14/V01/V03) | approved | `docs/cr/cr-060-rte-hydration.md` |
+| CR-061 | Reflow kontrol/workspace mobile (C15/R01) | approved | `docs/cr/cr-061-responsive-controls.md` |
+| CR-062 | Reveal katalog home mobile tidak mencapai threshold (C16) | approved | `docs/cr/cr-062-home-reveal.md` |
+| CR-063 | Peran warna, heading, segmented dan literal palette (W01–03/W05–07) | approved | `docs/cr/cr-063-visual-consistency.md` |
+| CR-064 | State tabel konsumen dan pemulihan empty master-detail (W04/C08) | approved | `docs/cr/cr-064-data-state-recovery.md` |
 
 ## Catatan
+
+- Rekonsiliasi CR sebelum 054 (2026-11-23): `docs/reviews/cr-before-054-status-reconciliation.md`. User menetapkan CR-034/035/037/038/042/047/050–053 done; CR-017/018/036 tetap approved dan terbuka. Catatan eksekusi/commit/screenshot disinkronkan tanpa perubahan UI.
 
 - Nomor PRD 007–009 **sengaja tidak dipakai** — sudah direservasi sebagai ID seri
   story lightweight track (007-01, 008-01/008-02, 009-01, lihat registry di bawah).

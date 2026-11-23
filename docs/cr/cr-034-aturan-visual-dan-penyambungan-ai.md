@@ -1,6 +1,6 @@
 # CR-034 — Aturan visual docs showcase + penyambungan ke AI (opencode)
 
-**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
+**Status:** done (ditetapkan user 2026-11-23)
 **Sumber:** review — pertanyaan user pada sesi 2026-11-22: halaman `foundations/typography`, `motion`, `themes` tidak koheren; "gimana agar ai itu konsisten juga"
 **Ref:** `docs/design/visual-language.md`, `opencode.json:3`, `AGENTS.md`, `docs/ARCHITECTURE.md`, `docs/CONVENTIONS.md`, `apps/showcase/src/test/visual-language-guard.test.ts`
 
@@ -57,7 +57,7 @@
 Branch: `visual-polish` (integrasi pekerjaan visual, dari `dev` `e57f7ea`; belum push/PR)
 Commit: `docs: aturan visual dan penyambungan AI [CR-034]`
 
-- [ ] CR disetujui user.
+- [x] CR disetujui user 2026-11-22; ditetapkan done 2026-11-23.
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan (targeted).
 - [x] `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/STATUS-LOG.md` diperbarui.

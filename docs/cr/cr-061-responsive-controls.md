@@ -1,6 +1,6 @@
 # CR-061 — Reflow kontrol dan workspace mobile
 
-**Status:** draft
+**Status:** approved
 **Sumber:** audit
 **Ref:** CR-054 C15/R01; `docs/reviews/cr-054-code-audit.md:298`–`:306`
 
@@ -41,5 +41,6 @@
 Branch: `cr-061-responsive-controls`
 Commit: `fix: contain responsive showcase controls [CR-061]`
 
-- [ ] Disetujui user; branch dibuat; implementasi dan verifikasi.
+- [x] Disetujui user (2026-11-23).
+- [ ] Branch dibuat; implementasi dan verifikasi.
 - [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.

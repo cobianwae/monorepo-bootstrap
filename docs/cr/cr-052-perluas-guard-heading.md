@@ -1,6 +1,6 @@
 # CR-052 — Perluas guard heading ke seluruh app/(docs)
 
-**Status:** approved (hanya user yang menetapkan `approved` dan `done`)
+**Status:** done (ditetapkan user 2026-11-23)
 **Sumber:** audit visual-polish setelah CR-039/CR-041/CR-050; pertanyaan user "perluas guard heading (ini butuh cr atau gimana?)"
 **Ref:** `apps/showcase/src/test/visual-language-guard.test.ts`, CR-041 (h2 manual sisa), CR-045 (guard src)
 

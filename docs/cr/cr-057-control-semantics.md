@@ -1,6 +1,6 @@
 # CR-057 — Semantik kontrol dan tabel virtual
 
-**Status:** draft
+**Status:** approved
 **Sumber:** audit
 **Ref:** CR-054 C02–C04/C07/C10; `docs/reviews/cr-054-code-audit.md:66`
 
@@ -40,5 +40,6 @@
 Branch: `cr-057-control-semantics`
 Commit: `fix: expose control and table semantics [CR-057]`
 
-- [ ] Disetujui user; branch dibuat; implementasi dan verifikasi.
+- [x] Disetujui user (2026-11-23).
+- [ ] Branch dibuat; implementasi dan verifikasi.
 - [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.

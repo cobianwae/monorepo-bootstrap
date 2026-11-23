@@ -1,6 +1,6 @@
 # CR-056 — Reflow Banner bersama
 
-**Status:** draft
+**Status:** approved
 **Sumber:** audit
 **Ref:** CR-054 C11/V02; `docs/reviews/cr-054-code-audit.md:128`
 
@@ -37,5 +37,6 @@
 Branch: `cr-056-banner-reflow`
 Commit: `fix: contain banner content and actions [CR-056]`
 
-- [ ] Disetujui user; branch dibuat; implementasi dan verifikasi.
+- [x] Disetujui user (2026-11-23).
+- [ ] Branch dibuat; implementasi dan verifikasi.
 - [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.

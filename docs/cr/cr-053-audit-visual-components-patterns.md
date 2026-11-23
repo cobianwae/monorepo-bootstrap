@@ -1,6 +1,6 @@
 # CR-053 — Audit visual components/ dan patterns/ (docs showcase)
 
-**Status:** approved (disetujui user 2026-11-22; `done` belum ditetapkan)
+**Status:** done (ditetapkan user 2026-11-23)
 **Sumber:** pertanyaan user 2026-11-22 "buat cr buat periksa patterns/ components/ atau ini udah ada cr nya?". Belum ada CR khusus; CR-039 hanya menghapus ikon heading.
 **Ref:** `docs/design/visual-language.md` (Section Heading, Color Roles, Type Scale), `apps/showcase/src/test/visual-language-guard.test.ts`, CR-039, CR-041, CR-049, CR-052
 
@@ -87,14 +87,14 @@ Angka mentah. Sebagian hasil adalah false positive (hover, ikon kotak, dan teks 
 
 - [x] Tidak ada hex/RGB hardcode.
 - [x] Hierarki heading tetap (h1 → h2 → h3) dan tidak ada h3 tunggal.
-- [x] Teks kecil tidak memakai `text-highlight` (kontras, lihat visual-language.md).
+- [x] Lokasi teks kecil yang diubah pada eksekusi awal diperbaiki. Ini bukan jaminan seluruh 46 halaman bebas pelanggaran; sisa statis/inherited/hover ditemukan di CR-054 dan diteruskan ke CR-055.
 - [x] Light dan dark parity dicek lewat screenshot.
 - [x] Guard `visual-language-guard` tetap hijau.
 
 ## Eksekusi
 
 - Branch: `visual-polish` (digabung di branch ini sesuai instruksi user).
-- Commit: belum.
+- Commit implementasi: `0a7e936`; verifikasi lanjutan: `8737e64`; timeout tes PermissionMatrix: `d6b09f3`.
 
 ## Keputusan (eksekusi)
 
@@ -114,6 +114,7 @@ Angka mentah. Sebagian hasil adalah false positive (hover, ikon kotak, dan teks 
 
 - File diubah: `components/forms/page.tsx`, `components/data-display/page.tsx`, `components/marketing/page.tsx`, `components/page.tsx`, `patterns/master-detail/page.tsx`, `patterns/onboarding/page.tsx`.
 - Verifikasi: guard `visual-language-guard.test.ts` 5/5 hijau; `@ds/showcase lint` exit 0; `@ds/showcase build:types` exit 0.
-- Screenshot (Chrome headless, Atelier/Pulse, `/tmp/cr053-shots/`): `components` light dan dark, `patterns/onboarding` light (modal), `components/forms` light dan dark, `patterns/master-detail` dark, `components/marketing` light: heading seragam dan tidak ada teks terpotong. `components/data-display` dark tertangkap dalam light (kegagalan probe tema, bukan regresi kode) dan belum diambil ulang.
-- Belum dicakup: palet/art direction selain Atelier/Pulse untuk halaman components/patterns; `pnpm test` penuh dan build produksi tidak dijalankan ulang untuk CR-053.
-- Status: approved oleh user 2026-11-22. `done` menunggu penetapan user.
+- Screenshot awal (Chrome headless, Atelier/Pulse, `/tmp/cr053-shots/`): `components` light/dark, `patterns/onboarding` light, `components/forms` light/dark, `patterns/master-detail` dark, `components/marketing` light. Retry `components/data-display` dark kemudian berhasil; verifikasi lanjutan dicatat di commit `8737e64` dan STATUS-LOG 2026-11-22.
+- Verifikasi lanjutan historis: Aurora/Nebula untuk forms, marketing, onboarding; Blueprint/Ink untuk master-detail dan components. `pnpm test`: tokens 10/10, showcase 79/79, ui 705/707 (dua timeout OrgChartEditor/PermissionMatrix; suite terkait lulus 53/53 saat dijalankan sendiri). Build produksi 76/76 dari salinan; typecheck root tetap 12 error baseline FlowEditor. Bukan pengujian baru pada sesi rekonsiliasi.
+- Batas: tidak seluruh kombinasi palet/state diuji. Audit menyeluruh diteruskan dan selesai di CR-054; temuan sisa menjadi CR-055–064 approved.
+- Status: approved oleh user 2026-11-22; done ditetapkan user 2026-11-23. Batas verifikasi dan CR lanjutan tetap berlaku.

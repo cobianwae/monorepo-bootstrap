@@ -25,7 +25,7 @@ Pemakaian `primary` sebagai dekorasi (ikon kartu, ikon fitur, callout informatif
 
 ## Yang sengaja TIDAK diubah (tetap `primary`)
 
-Aturan batas: `primary` tetap untuk aksi, fokus, dan state terpilih; `highlight` untuk aksen dan identitas.
+Batas eksekusi historis CR-044: aksi/fokus dan state terpilih tidak diubah di CR ini. Ini bukan pengecualian aturan warna saat ini: state terpilih ditindaklanjuti di CR-047/049, dan sisa drift ditemukan di CR-054 → CR-057/063.
 
 - Tombol dan aksi (mis. `onboarding`, `master-data`, `stepper` kotak ikon `bg-primary text-primary-foreground` dan callout dengan tombol aksi).
 - State terpilih: `workspace:69`, `cascader-tree-select:81`, `transfer-list:52`, `activity-feed:251` (`bg-highlight` sudah), `overlays-menus:272`, `data-display:424`, `dashboard:182`, `stepper:317`, `master-detail:376`, `notifications:176` (indikator belum dibaca), `command-palette`. Ini state yang sebaiknya memakai `SegmentedControl` atau pola state terpisah (CR terpisah bila disetujui).
@@ -39,7 +39,7 @@ Aturan batas: `primary` tetap untuk aksi, fokus, dan state terpilih; `highlight`
 - [x] `pnpm --filter @ds/showcase lint` hijau (exit 0).
 - [x] `pnpm --filter @ds/showcase build:types` hijau (exit 0).
 - [x] `visual-language-guard` hijau 4/4.
-- [ ] Screenshot dark dan light halaman yang berubah (`getting-started`, `guidelines`, `patterns/dynamic-form`, `patterns/master-detail`, beranda docs) belum dilakukan dalam sesi ini.
+- [x] Pemeriksaan visual lanjutan CR-054 mencakup halaman tersebut pada desktop light serta dark/mobile. Home mobile ternyata memiliki katalog tersembunyi (C16 → CR-062), bukan dinyatakan lolos; lihat laporan final CR-054.
 
 ## Keputusan
 
@@ -50,16 +50,16 @@ Aturan batas: `primary` tetap untuk aksi, fokus, dan state terpilih; `highlight`
 
 ## Catatan risiko
 
-- Teks `text-highlight` tidak dipakai (hanya ikon, border, dan bg). Aturan `visual-language.md` tentang teks kecil tetap terpenuhi.
-- Pada `patterns/virtualized-list:140` accent dipakai sebagai warna angka metrik. Angka tersebut `text-highlight` dengan ukuran besar; kontras teks ukuran itu perlu dicek untuk tema ber-highlight rendah (lihat audit kontras). Ini belum dibuktikan.
+- Klaim awal bahwa seluruh penggantian hanya ikon/border/bg tidak membuktikan kepatuhan semua teks. Audit CR-054 menemukan teks kecil `highlight` di sejumlah halaman; perbaikannya diteruskan ke CR-055.
+- Kandidat angka metrik `virtualized-list` dikoreksi oleh audit kode CR-054: nilai statistik memakai foreground; highlight berada pada wrapper SVG. Tidak ada pelanggaran kontras angka yang terbukti dari grep awal tersebut.
 
 ## Design System Checks
 
 - [x] Tidak ada hex/RGB hardcode.
 - [x] Guard `visual-language-guard` hijau.
-- [ ] Kontras metrik `text-highlight` di tema rendah belum diukur ulang.
+- [x] Kandidat metrik dikoreksi melalui inspeksi kode CR-054; bukan klaim audit kontras seluruh tema. Teks kecil yang benar-benar memakai highlight ditangani CR-055.
 
 ## Eksekusi
 
 Branch: `visual-polish`
-Commit: `refactor: primary dekoratif ke highlight di halaman docs [CR-044]` (dibuat setelah verifikasi).
+Commit: `293a36c` — `refactor: primary dekoratif ke highlight di halaman docs [CR-044]`.

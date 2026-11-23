@@ -1,6 +1,6 @@
 # CR-047 — State terpilih dan fill ikon `bg-primary` di halaman docs/scenario
 
-**Status:** approved (disetujui user 2026-11-22; `done` menunggu user). Cakupan: `app/(docs)` saja; `clinic`/`crm`/`scenarios` tidak disentuh (lanjutan terpisah).
+**Status:** done (ditetapkan user 2026-11-23). Cakupan: `app/(docs)` saja; `clinic`/`crm`/`scenarios` ditangani terpisah di CR-049.
 **Sumber:** audit halaman tidak koheren (2026-11-22), temuan terbuka dari CR-044
 **Ref:** `docs/design/visual-language.md` (Color Roles: `primary` = aksi, fokus; state terpilih: kontrol segmented wajib `SegmentedControl`; item aktif kumpulan pilihan visual memakai ring `highlight`)
 
@@ -29,7 +29,7 @@ Mengubah state terpilih mengubah cara pengguna membaca pilihan aktif. Itu keputu
 - [x] Inventaris dan klasifikasi per baris (grep `bg-primary` di `app/(docs)`).
 - [x] Ubah per kasus: 12 file (lihat Keputusan).
 - [x] Guard: pola solid `bg-primary text-primary-foreground` kini dijaga aturan `solid-primary-fill` (CR-050) yang memindai seluruh src. Pola handmade segmented tetap di foundations.
-- [~] Screenshot: `patterns/workspace` (light, Atelier/Pulse) sudah dilihat dan rapi. Halaman lain belum dilihat (stepper, master-data, transfer-list, data-display dark).
+- [x] Screenshot awal: `patterns/workspace` light Atelier/Pulse. Pemeriksaan lanjutan CR-054 mencakup stepper, master-data, transfer-list dan data-display dark/mobile; bukan bukti seluruh state/palet lolos. Temuan lanjutan diteruskan ke CR-055–064, lihat `docs/reviews/cr-054-final-audit.md`.
 - [x] `pnpm --filter @ds/showcase lint` dan `build:types` hijau; `vitest src/test` 4/4 hijau.
 
 ## Keputusan
@@ -40,7 +40,7 @@ Mengubah state terpilih mengubah cara pengguna membaca pilihan aktif. Itu keputu
 | 2 | Item pilihan (transfer-list, cascader): `bg-highlight/10 ring-1 ring-highlight` | Ring highlight untuk item pilihan visual |
 | 3 | Callout dekoratif stepper dan master-data: `border-highlight/30 bg-gradient from-highlight/10`, ikon `bg-highlight text-highlight-foreground` | Dekorasi dan identitas = highlight; pasangan `highlight-foreground` sudah ada di token |
 | 4 | Baris terpilih/aktif (master-detail, stepper card, data-display selectedIds) dan notifikasi unread → `highlight` | Konsisten dengan item pilihan |
-| 5 | `clinic`, `crm`, dan `scenarios` (±20 kasus `bg-primary/5`, `bg-primary text-primary-foreground`) belum diubah | Di luar cakupan CR; lanjutan terpisah bila disetujui |
+| 5 | `clinic`, `crm`, dan `scenarios` di luar perubahan CR-047; lanjutan dikerjakan di CR-049 (done) | Tidak memperluas cakupan CR-047 |
 
 ## Design System Checks
 
@@ -49,4 +49,4 @@ Mengubah state terpilih mengubah cara pengguna membaca pilihan aktif. Itu keputu
 
 ## Eksekusi
 
-Belum dieksekusi. Status tetap `draft`.
+Diimplementasikan di branch `visual-polish`, commit `3e14b2b`. Lint, build:types dan guard 4/4 adalah hasil verifikasi historis, bukan dijalankan ulang saat rekonsiliasi dokumen 2026-11-23. Done ditetapkan user 2026-11-23. Temuan state/semantik yang masih ada pada audit CR-054 ditangani terpisah di CR-057/063.

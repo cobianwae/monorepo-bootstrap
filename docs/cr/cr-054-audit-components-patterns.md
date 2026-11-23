@@ -1,6 +1,6 @@
 # CR-054 — Audit menyeluruh seluruh halaman showcase
 
-**Status:** draft
+**Status:** done
 **Sumber:** audit
 **Ref:** `docs/design/visual-language.md`, `docs/cr/cr-053-audit-visual-components-patterns.md`, `/tmp/cr054/static.json` (hasil `/tmp/cr054/static-audit.mjs`)
 
@@ -11,27 +11,28 @@ Memeriksa seluruh halaman showcase secara terstruktur (kode + visual) terhadap `
 ## Cakupan
 
 - Seluruh **73 file `page.tsx`** di `apps/showcase/src/app`: 58 docs (9 components, 37 patterns, 7 foundations, 5 umum), 8 clinic, 5 CRM, 2 landing/scratch. Inventori source/route lengkap: `docs/reviews/cr-054-code-audit.md`.
-- Matriks 46 halaman di bawah adalah subset awal, bukan keseluruhan showcase.
+- Matriks 46 halaman di bawah adalah inventori kandidat awal, bukan status penyelesaian audit atau keseluruhan showcase.
 - Pemeriksaan kode statis: aturan dari visual-language (px arbitrer, highlight pada teks kecil, primary dekoratif, solid primary fill, heading manual, ikon di heading, penggunaan SectionHeading).
 - Bukti awal: screenshot viewport 1440x1800 dark/light Atelier/Pulse (92 gambar, `/tmp/cr054-shots`).
-- Screenshot seluruh tinggi dokumen desktop light sudah tersedia untuk 30 route (8 clinic, 5 CRM, 8 components, 7 foundations, contribution, getting-started) dan lima route umum; seluruh **73 route** memiliki setidaknya satu pemeriksaan visual desktop light. 46 route components/patterns baru diperiksa pada viewport pertama, bukan seluruh tinggi halaman.
+- Seluruh **73 route** diperiksa visual desktop light setidaknya sebagian. Capture full-document light mencakup 30 route (8 clinic, 5 CRM, 8 components, 7 foundations, contribution, getting-started), lima route umum, serta seluruh **37 patterns** pada batch pemulihan; semuanya sudah dibaca. Batas konten dinamis dan panel scroll internal dicatat di laporan visual.
+- Seluruh **146 konfigurasi** desktop dark 1440px dan mobile light 390px (73 route × 2) tersimpan, tervalidasi URL/mode, dan dibaca. Capture tidak membuktikan semua state/interaksi berfungsi.
 - Sweep runtime 73 route × 3 konfigurasi lama timeout tanpa JSON tersimpan; progres 150/219 tidak dihitung sebagai bukti kelulusan. Pemulihan 2026-11-23 memakai batch berurutan dengan checkpoint per route/konfigurasi dan verifikasi URL/hidrasi/tema. Screenshot lama dibatasi 24000px, batch pemulihan 30000px; tinggi aktual dicatat per gambar. Panel scroll internal tetap perlu diperiksa terpisah.
-- Catatan triase visual: `docs/reviews/cr-054-visual-audit.md`; audit kode statis seluruh halaman: `docs/reviews/cr-054-code-audit.md`.
+- Konsolidasi final dan pemetaan CR turunan: `docs/reviews/cr-054-final-audit.md`; detail visual/runtime: `docs/reviews/cr-054-visual-audit.md`; audit kode dan inventori seluruh halaman: `docs/reviews/cr-054-code-audit.md`.
 
 ## Keterbatasan bukti (bukan pengecualian halaman)
 
 - Palet dan art direction selain Atelier/Pulse; belum dicek per halaman.
-- Screenshot awal hanya viewport pertama; tidak dapat menutup audit bagian bawah halaman.
-- Sebagian interaksi sudah diverifikasi runtime (Banner, onboarding, RTE, filter pasien, chart), tetapi hover, seluruh state terpilih, Play, dropdown, DnD, panel scroll internal, dan keyboard walkthrough belum menyeluruh; tetap pekerjaan audit terbuka.
+- Screenshot awal hanya viewport pertama dan bukan bukti cakupan final. Batch pemulihan menambah full-document dark/mobile seluruh route dan light seluruh patterns; halaman dinamis, modal yang menutupi konten, dan scroller internal tetap memiliki batas yang dijelaskan di laporan.
+- Probe terarah mencakup Banner, onboarding, RTE, filter pasien, chart, Reveal home, command palette, akhir infinite-scroll, data-table error/retry/empty/clear, lightbox dan validasi form. Seluruh permutasi hover/state/Play/dropdown/DnD/keyboard belum diuji; ini batas audit yang diteruskan ke verifikasi CR turunan, bukan task audit tanpa batas.
 - Judul kartu h2 manual (`text-sm/base`) sengaja tidak dihitung sebagai pelanggaran, sesuai CR-041 dan CR-052.
 
 ## Hasil audit statis
 
 Hitungan kandidat per halaman, bukan jumlah pelanggaran. `highlight kandidat` menghitung semua baris `text-highlight` (termasuk ikon/hover, tidak membuktikan ukuran teks). `primary kandidat` menghitung baris `text|bg|border-primary` (termasuk aksi sah). `solid primary` hanya pola persis `bg-primary text-primary-foreground`; nilai nol tidak membuktikan seluruh penggunaan primary benar. `h2 berikon` hanya kandidat `<h2` dengan `flex items-center`.
 
-Seluruh 46 pasangan screenshot viewport awal **sudah dibaca**; observasi per route ada di laporan visual. Kolom terakhir tetap “belum” karena menandai **audit lengkap halaman**, bukan ketersediaan/pembacaan screenshot. Bukti loading saja pada media-gallery dan canvas Studio light belum memadai untuk menilai state loaded.
+Seluruh 46 pasangan screenshot viewport awal **sudah dibaca**. Matriks berikut mempertahankan snapshot scan awal, bukan penilaian pass/fail atau status audit terkini. **“Belum” pada kolom terakhir berarti capture viewport awal saja belum mencukupi saat itu; bukan halaman yang belum diaudit sekarang.** Posisi final: seluruh 73 route sudah ditriase, termasuk media-gallery loaded dan canvas Studio light loaded pada batch lanjutan. Hasil final ada di laporan konsolidasi; batas interaksi ada di laporan visual.
 
-| # | Halaman | px | highlight kandidat | primary kandidat | solid primary | h2 manual | h3 manual | lg bold | h2 berikon | SectionHeading | Status historis viewport awal |
+| # | Halaman | px | highlight kandidat | primary kandidat | solid primary | h2 manual | h3 manual | lg bold | h2 berikon | SectionHeading | Bukti awal mencukupi? (historis, bukan status final) |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | `components/actions-inputs` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 11 | belum |
 | 2 | `components/charts` | 0 | 0 | 0 | 0 | 1 | 0 | 0 | 0 | 0 | belum |
@@ -111,7 +112,7 @@ Tabel merangkum cluster dengan severity proyek. ID C/W bukan severity; a11y yang
 
 ## Perubahan yang Diusulkan
 
-Tidak ada perubahan kode di CR ini. Konsolidasi selesai di `docs/reviews/cr-054-final-audit.md`; CR-055–064 dibuat sebagai draft per cluster. Approval/done tetap oleh user.
+Tidak ada perubahan kode di CR ini. Konsolidasi selesai di `docs/reviews/cr-054-final-audit.md`; CR-055–064 dibuat per cluster. CR-054 dan CR-055–064 disetujui user pada 2026-11-23. User mengonfirmasi CR-054 done pada tanggal yang sama karena pekerjaan audit sudah selesai; CR-055–064 tetap approved dan implementasinya belum dimulai.
 
 ## Tasks
 
@@ -121,8 +122,8 @@ Tidak ada perubahan kode di CR ini. Konsolidasi selesai di `docs/reviews/cr-054-
 - [x] Audit kode statis seluruh halaman dan triase kandidat warna/heading/semantik (laporan kode; dependency transitif belum seluruhnya diperiksa).
 - [x] Baca seluruh 92 screenshot viewport awal; catat observasi dan bukti yang tidak memadai.
 - [x] Screenshot full-document desktop dark dan mobile light seluruh 73 route serta validasi manifest; 37 patterns full-document light tambahan. Desktop light route lain tetap memiliki batas capture yang dicatat pada laporan.
-- [x] Triase visual seluruh route; hasil final di laporan visual, bukan kolom historis viewport awal.
-- [x] Triase kode kandidat primary/highlight (bedakan ikon, aksi, hover, display, teks kecil dan dekorasi); pengukuran runtime tetap terbuka.
+- [x] Triase visual seluruh route; hasil final di laporan visual/konsolidasi, bukan kolom kecukupan bukti awal pada matriks historis.
+- [x] Triase kode kandidat primary/highlight (bedakan ikon, aksi, hover, display, teks kecil dan dekorasi); pengukuran computed contrast per elemen yang belum dilakukan diteruskan ke CR-055, bukan diklaim lolos.
 - [x] Susun temuan dan pecah menjadi CR-055–064 (draft) per cluster.
 - [x] Verifikasi dokumentasi: `node scripts/check-status-log.mjs` hijau (90 artefak done); `git diff --check` bersih. Bukan verifikasi ulang suite kode.
 
@@ -141,6 +142,8 @@ Capture/sweep lama sempat terhenti, termasuk sweep tanpa JSON yang tidak dipakai
 
 ## Design System Checks
 
+Checklist berikut adalah kriteria verifikasi **implementasi perbaikan**, bukan task audit yang tertinggal. Tidak dinilai sebagai kelulusan oleh CR audit-only ini; temuan dan verifikasinya diteruskan ke CR-055–064. Checkbox tidak dicentang karena tidak ada perubahan kode atau suite kode baru yang dijalankan.
+
 - [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
 - [ ] Kontras light dan dark lolos WCAG AA (untuk temuan yang menyentuh teks).
 - [ ] Perilaku Radix/a11y tidak rusak.
@@ -151,12 +154,12 @@ Capture/sweep lama sempat terhenti, termasuk sweep tanpa JSON yang tidak dipakai
 
 ## Eksekusi
 
-Branch: `visual-polish` (digabung di branch ini sesuai instruksi user)
-Commit: `docs: audit components dan patterns [CR-054]`
+Branch: `visual-polish` (audit di-commit langsung di branch ini sesuai instruksi user)
+Commit hasil audit: `edd5bea` — `docs: complete showcase audit [CR-054]` (sudah di-push ke `origin/visual-polish`; perapihan dokumen berikutnya dicatat terpisah).
 
 - [x] CR dibuat (draft).
-- [ ] CR disetujui user.
+- [x] CR disetujui user (2026-11-23).
 - [x] Audit dijalankan dengan batas bukti tercatat.
 - [x] Temuan dicatat dan CR turunan dibuat (draft).
-- [x] Tasks di-tick dan indeks `docs/BACKLOG.md` diperbarui; status tetap draft.
+- [x] Tasks di-tick dan indeks `docs/BACKLOG.md` diperbarui; status done sesuai konfirmasi user (2026-11-23).
 - [x] `docs/STATUS-LOG.md` di-append dan `node scripts/check-status-log.mjs` hijau.

@@ -1,6 +1,6 @@
 # CR-060 — Hydration dan statistik awal RichTextEditor
 
-**Status:** draft
+**Status:** approved
 **Sumber:** audit
 **Ref:** CR-054 C14/V01/V03; `docs/reviews/cr-054-code-audit.md:286`
 
@@ -39,5 +39,6 @@
 Branch: `cr-060-rte-hydration`
 Commit: `fix: stabilize rich text editor hydration [CR-060]`
 
-- [ ] Disetujui user; branch dibuat; implementasi dan verifikasi.
+- [x] Disetujui user (2026-11-23).
+- [ ] Branch dibuat; implementasi dan verifikasi.
 - [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.

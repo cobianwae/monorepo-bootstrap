@@ -1,6 +1,6 @@
 # CR-064 — Skenario state data dan pemulihan empty
 
-**Status:** draft
+**Status:** approved
 **Sumber:** audit
 **Ref:** CR-054 W04/C08; `docs/reviews/cr-054-code-audit.md:112`, `:157`
 
@@ -39,5 +39,6 @@
 Branch: `cr-064-data-state-recovery`
 Commit: `fix: demonstrate data state recovery [CR-064]`
 
-- [ ] Disetujui user; branch dibuat; implementasi dan verifikasi.
+- [x] Disetujui user (2026-11-23).
+- [ ] Branch dibuat; implementasi dan verifikasi.
 - [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.

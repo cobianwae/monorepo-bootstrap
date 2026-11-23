@@ -1,6 +1,6 @@
 # CR-062 — Reveal katalog beranda mobile
 
-**Status:** draft
+**Status:** approved
 **Sumber:** audit
 **Ref:** CR-054 C16; `docs/reviews/cr-054-code-audit.md:308`
 
@@ -37,5 +37,6 @@
 Branch: `cr-062-home-reveal`
 Commit: `fix: reveal long home catalog on mobile [CR-062]`
 
-- [ ] Disetujui user; branch dibuat; implementasi dan verifikasi.
+- [x] Disetujui user (2026-11-23).
+- [ ] Branch dibuat; implementasi dan verifikasi.
 - [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.

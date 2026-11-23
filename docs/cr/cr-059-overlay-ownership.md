@@ -1,6 +1,6 @@
 # CR-059 — Fokus modal dan aktivasi command palette
 
-**Status:** draft
+**Status:** approved
 **Sumber:** audit
 **Ref:** CR-054 C06/C17; `docs/reviews/cr-054-code-audit.md`
 
@@ -40,5 +40,6 @@
 Branch: `cr-059-overlay-ownership`
 Commit: `fix: coordinate overlays and command activation [CR-059]`
 
-- [ ] Disetujui user; branch dibuat; implementasi dan verifikasi.
+- [x] Disetujui user (2026-11-23).
+- [ ] Branch dibuat; implementasi dan verifikasi.
 - [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.

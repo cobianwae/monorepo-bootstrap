@@ -1,6 +1,6 @@
 # CR-042 — Kontras teks varian `destructive` pada Alert (dark)
 
-**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
+**Status:** done (ditetapkan user 2026-11-23)
 **Sumber:** a11y
 **Ref:** `packages/ui/src/components/feedback/alert.tsx`, `docs/cr/cr-040-kontras-banner-info.md`, `docs/design/visual-language.md` (Color Roles)
 

@@ -1,6 +1,6 @@
 # CR-038 — Ganti `text-[Npx]` di `app/(docs)` non-foundations dengan `text-xs`
 
-**Status:** approved (disetujui user 2026-11-22; `done` menunggu user)
+**Status:** done (ditetapkan user 2026-11-23)
 **Sumber:** audit lanjutan CR-035/037 — 99 pemakaian `text-[10px]`/`text-[11px]`/`text-[9px]` di halaman docs di luar foundations
 **Ref:** `docs/design/visual-language.md` (Type Scale: teks terkecil `text-xs`), `apps/showcase/src/test/visual-language-guard.test.ts`
 
@@ -30,7 +30,7 @@
   - Indikator "1 Issue" di pojok kiri bawah saat `/components/forms` adalah overlay dev Next.js, bukan bagian halaman.
 - [x] Verifikasi visual light mode (Atelier/Pulse) pada 7 halaman yang sama. Tidak ada label `text-xs` terpotong atau tumpang tindih.
   - Regresi yang ditemukan dan diperbaiki (commit `eaf5fcf`): `patterns/workspace` nama file dan ukuran file menempel (ukuran naik dari 10px ke 12px). Diperbaiki dengan `truncate`, `shrink-0 pl-2`.
-  - Kontras banner info (`text-info-foreground` di atas `info/15`) pudar di light dan dark, bukan akibat CR ini. Dicatat sebagai CR-040 (draft).
+  - Kontras banner info (`text-info-foreground` di atas `info/15`) pudar di light dan dark, bukan akibat CR ini. Ditangani di CR-040 (done).
 - [x] Sampel art direction: halaman foundations dilihat di Aurora/Blueprint (CR-052). Halaman patterns/components hanya Atelier/Pulse; batas verifikasi tercatat.
 - [x] Verifikasi ulang di CR-052: typecheck (baseline 12 error FlowEditor), test (706/707, 1 flake RTE baseline), build produksi 76/76.
 
@@ -52,4 +52,4 @@
 ## Eksekusi
 
 Branch: `visual-polish`
-Commit: _belum dibuat_ (menunggu verifikasi visual atau keputusan user)
+Commit implementasi: `0ded210`; perbaikan wrap workspace: `eaf5fcf`. Verifikasi dark/light dicatat di `3144296` dan `7ee422b`. Done ditetapkan user 2026-11-23.

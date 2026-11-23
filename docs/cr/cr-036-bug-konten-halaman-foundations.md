@@ -49,8 +49,8 @@ Hanya konten/klaim/demo di tiga halaman; tidak ada perubahan token, `@ds/ui`, at
 
 ## Eksekusi
 
-Branch: `visual-polish` (integrasi pekerjaan visual, dari `dev` `e57f7ea`; belum push/PR)
-Commit: lihat CR-035 (satu commit bersama; file halaman yang sama dan saling tumpang tindih)
+Branch: `visual-polish` (integrasi pekerjaan visual, dari `dev` `e57f7ea`).
+Commit: `8294a05`, bersama CR-035. Catatan “belum push” adalah posisi awal, bukan status terkini; commit berada dalam riwayat audit `edd5bea` yang sudah di-push. Verifikasi AA seluruh tone di browser tetap terbuka sesuai checklist, tidak otomatis selesai oleh audit screenshot CR-054.
 
 - [x] CR disetujui user (instruksi 2026-11-22: "setuju semua CR kecuali CR-012 dan CR-013").
 - [x] Perubahan diimplementasikan.

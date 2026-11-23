@@ -1,6 +1,6 @@
 # CR-058 — Label, error dan empty value form
 
-**Status:** draft
+**Status:** approved
 **Sumber:** audit
 **Ref:** CR-054 C05/C09/C12/C13; `docs/reviews/cr-054-code-audit.md`
 
@@ -41,5 +41,6 @@
 Branch: `cr-058-form-accessibility`
 Commit: `fix: connect form errors and normalize empty values [CR-058]`
 
-- [ ] Disetujui user; branch dibuat; implementasi dan verifikasi.
+- [x] Disetujui user (2026-11-23).
+- [ ] Branch dibuat; implementasi dan verifikasi.
 - [ ] BACKLOG/STATUS/STATUS-LOG diperbarui; `check-status-log` hijau.

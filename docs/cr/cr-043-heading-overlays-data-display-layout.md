@@ -26,7 +26,7 @@
 - [x] `pnpm --filter @ds/showcase lint` hijau (exit 0).
 - [x] `pnpm --filter @ds/showcase build:types` hijau (exit 0).
 - [x] `visual-language-guard` hijau 4/4.
-- [ ] Screenshot dark dan light `overlays-menus`, `data-display`, `layout-navigation` (belum dilakukan dalam sesi ini).
+- [x] Pemeriksaan visual lanjutan CR-054: ketiga halaman diperiksa desktop light serta dark/mobile, termasuk full-document; lihat `docs/reviews/cr-054-visual-audit.md`. Bukan pengujian seluruh interaksi.
 
 ## Keputusan
 
@@ -40,9 +40,9 @@
 - [x] Tidak ada hex/RGB hardcode.
 - [x] Hierarki heading: h2 section, h3 judul kartu demo.
 - [x] Guard `visual-language-guard` hijau.
-- [ ] Verifikasi visual belum dilakukan (lihat tasks).
+- [x] Verifikasi visual lanjutan tercatat pada CR-054 (lihat tasks); tidak mengklaim semua state/palet lolos.
 
 ## Eksekusi
 
 Branch: `visual-polish`
-Commit: `refactor: heading section tanpa ikon di overlays-menus, data-display, layout-navigation [CR-043]` (dibuat setelah verifikasi).
+Commit: `c848b84` — `refactor: heading section tanpa ikon di overlays-menus, data-display, layout-navigation [CR-043]`.
