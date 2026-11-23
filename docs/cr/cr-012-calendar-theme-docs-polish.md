@@ -1,6 +1,6 @@
 # CR-012 — Calendar polish tema & docs showcase
 
-**Status:** draft
+**Status:** approved
 **Sumber:** audit read-only `ui-ux-auditor` scope 004 (2026-11-21)
 **Ref:** `docs/prd/004-calendar-scheduler.md`, `docs/design/calendar-scheduler.md`, `docs/stories/004-01-foundation-month-navigation.md`, `docs/stories/004-02-week-day-slot-allday.md`, `docs/stories/004-03-multiday-overlap-detail-dnd.md`, `docs/stories/004-04-locale-agenda-states-showcase.md`
 

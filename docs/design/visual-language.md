@@ -1,6 +1,6 @@
 # Visual Language
 
-Status: **draft** — diisi dari praktik implementasi dominan di `apps/showcase/src/app/(docs)` dan
+Status: **approved** (ditetapkan user 2026-11-23) — diisi dari praktik implementasi dominan di `apps/showcase/src/app/(docs)` dan
 keputusan sesi `/design-language` 2026-11-22. Section bertanda ✔ sudah diputuskan; ○ belum dikunci
 (tidak memblokir). Hanya user yang boleh menetapkan `approved`.
 Dimuat otomatis oleh opencode lewat `opencode.json` → `instructions` (CR-034). Jaga tetap ringkas.
@@ -152,3 +152,4 @@ Cakupan diperluas bertahap ke `components/`, `patterns/`, dll. setelah halamanny
 | 2026-11-22 | Isi Art Direction, Type Scale, Section Heading & Callout, Color Roles dari keputusan sesi `/design-language` | draft |
 | 2026-11-22 | Finalkan keputusan: motion invariant, state terpilih mengikuti `SegmentedControl`, spacing dari praktik dominan, deviasi `PageHeader`/weight dicatat (CR-034) | draft |
 | 2026-11-22 | Koreksi keputusan: heading section **tanpa ikon**, deskripsi opsional, sub-section hanya bila ≥2 kelompok paralel (helper `level="sub"` dihapus, 0 pemakaian); dikunci user lewat pilihan A (CR-037) | draft |
+| 2026-11-23 | Status ditetapkan `approved` oleh user (section ○ tetap belum dikunci, tidak memblokir uplift) | approved |

@@ -1,6 +1,6 @@
 # CR-013 — Anchor popover detail event EventCalendar (M-006) kadang jatuh ke pojok kiri atas
 
-**Status:** draft
+**Status:** approved
 **Sumber:** review (laporan user: popup detail event 004 kadang muncul di pojok kiri atas, bukan di atas/bawah event)
 **Ref:** `docs/prd/004-calendar-scheduler.md`, `docs/design/calendar-scheduler.md`, `docs/stories/004-03-multiday-overlap-detail-dnd.md`, `packages/ui/src/components/data-display/event-calendar.tsx`
 
