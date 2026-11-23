@@ -19,7 +19,7 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 ## Next
 
-CR-069 (copy English OrgChartStudio) approved + diimplementasikan di branch `cr-069-org-chart-studio-english-copy`, status review menunggu user. Dokumen CR-054 disinkronkan `edd5bea`; CR-054–064 done. CR-068 done atas persetujuan user; diimplementasikan di branch `cr-068-org-chart-studio-demo-polish` (worktree `arah-story`).
+CR-069 (copy English OrgChartStudio) done atas persetujuan user; dimerge ke `visual-polish`. Dokumen CR-054 disinkronkan `edd5bea`; CR-054–064 done. CR-068 done atas persetujuan user; diimplementasikan di branch `cr-068-org-chart-studio-demo-polish` (worktree `arah-story`).
 
 1. CR-063–064 done; antrean berikutnya 013-01/015-03 (butir 5). Batas CSS consumer/overflow non-Banner CR-056 tetap tercatat. Status done hanya oleh user.
 2. CR-017 ditetapkan **done** oleh user setelah uji klik dan pemulihan fokus di Chrome light/dark. Audit visual dan pembaca layar belum. CR-018 dan CR-036 tetap **done**.

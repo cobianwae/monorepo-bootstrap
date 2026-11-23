@@ -1,6 +1,6 @@
 # CR-069 — OrgChartStudio: seluruh copy runtime berbahasa Inggris
 
-**Status:** approved
+**Status:** done
 **Sumber:** permintaan user pada `/improve-ui` (`org-chart-studio/page.tsx`): "semua copy dalam bahasa inggris"; menutup C4 di CR-068 dan Pertanyaan Terbuka #1 CR-067
 **Ref:** `packages/ui/src/components/canvas/org-chart-studio.tsx`, `packages/ui/src/components/canvas/org-chart-studio.test.tsx`, `docs/cr/cr-067-org-chart-studio-page-uplift.md`, `docs/cr/cr-068-org-chart-studio-demo-polish.md`
 
