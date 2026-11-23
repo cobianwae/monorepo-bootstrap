@@ -40,6 +40,7 @@ interface StudioDemoPanelProps {
   query: string;
   onQueryChange: (value: string) => void;
   searchStatus: string;
+  searchDisabled?: boolean;
   summary: string;
   onReset: () => void;
 }
@@ -54,6 +55,7 @@ export function StudioDemoPanel({
   query,
   onQueryChange,
   searchStatus,
+  searchDisabled,
   summary,
   onReset,
 }: StudioDemoPanelProps) {
@@ -117,6 +119,7 @@ export function StudioDemoPanel({
               type="search"
               value={query}
               placeholder="Name, title or department, e.g. engineer"
+              disabled={searchDisabled}
               onChange={(event) => onQueryChange(event.target.value)}
             />
             <p role="status" className="text-sm text-muted-foreground">

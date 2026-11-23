@@ -129,6 +129,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-065 | Uplift halaman File Manager: segmented control, struktur demo/a11y, copy English; done dan di-merge ke `visual-polish` | done | `docs/cr/cr-065-file-manager-page-uplift.md` |
 | CR-066 | File Manager: poles demo (preview dari grid/state, toast, kontrol quota/sidebar), copy English komponen, target sentuh segmented; 3 cluster A/B/C; done dan di-merge ke `visual-polish` | done | `docs/cr/cr-066-file-manager-polish-and-copy.md` |
 | CR-067 | Uplift halaman Org Chart Studio: demo-first, segmented control, CodeBlock resep, copy English; done dan di-merge ke `visual-polish` | done | `docs/cr/cr-067-org-chart-studio-page-uplift.md` |
+| CR-068 | Org Chart Studio: poles demo (search di state non-data, reset seed, klaim dari data, toast Loading) dan section keyboard (sub-heading, `<kbd>`); 2 cluster A/B | done | `docs/cr/cr-068-org-chart-studio-demo-polish.md` |
 
 ## Catatan
 

@@ -35,18 +35,8 @@ export default function OrgChartStudioPage() {
   const example40 = React.useMemo(() => buildStudioExample40(), []);
 
   // Consumer-owned presentational search: matches name, title or department.
-  const highlightedIds = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return data
-      .filter(
-        (node) =>
-          node.title.toLowerCase().includes(q) ||
-          (node.subtitle ?? '').toLowerCase().includes(q) ||
-          (node.badge ?? '').toLowerCase().includes(q),
-      )
-      .map((node) => node.id);
-  }, [data, query]);
+  // Search only applies to data states; other states disable the input.
+  const searchEnabled = kind === 'populated' || kind === 'large';
 
   const visibleData = React.useMemo<OrgStudioNodeFlat[]>(() => {
     switch (kind) {
@@ -59,20 +49,34 @@ export default function OrgChartStudioPage() {
     }
   }, [kind, data, invalidKind]);
 
+  const highlightedIds = React.useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q || !searchEnabled) return [];
+    return visibleData
+      .filter(
+        (node) =>
+          node.title.toLowerCase().includes(q) ||
+          (node.subtitle ?? '').toLowerCase().includes(q) ||
+          (node.badge ?? '').toLowerCase().includes(q),
+      )
+      .map((node) => node.id);
+  }, [visibleData, query, searchEnabled]);
+
   const handleKindChange = React.useCallback(
     (next: StudioDemoKind) => {
       if (next === 'large') {
         setData(example40);
         setQuery('');
         setExpandedIds(undefined);
+      } else if (next === 'populated' && kind === 'large') {
+        setData(studioSeedData);
+        setQuery('');
+        setExpandedIds(undefined);
       }
       setKind(next);
       setExternalError(next === 'external' ? EXTERNAL_ERROR_MESSAGE : null);
-      if (next === 'loading') {
-        toast({ title: 'Loading structure…', description: 'Skeleton cards with a screen-reader message (aria-busy).', duration: 3000 });
-      }
     },
-    [example40],
+    [example40, kind],
   );
 
   const resetDemo = React.useCallback(() => {
@@ -98,13 +102,33 @@ export default function OrgChartStudioPage() {
     () => new Set(visibleData.map((node) => node.badge).filter(Boolean)).size,
     [visibleData],
   );
+  const levelCount = React.useMemo(() => {
+    if (visibleData.length === 0) return 0;
+    const byId = new Map(visibleData.map((node) => [node.id, node]));
+    let max = 1;
+    for (const node of visibleData) {
+      let depth = 1;
+      const seen = new Set<string>([node.id]);
+      let current = node;
+      while (current.parentId) {
+        const parent = byId.get(current.parentId);
+        if (!parent || seen.has(parent.id)) break;
+        seen.add(parent.id);
+        depth += 1;
+        current = parent;
+      }
+      if (depth > max) max = depth;
+    }
+    return max;
+  }, [visibleData]);
   const summary =
     kind === 'large'
-      ? `${visibleData.length} people · 4 levels · ${deptCount} departments`
-      : `${visibleData.length} ${visibleData.length === 1 ? 'person' : 'people'} · ${deptCount} ${deptCount === 1 ? 'department' : 'departments'}`;
+      ? `${visibleData.length} people · ${levelCount} levels · ${deptCount} departments`
+      : `${visibleData.length} ${visibleData.length === 1 ? 'person' : 'people'} · ${levelCount} ${levelCount === 1 ? 'level' : 'levels'} · ${deptCount} ${deptCount === 1 ? 'department' : 'departments'}`;
 
-  const searchStatus =
-    query.trim() === ''
+  const searchStatus = !searchEnabled
+    ? 'Search is available in Populated and 40 people.'
+    : query.trim() === ''
       ? 'Matches get a ring, a "Match" badge and a dashed path.'
       : highlightedIds.length === 0
         ? 'No results.'
@@ -136,6 +160,7 @@ export default function OrgChartStudioPage() {
           query={query}
           onQueryChange={setQuery}
           searchStatus={searchStatus}
+          searchDisabled={!searchEnabled}
           summary={summary}
           onReset={resetDemo}
         />
@@ -167,7 +192,7 @@ export default function OrgChartStudioPage() {
       </section>
 
       <section id="try-it" aria-labelledby="org-studio-steps" className="space-y-4 scroll-mt-20">
-        <SectionHeading id="org-studio-steps" title="Try it" description="Six steps from reading the chart to starting over." />
+        <SectionHeading id="org-studio-steps" title="Try it" description={`${STUDIO_STEPS.length} steps from reading the chart to starting over.`} />
         <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground marker:font-medium marker:text-foreground">
           {STUDIO_STEPS.map((step) => (
             <li key={step.title}>
