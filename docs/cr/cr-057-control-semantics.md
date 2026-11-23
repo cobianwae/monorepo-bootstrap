@@ -1,6 +1,6 @@
 # CR-057 — Semantik kontrol dan tabel virtual
 
-**Status:** approved
+**Status:** done
 **Sumber:** audit
 **Ref:** CR-054 C02–C04/C07/C10; `docs/reviews/cr-054-code-audit.md:66`
 
@@ -49,4 +49,4 @@ Commit: `fix: expose control and table semantics [CR-057]`
 - [x] Disetujui user (2026-11-23).
 - [x] Branch dibuat; implementasi dan verifikasi.
 - [x] Test baru: `virtualized-list/page.test.tsx`, `notifications/page.test.tsx`, `components/data-display/page.test.tsx`.
-- [ ] Status `done` menunggu user.
+- [x] Status `done` ditetapkan user (2026-11-23).

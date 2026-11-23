@@ -116,7 +116,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-054 | Audit 73 route selesai dengan batas bukti tercatat; done dikonfirmasi user 2026-11-23, perbaikan diteruskan ke CR-055–064 approved | done | `docs/cr/cr-054-audit-components-patterns.md` |
 | CR-055 | Kontras teks kecil lintas tema (C01); done dikonfirmasi user 2026-11-23 | done | `docs/cr/cr-055-small-text-contrast.md` |
 | CR-056 | Reflow Banner bersama dan audit caller (C11/V02) | approved | `docs/cr/cr-056-banner-reflow.md` |
-| CR-057 | Semantik kontrol, keyboard dan tabel virtual (C02–04/C07/C10); diimplementasikan di `cr-057-control-semantics`, menunggu review user | approved | `docs/cr/cr-057-control-semantics.md` |
+| CR-057 | Semantik kontrol, keyboard dan tabel virtual (C02–04/C07/C10); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-057-control-semantics.md` |
 | CR-058 | Label/error, target password dan empty-value form (C05/C09/C12/C13) | approved | `docs/cr/cr-058-form-accessibility.md` |
 | CR-059 | Fokus onboarding dan kepemilikan command palette (C06/C17) | done | `docs/cr/cr-059-overlay-ownership.md` |
 | CR-060 | Hydration RTE, statistik awal dan asset demo (C14/V01/V03); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-060-rte-hydration.md` |
