@@ -1,6 +1,6 @@
 # CR-013 — Anchor popover detail event EventCalendar (M-006) kadang jatuh ke pojok kiri atas
 
-**Status:** approved
+**Status:** done (ditetapkan user 2026-11-23)
 **Sumber:** review (laporan user: popup detail event 004 kadang muncul di pojok kiri atas, bukan di atas/bawah event)
 **Ref:** `docs/prd/004-calendar-scheduler.md`, `docs/design/calendar-scheduler.md`, `docs/stories/004-03-multiday-overlap-detail-dnd.md`, `packages/ui/src/components/data-display/event-calendar.tsx`
 
@@ -63,13 +63,13 @@ Commit: `fix: stabilize EventCalendar detail popover anchor [CR-013]`
 - [x] Branch dibuat dari `visual-polish` `355f01f` di worktree `arah-prd`.
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan.
-- [x] CR di-tick dan catatan di `docs/BACKLOG.md` diperbarui; status tetap `approved`.
+- [x] CR di-tick dan `docs/BACKLOG.md` diperbarui; status `done` atas persetujuan user 2026-11-23.
 - [x] `docs/STATUS.md` diperbarui.
 - [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau (119 artefak done).
 
 ### Hasil dan batas verifikasi
 
-- Implementasi siap review; `done` hanya ditetapkan user. Tanpa push/PR.
+- Implementasi diterima dan ditetapkan `done` oleh user 2026-11-23; push branch dan merge/push ke `visual-polish` diizinkan. Batas verifikasi browser di bawah tetap tercatat, bukan dinyatakan lulus.
 - Graphify dicoba: graph dibangun pada `1568661`, tertinggal dari basis `355f01f`;
   node `EventCalendar` tidak ditemukan. Fallback pencarian kode menemukan konsumen langsung
   `apps/showcase/src/app/(docs)/patterns/calendar/page.tsx`; tidak ada perubahan API/dependency.
