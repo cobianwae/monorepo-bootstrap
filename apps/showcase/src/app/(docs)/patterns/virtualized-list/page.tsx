@@ -212,16 +212,16 @@ export default function VirtualizedListPage() {
             />
           </CardContent>
         ) : (
-          <div ref={parentRef} className="h-[480px] overflow-auto overscroll-contain">
-            <div className="min-w-[720px]">
+          <div ref={parentRef} role="rowgroup" className="h-[480px] overflow-auto overscroll-contain">
+            <div className="min-w-[720px]" role="table" aria-label="Products" aria-rowcount={filtered.length + 1}>
               {/* Header — sticky inside same scroller so width stays aligned */}
-              <div className="sticky top-0 z-[1] grid grid-cols-[110px_minmax(0,1fr)_140px_110px_130px_140px] gap-3 border-b border-border/60 bg-muted/10 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-muted-foreground font-mono">
-                <span>SKU</span>
-                <span>Product</span>
-                <span>Category</span>
-                <span>Price</span>
-                <span>Status</span>
-                <span>Updated</span>
+              <div role="row" aria-rowindex={1} className="sticky top-0 z-[1] grid grid-cols-[110px_minmax(0,1fr)_140px_110px_130px_140px] gap-3 border-b border-border/60 bg-muted/10 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-muted-foreground font-mono">
+                <span role="columnheader">SKU</span>
+                <span role="columnheader">Product</span>
+                <span role="columnheader">Category</span>
+                <span role="columnheader">Price</span>
+                <span role="columnheader">Status</span>
+                <span role="columnheader">Updated</span>
               </div>
 
               <div
@@ -240,17 +240,17 @@ export default function VirtualizedListPage() {
                       className="absolute left-0 top-0 w-full"
                       style={{ height: rowHeight, transform: `translateY(${virtualRow.start}px)` }}
                     >
-                      <div className={`grid grid-cols-[110px_minmax(0,1fr)_140px_110px_130px_140px] items-center gap-3 border-b border-border/40 px-4 text-sm hover:bg-muted/20 transition-colors ${dense ? 'py-1' : 'py-2.5'}`}>
-                        <span className="font-mono text-xs text-muted-foreground">{product.id}</span>
-                        <span className="truncate font-medium text-foreground">{product.name}</span>
-                        <span className="truncate text-xs text-muted-foreground">{product.category}</span>
-                        <span className="font-mono text-xs text-foreground">${product.price.toFixed(2)}</span>
-                        <span>
+                      <div role="row" aria-rowindex={virtualRow.index + 2} className={`grid grid-cols-[110px_minmax(0,1fr)_140px_110px_130px_140px] items-center gap-3 border-b border-border/40 px-4 text-sm hover:bg-muted/20 transition-colors ${dense ? 'py-1' : 'py-2.5'}`}>
+                        <span role="cell" className="font-mono text-xs text-muted-foreground">{product.id}</span>
+                        <span role="cell" className="truncate font-medium text-foreground">{product.name}</span>
+                        <span role="cell" className="truncate text-xs text-muted-foreground">{product.category}</span>
+                        <span role="cell" className="font-mono text-xs text-foreground">${product.price.toFixed(2)}</span>
+                        <span role="cell">
                           <Badge variant={meta.badge} className="text-xs px-2 py-0.5 font-mono">
                             {meta.label}
                           </Badge>
                         </span>
-                        <span className="font-mono text-xs text-muted-foreground">{product.updated}</span>
+                        <span role="cell" className="font-mono text-xs text-muted-foreground">{product.updated}</span>
                       </div>
                     </div>
                   );

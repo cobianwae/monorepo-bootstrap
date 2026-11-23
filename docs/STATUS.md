@@ -18,9 +18,9 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 ## Next
 
-Dokumen CR-054 disinkronkan `edd5bea`; CR-054/CR-055/CR-059/CR-060/CR-061/CR-062 done, sisa CR-056–058,063–064 approved belum dimulai.
+Dokumen CR-054 disinkronkan `edd5bea`; CR-054/CR-055/CR-057/CR-059/CR-060/CR-061/CR-062 done (CR-057 di-merge dan di-push, `f6c2f8d`). Sisa CR-056/058/063–064 approved belum dimulai.
 
-1. Implementasi CR-056 (banner reflow), lalu CR-057/058 (semantik/form), CR-063/064 (konsistensi/state), satu CR per sesi. Status done hanya oleh user.
+1. Implementasi CR-056 (banner reflow), lalu CR-058 (form), CR-063/064 (konsistensi/state), satu CR per sesi. Status done hanya oleh user.
 2. Sisa CR lama: CR-036 (verifikasi AA tone), CR-017/018 (implementasi/verifikasi Tour). CR lama lain sebelum 054 sudah done atas keputusan user; tidak dibuka ulang oleh antrean ini.
 3. Jangan membuka ulang temuan yang sudah ditangani: eyebrow PageHeader CR-046 done, Directional Motion CR-048 done, deviasi h1/weight dipertahankan CR-051. Sisa teks kecil → CR-055; guard heading seluruh docs sudah diperluas di CR-052; flaky RTE tetap baseline.
 4. Baseline baru pengganti CR-015 — verifikasi 12 error tipe FlowEditor + smoke RTE + timing worker (CR baru bila perlu).
