@@ -491,15 +491,17 @@ function InspectorPanel({
               <Input readOnly value={node?.id ?? ''} className="text-xs" />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs font-medium">Judul</Label>
+              <Label htmlFor="flow-node-title" className="text-xs font-medium">Judul</Label>
               <Input
+                id="flow-node-title"
                 value={draftTitle}
                 onChange={(e) => onChangeTitle(e.target.value)}
                 onBlur={() => onBlurTitle(draftTitle)}
                 className={`text-xs border ${titleError ? 'border-destructive' : ''}`}
+                aria-describedby={titleError ? 'err-flow-node-title' : undefined}
                 aria-invalid={titleError}
               />
-              {titleError && <p className="text-xs text-destructive">Judul tidak boleh kosong.</p>}
+              {titleError && <p id="err-flow-node-title" className="text-xs text-destructive">Judul tidak boleh kosong.</p>}
             </div>
             <div className="space-y-1">
               <Label htmlFor="flow-node-description" className="text-xs font-medium">Deskripsi</Label>

@@ -87,6 +87,7 @@ export default function ColorsPage() {
               <div className="flex gap-2">
                 <input
                   type="color"
+                  aria-label="Pick foreground color"
                   value={customFg.startsWith('#') && customFg.length === 7 ? customFg : '#3D34B3'}
                   onChange={(e) => setCustomFg(e.target.value)}
                   className="h-9 w-12 rounded-md border border-input cursor-pointer bg-background p-1"
@@ -105,6 +106,7 @@ export default function ColorsPage() {
               <div className="flex gap-2">
                 <input
                   type="color"
+                  aria-label="Pick background color"
                   value={customBg.startsWith('#') && customBg.length === 7 ? customBg : '#FFFFFF'}
                   onChange={(e) => setCustomBg(e.target.value)}
                   className="h-9 w-12 rounded-md border border-input cursor-pointer bg-background p-1"

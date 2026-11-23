@@ -114,8 +114,10 @@ export function TreeSelect({
   }, [options]);
 
   const selectedIds = React.useMemo<string[]>(() => {
-    if (value === undefined) return [];
-    return Array.isArray(value) ? value : [value];
+    if (value === undefined || value === null) return [];
+    const list = Array.isArray(value) ? value : [value];
+    // Empty string berarti "tidak ada pilihan" (C13), bukan node valid.
+    return list.filter((id): id is string => typeof id === 'string' && id.length > 0);
   }, [value]);
 
   const ancestorsOf = React.useCallback(

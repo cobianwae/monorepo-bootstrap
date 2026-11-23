@@ -494,11 +494,12 @@ export default function FormsPage() {
               </Label>
               <Input
                 id="input-error"
+                aria-describedby="err-input-error"
                 error
                 defaultValue="invalid-email-format"
                 placeholder="name@example.com"
               />
-              <p className="text-xs text-destructive">Please enter a valid email address.</p>
+              <p id="err-input-error" className="text-xs text-destructive">Please enter a valid email address.</p>
             </div>
 
             <div className="space-y-2">
@@ -682,12 +683,12 @@ export default function FormsPage() {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>IdP Metadata URL</Label>
-                  <Input placeholder="https://auth.okta.com/app/sso" defaultValue="https://idp.acme.corp/saml" />
+                  <Label htmlFor="idp-metadata-url">IdP Metadata URL</Label>
+                  <Input id="idp-metadata-url" placeholder="https://auth.okta.com/app/sso" defaultValue="https://idp.acme.corp/saml" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Entity ID</Label>
-                  <Input placeholder="urn:acme:sso" defaultValue="urn:apex:sp" />
+                  <Label htmlFor="entity-id">Entity ID</Label>
+                  <Input id="entity-id" placeholder="urn:acme:sso" defaultValue="urn:apex:sp" />
                 </div>
               </div>
             </FormSection>

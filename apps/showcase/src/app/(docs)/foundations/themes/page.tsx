@@ -134,6 +134,7 @@ export default function ThemesPage() {
 
               <div className="space-y-1.5">
                 <Input
+                  aria-label="Theme preview input"
                   placeholder="Interactive token input..."
                   className="h-8 text-xs"
                   defaultValue="Live theme tokens active"

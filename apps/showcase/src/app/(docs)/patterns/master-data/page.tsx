@@ -308,6 +308,7 @@ export default function MasterDataPage() {
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
+                aria-label="Search master data"
                 placeholder="Search master data code, name..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}

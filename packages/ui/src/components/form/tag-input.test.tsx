@@ -9,6 +9,14 @@ function StatefulTagInput(props: Omit<React.ComponentProps<typeof TagInput>, 'va
 }
 
 describe('TagInput component', () => {
+  it('associates label with input via htmlFor and id', () => {
+    render(<TagInput value={[]} onChange={() => undefined} label="Tags" />);
+    const input = screen.getByRole('textbox', { name: 'Tags' });
+    const label = screen.getByText('Tags');
+    expect(label.getAttribute('for')).toBe(input.id);
+    expect(input.id).not.toBe('');
+  });
+
   it('renders existing tags', () => {
     render(<TagInput value={['React', 'Vue']} onChange={() => undefined} />);
     expect(screen.getByText('React')).toBeDefined();
