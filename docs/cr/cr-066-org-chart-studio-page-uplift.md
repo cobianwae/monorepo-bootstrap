@@ -1,6 +1,6 @@
 # CR-066 — Uplift halaman Org Chart Studio: struktur demo-first, kontrol segmented, dan copy English
 
-**Status:** approved
+**Status:** done
 **Sumber:** visual uplift (`/polish-ui`), audit gap vs `docs/design/visual-language.md` (approved 2026-11-23)
 **Ref:** `apps/showcase/src/app/(docs)/patterns/org-chart-studio/page.tsx` + `_components/*`, acuan pola `apps/showcase/src/app/(docs)/components/data-display/page.tsx`, preseden `docs/cr/cr-065-file-manager-page-uplift.md`
 
