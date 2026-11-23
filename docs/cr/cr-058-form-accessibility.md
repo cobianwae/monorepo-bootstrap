@@ -1,6 +1,6 @@
 # CR-058 — Label, error dan empty value form
 
-**Status:** review
+**Status:** done
 **Sumber:** audit
 **Ref:** CR-054 C05/C09/C12/C13; `docs/reviews/cr-054-code-audit.md`
 
