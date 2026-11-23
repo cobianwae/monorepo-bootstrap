@@ -77,7 +77,7 @@ export const HeroBand = React.forwardRef<HTMLDivElement, HeroBandProps>(
                 'inline-flex items-center gap-2 rounded-full border px-3.5 py-1 text-xs font-semibold font-mono',
                 eyebrowActive === 'primary'
                   ? 'border-primary/30 bg-primary/10 text-primary'
-                  : 'border-highlight/30 bg-highlight/10 text-highlight'
+                  : 'border-highlight/30 bg-highlight/10 text-foreground'
               )}
             >
               {EyebrowIcon && <EyebrowIcon className="h-3.5 w-3.5 shrink-0" />}

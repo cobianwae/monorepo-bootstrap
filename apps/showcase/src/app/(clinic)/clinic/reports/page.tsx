@@ -180,7 +180,7 @@ export default function ClinicReportsPage() {
           </h3>
           <div className="space-y-3 text-xs">
             <div className="p-3.5 rounded-xl bg-highlight/10 border border-highlight/20 space-y-1">
-              <span className="font-mono text-xs uppercase font-bold text-highlight block">
+              <span className="font-mono text-xs uppercase font-bold text-foreground block">
                 Endocrinology GLP-1 Cohort
               </span>
               <p className="text-foreground leading-relaxed">

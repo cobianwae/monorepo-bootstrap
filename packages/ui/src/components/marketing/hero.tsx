@@ -44,7 +44,7 @@ export const HeroEyebrow = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      'inline-flex items-center gap-2 rounded-full border border-highlight/30 bg-highlight/10 px-3.5 py-1 text-xs sm:text-sm font-semibold text-highlight font-mono tracking-wide mb-6 shadow-xs',
+      'inline-flex items-center gap-2 rounded-full border border-highlight/30 bg-highlight/10 px-3.5 py-1 text-xs sm:text-sm font-semibold text-foreground font-mono tracking-wide mb-6 shadow-xs',
       className
     )}
     {...props}

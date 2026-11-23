@@ -110,7 +110,7 @@ const PEOPLE: Person[] = [
     name: 'Sari Wulandari',
     handle: 'sari.w',
     initials: 'SW',
-    avatarClass: 'bg-highlight/15 text-highlight ring-1 ring-highlight/20',
+    avatarClass: 'bg-highlight/15 text-foreground ring-1 ring-highlight/20',
     role: 'Product',
   },
   {

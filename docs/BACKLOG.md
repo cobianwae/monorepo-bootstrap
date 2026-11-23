@@ -114,14 +114,14 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-052 | Perluas guard `text-lg font-bold` sebagai heading ke seluruh `app/(docs)`; sisa di `guidelines` ke `SectionHeading` | done | `docs/cr/cr-052-perluas-guard-heading.md` |
 | CR-053 | Audit visual `components/` dan `patterns/` (46 halaman): text-highlight pada teks kecil, primary dekoratif, h2/h3 manual, text-lg/text-2xl font-bold manual; cakupan palet selain Atelier/Pulse | done | `docs/cr/cr-053-audit-visual-components-patterns.md` |
 | CR-054 | Audit 73 route selesai dengan batas bukti tercatat; done dikonfirmasi user 2026-11-23, perbaikan diteruskan ke CR-055–064 approved | done | `docs/cr/cr-054-audit-components-patterns.md` |
-| CR-055 | Kontras teks kecil lintas tema (C01) | approved | `docs/cr/cr-055-small-text-contrast.md` |
+| CR-055 | Kontras teks kecil lintas tema (C01); done dikonfirmasi user 2026-11-23 | done | `docs/cr/cr-055-small-text-contrast.md` |
 | CR-056 | Reflow Banner bersama dan audit caller (C11/V02) | approved | `docs/cr/cr-056-banner-reflow.md` |
 | CR-057 | Semantik kontrol, keyboard dan tabel virtual (C02–04/C07/C10) | approved | `docs/cr/cr-057-control-semantics.md` |
 | CR-058 | Label/error, target password dan empty-value form (C05/C09/C12/C13) | approved | `docs/cr/cr-058-form-accessibility.md` |
 | CR-059 | Fokus onboarding dan kepemilikan command palette (C06/C17) | done | `docs/cr/cr-059-overlay-ownership.md` |
 | CR-060 | Hydration RTE, statistik awal dan asset demo (C14/V01/V03); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-060-rte-hydration.md` |
 | CR-061 | Reflow kontrol/workspace mobile (C15/R01) | approved | `docs/cr/cr-061-responsive-controls.md` |
-| CR-062 | Reveal katalog home mobile tidak mencapai threshold (C16) | approved | `docs/cr/cr-062-home-reveal.md` |
+| CR-062 | Reveal katalog home mobile tidak mencapai threshold (C16); diperbaiki di `useReveal` dan di-merge ke `visual-polish` | done | `docs/cr/cr-062-home-reveal.md` |
 | CR-063 | Peran warna, heading, segmented dan literal palette (W01–03/W05–07) | approved | `docs/cr/cr-063-visual-consistency.md` |
 | CR-064 | State tabel konsumen dan pemulihan empty master-detail (W04/C08) | approved | `docs/cr/cr-064-data-state-recovery.md` |
 

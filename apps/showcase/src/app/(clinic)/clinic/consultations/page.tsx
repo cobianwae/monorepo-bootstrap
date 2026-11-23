@@ -527,7 +527,7 @@ export default function ConsultationsPage() {
                               }}
                               className={`px-2 py-1 rounded-md text-xs border transition-all cursor-pointer ${
                                 active
-                                  ? 'bg-highlight/15 text-highlight border-highlight/40 font-medium'
+                                  ? 'bg-highlight/15 text-foreground border-highlight/40 font-medium'
                                   : 'bg-card border-border text-muted-foreground hover:bg-muted/40'
                               }`}
                             >
