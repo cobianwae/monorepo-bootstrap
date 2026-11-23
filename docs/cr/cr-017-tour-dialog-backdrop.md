@@ -1,6 +1,6 @@
 # CR-017 — Tour: dialog konfirmasi tertutup backdrop + inert + focus ring
 
-**Status:** approved
+**Status:** done
 **Sumber:** review artefak 017 (laporan user: "kayak ada backdrop yang menghalangi")
 **Ref:** `docs/prd/017-product-tour.md` (FR-005), `docs/design/wireframes/product-tour.md` (§1, §4, §6, K2), `docs/stories/017-02-target-hilang-keyboard-motion-states.md` (AC-02), `docs/stories/017-03-showcase-audit-smoke.md` (AC-01), `packages/ui/src/components/overlay/tour.tsx`, `packages/ui/src/components/overlay/tour.css`, `apps/showcase/src/app/(docs)/patterns/product-tour/page.tsx`
 
@@ -58,7 +58,7 @@ Commit: `fix: dialog lewati tur di atas backdrop overlay [CR-017]`
 - [x] Perubahan diimplementasikan.
 - [x] Verifikasi dijalankan (`tour.test.tsx` 19/19; overlay 30/30; typecheck: 12 error baseline FlowEditor, tidak ada di tour; `pnpm lint` lulus).
 - [x] Verifikasi Chrome light/dark: Lanjut, Kembali, buka dialog, batal dan konfirmasi memakai klik browser; fokus kembali ke judul popover atau pemicu sesuai aksi. Kontrol halaman tetap tidak aktif selama tur.
-- [ ] Audit visual opacity dan uji pembaca layar. Status CR tetap `approved`.
+- [ ] Audit visual opacity dan uji pembaca layar belum dijalankan; user menetapkan `done` berdasarkan verifikasi yang tersedia.
 - [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
 - [ ] `docs/STATUS.md` diperbarui bila relevan.
 - [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.

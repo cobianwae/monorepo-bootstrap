@@ -76,7 +76,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 
 | ID | Judul | Status | File |
 |---|---|---|---|
-| CR-017 | Tour: perbaikan dialog teruji di Chrome light/dark; audit visual dan pembaca layar masih terbuka | approved | `docs/cr/cr-017-tour-dialog-backdrop.md` |
+| CR-017 | Tour: perbaikan dialog teruji di Chrome light/dark | done | `docs/cr/cr-017-tour-dialog-backdrop.md` |
 | CR-018 | Tour: varian cva + responsif di komponen + sinkron docs | approved | `docs/cr/cr-018-tour-varian-responsif-docs.md` |
 | CR-019 | Flow Editor inspector on-demand tidak mengunci + sesuai AC | done | `docs/cr/cr-019-flow-inspector-on-demand.md` |
 | CR-020 | Mind Map: pointer, pemusatan edit/fokus, minimap mobile dipulihkan; tes/browser/build terverifikasi, disetujui user | done | `docs/cr/cr-020-mind-map-canvas-parity.md` |
