@@ -35,6 +35,8 @@ import {
   StatementCard,
   DotPattern,
   TableOfContents,
+  SegmentedControl,
+  SegmentedControlItem,
 } from '@ds/ui';
 import { SectionHeading } from '../../../../components/section-heading';
 
@@ -90,7 +92,7 @@ export default function MarketingBlocksPage() {
                       Fullstack TypeScript monorepo with Tailwind CSS v4, OKLCH tokens, Radix UI primitives, and integrated UX scenario recipes.
                     </HeroDescription>
                     <HeroActions>
-                      <Button size="lg" variant="highlight" className="gap-2 shadow-md">
+                      <Button size="lg" variant="default" className="gap-2 shadow-md">
                         <span>Explore Components</span>
                         <ArrowRight className="h-4 w-4" />
                       </Button>
@@ -177,33 +179,22 @@ export default function MarketingBlocksPage() {
             </div>
 
             <div className="flex justify-center mb-6">
-              <div className="inline-flex items-center rounded-lg border border-border bg-muted/40 p-1 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setBillingInterval('monthly')}
-                  className={`rounded-md px-3 py-1.5 font-semibold transition-colors cursor-pointer ${
-                    billingInterval === 'monthly'
-                      ? 'bg-card text-foreground shadow-xs'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  Monthly Billing
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setBillingInterval('yearly')}
-                  className={`rounded-md px-3 py-1.5 font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
-                    billingInterval === 'yearly'
-                      ? 'bg-card text-foreground shadow-xs'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
+              <SegmentedControl
+                type="single"
+                value={billingInterval}
+                onValueChange={(v) => {
+                  if (v) setBillingInterval(v as 'monthly' | 'yearly');
+                }}
+                aria-label="Billing interval"
+              >
+                <SegmentedControlItem value="monthly">Monthly Billing</SegmentedControlItem>
+                <SegmentedControlItem value="yearly">
                   <span>Annual Billing</span>
                   <Badge variant="highlight" className="text-xs py-0 px-1 font-mono">
                     Save 20%
                   </Badge>
-                </button>
-              </div>
+                </SegmentedControlItem>
+              </SegmentedControl>
             </div>
 
             <PricingGrid columns={3}>
@@ -363,7 +354,7 @@ export default function MarketingBlocksPage() {
               description="Deploy a production-grade fullstack monorepo with verified WCAG contrast tokens, Tailwind CSS v4, and ready-to-use UX scenario recipes."
               actions={
                 <>
-                  <Button size="lg" variant="highlight" className="gap-2 shadow-md">
+                  <Button size="lg" variant="default" className="gap-2 shadow-md">
                     <span>Get Started</span>
                     <ArrowRight className="h-4 w-4" />
                   </Button>

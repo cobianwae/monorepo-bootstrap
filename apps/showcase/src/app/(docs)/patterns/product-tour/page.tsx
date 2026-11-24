@@ -40,11 +40,6 @@ const VARIANT_LABEL: Record<DemoVariant, string> = {
   loading: 'Pemicu loading singkat',
 };
 
-function clickDriver(selector: string) {
-  const el = document.querySelector<HTMLElement>(selector);
-  el?.click();
-}
-
 export default function ProductTourPatternPage() {
   const mulaiRef = React.useRef<HTMLButtonElement>(null);
 
@@ -111,7 +106,7 @@ export default function ProductTourPatternPage() {
         eyebrow="Pola · S-005.20"
         eyebrowIcon={Compass}
         title="Product Tour — tur 5 langkah (S-005.20)"
-        description="Dashboard contoh di bawah adalah area target tur (bukan data produksi). Jalankan skenario 6 langkah, coba semua state demo, lalu audit keyboard dan kontras light & dark via theme toggle."
+        description="Klik Mulai tur untuk mengenal dashboard contoh. Gunakan Lanjut, Kembali, atau tombol tutup pada popover di dekat sorotan."
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">driver.js</Badge>
@@ -133,15 +128,6 @@ export default function ProductTourPatternPage() {
         <Button ref={mulaiRef} type="button" onClick={mulaiTur} data-testid="tour-start">
           <MousePointerClick className="h-4 w-4" />
           Mulai tur
-        </Button>
-        <Button type="button" variant="outline" onClick={() => clickDriver('.driver-popover-next-btn')} data-testid="tour-next">
-          Lanjut (demo)
-        </Button>
-        <Button type="button" variant="outline" onClick={() => clickDriver('.driver-popover-prev-btn')} data-testid="tour-back">
-          Kembali (demo)
-        </Button>
-        <Button type="button" variant="ghost" onClick={() => clickDriver('.driver-popover-close-btn')} data-testid="tour-skip">
-          Lewati (demo)
         </Button>
       </div>
 
@@ -323,11 +309,6 @@ export default function ProductTourPatternPage() {
           )}
         </CardContent>
       </Card>
-
-      <style>{`@media (max-width: 767px) {
-        .ds-tour-popover.driver-popover { max-width: calc(100vw - 32px); }
-        .ds-tour-popover .driver-popover-footer { display: flex; flex-direction: column; gap: 8px; }
-      }`}</style>
     </div>
   );
 }

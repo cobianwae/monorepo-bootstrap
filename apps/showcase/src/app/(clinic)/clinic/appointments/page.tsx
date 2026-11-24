@@ -286,20 +286,22 @@ export default function AppointmentsPage() {
       />
 
       {/* Filter Toolbar */}
-      <Card className="p-4 bg-card border-border shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+      <Card className="p-4 bg-card border-border shadow-xs flex flex-wrap items-center justify-between gap-3 min-w-0">
+        <div className="flex min-w-0 w-full flex-wrap items-center gap-3 sm:w-auto">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none">
+            <Calendar className="h-4 w-4 shrink-0 text-muted-foreground" />
             <Input
+              id="appointment-date-filter"
+              aria-label="Filter by appointment date"
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="h-9 w-40 text-xs font-mono"
+              className="h-9 w-full min-w-0 text-xs font-mono sm:w-40"
             />
           </div>
 
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="h-9 w-44 text-xs">
+            <SelectTrigger className="h-9 w-full min-w-0 text-xs sm:w-44">
               <SelectValue placeholder="All Disciplines" />
             </SelectTrigger>
             <SelectContent>
@@ -311,7 +313,7 @@ export default function AppointmentsPage() {
           </Select>
         </div>
 
-        <div className="text-xs font-mono text-muted-foreground">
+        <div className="min-w-0 break-words text-xs font-mono text-muted-foreground">
           Showing <strong>{filteredAppointments.length}</strong> appointments for {selectedDate}
         </div>
       </Card>
@@ -338,9 +340,9 @@ export default function AppointmentsPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-2">
               <div className="space-y-1 sm:col-span-2">
-                <Label className="text-xs">Select Patient *</Label>
+                <Label htmlFor="appointment-patient" className="text-xs">Select Patient *</Label>
                 <Select value={patientId} onValueChange={setPatientId}>
-                  <SelectTrigger className="h-9 text-xs">
+                  <SelectTrigger id="appointment-patient" className="h-9 text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>

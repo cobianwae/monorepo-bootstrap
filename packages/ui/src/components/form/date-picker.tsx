@@ -81,6 +81,9 @@ export interface DatePickerProps {
   presets?: DatePreset[];
   label?: string;
   error?: boolean;
+  id?: string;
+  'aria-describedby'?: string;
+  'aria-invalid'?: React.AriaAttributes['aria-invalid'];
 }
 
 export function DatePicker({
@@ -99,8 +102,13 @@ export function DatePicker({
   presets,
   label,
   error,
+  id,
+  'aria-describedby': ariaDescribedBy,
+  'aria-invalid': ariaInvalid,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
+  const generatedId = React.useId();
+  const triggerId = id ?? generatedId;
   const selected = value && isValid(value) ? value : undefined;
 
   const display = formatDate
@@ -114,14 +122,22 @@ export function DatePicker({
   return (
     <div className={cn('w-full', className)}>
       {label && (
-        <label className="mb-1.5 block text-sm font-medium text-foreground">{label}</label>
+        <label
+          htmlFor={triggerId}
+          className="mb-1.5 block text-sm font-medium text-foreground"
+        >
+          {label}
+        </label>
       )}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
+            id={triggerId}
             type="button"
             variant="outline"
             disabled={disabled}
+            aria-describedby={ariaDescribedBy}
+            aria-invalid={ariaInvalid ?? (error ? true : undefined)}
             className={cn(
               'w-full justify-start gap-2 px-3 font-normal',
               !selected && 'text-muted-foreground',
@@ -211,6 +227,9 @@ export interface DateRangePickerProps {
   presets?: DatePreset[];
   label?: string;
   error?: boolean;
+  id?: string;
+  'aria-describedby'?: string;
+  'aria-invalid'?: React.AriaAttributes['aria-invalid'];
 }
 
 export function DateRangePicker({
@@ -227,8 +246,13 @@ export function DateRangePicker({
   presets,
   label,
   error,
+  id,
+  'aria-describedby': ariaDescribedBy,
+  'aria-invalid': ariaInvalid,
 }: DateRangePickerProps) {
   const [open, setOpen] = React.useState(false);
+  const generatedId = React.useId();
+  const triggerId = id ?? generatedId;
   const range = value && value.from ? value : null;
 
   const displayRange = (() => {
@@ -246,14 +270,22 @@ export function DateRangePicker({
   return (
     <div className={cn('w-full', className)}>
       {label && (
-        <label className="mb-1.5 block text-sm font-medium text-foreground">{label}</label>
+        <label
+          htmlFor={triggerId}
+          className="mb-1.5 block text-sm font-medium text-foreground"
+        >
+          {label}
+        </label>
       )}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
+            id={triggerId}
             type="button"
             variant="outline"
             disabled={disabled}
+            aria-describedby={ariaDescribedBy}
+            aria-invalid={ariaInvalid ?? (error ? true : undefined)}
             className={cn(
               'w-full justify-start gap-2 px-3 font-normal',
               !hasSelection && 'text-muted-foreground',

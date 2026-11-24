@@ -29,6 +29,7 @@ import { Calendar } from '../form/date-picker';
 import { SegmentedControl, SegmentedControlItem } from '../form/segmented-control';
 import { Alert, AlertDescription, AlertTitle } from '../feedback/alert';
 import { EmptyState } from '../feedback/empty-state';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '../feedback/dialog';
 import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from '../overlay/popover';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../overlay/sheet';
 import type { VariantProps } from 'class-variance-authority';
@@ -133,12 +134,23 @@ const DOT_CLASSES: Record<EventCategory, string> = {
 };
 
 const BLOCK_CLASSES: Record<EventCategory, string> = {
-  primary: 'border-primary/50 bg-primary/10',
-  success: 'border-success/50 bg-success/10',
-  warning: 'border-warning/50 bg-warning/10',
-  info: 'border-info/50 bg-info/10',
-  destructive: 'border-destructive/50 bg-destructive/10',
+  primary: 'border-primary/60 bg-primary/15',
+  success: 'border-success/60 bg-success/15',
+  warning: 'border-warning/60 bg-warning/15',
+  info: 'border-info/60 bg-info/15',
+  destructive: 'border-destructive/60 bg-destructive/15',
 };
+
+function CalendarEmpty() {
+  return (
+    <EmptyState
+      role="status"
+      title="Tidak ada event di periode ini"
+      description="Belum ada jadwal pada periode yang dipilih. Coba ganti view atau periode."
+      actionLabel="Buat event"
+    />
+  );
+}
 
 function clampEnd(event: CalendarEvent): Date {
   return event.end >= event.start ? event.end : event.start;
@@ -609,12 +621,18 @@ function DayOverflow({
   onOpen: (event: CalendarEvent, anchor: HTMLElement | null) => void;
 }) {
   const [open, setOpen] = React.useState(false);
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+  const openingDetailRef = React.useRef(false);
   const extra = segments.length - MAX_VISIBLE;
   if (extra <= 0) return null;
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(next) => {
+      if (next) openingDetailRef.current = false;
+      setOpen(next);
+    }}>
       <PopoverTrigger asChild>
         <Button
+          ref={triggerRef}
           type="button"
           variant="ghost"
           size="sm"
@@ -624,7 +642,13 @@ function DayOverflow({
           +{extra}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="max-h-64 overflow-y-auto p-3">
+      <PopoverContent
+        align="start"
+        className="max-h-64 overflow-y-auto p-3"
+        onCloseAutoFocus={(event) => {
+          if (openingDetailRef.current) event.preventDefault();
+        }}
+      >
         <p className="mb-2 text-xs font-semibold text-foreground">
           {format(day, 'EEEE, d MMMM yyyy', { locale })}
         </p>
@@ -634,9 +658,10 @@ function DayOverflow({
               <button
                 type="button"
                 className="inline-flex w-full items-center gap-1.5 rounded px-1 py-0.5 text-left hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                onClick={(domEvent) => {
+                onClick={() => {
+                  openingDetailRef.current = true;
                   setOpen(false);
-                  onOpen(segment.event, domEvent.currentTarget);
+                  onOpen(segment.event, triggerRef.current);
                 }}
               >
                 <span
@@ -896,7 +921,7 @@ function TimeGrid({
                       {segments.map((segment) => {
                         const category = segment.event.category ?? 'primary';
                         const top = (segment.startMinute - minute) * pixelsPerMinute;
-                        const height = Math.max(18, (segment.endMinute - segment.startMinute) * pixelsPerMinute);
+                        const height = Math.max(24, (segment.endMinute - segment.startMinute) * pixelsPerMinute);
                         const widthPercent = 100 / segment.columns;
                         const leftPercent = segment.column * widthPercent;
                         const label = `${segment.event.title}, ${eventTimeRange(segment.event, locale)}${
@@ -924,7 +949,7 @@ function TimeGrid({
                               width: `calc(${widthPercent}% - 4px)`,
                             }}
                             className={cn(
-                              'absolute z-10 overflow-hidden rounded border border-l-2 px-1 py-0.5 text-left text-[10px] leading-tight text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                              'absolute z-10 overflow-hidden rounded border border-l-4 px-1 py-0.5 text-left text-[10px] leading-tight text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                               editable && 'cursor-grab touch-none active:cursor-grabbing',
                               BLOCK_CLASSES[category]
                             )}
@@ -950,7 +975,7 @@ function TimeGrid({
                           aria-hidden
                           style={{
                             top: (differenceInMinutes(preview.start, dayStart) - minute) * pixelsPerMinute,
-                            height: Math.max(18, differenceInMinutes(preview.end, preview.start) * pixelsPerMinute),
+                            height: Math.max(24, differenceInMinutes(preview.end, preview.start) * pixelsPerMinute),
                           }}
                           className="pointer-events-none absolute inset-x-1 z-20 rounded border-2 border-dashed border-primary bg-primary/20 px-1 py-0.5 font-mono text-[10px] text-primary"
                         >
@@ -1029,6 +1054,26 @@ export function EventCalendar({
   const [selectedEvent, setSelectedEvent] = React.useState<CalendarEvent | null>(null);
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const anchorRef = React.useRef<HTMLElement | null>(null);
+  const calendarRef = React.useRef<HTMLElement>(null);
+  const detailOpenRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (!selectedEvent || !anchorEl) return;
+    const observer = new MutationObserver(() => {
+      if (!anchorEl.isConnected) setAnchorEl(null);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [selectedEvent, anchorEl]);
+
+  const restoreDetailFocus = React.useCallback((event: Event) => {
+    event.preventDefault();
+    // Switching from a popover to the fallback dialog must not steal its focus.
+    if (detailOpenRef.current) return;
+    const anchor = anchorRef.current;
+    if (anchor?.isConnected) anchor.focus();
+    else calendarRef.current?.focus();
+  }, []);
 
   const [dragState, setDragState] = React.useState<DragState | null>(null);
   const [dragPreview, setDragPreview] = React.useState<DragPreview | null>(null);
@@ -1052,14 +1097,14 @@ export function EventCalendar({
   );
 
   const closeDetail = React.useCallback(() => {
-    const anchor = anchorRef.current;
+    detailOpenRef.current = false;
     setSelectedEvent(null);
     setAnchorEl(null);
-    if (anchor) window.setTimeout(() => anchor.focus(), 0);
   }, []);
 
   const openDetail = React.useCallback(
     (event: CalendarEvent, anchor: HTMLElement | null) => {
+      detailOpenRef.current = true;
       anchorRef.current = anchor;
       setAnchorEl(anchor);
       setSelectedEvent(event);
@@ -1234,13 +1279,11 @@ export function EventCalendar({
       }));
   }, [events, activeDate, locale]);
 
-  const virtualAnchor = React.useMemo<React.RefObject<HTMLElement | null>>(
-    () => ({ current: anchorEl }),
-    [anchorEl]
-  );
+  const anchorRect = anchorEl?.isConnected ? anchorEl.getBoundingClientRect() : null;
+  const hasValidAnchor = !!anchorRect && anchorRect.width > 0 && anchorRect.height > 0;
 
   return (
-    <section aria-label={ariaLabel} className={cn('space-y-4', className)}>
+    <section ref={calendarRef} tabIndex={-1} aria-label={ariaLabel} className={cn('space-y-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring', className)}>
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <Button
@@ -1304,13 +1347,38 @@ export function EventCalendar({
           role="grid"
           aria-busy="true"
           aria-label={ariaLabel}
-          className="rounded-lg border border-border bg-card min-h-[32rem] flex flex-col items-center justify-center py-10"
+          data-skeleton-view={activeView}
+          className="rounded-lg border border-border bg-card p-4"
         >
-          <div className="flex flex-col items-center gap-3">
-            <Skeleton className="w-24 h-24 rounded-full" />
-            <Skeleton className="w-40 h-4" />
-          </div>
-          <p className="mt-2 text-sm text-muted-foreground">Memuat event…</p>
+          {activeView === 'month' && (
+            <div className="grid w-full grid-cols-7 gap-px overflow-hidden rounded-md border border-border/50" aria-hidden>
+              {Array.from({ length: 42 }).map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full rounded-none" />
+              ))}
+            </div>
+          )}
+          {activeView === 'week' && (
+            <div className="grid w-full grid-cols-7 gap-2" aria-hidden>
+              {Array.from({ length: 7 }).map((_, i) => (
+                <Skeleton key={i} className="h-64 w-full" />
+              ))}
+            </div>
+          )}
+          {activeView === 'day' && (
+            <div className="grid w-full gap-2" aria-hidden>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full" />
+              ))}
+            </div>
+          )}
+          {activeView === 'agenda' && (
+            <div className="w-full space-y-2" aria-hidden>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-14 w-full" />
+              ))}
+            </div>
+          )}
+          <p className="mt-4 text-center text-sm text-muted-foreground">Memuat event…</p>
         </div>
       ) : error ? (
         <Alert variant="destructive" role="alert" className="rounded-lg border border-border">
@@ -1326,9 +1394,9 @@ export function EventCalendar({
         <div className="rounded-lg border border-border bg-card p-4">
           <p className="text-sm font-medium text-foreground">{format(activeDate, 'LLLL yyyy', { locale })}</p>
           {agendaGroups.length === 0 ? (
-            <p className="mt-1 text-sm text-muted-foreground">
-              Tidak ada event pada periode ini.
-            </p>
+            <div className="mt-1">
+              <CalendarEmpty />
+            </div>
           ) : (
             <div className="mt-4 space-y-4" role="list">
               {agendaGroups.map((group) => (
@@ -1340,7 +1408,7 @@ export function EventCalendar({
                         key={event.id}
                         type="button"
                         disabled={loading}
-                        onClick={() => onSelectEvent?.(event)}
+                        onClick={(domEvent) => handleEventClick(event, domEvent.currentTarget)}
                         className="flex items-center justify-between gap-2 rounded border border-border/50 bg-background px-3 py-2 text-left text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:bg-accent/40"
                         aria-label={formatDetailRange(event, locale)}
                       >
@@ -1364,12 +1432,7 @@ export function EventCalendar({
           )}
         </div>
       ) : events.length === 0 ? (
-        <EmptyState
-          role="status"
-          title="Tidak ada event di periode ini"
-          description="Belum ada jadwal pada periode yang dipilih. Coba ganti view atau periode."
-          actionLabel="Buat event"
-        />
+        <CalendarEmpty />
       ) : (
         <>
           {activeView === 'month' && (
@@ -1423,13 +1486,18 @@ export function EventCalendar({
         </>
       )}
 
-      {selectedEvent && !isMobile && (
+      {selectedEvent && !isMobile && hasValidAnchor && (
         <Popover open onOpenChange={(next) => { if (!next) closeDetail(); }}>
-          <PopoverAnchor virtualRef={virtualAnchor} />
+          <PopoverAnchor virtualRef={anchorRef} />
           <PopoverContent
             role="dialog"
             aria-label={`Event detail: ${selectedEvent.title}`}
             align="start"
+            side="bottom"
+            avoidCollisions
+            collisionPadding={8}
+            sticky="partial"
+            onCloseAutoFocus={restoreDetailFocus}
             className="w-80 space-y-3"
           >
             <EventDetailBody
@@ -1447,9 +1515,29 @@ export function EventCalendar({
         </Popover>
       )}
 
+      {selectedEvent && !isMobile && !hasValidAnchor && (
+        <Dialog open onOpenChange={(next) => { if (!next) closeDetail(); }}>
+          <DialogContent onCloseAutoFocus={restoreDetailFocus} className="max-h-[85vh] overflow-y-auto">
+            <DialogTitle>{`Event detail: ${selectedEvent.title}`}</DialogTitle>
+            <DialogDescription>Event details and available actions.</DialogDescription>
+            <EventDetailBody
+              key={selectedEvent.id}
+              event={selectedEvent}
+              locale={locale}
+              interval={interval}
+              editable={editable}
+              onAction={onAction}
+              renderEventActions={renderEventActions}
+              onEventDrop={onEventDrop}
+              onClose={closeDetail}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
       {selectedEvent && isMobile && (
         <Sheet open onOpenChange={(next) => { if (!next) closeDetail(); }}>
-          <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
+          <SheetContent side="bottom" onCloseAutoFocus={restoreDetailFocus} className="max-h-[85vh] overflow-y-auto">
             <SheetHeader>
               <SheetTitle>Event detail</SheetTitle>
               <SheetDescription>{selectedEvent.title}</SheetDescription>

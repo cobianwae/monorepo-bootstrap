@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act, fireEvent } from '@testing-library/react';
 import { Tour, isTargetVisible } from './tour';
@@ -65,6 +66,20 @@ function mockReducedMotion(matches: boolean) {
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
     }),
+  });
+}
+
+/** CR-018: bedakan query responsif <md (§5) dari reduced-motion (K5). */
+function mockMediaQuery(opts: { narrow?: boolean; reduced?: boolean } = {}) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes('767px') ? !!opts.narrow : !!opts.reduced,
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })),
   });
 }
 
@@ -292,6 +307,49 @@ describe('Tour 017-02 (target hilang + keyboard + motion + states)', () => {
     expect(bg.getAttribute('inert')).toBeNull();
   });
 
+  it('CR-017: saudara di dalam root app ikut inert; lapisan driver.js tidak inert', () => {
+    document.body.insertAdjacentHTML('beforeend', '<div class="driver-layer" data-testid="drv"></div>');
+    render(
+      <div>
+        <header data-testid="app-header">Header</header>
+        <Tour steps={fiveSteps()} open={true} />
+      </div>
+    );
+    renderTargets();
+    expect(screen.getByTestId('app-header').getAttribute('inert')).not.toBeNull();
+    expect(screen.getByTestId('app-header').getAttribute('aria-hidden')).toBe('true');
+    expect(screen.getByTestId('drv').hasAttribute('inert')).toBe(false);
+  });
+
+  it('CR-017: dialog konfirmasi menyembunyikan lapisan driver selama terbuka', () => {
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} />);
+    const passedSteps = getPassedSteps();
+    act(() => {
+      nextAt(passedSteps, 0)?.();
+    });
+    act(() => {
+      nextAt(passedSteps, 1)?.();
+    });
+    act(() => {
+      closeAt(passedSteps, 2)?.();
+    });
+    expect(screen.getByTestId('tour-skip-dialog').hasAttribute('data-tour-layer')).toBe(true);
+    expect(document.body.dataset.tourConfirm).toBe('true');
+    act(() => {
+      fireEvent.click(screen.getByText('Lanjut tur'));
+    });
+    expect(document.body.dataset.tourConfirm).toBeUndefined();
+  });
+
+  it('CR-017: CSS backdrop tunggal dan ring fokus tombol popover', () => {
+    const css = readFileSync(`${import.meta.dirname}/tour.css`, 'utf8');
+    expect(css).not.toMatch(/\.driver-overlay\s*\{[^}]*background-color/);
+    expect(css).toMatch(/\.driver-popover-footer button:focus-visible,[^{]*\.driver-popover-close-btn:focus-visible\s*\{[^}]*outline:\s*2px solid var\(--primary\)/);
+    expect(css).toMatch(/>\s*\.driver-overlay,[^{]*>\s*\.ds-tour-popover\s*\{[^}]*display:\s*none/);
+    expect(css).toMatch(/\[data-tour-confirm-dialog\] button:not\(:disabled\)\s*\{[^}]*pointer-events:\s*auto/);
+  });
+
   it('AC-03: Tab cycling di footer popover', async () => {
     renderTargets();
     render(<Tour steps={fiveSteps()} open={true} />);
@@ -345,5 +403,50 @@ describe('Tour 017-02 (target hilang + keyboard + motion + states)', () => {
     await settle();
     expect(screen.getByTestId('tour-announcer').getAttribute('aria-busy')).toBeNull();
     expect(document.querySelector('#qn')?.getAttribute('disabled')).toBeNull();
+  });
+});
+
+describe('Tour CR-018 (varian §2.5 + responsif §5)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    document.body.innerHTML = '';
+    mockMediaQuery();
+  });
+
+  it('varian default: stagePadding 8 + popoverClass ds-tour-popover (backward-compat)', () => {
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} />);
+    expect(mockDriver).toHaveBeenCalledTimes(1);
+    expect(getDriverConfig().stagePadding).toBe(8);
+    expect(getDriverConfig().popoverClass).toBe('ds-tour-popover');
+    expect(getPassedSteps()[0].popover?.popoverClass).toBe('ds-tour-popover');
+  });
+
+  it('varian spotlight tight: stagePadding 4', () => {
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} spotlight="tight" />);
+    expect(getDriverConfig().stagePadding).toBe(4);
+  });
+
+  it('spotlight auto: viewport <md → tight', () => {
+    mockMediaQuery({ narrow: true });
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} />);
+    expect(getDriverConfig().stagePadding).toBe(4);
+  });
+
+  it('spotlight eksplisit default menang atas auto <md', () => {
+    mockMediaQuery({ narrow: true });
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} spotlight="default" />);
+    expect(getDriverConfig().stagePadding).toBe(8);
+  });
+
+  it('varian popover compact: class popover compact di config + tiap langkah', () => {
+    renderTargets();
+    render(<Tour steps={fiveSteps()} open={true} popover="compact" />);
+    expect(getDriverConfig().popoverClass).toContain('ds-tour-popover-compact');
+    expect(getPassedSteps()[0].popover?.popoverClass).toContain('ds-tour-popover-compact');
+    expect(getPassedSteps()[4].popover?.popoverClass).toContain('ds-tour-popover-compact');
   });
 });

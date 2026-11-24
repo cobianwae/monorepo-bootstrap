@@ -76,8 +76,10 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 
 | ID | Judul | Status | File |
 |---|---|---|---|
-| CR-017 | Tour: dialog konfirmasi tertutup backdrop + inert + focus ring | approved | `docs/cr/cr-017-tour-dialog-backdrop.md` |
-| CR-018 | Tour: varian cva + responsif di komponen + sinkron docs | approved | `docs/cr/cr-018-tour-varian-responsif-docs.md` |
+| CR-012 | Calendar polish tema & docs showcase | done | `docs/cr/cr-012-calendar-theme-docs-polish.md` |
+| CR-013 | Anchor popover detail event EventCalendar (M-006) jatuh ke pojok kiri atas — diterima user; browser positioning/keyboard belum diverifikasi | done | `docs/cr/cr-013-popover-anchor-event-calendar.md` |
+| CR-017 | Tour: perbaikan dialog teruji di Chrome light/dark | done | `docs/cr/cr-017-tour-dialog-backdrop.md` |
+| CR-018 | Tour: varian cva + responsif di komponen + sinkron docs | done | `docs/cr/cr-018-tour-varian-responsif-docs.md` |
 | CR-019 | Flow Editor inspector on-demand tidak mengunci + sesuai AC | done | `docs/cr/cr-019-flow-inspector-on-demand.md` |
 | CR-020 | Mind Map: pointer, pemusatan edit/fokus, minimap mobile dipulihkan; tes/browser/build terverifikasi, disetujui user | done | `docs/cr/cr-020-mind-map-canvas-parity.md` |
 | CR-021 | Flow Editor: kanvas rusak visual/layout (node 0×0, handle, toolbar, fitView, edge) | done | `docs/cr/cr-021-flow-editor-visual-rusak.md` |
@@ -95,7 +97,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-033 | Token: scope tema bersarang tidak me-resolve ulang `--color-*` (dark mode kanvas mind-map; dikerjakan lebih dulu) | done | `docs/cr/cr-033-token-scope-tema-bersarang.md` |
 | CR-034 | Aturan visual docs showcase (`visual-language.md`) + penyambungan ke AI (`instructions`, AGENTS, ARCHITECTURE, CONVENTIONS) + pagar guard | done | `docs/cr/cr-034-aturan-visual-dan-penyambungan-ai.md` |
 | CR-035 | Seragamkan 7 halaman `foundations`: `SectionHeading`, teks mikro → `text-xs`, `primary` dekoratif → `highlight`, `SegmentedControl` | done | `docs/cr/cr-035-seragamkan-halaman-foundations.md` |
-| CR-036 | Bug konten `foundations`: klaim WCAG dihitung, "3-step", demo durasi satu easing, label arah, "Play All", badge Ratio dark mode | approved | `docs/cr/cr-036-bug-konten-halaman-foundations.md` |
+| CR-036 | Bug konten `foundations`: klaim WCAG dihitung, "3-step", demo durasi satu easing, label arah, "Play All", badge Ratio dark mode. Verifikasi AA matriks di browser 16/16. | done | `docs/cr/cr-036-bug-konten-halaman-foundations.md` |
 | CR-037 | Sederhanakan `SectionHeading`: tanpa ikon, tanpa level sub (mengoreksi keputusan CR-034 #2; opsi A pilihan user) | done | `docs/cr/cr-037-sederhanakan-section-heading-tanpa-ikon.md` |
 | CR-038 | Ganti `text-[9/10/11px]` → `text-xs` di `app/(docs)` non-foundations (99 pemakaian, 29 file); guard px diperluas ke seluruh docs | done | `docs/cr/cr-038-text-xs-docs-non-foundations.md` |
 | CR-039 | Hapus ikon heading manual di `components/` dan `patterns/` (78 baris, 11 file) | done | `docs/cr/cr-039-ikon-heading-components-patterns.md` |
@@ -115,19 +117,25 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-053 | Audit visual `components/` dan `patterns/` (46 halaman): text-highlight pada teks kecil, primary dekoratif, h2/h3 manual, text-lg/text-2xl font-bold manual; cakupan palet selain Atelier/Pulse | done | `docs/cr/cr-053-audit-visual-components-patterns.md` |
 | CR-054 | Audit 73 route selesai dengan batas bukti tercatat; done dikonfirmasi user 2026-11-23, perbaikan diteruskan ke CR-055–064 approved | done | `docs/cr/cr-054-audit-components-patterns.md` |
 | CR-055 | Kontras teks kecil lintas tema (C01); done dikonfirmasi user 2026-11-23 | done | `docs/cr/cr-055-small-text-contrast.md` |
-| CR-056 | Reflow Banner bersama dan audit caller (C11/V02) | approved | `docs/cr/cr-056-banner-reflow.md` |
-| CR-057 | Semantik kontrol, keyboard dan tabel virtual (C02–04/C07/C10) | approved | `docs/cr/cr-057-control-semantics.md` |
-| CR-058 | Label/error, target password dan empty-value form (C05/C09/C12/C13) | approved | `docs/cr/cr-058-form-accessibility.md` |
+| CR-056 | Reflow Banner; 17 instance showcase terverifikasi, batas CSS consumer tercatat; done atas persetujuan user 2026-11-23 (C11/V02) | done | `docs/cr/cr-056-banner-reflow.md` |
+| CR-057 | Semantik kontrol, keyboard dan tabel virtual (C02–04/C07/C10); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-057-control-semantics.md` |
+| CR-058 | Label/error, target password dan empty-value form (C05/C09/C12/C13); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-058-form-accessibility.md` |
 | CR-059 | Fokus onboarding dan kepemilikan command palette (C06/C17) | done | `docs/cr/cr-059-overlay-ownership.md` |
 | CR-060 | Hydration RTE, statistik awal dan asset demo (C14/V01/V03); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-060-rte-hydration.md` |
-| CR-061 | Reflow kontrol/workspace mobile (C15/R01) | approved | `docs/cr/cr-061-responsive-controls.md` |
+| CR-061 | Reflow kontrol/workspace mobile (C15/R01) | done | `docs/cr/cr-061-responsive-controls.md` |
 | CR-062 | Reveal katalog home mobile tidak mencapai threshold (C16); diperbaiki di `useReveal` dan di-merge ke `visual-polish` | done | `docs/cr/cr-062-home-reveal.md` |
-| CR-063 | Peran warna, heading, segmented dan literal palette (W01–03/W05–07) | approved | `docs/cr/cr-063-visual-consistency.md` |
-| CR-064 | State tabel konsumen dan pemulihan empty master-detail (W04/C08) | approved | `docs/cr/cr-064-data-state-recovery.md` |
+| CR-063 | Peran warna, heading, segmented dan literal palette (W01–03/W05–07) | done | `docs/cr/cr-063-visual-consistency.md` |
+| CR-064 | State tabel konsumen dan pemulihan empty master-detail (W04/C08); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-064-data-state-recovery.md` |
+| CR-065 | Uplift halaman File Manager: segmented control, struktur demo/a11y, copy English; done dan di-merge ke `visual-polish` | done | `docs/cr/cr-065-file-manager-page-uplift.md` |
+| CR-066 | File Manager: poles demo (preview dari grid/state, toast, kontrol quota/sidebar), copy English komponen, target sentuh segmented; 3 cluster A/B/C; done dan di-merge ke `visual-polish` | done | `docs/cr/cr-066-file-manager-polish-and-copy.md` |
+| CR-067 | Uplift halaman Org Chart Studio: demo-first, segmented control, CodeBlock resep, copy English; done dan di-merge ke `visual-polish` | done | `docs/cr/cr-067-org-chart-studio-page-uplift.md` |
+| CR-068 | Org Chart Studio: poles demo (search di state non-data, reset seed, klaim dari data, toast Loading) dan section keyboard (sub-heading, `<kbd>`); 2 cluster A/B | done | `docs/cr/cr-068-org-chart-studio-demo-polish.md` |
+| CR-069 | OrgChartStudio: seluruh copy runtime (label, dialog, toast, live region, pesan validasi, default `emptyActionLabel`) ke English + update test; 4 cluster A–D | done | `docs/cr/cr-069-org-chart-studio-english-copy.md` |
+| CR-070 | CodeBlock syntax highlighting (Shiki): dual-theme light/dark + audit kontras + fallback flat; done atas persetujuan user, visual browser belum diverifikasi | done | `docs/cr/cr-070-codeblock-shiki-highlighting.md` |
 
 ## Catatan
 
-- Rekonsiliasi CR sebelum 054 (2026-11-23): `docs/reviews/cr-before-054-status-reconciliation.md`. User menetapkan CR-034/035/037/038/042/047/050–053 done; CR-017/018/036 tetap approved dan terbuka. Catatan eksekusi/commit/screenshot disinkronkan tanpa perubahan UI.
+- Rekonsiliasi CR sebelum 054 (2026-11-23): `docs/reviews/cr-before-054-status-reconciliation.md`. User menetapkan CR-034/035/037/038/042/047/050–053 done. CR-017/018/036 masih terbuka pada rekonsiliasi tersebut dan kemudian ditetapkan done; lihat tabel untuk status terkini.
 
 - Nomor PRD 007–009 **sengaja tidak dipakai** — sudah direservasi sebagai ID seri
   story lightweight track (007-01, 008-01/008-02, 009-01, lihat registry di bawah).

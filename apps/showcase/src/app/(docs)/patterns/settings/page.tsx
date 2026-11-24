@@ -647,6 +647,9 @@ export default function SettingsPage() {
                   <CardContent className="space-y-4">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                       <Input
+                        id="new-member-email"
+                        aria-label="New member email"
+                        aria-describedby={memberError ? 'err-new-member-email' : undefined}
                         value={newMemberEmail}
                         onChange={(e) => {
                           setNewMemberEmail(e.target.value);
@@ -675,7 +678,7 @@ export default function SettingsPage() {
                       </div>
                     </div>
                     {memberError && (
-                      <p className="text-xs font-medium text-destructive">{memberError}</p>
+                      <p id="err-new-member-email" className="text-xs font-medium text-destructive">{memberError}</p>
                     )}
 
                     {members.length === 0 ? (

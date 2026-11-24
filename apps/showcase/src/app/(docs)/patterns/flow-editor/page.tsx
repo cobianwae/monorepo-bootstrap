@@ -27,6 +27,8 @@ import {
   useTheme,
   PaletteSwitcher,
   toast,
+  SegmentedControl,
+  SegmentedControlItem,
   type FlowEdge,
   type FlowNode,
   type FlowEditorProps,
@@ -491,15 +493,17 @@ function InspectorPanel({
               <Input readOnly value={node?.id ?? ''} className="text-xs" />
             </div>
             <div className="space-y-1">
-              <Label className="text-xs font-medium">Judul</Label>
+              <Label htmlFor="flow-node-title" className="text-xs font-medium">Judul</Label>
               <Input
+                id="flow-node-title"
                 value={draftTitle}
                 onChange={(e) => onChangeTitle(e.target.value)}
                 onBlur={() => onBlurTitle(draftTitle)}
                 className={`text-xs border ${titleError ? 'border-destructive' : ''}`}
+                aria-describedby={titleError ? 'err-flow-node-title' : undefined}
                 aria-invalid={titleError}
               />
-              {titleError && <p className="text-xs text-destructive">Judul tidak boleh kosong.</p>}
+              {titleError && <p id="err-flow-node-title" className="text-xs text-destructive">Judul tidak boleh kosong.</p>}
             </div>
             <div className="space-y-1">
               <Label htmlFor="flow-node-description" className="text-xs font-medium">Deskripsi</Label>
@@ -512,23 +516,20 @@ function InspectorPanel({
             </div>
             <fieldset className="space-y-1">
               <legend className="text-xs font-medium">Status</legend>
-              <div className="flex flex-wrap gap-1">
-                {STATUS_OPTIONS.map((opt) => {
-                  const active = (node?.data.status ?? 'default') === opt.value;
-                  return (
-                    <Button
-                      key={opt.value}
-                      type="button"
-                      variant={active ? 'default' : 'outline'}
-                      size="sm"
-                      aria-pressed={active}
-                      onClick={() => node && onPatchNode(node.id, { status: opt.value })}
-                    >
-                      {opt.label}
-                    </Button>
-                  );
-                })}
-              </div>
+              <SegmentedControl
+                type="single"
+                value={node?.data.status ?? 'default'}
+                onValueChange={(v) => {
+                  if (v && node) onPatchNode(node.id, { status: v as FlowStatus });
+                }}
+                aria-label="Node status"
+              >
+                {STATUS_OPTIONS.map((opt) => (
+                  <SegmentedControlItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SegmentedControlItem>
+                ))}
+              </SegmentedControl>
             </fieldset>
             <div className="space-y-1">
               <div className="text-xs font-medium">Posisi</div>

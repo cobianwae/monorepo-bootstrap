@@ -205,11 +205,11 @@ const TYPE_ICONS: Record<FileItemType, React.ElementType> = {
 };
 
 const TYPE_LABELS: Record<FileItemType, string> = {
-  image: 'Gambar',
+  image: 'Image',
   pdf: 'PDF',
   video: 'Video',
   audio: 'Audio',
-  other: 'Lainnya',
+  other: 'Other',
 };
 
 export function FileManager({
@@ -416,7 +416,7 @@ export function FileManager({
     if (!renameTarget) return;
     const next = renameValue.trim();
     if (!next) {
-      setRenameError('Nama tidak boleh kosong.');
+      setRenameError('Name cannot be empty.');
       return;
     }
     const duplicate = allItems.some(
@@ -426,7 +426,7 @@ export function FileManager({
         item.name.toLowerCase() === next.toLowerCase()
     );
     if (duplicate) {
-      setRenameError('Nama sudah dipakai file lain di folder ini.');
+      setRenameError('Another file in this folder already uses this name.');
       return;
     }
     onRename?.(renameTarget, next);
@@ -438,7 +438,7 @@ export function FileManager({
     if (!newFolderParent) return;
     const next = newFolderValue.trim();
     if (!next) {
-      setNewFolderError('Nama tidak boleh kosong.');
+      setNewFolderError('Name cannot be empty.');
       return;
     }
     const duplicate = folders.some(
@@ -447,7 +447,7 @@ export function FileManager({
         folder.name.toLowerCase() === next.toLowerCase()
     );
     if (duplicate) {
-      setNewFolderError('Nama sudah dipakai folder lain di folder ini.');
+      setNewFolderError('Another folder in this folder already uses this name.');
       return;
     }
     // Kontrak publik memakai string; '' menandakan folder root (parentId null).
@@ -535,13 +535,13 @@ export function FileManager({
     () => [
       {
         id: 'select',
-        header: () => <span className="sr-only">Pilih</span>,
+        header: () => <span className="sr-only">Select</span>,
         cell: ({ row }) => {
           const item = row.original;
           const index = visibleItems.findIndex((i) => i.id === item.id);
           return (
             <Checkbox
-              aria-label={`Pilih ${item.name}`}
+              aria-label={`Select ${item.name}`}
               checked={currentSelected.includes(item.id)}
               onCheckedChange={() => toggleItem(item, 'additive', index)}
             />
@@ -551,7 +551,7 @@ export function FileManager({
       },
       {
         accessorKey: 'name',
-        header: 'Nama',
+        header: 'Name',
         cell: ({ row }) => {
           const ItemIcon = TYPE_ICONS[row.original.type];
           return (
@@ -564,18 +564,18 @@ export function FileManager({
       },
       {
         accessorKey: 'type',
-        header: 'Tipe',
+        header: 'Type',
         cell: ({ row }) => TYPE_LABELS[row.original.type],
         enableSorting: false,
       },
       {
         accessorKey: 'size',
-        header: 'Ukuran',
+        header: 'Size',
         cell: ({ row }) => formatSize(row.original.size),
       },
       {
         accessorKey: 'updatedAt',
-        header: 'Tanggal',
+        header: 'Date',
         cell: ({ row }) => formatDate(row.original.updatedAt),
       },
     ],
@@ -615,29 +615,29 @@ export function FileManager({
     quotaLevel === 'warning' ? 'text-warning-text' : quotaLevel === 'full' ? 'text-destructive' : 'text-muted-foreground';
   const quotaMessage =
     quotaLevel === 'warning'
-      ? 'Hampir penuh — pertimbangkan menghapus file yang tidak lagi diperlukan.'
+      ? 'Almost full — consider deleting files you no longer need.'
       : quotaLevel === 'full'
-        ? 'Penyimpanan penuh — hapus file untuk dapat mengunggah lagi.'
-        : 'Kapasitas masih cukup.';
+        ? 'Storage full — delete files to upload again.'
+        : 'Plenty of space left.';
 
   const detailItem = selectedItems[0] ?? null;
 
   const bulkActions = [
     {
       id: 'download',
-      label: 'Unduh',
+      label: 'Download',
       icon: Download,
       onClick: () => onDownload?.(selectedItems),
     },
     {
       id: 'move',
-      label: 'Pindah',
+      label: 'Move',
       icon: FolderInput,
       onClick: () => openConfirm('move', selectedItems),
     },
     {
       id: 'delete',
-      label: 'Hapus',
+      label: 'Delete',
       icon: Trash2,
       variant: 'destructive' as const,
       onClick: () => openConfirm('delete', selectedItems),
@@ -648,23 +648,23 @@ export function FileManager({
     <ContextMenuContent aria-label={`Aksi ${item.name}`}>
       <ContextMenuItem onSelect={() => openPreview(item)}>
         <Eye className="mr-2 h-4 w-4" aria-hidden="true" />
-        Buka / Pratinjau
+        Open / Preview
       </ContextMenuItem>
       <ContextMenuItem onSelect={() => onDownload?.([item])}>
         <Download className="mr-2 h-4 w-4" aria-hidden="true" />
-        Unduh
+        Download
       </ContextMenuItem>
       <ContextMenuItem onSelect={() => openRename(item)}>
         <Pencil className="mr-2 h-4 w-4" aria-hidden="true" />
-        Ganti nama
+        Rename
       </ContextMenuItem>
       <ContextMenuItem onSelect={() => openConfirm('move', [item])}>
         <FolderInput className="mr-2 h-4 w-4" aria-hidden="true" />
-        Pindah
+        Move
       </ContextMenuItem>
       <ContextMenuItem variant="destructive" onSelect={() => openConfirm('delete', [item])}>
         <Trash2 className="mr-2 h-4 w-4" aria-hidden="true" />
-        Hapus
+        Delete
       </ContextMenuItem>
       <ContextMenuItem
         onSelect={() => {
@@ -674,7 +674,7 @@ export function FileManager({
         }}
       >
         <Info className="mr-2 h-4 w-4" aria-hidden="true" />
-        Detail
+        Details
       </ContextMenuItem>
     </ContextMenuContent>
   );
@@ -684,13 +684,13 @@ export function FileManager({
       {[0, 1, 2, 3].map((i) => (
         <Skeleton key={i} className="h-6 w-full" />
       ))}
-      <span className="sr-only">Memuat folder…</span>
+      <span className="sr-only">Loading folders…</span>
     </div>
   ) : error ? (
     <div role="alert" className="space-y-3 p-4">
       <p className="text-sm text-destructive">{error}</p>
       <Button size="sm" variant="outline" onClick={onRetry}>
-        Coba lagi
+        Try again
       </Button>
     </div>
   ) : folders.length === 0 ? (
@@ -698,7 +698,7 @@ export function FileManager({
       <p className="text-sm text-muted-foreground">Belum ada folder.</p>
       <Button size="sm" variant="outline" onClick={() => openCreateFolder(null)}>
         <FolderPlus className="h-4 w-4" />
-        Folder baru
+        New folder
       </Button>
     </div>
   ) : (
@@ -717,12 +717,12 @@ export function FileManager({
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="text-sm font-semibold">{activeFolder?.name ?? 'Folder'}</h2>
-        <div className="ml-auto flex items-center gap-2" role="group" aria-label="Mode tampilan">
+        <div className="ml-auto flex items-center gap-2" role="group" aria-label="View mode">
           <Button
             size="icon"
             variant={currentView === 'list' ? 'default' : 'ghost'}
             className="h-8 w-8"
-            aria-label="Tampilan list"
+            aria-label="List view"
             aria-pressed={currentView === 'list'}
             onClick={() => setView('list')}
           >
@@ -732,7 +732,7 @@ export function FileManager({
             size="icon"
             variant={currentView === 'grid' ? 'default' : 'ghost'}
             className="h-8 w-8"
-            aria-label="Tampilan grid"
+            aria-label="Grid view"
             aria-pressed={currentView === 'grid'}
             onClick={() => setView('grid')}
           >
@@ -743,16 +743,16 @@ export function FileManager({
               value={filterType}
               onValueChange={(value) => setFilterType(value as 'all' | FileItemType)}
             >
-              <SelectTrigger aria-label="Filter tipe file" className="h-8 w-36">
-                <SelectValue placeholder="Semua tipe" />
+              <SelectTrigger aria-label="Filter by file type" className="h-8 w-36">
+                <SelectValue placeholder="All types" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua tipe</SelectItem>
-                <SelectItem value="image">Gambar</SelectItem>
+                <SelectItem value="all">All types</SelectItem>
+                <SelectItem value="image">Image</SelectItem>
                 <SelectItem value="pdf">PDF</SelectItem>
                 <SelectItem value="video">Video</SelectItem>
                 <SelectItem value="audio">Audio</SelectItem>
-                <SelectItem value="other">Lainnya</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
           )}
@@ -760,12 +760,12 @@ export function FileManager({
       </div>
 
       <p aria-live="polite" className="sr-only">
-        {currentSelected.length > 0 ? `${currentSelected.length} item dipilih` : ''}
+        {currentSelected.length > 0 ? `${currentSelected.length} ${currentSelected.length === 1 ? 'item' : 'items'} selected` : ''}
       </p>
 
       {loading ? (
         <div aria-busy="true" className="space-y-3">
-          <span className="sr-only">Memuat konten…</span>
+          <span className="sr-only">Loading contents…</span>
           {currentView === 'list' ? (
             <div className="space-y-2">
               {[0, 1, 2, 3].map((i) => (
@@ -784,19 +784,19 @@ export function FileManager({
         <div role="alert" className="space-y-3 rounded-xl border border-destructive/40 bg-destructive/5 p-6 text-center">
           <p className="text-sm text-destructive">{error}</p>
           <Button size="sm" variant="outline" onClick={onRetry}>
-            Coba lagi
+            Try again
           </Button>
         </div>
       ) : activeItems.length === 0 ? (
         <EmptyState
           icon={FolderOpen}
-          title="Folder kosong"
-          description="Folder ini belum berisi file. Unggah file pertama atau buat folder baru untuk mulai."
+          title="This folder is empty"
+          description="Upload your first file or create a new folder to get started."
           actionLabel="Upload"
           // Upload compose tersedia di panel konteks (S-005.27.02); CTA di
           // sini membuka panel tersebut di mobile/tablet.
           onAction={() => setContextOpen(true)}
-          secondaryActionLabel="Folder baru"
+          secondaryActionLabel="New folder"
           onSecondaryAction={() => openCreateFolder(activeFolderId || null)}
         />
       ) : currentView === 'list' ? (
@@ -834,7 +834,7 @@ export function FileManager({
           </Table>
         </div>
       ) : (
-        <ul role="listbox" aria-multiselectable="true" aria-label="Konten folder (grid)" className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <ul role="listbox" aria-multiselectable="true" aria-label="Folder contents (grid)" className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {sortedItems.map((item, index) => {
             const ItemIcon = TYPE_ICONS[item.type];
             const isSelected = currentSelected.includes(item.id);
@@ -861,7 +861,7 @@ export function FileManager({
                         )}
                       </span>
                       <Checkbox
-                        aria-label={`Pilih ${item.name}`}
+                        aria-label={`Select ${item.name}`}
                         checked={isSelected}
                         onCheckedChange={() => toggleItem(item, 'additive', index)}
                       />
@@ -884,7 +884,7 @@ export function FileManager({
         count={currentSelected.length}
         actions={bulkActions}
         onClearSelection={() => setSelection([])}
-        label={(n) => `${n} item dipilih`}
+        label={(n) => `${n} ${n === 1 ? 'item' : 'items'} selected`}
       />
     </div>
   );
@@ -898,20 +898,20 @@ export function FileManager({
             variant="compact"
             uploadHandler={uploadHandler}
             onAllDone={handleUploadDone}
-            helperText={`Unggah ke folder ${activeFolder?.name ?? activeFolderId}.`}
+            helperText={`Upload to ${activeFolder?.name ?? activeFolderId}.`}
           />
         ) : (
-          <p className="text-sm text-muted-foreground">Upload tidak tersedia pada pattern ini.</p>
+          <p className="text-sm text-muted-foreground">Upload is not available in this pattern.</p>
         )}
       </section>
 
       {quotaLevel !== 'hidden' && (
-        <section aria-label="Kuota penyimpanan" className="space-y-2">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Kuota penyimpanan</h3>
+        <section aria-label="Storage quota" className="space-y-2">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Storage quota</h3>
           {quotaLoading ? (
             <div aria-busy="true" className="space-y-2">
               <Skeleton className="h-2 w-full" />
-              <span className="sr-only">Memuat kuota…</span>
+              <span className="sr-only">Loading quota…</span>
             </div>
           ) : quotaError ? (
             <p role="status" className="text-sm text-destructive">{quotaError}</p>
@@ -923,18 +923,18 @@ export function FileManager({
                   <dd className="font-medium">{formatSize(quota.total)}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-muted-foreground">Terpakai</dt>
+                  <dt className="text-xs text-muted-foreground">Used</dt>
                   <dd className="font-medium">{formatSize(quota.used)}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-muted-foreground">Sisa</dt>
+                  <dt className="text-xs text-muted-foreground">Remaining</dt>
                   <dd className="font-medium">{formatSize(Math.max(0, quota.total - quota.used))}</dd>
                 </div>
               </dl>
               <Progress
                 value={quotaPercent}
                 indicatorClassName={quotaIndicatorClass}
-                aria-label={`Kuota penyimpanan ${Math.round(quotaPercent)} persen terpakai`}
+                aria-label={`Storage quota ${Math.round(quotaPercent)} percent used`}
               />
               <p className={cn('text-sm', quotaMessageClass)}>{quotaMessage}</p>
             </>
@@ -942,41 +942,41 @@ export function FileManager({
         </section>
       )}
 
-      <section aria-label="Detail item" className="space-y-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Detail item</h3>
+      <section aria-label="Item details" className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Item details</h3>
         {detailItem ? (
           <dl className="space-y-1.5 text-sm">
             <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">Nama</dt>
+              <dt className="text-muted-foreground">Name</dt>
               <dd className="text-right font-medium">{detailItem.name}</dd>
             </div>
             <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">Tipe</dt>
+              <dt className="text-muted-foreground">Type</dt>
               <dd>{TYPE_LABELS[detailItem.type]}</dd>
             </div>
             <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">Ukuran</dt>
+              <dt className="text-muted-foreground">Size</dt>
               <dd>{formatSize(detailItem.size)}</dd>
             </div>
             <div className="flex justify-between gap-3">
-              <dt className="text-muted-foreground">Tanggal</dt>
+              <dt className="text-muted-foreground">Date</dt>
               <dd>{formatDate(detailItem.updatedAt)}</dd>
             </div>
             {detailItem.dimensions && (
               <div className="flex justify-between gap-3">
-                <dt className="text-muted-foreground">Dimensi</dt>
+                <dt className="text-muted-foreground">Dimensions</dt>
                 <dd>{detailItem.dimensions}</dd>
               </div>
             )}
             {detailItem.duration !== undefined && (
               <div className="flex justify-between gap-3">
-                <dt className="text-muted-foreground">Durasi</dt>
+                <dt className="text-muted-foreground">Duration</dt>
                 <dd>{formatDuration(detailItem.duration)}</dd>
               </div>
             )}
           </dl>
         ) : (
-          <p className="text-sm text-muted-foreground">Pilih item untuk melihat detailnya di sini.</p>
+          <p className="text-sm text-muted-foreground">Select an item to see its details here.</p>
         )}
       </section>
     </div>
@@ -989,7 +989,7 @@ export function FileManager({
       <div className="flex flex-col items-center justify-center gap-3 rounded-lg bg-muted p-8 text-center">
         <FileIcon className="h-10 w-10 text-muted-foreground" aria-hidden="true" />
         <p className="text-sm text-muted-foreground">
-          Pratinjau tidak tersedia untuk tipe file ini. Unduh untuk melihat isinya.
+          Preview isn&apos;t available for this file type. Download it to view the contents.
         </p>
       </div>
     );
@@ -1044,30 +1044,30 @@ export function FileManager({
       {previewMedia}
       <dl className="space-y-1.5 text-sm">
         <div className="flex justify-between gap-3">
-          <dt className="text-muted-foreground">Nama</dt>
+          <dt className="text-muted-foreground">Name</dt>
           <dd className="text-right font-medium">{previewItem.name}</dd>
         </div>
         <div className="flex justify-between gap-3">
-          <dt className="text-muted-foreground">Tipe</dt>
+          <dt className="text-muted-foreground">Type</dt>
           <dd>{TYPE_LABELS[previewItem.type]}</dd>
         </div>
         <div className="flex justify-between gap-3">
-          <dt className="text-muted-foreground">Ukuran</dt>
+          <dt className="text-muted-foreground">Size</dt>
           <dd>{formatSize(previewItem.size)}</dd>
         </div>
         <div className="flex justify-between gap-3">
-          <dt className="text-muted-foreground">Tanggal</dt>
+          <dt className="text-muted-foreground">Date</dt>
           <dd>{formatDate(previewItem.updatedAt)}</dd>
         </div>
         {previewItem.dimensions && (
           <div className="flex justify-between gap-3">
-            <dt className="text-muted-foreground">Dimensi</dt>
+            <dt className="text-muted-foreground">Dimensions</dt>
             <dd>{previewItem.dimensions}</dd>
           </div>
         )}
         {previewItem.duration !== undefined && (
           <div className="flex justify-between gap-3">
-            <dt className="text-muted-foreground">Durasi</dt>
+            <dt className="text-muted-foreground">Duration</dt>
             <dd>{formatDuration(previewItem.duration)}</dd>
           </div>
         )}
@@ -1077,13 +1077,13 @@ export function FileManager({
           <Button asChild size="sm">
             <a href={previewItem.previewUrl} download={previewItem.name}>
               <Download className="mr-2 h-4 w-4" aria-hidden="true" />
-              Unduh
+              Download
             </a>
           </Button>
         ) : (
           <Button size="sm" onClick={() => onDownload?.([previewItem])}>
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
-            Unduh
+            Download
           </Button>
         )}
       </div>
@@ -1098,7 +1098,7 @@ export function FileManager({
           size="icon"
           variant="ghost"
           className="h-8 w-8 lg:hidden"
-          aria-label="Buka daftar folder"
+          aria-label="Open folder list"
           onClick={() => setSidebarOpen(true)}
         >
           <PanelLeft className="h-4 w-4" />
@@ -1131,7 +1131,7 @@ export function FileManager({
         <div className="ml-auto flex items-center gap-2">
           <div className="relative hidden sm:block">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Cari di folder ini" aria-label="Cari di folder ini" className="h-8 w-44 pl-8" />
+            <Input placeholder="Search this folder" aria-label="Search this folder" className="h-8 w-44 pl-8" />
           </div>
           <Button size="sm" variant="outline" className="hidden sm:inline-flex" onClick={() => setContextOpen(true)}>
             <Upload className="h-4 w-4" />
@@ -1144,13 +1144,13 @@ export function FileManager({
             onClick={() => openCreateFolder(activeFolderId || null)}
           >
             <FolderPlus className="h-4 w-4" />
-            Folder baru
+            New folder
           </Button>
           <Button
             size="icon"
             variant="ghost"
             className="h-8 w-8 lg:hidden"
-            aria-label="Buka panel konteks"
+            aria-label="Open context panel"
             onClick={() => setContextOpen(true)}
           >
             <PanelRight className="h-4 w-4" />
@@ -1160,15 +1160,15 @@ export function FileManager({
 
       {/* Three zones */}
       <div className="flex min-h-0 flex-col lg:h-[480px] lg:flex-row">
-        <aside aria-label="Sidebar folder" className="hidden w-60 shrink-0 border-r border-border bg-muted/20 lg:block">
+        <aside aria-label="Folder sidebar" className="hidden w-60 shrink-0 border-r border-border bg-muted/20 lg:block">
           {sidebarBody}
         </aside>
 
-        <main aria-label="Konten folder" className="min-w-0 flex-1 bg-background p-4">
+        <main aria-label="Folder contents" className="min-w-0 flex-1 bg-background p-4">
           {contentBody}
         </main>
 
-        <aside aria-label="Panel konteks" className="hidden w-80 shrink-0 border-l border-border bg-muted/20 lg:block">
+        <aside aria-label="Context panel" className="hidden w-80 shrink-0 border-l border-border bg-muted/20 lg:block">
           {contextSlot ?? contextPanel}
         </aside>
       </div>
@@ -1176,7 +1176,7 @@ export function FileManager({
       {/* Mobile/tablet drawer: sidebar */}
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetContent side="left" className="p-0 sm:max-w-sm lg:hidden">
-          <SheetTitle className="sr-only">Daftar folder</SheetTitle>
+          <SheetTitle className="sr-only">Folder list</SheetTitle>
           <div className="border-b border-border px-4 py-3">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Folder</span>
           </div>
@@ -1187,9 +1187,9 @@ export function FileManager({
       {/* Tablet/mobile sheet: context panel */}
       <Sheet open={contextOpen} onOpenChange={setContextOpen}>
         <SheetContent side="right" className="p-0 sm:max-w-sm lg:hidden">
-          <SheetTitle className="sr-only">Panel konteks</SheetTitle>
+          <SheetTitle className="sr-only">Context panel</SheetTitle>
           <div className="border-b border-border px-4 py-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Panel konteks</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Context panel</span>
           </div>
           {contextSlot ?? contextPanel}
         </SheetContent>
@@ -1204,7 +1204,7 @@ export function FileManager({
           }}
         >
           <SheetContent side="right" className="overflow-y-auto sm:max-w-md">
-            <SheetTitle>{previewItem?.name ?? 'Pratinjau'}</SheetTitle>
+            <SheetTitle>{previewItem?.name ?? 'Preview'}</SheetTitle>
             {previewBody}
           </SheetContent>
         </Sheet>
@@ -1216,7 +1216,7 @@ export function FileManager({
           }}
         >
           <DialogContent className="max-h-[100dvh] w-full max-w-none overflow-y-auto rounded-none sm:rounded-none">
-            <DialogTitle>{previewItem?.name ?? 'Pratinjau'}</DialogTitle>
+            <DialogTitle>{previewItem?.name ?? 'Preview'}</DialogTitle>
             {previewBody}
           </DialogContent>
         </Dialog>
@@ -1231,11 +1231,11 @@ export function FileManager({
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{renameTarget ? 'Ganti nama' : 'Folder baru'}</DialogTitle>
+            <DialogTitle>{renameTarget ? 'Rename' : 'New folder'}</DialogTitle>
             <DialogDescription>
               {renameTarget
-                ? `Nama baru untuk ${renameTarget.name}. Nama harus unik di folder ini.`
-                : 'Buat folder baru di folder aktif. Nama harus unik di folder ini.'}
+                ? `New name for ${renameTarget.name}. The name must be unique in this folder.`
+                : 'Create a new folder in the active folder. The name must be unique in this folder.'}
             </DialogDescription>
           </DialogHeader>
           <form
@@ -1244,7 +1244,7 @@ export function FileManager({
             noValidate
           >
             <div className="space-y-1.5">
-              <Label htmlFor="file-manager-name-input">Nama</Label>
+              <Label htmlFor="file-manager-name-input">Name</Label>
               <Input
                 id="file-manager-name-input"
                 value={renameTarget ? renameValue : newFolderValue}
@@ -1270,9 +1270,9 @@ export function FileManager({
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={closeManage}>
-                Batal
+                Cancel
               </Button>
-              <Button type="submit">{renameTarget ? 'Simpan' : 'Buat folder'}</Button>
+              <Button type="submit">{renameTarget ? 'Save' : 'Create folder'}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -1289,13 +1289,13 @@ export function FileManager({
           <DialogHeader>
             <DialogTitle>
               {confirmAction?.kind === 'delete'
-                ? `Hapus ${confirmAction.items.length} item?`
-                : `Pindah ${confirmAction?.items.length ?? 0} item ke folder…`}
+                ? `Delete ${confirmAction.items.length} ${confirmAction.items.length === 1 ? 'item' : 'items'}?`
+                : `Move ${confirmAction?.items.length ?? 0} ${(confirmAction?.items.length ?? 0) === 1 ? 'item' : 'items'} to…`}
             </DialogTitle>
             <DialogDescription>
               {confirmAction?.kind === 'delete'
-                ? 'Item yang dihapus tidak dapat dikembalikan. Tindakan ini meminta konfirmasi sebelum handler dipanggil.'
-                : 'Pilih folder tujuan. Item akan dipindahkan setelah Anda mengonfirmasi.'}
+                ? 'Deleted items cannot be restored.'
+                : 'Choose a destination folder. Items move once you confirm.'}
             </DialogDescription>
           </DialogHeader>
           {confirmAction && (
@@ -1308,7 +1308,7 @@ export function FileManager({
             </ul>
           )}
           {confirmAction?.kind === 'move' && (
-            <div className="space-y-1.5" role="radiogroup" aria-label="Folder tujuan">
+            <div className="space-y-1.5" role="radiogroup" aria-label="Destination folder">
               {folders
                 .filter((folder) => folder.id !== confirmAction.items[0]?.folderId)
                 .map((folder) => {
@@ -1334,7 +1334,7 @@ export function FileManager({
           )}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={closeManage}>
-              Batal
+              Cancel
             </Button>
             <Button
               type="button"
@@ -1342,7 +1342,7 @@ export function FileManager({
               disabled={confirmAction?.kind === 'move' && !moveTargetId}
               onClick={submitConfirm}
             >
-              {confirmAction?.kind === 'delete' ? 'Hapus' : 'Pindah'}
+              {confirmAction?.kind === 'delete' ? 'Delete' : 'Move'}
             </Button>
           </DialogFooter>
         </DialogContent>

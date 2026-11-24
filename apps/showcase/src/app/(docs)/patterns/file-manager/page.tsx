@@ -4,40 +4,48 @@ import * as React from 'react';
 import { Sparkles } from 'lucide-react';
 import {
   Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
   FileManager,
   PageHeader,
+  SegmentedControl,
+  SegmentedControlItem,
   toast,
   type FileFolder,
   type FileItem,
   type FileManagerView,
 } from '@ds/ui';
+import { SectionHeading } from '../../../../components/section-heading';
 
 const folders: FileFolder[] = [
-  { id: 'dokumen', name: 'Dokumen', parentId: null },
-  { id: '2026', name: '2026', parentId: 'dokumen' },
+  { id: 'documents', name: 'Documents', parentId: null },
+  { id: '2026', name: '2026', parentId: 'documents' },
   { id: 'q4', name: 'Q4', parentId: '2026' },
-  { id: 'arsip', name: 'Arsip', parentId: null },
+  { id: 'archive', name: 'Archive', parentId: null },
 ];
 
 const items: FileItem[] = [
-  { id: 'f1', folderId: 'q4', name: 'laporan-q4.pdf', type: 'pdf', size: 204800, updatedAt: '2026-11-01T00:00:00Z', previewUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
-  { id: 'f2', folderId: 'q4', name: 'foto-tim.jpg', type: 'image', size: 1048576, updatedAt: '2026-11-02T00:00:00Z', dimensions: '4032x3024', previewUrl: 'https://picsum.photos/seed/foto-tim/800/600' },
-  { id: 'f3', folderId: 'q4', name: 'rekaman-demo.mp4', type: 'video', size: 52428800, updatedAt: '2026-10-15T00:00:00Z', duration: 754, previewUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4' },
+  { id: 'f1', folderId: 'q4', name: 'q4-report.pdf', type: 'pdf', size: 204800, updatedAt: '2026-11-01T00:00:00Z', previewUrl: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
+  { id: 'f2', folderId: 'q4', name: 'team-photo.jpg', type: 'image', size: 1048576, updatedAt: '2026-11-02T00:00:00Z', dimensions: '4032x3024', previewUrl: 'https://picsum.photos/seed/foto-tim/800/600' },
+  { id: 'f3', folderId: 'q4', name: 'demo-recording.mp4', type: 'video', size: 52428800, updatedAt: '2026-10-15T00:00:00Z', duration: 754, previewUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4' },
   { id: 'f4', folderId: 'q4', name: 'podcast-ep1.mp3', type: 'audio', size: 8388608, updatedAt: '2026-11-03T00:00:00Z', duration: 2145, previewUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3' },
-  { id: 'f5', folderId: '2026', name: 'rekaman-demo.mp4', type: 'video', size: 52428800, updatedAt: '2026-10-15T00:00:00Z', duration: 754, previewUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4' },
-  { id: 'f6', folderId: 'dokumen', name: 'pedoman.docx', type: 'other', size: 51200, updatedAt: '2026-09-01T00:00:00Z' },
+  { id: 'f5', folderId: '2026', name: 'demo-recording.mp4', type: 'video', size: 52428800, updatedAt: '2026-10-15T00:00:00Z', duration: 754, previewUrl: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4' },
+  { id: 'f6', folderId: 'documents', name: 'guidelines.docx', type: 'other', size: 51200, updatedAt: '2026-09-01T00:00:00Z' },
 ];
 
-const sidebarStates = ['normal', 'loading', 'error'] as const;
+const sidebarStates = ['normal', 'loading', 'error', 'empty'] as const;
 type SidebarState = (typeof sidebarStates)[number];
 
 const contentStates = ['normal', 'loading', 'empty', 'error'] as const;
 type ContentState = (typeof contentStates)[number];
 
-const quotaLevels = ['normal', 'warning', 'full'] as const;
-type QuotaLevel = (typeof quotaLevels)[number];
+const quotaStates = ['normal', 'warning', 'full', 'loading', 'error'] as const;
+type QuotaState = (typeof quotaStates)[number];
 
-const quotaByLevel: Record<QuotaLevel, { total: number; used: number }> = {
+const quotaByLevel: Record<'normal' | 'warning' | 'full', { total: number; used: number }> = {
   normal: { total: 10 * 1024 ** 3, used: 2 * 1024 ** 3 },
   warning: { total: 10 * 1024 ** 3, used: 9 * 1024 ** 3 },
   full: { total: 10 * 1024 ** 3, used: 10 * 1024 ** 3 },
@@ -49,30 +57,102 @@ const mockUploadHandler = async (_file: File, { onProgress }: { onProgress: (n: 
   onProgress(100);
 };
 
-function toastAction(title: string, count?: number) {
-  toast({
-    variant: 'success',
-    title,
-    description: count !== undefined ? `${count} item` : undefined,
-  });
+function plural(count: number) {
+  return `${count} ${count === 1 ? 'item' : 'items'}`;
 }
+
+function toastAction(title: string, description?: string) {
+  toast({ variant: 'success', title, description });
+}
+
+interface DemoControlProps<T extends string> {
+  label: string;
+  value: T;
+  options: readonly T[];
+  onChange: (value: T) => void;
+}
+
+/** Satu baris kontrol demo: label + segmented single-select (selalu ada satu nilai terpilih). */
+function DemoControl<T extends string>({ label, value, options, onChange }: DemoControlProps<T>) {
+  return (
+    <div className="space-y-1.5">
+      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+      <div className="max-w-full overflow-x-auto">
+        <SegmentedControl
+          type="single"
+          value={value}
+          onValueChange={(next) => {
+            if (next) onChange(next as T);
+          }}
+          aria-label={label}
+        >
+          {options.map((option) => (
+            <SegmentedControlItem key={option} value={option} className="capitalize">
+              {option}
+            </SegmentedControlItem>
+          ))}
+        </SegmentedControl>
+      </div>
+    </div>
+  );
+}
+
+const accessibilityGroups: { title: string; notes: string[] }[] = [
+  {
+    title: 'Keyboard',
+    notes: [
+      'The folder tree uses arrow keys to move and Enter or Space to select.',
+      'Context menu opens on right-click, or with the Menu key or Shift+F10 on a focused row.',
+      'Select many items with Shift or Ctrl-click and Shift+Arrow.',
+      'Tab order: toolbar → sidebar → content → context panel → bulk bar (when visible) → modal.',
+    ],
+  },
+  {
+    title: 'Screen reader',
+    notes: [
+      'Breadcrumb is a labelled nav; every segment is a keyboard-reachable button.',
+      'Selection changes are announced through an aria-live polite region.',
+      'Loading uses skeletons with aria-busy; errors use role alert with a retry button.',
+      'Table headers expose aria-sort; grid view is a listbox with item positions (aria-posinset).',
+      'Quota shows used, total, and remaining as text, not only as colour.',
+    ],
+  },
+  {
+    title: 'Dialogs & preview',
+    notes: [
+      'Preview opens with Enter on a row or from the Open / Preview menu item. Focus is trapped, Esc closes, and focus returns to the row.',
+      'PDFs render in a script-free sandbox with a download button; unsupported types fall back to a generic card.',
+      'Rename and new-folder dialogs validate empty and duplicate names inline.',
+      'Delete asks for confirmation and Move asks for a target folder. Cancel closes with no effect, and selection clears after the action.',
+    ],
+  },
+  {
+    title: 'Responsive & motion',
+    notes: [
+      'On mobile the sidebar becomes a drawer and the context panel becomes a sheet; no core function is lost.',
+      'View and progress transitions respect prefers-reduced-motion.',
+      'All states use semantic tokens, so light and dark stay in parity.',
+    ],
+  },
+];
 
 export default function FileManagerPage() {
   const [folderList, setFolderList] = React.useState<FileFolder[]>(folders);
   const [itemList, setItemList] = React.useState<FileItem[]>(items);
-  const [activeFolderId, setActiveFolderId] = React.useState('dokumen');
+  const [activeFolderId, setActiveFolderId] = React.useState('documents');
   const [sidebarState, setSidebarState] = React.useState<SidebarState>('normal');
   const [contentState, setContentState] = React.useState<ContentState>('normal');
   const [view, setView] = React.useState<FileManagerView>('list');
   const [selectedIds, setSelectedIds] = React.useState<string[]>([]);
-  const [isEmpty, setIsEmpty] = React.useState(false);
-  const [quotaLevel, setQuotaLevel] = React.useState<QuotaLevel>('normal');
-  const [quotaLoading, setQuotaLoading] = React.useState(false);
-  const [quotaError, setQuotaError] = React.useState(false);
+  const [quotaState, setQuotaState] = React.useState<QuotaState>('normal');
 
-  // Buka preview lewat jalur keyboard yang sama dengan user: fokus baris
-  // item lalu dispatch Enter (pattern menangani sisanya).
+  // Open the preview through the same keyboard path a user would take:
+  // focus the item row, then dispatch Enter (the pattern handles the rest).
+  // Rows only exist in the list view with normal data, so reset those demo states first.
   const openPreviewFor = (item: FileItem) => {
+    setView('list');
+    setSidebarState('normal');
+    setContentState('normal');
     setActiveFolderId(item.folderId);
     setSelectedIds([item.id]);
     window.requestAnimationFrame(() => {
@@ -84,176 +164,138 @@ export default function FileManagerPage() {
     });
   };
 
-  const handleFolderChange = (folderId: string) => {
-    setActiveFolderId(folderId);
-    toast({
-      variant: 'success',
-      title: 'Folder aktif berubah',
-      description: `Folder aktif: ${folderList.find((f) => f.id === folderId)?.name ?? folderId}`,
-    });
-  };
+  const folderName = (folderId: string) => folderList.find((f) => f.id === folderId)?.name ?? folderId;
 
   const shownItems = contentState === 'empty' ? [] : itemList;
 
-  // Handler demo stateful (FR-010): pattern tetap murni memanggil handler,
-  // consumer yang menerapkan perubahan ke datanya sendiri.
+  // Stateful demo handlers: the pattern only calls handlers,
+  // the consumer applies changes to its own data.
   const handleRename = (item: FileItem, nextName: string) => {
     setItemList((prev) => prev.map((i) => (i.id === item.id ? { ...i, name: nextName } : i)));
-    toastAction(`Ganti nama ${item.name} → ${nextName}`);
+    toastAction('Item renamed', `${item.name} → ${nextName}`);
   };
 
   const handleCreateFolder = (parentId: string, name: string) => {
-    const id = `folder-baru-${folderList.length + 1}`;
+    const id = `new-folder-${folderList.length + 1}`;
     setFolderList((prev) => [...prev, { id, name, parentId: parentId || null }]);
-    toastAction(`Folder baru: ${name}`);
+    toastAction('Folder created', name);
   };
 
   const handleDelete = (selected: FileItem[]) => {
     setItemList((prev) => prev.filter((i) => !selected.some((s) => s.id === i.id)));
-    toastAction('Hapus', selected.length);
+    toastAction('Deleted', plural(selected.length));
   };
 
   const handleMove = (selected: FileItem[], targetFolderId: string) => {
     setItemList((prev) =>
       prev.map((i) => (selected.some((s) => s.id === i.id) ? { ...i, folderId: targetFolderId } : i))
     );
-    toastAction(
-      `Pindah ke ${folderList.find((f) => f.id === targetFolderId)?.name ?? targetFolderId}`,
-      selected.length
-    );
+    toastAction(`Moved to ${folderName(targetFolderId)}`, plural(selected.length));
   };
 
   return (
     <div className="animate-in fade-in-50 space-y-10 duration-200">
       <PageHeader
-        eyebrow="UX Recipe Scenario"
+        eyebrow="UX Recipe"
         eyebrowIcon={Sparkles}
-        title="File Manager / Panel Konteks, Preview & Quota"
-        description="Pattern FileManager (S-005.27.02): panel konteks berisi upload queue (compose file-upload), indikator quota tiga level via token, dan detail item terpilih. Preview M-001 tampil sebagai sheet di desktop dan dialog full-screen di mobile untuk image, PDF (sandbox), video, audio, dengan fallback generik untuk tipe lain."
+        title="File Manager"
+        description="Browse folders, select and manage files in bulk, preview images, PDFs, video, and audio, and track uploads and storage quota in one workspace."
       />
 
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          State sidebar
-        </span>
-        {sidebarStates.map((state) => (
-          <Button
-            key={state}
-            size="sm"
-            variant={sidebarState === state ? 'default' : 'outline'}
-            onClick={() => setSidebarState(state)}
-          >
-            {state}
-          </Button>
-        ))}
-      </div>
+      <section id="demo" aria-labelledby="demo-heading" className="space-y-4 scroll-mt-20">
+        <SectionHeading
+          id="demo-heading"
+          title="Interactive demo"
+          description="Use the controls to simulate each state, then interact with the manager below."
+        />
 
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          State konten
-        </span>
-        {contentStates.map((state) => (
-          <Button
-            key={state}
-            size="sm"
-            variant={contentState === state ? 'default' : 'outline'}
-            onClick={() => setContentState(state)}
-          >
-            {state}
-          </Button>
-        ))}
-        <Button size="sm" variant={isEmpty ? 'default' : 'outline'} onClick={() => setIsEmpty((v) => !v)}>
-          empty (sidebar)
-        </Button>
-      </div>
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-base">Simulate states</CardTitle>
+            <CardDescription>Switch loading, empty, error, and quota conditions on the fly.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
+            <DemoControl label="Sidebar" value={sidebarState} options={sidebarStates} onChange={setSidebarState} />
+            <DemoControl label="Content" value={contentState} options={contentStates} onChange={setContentState} />
+            <DemoControl label="Quota" value={quotaState} options={quotaStates} onChange={setQuotaState} />
 
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Level quota
-        </span>
-        {quotaLevels.map((level) => (
-          <Button
-            key={level}
-            size="sm"
-            variant={quotaLevel === level ? 'default' : 'outline'}
-            onClick={() => setQuotaLevel(level)}
-          >
-            {level}
-          </Button>
-        ))}
-        <Button size="sm" variant={quotaLoading ? 'default' : 'outline'} onClick={() => setQuotaLoading((v) => !v)}>
-          loading
-        </Button>
-        <Button size="sm" variant={quotaError ? 'default' : 'outline'} onClick={() => setQuotaError((v) => !v)}>
-          error
-        </Button>
-      </div>
+            <div className="space-y-1.5 md:col-span-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Open preview
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {previewTypes.map((type) => {
+                  const item = itemList.find((i) => i.type === type);
+                  if (!item) return null;
+                  return (
+                    <Button
+                      key={type}
+                      size="sm"
+                      variant="outline"
+                      className="capitalize"
+                      onClick={() => openPreviewFor(item)}
+                    >
+                      {type}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Buka preview
-        </span>
-        {previewTypes.map((type) => {
-          const item = itemList.find((i) => i.type === type);
-          if (!item) return null;
-          return (
-            <Button key={type} size="sm" variant="outline" onClick={() => openPreviewFor(item)}>
-              {type}
-            </Button>
-          );
-        })}
-      </div>
+        <FileManager
+          folders={sidebarState === 'empty' ? [] : folderList}
+          items={shownItems}
+          activeFolderId={activeFolderId}
+          view={view}
+          selectedIds={selectedIds}
+          loading={sidebarState === 'loading' || contentState === 'loading'}
+          error={
+            sidebarState === 'error'
+              ? "Couldn't load folders. Check your connection and try again."
+              : contentState === 'error'
+                ? "Couldn't load folder contents. Your selection was cleared."
+                : null
+          }
+          onActiveFolderChange={setActiveFolderId}
+          onSelectionChange={setSelectedIds}
+          onViewChange={setView}
+          quota={quotaByLevel[quotaState === 'loading' || quotaState === 'error' ? 'normal' : quotaState]}
+          quotaLoading={quotaState === 'loading'}
+          quotaError={quotaState === 'error' ? "Couldn't load quota. Try again later." : null}
+          uploadHandler={mockUploadHandler}
+          onDownload={(selected) => toastAction('Download started', plural(selected.length))}
+          onMove={handleMove}
+          onDelete={handleDelete}
+          onRename={handleRename}
+          onCreateFolder={handleCreateFolder}
+          onRetry={() => {
+            setSidebarState('normal');
+            setContentState('normal');
+          }}
+        />
+      </section>
 
-      <FileManager
-        folders={isEmpty ? [] : folderList}
-        items={shownItems}
-        activeFolderId={activeFolderId}
-        view={view}
-        selectedIds={selectedIds}
-        loading={sidebarState === 'loading' || contentState === 'loading'}
-        error={
-          sidebarState === 'error'
-            ? 'Gagal memuat folder. Periksa koneksi lalu coba lagi.'
-            : contentState === 'error'
-              ? 'Gagal memuat konten folder. Seleksi dibersihkan.'
-              : null
-        }
-        onActiveFolderChange={handleFolderChange}
-        onSelectionChange={setSelectedIds}
-        onViewChange={setView}
-        quota={quotaByLevel[quotaLevel]}
-        quotaLoading={quotaLoading}
-        quotaError={quotaError ? 'Kuota gagal dimuat. Coba lagi nanti.' : null}
-        uploadHandler={mockUploadHandler}
-        onPreview={(item) => toastAction(`Buka ${item.name}`)}
-        onDownload={(selected) => toastAction('Unduh', selected.length)}
-        onMove={handleMove}
-        onDelete={handleDelete}
-        onRename={handleRename}
-        onCreateFolder={handleCreateFolder}
-        onRetry={() => {
-          setSidebarState('normal');
-          setContentState('normal');
-        }}
-      />
+      <section id="accessibility" aria-labelledby="accessibility-heading" className="space-y-4 scroll-mt-20">
+        <SectionHeading
+          id="accessibility-heading"
+          title="Accessibility notes"
+          description="What the pattern guarantees for keyboard, assistive technology, and small screens."
+        />
 
-      <section aria-label="Catatan aksesibilitas" className="space-y-2">
-        <h2 className="text-sm font-semibold">Catatan aksesibilitas</h2>
-        <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-          <li>Sidebar memakai pola treeview existing: panah untuk bergerak, Enter/spasi untuk memilih.</li>
-          <li>Breadcrumb memakai nav berlabel Breadcrumb; setiap segmen adalah tombol yang terjangkau keyboard.</li>
-          <li>Loading sidebar dan konten memakai skeleton dengan aria-busy; error memakai role alert dengan tombol Coba lagi.</li>
-          <li>Seleksi diumumkan via aria-live polite; bulk action bar muncul saat ada item terpilih.</li>
-          <li>Context menu terbuka via klik kanan atau tombol Menu/Shift+F10 pada baris item yang fokus.</li>
-          <li>Grid memakai listbox dengan posisi item (aria-posinset) terbaca screen reader.</li>
-          <li>Di mobile, sidebar menjadi drawer dan panel konteks menjadi sheet; tidak ada fungsi inti yang hilang.</li>
-          <li>Panel konteks berisi upload queue, quota (total/terpakai/sisa + pesan teks, bukan hanya warna), dan detail item terpilih.</li>
-          <li>Preview M-001 terbuka via Enter pada baris item atau menu Buka/Pratinjau; fokus terjebak di dalamnya, Esc menutup, fokus kembali ke baris pemicu.</li>
-          <li>PDF dirender dengan sandbox tanpa script ditambah tombol unduh; tipe tak didukung jatuh ke fallback generik.</li>
-          <li>Dialog kelola M-002 (rename/folder baru) memvalidasi nama kosong/duplikat dengan pesan inline; M-003 meminta konfirmasi hapus atau pilihan folder tujuan move — Batal menutup tanpa efek, seleksi dibersihkan setelah aksi.</li>
-          <li>Tab order: toolbar → sidebar → konten → panel konteks → bulk bar (saat muncul) → modal; seleksi massal via Shift/Ctrl-klik dan Shift+Panah; header sortir mengekspos aria-sort.</li>
-          <li>Transisi view dan progress dihormati via prefers-reduced-motion (motion-reduce); semua state memakai token semantik sehingga light/dark parity terjaga.</li>
-        </ul>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {accessibilityGroups.map((group) => (
+            <div key={group.title} className="space-y-2">
+              <h3 className="text-xl font-bold font-display text-foreground">{group.title}</h3>
+              <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                {group.notes.map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );

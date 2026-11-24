@@ -45,6 +45,7 @@ const RULES: Rule[] = [
     id: 'manual-section-heading',
     pattern: /<h2 className="text-2xl font-bold/,
     hint: 'Heading section ditulis lewat <SectionHeading />, bukan class manual.',
+    root: DOCS,
   },
   {
     id: 'manual-heading-with-icon',

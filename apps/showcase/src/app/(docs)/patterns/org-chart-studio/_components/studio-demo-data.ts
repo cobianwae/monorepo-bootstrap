@@ -1,8 +1,8 @@
 import type { OrgStudioNodeFlat } from '@ds/ui';
 
-// Dataset awal demo: 6 node, 3 tingkat, 3 departemen (ringan untuk langkah 1–6).
+// Seed dataset: 6 nodes, 3 levels, 3 departments (light enough for the guided steps).
 export const studioSeedData: OrgStudioNodeFlat[] = [
-  { id: 'ceo', parentId: null, title: 'Ratna Wijaya', subtitle: 'Chief Executive Officer', badge: 'Direksi', accent: 'primary' },
+  { id: 'ceo', parentId: null, title: 'Ratna Wijaya', subtitle: 'Chief Executive Officer', badge: 'Executive', accent: 'primary' },
   { id: 'eng-head', parentId: 'ceo', title: 'Bima Prasetyo', subtitle: 'VP Engineering', badge: 'Engineering', accent: 'info' },
   { id: 'eng-fe', parentId: 'eng-head', title: 'Sari Dewi', subtitle: 'Engineering Manager Frontend', badge: 'Engineering', accent: 'info' },
   { id: 'eng-be', parentId: 'eng-head', title: 'Andi Kurniawan', subtitle: 'Engineering Manager Backend', badge: 'Engineering', accent: 'info' },
@@ -16,8 +16,8 @@ interface ExampleSpec {
   subtitle: string;
 }
 
-// Contoh 40 orang / 4 tingkat / 4 departemen (FR-018): 1 root + 3 VP +
-// 9 manajer (3 per VP) + 27 staf (3 per manajer). Deterministik untuk demo.
+// 40 people / 4 levels / 4 departments: 1 root + 3 VPs + 9 managers (3 per VP)
+// + 27 staff (3 per manager). Deterministic for the demo.
 const EXAMPLE_MANAGERS: Array<{ vp: ExampleSpec; vpBadge: string; managers: Array<ExampleSpec & { staff: ExampleSpec[] }> }> = [
   {
     vp: { id: 'eng-head', title: 'Bima Prasetyo', subtitle: 'VP Engineering' },
@@ -115,7 +115,7 @@ const EXAMPLE_ACCENTS = ['primary', 'info', 'success', 'warning'] as const;
 
 export function buildStudioExample40(): OrgStudioNodeFlat[] {
   const nodes: OrgStudioNodeFlat[] = [
-    { id: 'ceo', parentId: null, title: 'Ratna Wijaya', subtitle: 'Chief Executive Officer', badge: 'Direksi', accent: 'primary' },
+    { id: 'ceo', parentId: null, title: 'Ratna Wijaya', subtitle: 'Chief Executive Officer', badge: 'Executive', accent: 'primary' },
   ];
   for (const group of EXAMPLE_MANAGERS) {
     nodes.push({ ...group.vp, parentId: 'ceo', badge: group.vpBadge, accent: 'info' });
@@ -126,61 +126,63 @@ export function buildStudioExample40(): OrgStudioNodeFlat[] {
       }
     }
   }
-  // Aksen strip per departemen agar audit kontras §7 teramati di contoh penuh.
+  // Vary the accent strip so contrast is observable across the full example.
   return nodes.map((node, index) => ({
     ...node,
     accent: node.parentId === null ? 'primary' : EXAMPLE_ACCENTS[(index % (EXAMPLE_ACCENTS.length - 1)) + 1] ?? 'info',
   }));
 }
 
-export type StudioInvalidKind = 'duplikat' | 'parent-hilang' | 'siklus';
+export type StudioInvalidKind = 'duplicate' | 'missing-parent' | 'cycle';
 
-// Dataset invalid untuk demo state error terstruktur (penyebab + id + salin).
+// Invalid datasets for the structured error state (cause + id + copy).
 export function buildStudioInvalid(kind: StudioInvalidKind): OrgStudioNodeFlat[] {
-  if (kind === 'duplikat') {
+  if (kind === 'duplicate') {
     return [
       { id: 'ceo', parentId: null, title: 'Ratna Wijaya', subtitle: 'Chief Executive Officer' },
       { id: 'eng-head', parentId: 'ceo', title: 'Bima Prasetyo', subtitle: 'VP Engineering' },
-      { id: 'eng-head', parentId: 'ceo', title: 'Ganda', subtitle: 'ID sama' },
+      { id: 'eng-head', parentId: 'ceo', title: 'Duplicate', subtitle: 'Same ID' },
     ];
   }
-  if (kind === 'parent-hilang') {
+  if (kind === 'missing-parent') {
     return [
       { id: 'ceo', parentId: null, title: 'Ratna Wijaya', subtitle: 'Chief Executive Officer' },
-      { id: 'orphan-1', parentId: 'tidak-ada', title: 'Yatim', subtitle: 'Parent hilang' },
+      { id: 'orphan-1', parentId: 'does-not-exist', title: 'Orphan', subtitle: 'Missing parent' },
     ];
   }
   return [
     { id: 'ceo', parentId: null, title: 'Ratna Wijaya', subtitle: 'Chief Executive Officer' },
-    { id: 'a-1', parentId: 'b-1', title: 'Node A', subtitle: 'Siklus via B' },
-    { id: 'b-1', parentId: 'a-1', title: 'Node B', subtitle: 'Siklus via A' },
+    { id: 'a-1', parentId: 'b-1', title: 'Node A', subtitle: 'Cycle via B' },
+    { id: 'b-1', parentId: 'a-1', title: 'Node B', subtitle: 'Cycle via A' },
   ];
 }
 
-// Kotak resep integrasi 15 baris: fetch → data, onChange → POST (FR-014).
-export const STUDIO_RECIPE_LINES: string[] = [
-  '// Resep konsumen: fetch → data, onChange → POST',
-  'const [data, setData] = useState<OrgStudioNodeFlat[]>([]);',
-  'useEffect(() => {',
-  '  fetch(`/api/org`).then((r) => r.json()).then(setData);',
-  '}, []);',
-  'async function handleChange(next: OrgStudioNodeFlat[]) {',
-  '  setData(next); // optimistis, sekali per commit',
-  '  await fetch(`/api/org`, {',
-  '    method: `POST`, headers: { `content-type`: `application/json` },',
-  '    body: JSON.stringify(next),',
-  '  });',
-  '}',
-  '<OrgChartStudio data={data} onChange={handleChange} />',
-  '// Cari milik konsumen: highlightedIds + getAncestors.',
-  '// Undo/redo + toast Urungkan sudah di dalam komponen.',
-];
+// Integration recipe shown in the CodeBlock: fetch -> data, onChange -> POST.
+export const STUDIO_RECIPE = `// Consumer recipe: fetch -> data, onChange -> POST
+const [data, setData] = useState<OrgStudioNodeFlat[]>([]);
+
+useEffect(() => {
+  fetch('/api/org').then((r) => r.json()).then(setData);
+}, []);
+
+async function handleChange(next: OrgStudioNodeFlat[]) {
+  setData(next); // optimistic, once per commit
+  await fetch('/api/org', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(next),
+  });
+}
+
+<OrgChartStudio data={data} onChange={handleChange} />
+// Search is yours: compute highlightedIds from your own query.
+// Undo/redo and the "Undo" toast are built in.`;
 
 export const STUDIO_STEPS: Array<{ title: string; detail: string }> = [
-  { title: 'Buka kanvas', detail: 'Struktur rapi langsung terbaca: root di atas, anak menyebar seimbang. Panel detail tidak terbuka sendiri.' },
-  { title: 'Tambah bawahan inline', detail: 'Klik kartu CEO (terpilih, gagang + muncul menetap) → klik + bawah (tooltip “Tambah bawahan”) → ketik nama → Enter simpan (Esc batal). Kanvas otomatis memusatkan ke kartu baru. Gagang + samping = tambah sejawat. Tanpa buka form.' },
-  { title: 'Pindah node', detail: 'Seret kartu ke tim lain (garis hijau + preview path) atau dialog M-007 via panel — setara keyboard.' },
-  { title: 'Hapus + Urungkan', detail: 'Delete membuka M-008 (sebut N turunan, root diproteksi) → konfirmasi → toast “Dihapus — Urungkan”.' },
-  { title: 'Cari orang', detail: 'Ketik nama/jabatan di pencarian → sorot ring + badge Cocok + path ancestor terbuka + live region jumlah.' },
-  { title: 'Reset demo', detail: 'Tombol Reset demo mengembalikan dataset awal 6 node, membersihkan pencarian, dan menutup error eksternal.' },
+  { title: 'Read the chart', detail: 'The root sits on top and children spread evenly below. No panel opens until you ask for one.' },
+  { title: 'Add a report inline', detail: 'Click the CEO card, then the + below it ("Add report"), type a name and press Enter (Esc cancels). The canvas centres on the new card. The side + adds a peer.' },
+  { title: 'Move a person', detail: 'Drag a card onto another team (a green line previews the new path), or use the Move dialog from the detail panel. Both work from the keyboard.' },
+  { title: 'Delete and undo', detail: 'Press Delete to open a confirmation that states how many reports go with it (the root is protected). Confirm, then use Undo in the toast.' },
+  { title: 'Find someone', detail: 'Type a name, title or department. Matches get a ring and a "Match" badge, their ancestors expand, and the count is announced.' },
+  { title: 'Start over', detail: 'Reset demo restores the 6-person seed, clears search and dismisses the external error.' },
 ];

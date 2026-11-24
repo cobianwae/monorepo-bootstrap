@@ -8,6 +8,19 @@ const __dirname = path.dirname(__filename);
 const nextConfig = {
   outputFileTracingRoot: path.join(__dirname, '../../'),
   transpilePackages: ['@ds/ui', '@ds/tokens', '@shared/types'],
+  experimental: {
+    // Dev-compile lambat: tiap page menarik ~4800 modul karena barrel
+    // @ds/ui + lucide-react di-compile utuh per route (terukur 70–80 dtk).
+    // Ini membatasi import ke subpath yang benar-benar dipakai.
+    optimizePackageImports: [
+      'lucide-react',
+      '@ds/ui',
+      '@ds/tokens',
+      'date-fns',
+      '@tanstack/react-table',
+      '@tanstack/react-virtual',
+    ],
+  },
   async redirects() {
     return [
       {

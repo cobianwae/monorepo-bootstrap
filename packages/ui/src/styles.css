@@ -185,3 +185,17 @@
   --xy-edge-label-background-color: var(--card);
   --xy-edge-label-color: var(--foreground);
 }
+
+/* CodeBlock syntax highlight (CR-070): warna token dari variabel Shiki per mode.
+ * Background dikosongkan; permukaan mengikuti `bg-card` dari wrapper. */
+.ds-code-block pre {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+}
+.ds-code-block .shiki span {
+  color: var(--shiki-light);
+}
+.dark .ds-code-block .shiki span {
+  color: var(--shiki-dark);
+}

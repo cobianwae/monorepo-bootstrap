@@ -1,5 +1,9 @@
 'use client';
 
+// Pengecualian diagnostik CR-063/W06: route nonproduksi untuk membandingkan spesimen display
+// 6.5rem vs kontrol h3. Nilai text-[6.5rem] sengaja di luar TYPOGRAPHY_SCALE dan bukan pola
+// untuk halaman docs/produksi; guard px tidak memblokirnya. Jangan hapus tanpa approval.
+
 export default function ScratchPage() {
   return (
     <div className="p-8 space-y-4 bg-background">

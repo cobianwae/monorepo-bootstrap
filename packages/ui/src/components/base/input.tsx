@@ -10,6 +10,8 @@ export interface InputProps
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, error, startAdornment, endAdornment, ...props }, ref) => {
+    const ariaInvalid = props['aria-invalid'] ?? (error ? true : undefined);
+
     if (startAdornment || endAdornment) {
       return (
         <div
@@ -29,6 +31,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             className="flex-1 bg-transparent text-sm placeholder:text-muted-foreground focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             ref={ref}
             {...props}
+            aria-invalid={ariaInvalid}
           />
           {endAdornment && (
             <span className="ml-2 flex items-center text-muted-foreground [&_svg]:size-4">
@@ -49,6 +52,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         )}
         ref={ref}
         {...props}
+        aria-invalid={ariaInvalid}
       />
     );
   }

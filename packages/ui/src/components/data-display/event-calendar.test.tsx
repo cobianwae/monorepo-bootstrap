@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { addMonths } from 'date-fns';
 import { enUS as en, id } from 'date-fns/locale';
@@ -404,6 +404,7 @@ describe('EventCalendar overlap columns', () => {
 });
 
 describe('EventCalendar event detail M-006', () => {
+  afterEach(() => vi.restoreAllMocks());
   const DETAIL_EVENTS: CalendarEvent[] = [
     {
       id: 'review',
@@ -415,6 +416,105 @@ describe('EventCalendar event detail M-006', () => {
       description: 'Review komponen calendar.',
     },
   ];
+
+  it.each(['month', 'week', 'day', 'agenda'] as const)(
+    'CR-013: %s opens anchored detail once and Escape restores the source button',
+    async (defaultView) => {
+      const onSelectEvent = vi.fn();
+      const { container } = render(
+        <EventCalendar events={DETAIL_EVENTS} defaultDate={CONTEXT_DATE} defaultView={defaultView} onSelectEvent={onSelectEvent} />
+      );
+      const chip = defaultView === 'agenda'
+        ? screen.getByText('Design Review').closest('button')!
+        : within(container).getByRole('button', { name: /Design Review/ });
+      vi.spyOn(chip, 'getBoundingClientRect').mockReturnValue({
+        x: 120, y: 160, top: 160, left: 120, right: 180, bottom: 184,
+        width: 60, height: 24, toJSON: () => ({}),
+      });
+      chip.focus();
+      fireEvent.click(chip);
+      const detail = await screen.findByRole('dialog', { name: /Event detail: Design Review/ });
+      expect(detail.getAttribute('data-side')).not.toBeNull();
+      expect(onSelectEvent).toHaveBeenCalledExactlyOnceWith(DETAIL_EVENTS[0]);
+      fireEvent.keyDown(detail, { key: 'Escape', code: 'Escape' });
+      await waitFor(() => expect(document.activeElement).toBe(chip));
+    }
+  );
+
+  it('CR-013: mobile keeps the sheet and returns focus on Escape', async () => {
+    const matchMedia = window.matchMedia;
+    vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
+      ...matchMedia(query), matches: true,
+    }));
+    render(<EventCalendar events={DETAIL_EVENTS} defaultDate={CONTEXT_DATE} defaultView="agenda" />);
+    const chip = screen.getByText('Design Review').closest('button')!;
+    fireEvent.click(chip);
+    const detail = await screen.findByRole('dialog', { name: 'Event detail' });
+    expect(detail.className).toContain('bottom-0');
+    fireEvent.keyDown(detail, { key: 'Escape', code: 'Escape' });
+    await waitFor(() => expect(document.activeElement).toBe(chip));
+  });
+
+  it('CR-013: overflow detail anchors to the mounted +n trigger, not the removed item', async () => {
+    const onSelectEvent = vi.fn();
+    render(<EventCalendar events={EVENTS} defaultDate={CONTEXT_DATE} onSelectEvent={onSelectEvent} />);
+    const trigger = screen.getByRole('button', { name: /more events on/ });
+    const measure = vi.spyOn(trigger, 'getBoundingClientRect').mockReturnValue({
+      x: 120, y: 160, top: 160, left: 120, right: 180, bottom: 184,
+      width: 60, height: 24, toJSON: () => ({}),
+    });
+    fireEvent.click(trigger);
+    const item = screen.getByRole('button', { name: /Panel Talk/ });
+    fireEvent.click(item);
+    const detail = await screen.findByRole('dialog', { name: /Event detail: Panel Talk/ });
+    expect(item.isConnected).toBe(false);
+    expect(trigger.isConnected).toBe(true);
+    expect(measure).toHaveBeenCalled();
+    expect(detail.getAttribute('data-side')).not.toBeNull();
+    expect(onSelectEvent).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(detail.contains(document.activeElement)).toBe(true));
+    fireEvent.keyDown(detail, { key: 'Escape', code: 'Escape' });
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
+  });
+
+  it('CR-013: unmeasurable anchors use a centered dialog instead of an unanchored popover', async () => {
+    const { container } = render(<EventCalendar events={DETAIL_EVENTS} defaultDate={CONTEXT_DATE} />);
+    const chip = within(cellFor(container, '2026-11-21')!).getByRole('button', { name: /Design Review/ });
+    vi.spyOn(chip, 'getBoundingClientRect').mockReturnValue({
+      x: 0, y: 0, top: 0, left: 0, right: 0, bottom: 0,
+      width: 0, height: 0, toJSON: () => ({}),
+    });
+    fireEvent.click(chip);
+    const detail = await screen.findByRole('dialog', { name: /Event detail: Design Review/ });
+    expect(detail.getAttribute('data-side')).toBeNull();
+    expect(detail.className).toContain('fixed');
+    expect(document.querySelector('[data-radix-popper-content-wrapper]')).toBeNull();
+    fireEvent.keyDown(detail, { key: 'Escape', code: 'Escape' });
+    await waitFor(() => expect(document.activeElement).toBe(chip));
+  });
+
+  it('CR-013: detached agenda anchor falls back to a dialog and returns focus to the calendar', async () => {
+    const { container, rerender } = render(
+      <EventCalendar events={DETAIL_EVENTS} defaultDate={CONTEXT_DATE} defaultView="agenda" />
+    );
+    const chip = screen.getByText('Design Review').closest('button')!;
+    vi.spyOn(chip, 'getBoundingClientRect').mockReturnValue({
+      x: 120, y: 160, top: 160, left: 120, right: 180, bottom: 184,
+      width: 60, height: 24, toJSON: () => ({}),
+    });
+    fireEvent.click(chip);
+    const popover = await screen.findByRole('dialog', { name: /Event detail: Design Review/ });
+    expect(popover.getAttribute('data-side')).not.toBeNull();
+    rerender(<EventCalendar events={[]} defaultDate={CONTEXT_DATE} defaultView="agenda" />);
+    await waitFor(() => {
+      const detail = screen.getByRole('dialog', { name: /Event detail: Design Review/ });
+      expect(detail.getAttribute('data-side')).toBeNull();
+      expect(chip.isConnected).toBe(false);
+    });
+    await waitFor(() => expect(screen.getByRole('dialog').contains(document.activeElement)).toBe(true));
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape', code: 'Escape' });
+    await waitFor(() => expect(document.activeElement).toBe(container.querySelector('section')));
+  });
 
   it('AC-03: klik event memanggil onSelectEvent dan membuka detail lengkap', async () => {
     const onSelectEvent = vi.fn();
@@ -630,7 +730,7 @@ describe('EventCalendar agenda', () => {
     expect((onSelectEvent.mock.calls[0][0] as CalendarEvent).id).toBe('keynote');
   });
 
-  it('AC-04: agenda periode tanpa event menampilkan pesan kosong', () => {
+  it('AC-04: agenda periode tanpa event menampilkan empty-state role status + CTA', () => {
     render(
       <EventCalendar
         events={[]}
@@ -638,7 +738,9 @@ describe('EventCalendar agenda', () => {
         defaultView="agenda"
       />
     );
-    expect(screen.getByText('Tidak ada event pada periode ini.')).toBeDefined();
+    expect(screen.getByRole('status')).toBeDefined();
+    expect(screen.getByText('Tidak ada event di periode ini')).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Buat event' })).toBeDefined();
   });
 });
 
@@ -649,8 +751,23 @@ describe('EventCalendar state matrix', () => {
     );
     const grid = screen.getByRole('grid');
     expect(grid.getAttribute('aria-busy')).toBe('true');
+    expect(grid.getAttribute('data-skeleton-view')).toBe('month');
     expect(screen.getByText('Memuat event…')).toBeDefined();
     expect(screen.getByLabelText('Previous period').getAttribute('disabled')).toBeDefined();
+  });
+
+  it('AC-01: loading menampilkan skeleton sesuai view (week/day/agenda)', () => {
+    const { unmount } = render(
+      <EventCalendar events={[]} defaultDate={CONTEXT_DATE} defaultView="week" loading />
+    );
+    expect(screen.getByRole('grid').getAttribute('data-skeleton-view')).toBe('week');
+    expect(screen.getByText('Memuat event…')).toBeDefined();
+    unmount();
+    render(
+      <EventCalendar events={[]} defaultDate={CONTEXT_DATE} defaultView="day" loading />
+    );
+    expect(screen.getByRole('grid').getAttribute('data-skeleton-view')).toBe('day');
+    expect(screen.getByText('Memuat event…')).toBeDefined();
   });
 
   it('AC-01: error menampilkan alert role alert + pesan + tombol Coba lagi', () => {

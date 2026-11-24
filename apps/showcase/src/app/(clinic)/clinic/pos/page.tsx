@@ -141,6 +141,7 @@ export default function PosPage() {
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
+                aria-label="Search products"
                 placeholder="Search products, SKU..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -364,7 +365,7 @@ export default function PosPage() {
 
               <div className="flex justify-between font-display font-bold text-base text-foreground pt-2 border-t border-border/40">
                 <span>Grand Total</span>
-                <span className="text-primary font-mono text-lg">Rp {grandTotal.toLocaleString()}</span>
+                <span className="text-foreground font-mono text-lg">Rp {grandTotal.toLocaleString()}</span>
               </div>
             </div>
 

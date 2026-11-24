@@ -308,6 +308,7 @@ export default function MasterDataPage() {
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
+                aria-label="Search master data"
                 placeholder="Search master data code, name..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -481,7 +482,7 @@ export default function MasterDataPage() {
                 filteredItems.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>
-                      <span className="font-mono font-semibold text-xs text-primary bg-primary/10 px-2 py-1 rounded">
+                      <span className="font-mono font-semibold text-xs text-foreground bg-highlight/10 px-2 py-1 rounded">
                         {item.code}
                       </span>
                     </TableCell>

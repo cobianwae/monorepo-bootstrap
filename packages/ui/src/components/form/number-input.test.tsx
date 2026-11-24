@@ -8,6 +8,14 @@ describe('NumberInput component', () => {
     expect(screen.getByLabelText('Quantity')).toBeDefined();
   });
 
+  it('associates label with input via htmlFor and id', () => {
+    render(<NumberInput label="Headcount" />);
+    const input = screen.getByRole('textbox', { name: 'Headcount' });
+    const label = screen.getByText('Headcount');
+    expect(label.getAttribute('for')).toBe(input.id);
+    expect(input.id).not.toBe('');
+  });
+
   it('displays the current value', () => {
     render(<NumberInput value={5} aria-label="Quantity" />);
     expect((screen.getByLabelText('Quantity') as HTMLInputElement).value).toBe('5');

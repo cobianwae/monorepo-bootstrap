@@ -238,7 +238,7 @@ export default function PatientRegistrationPage() {
       />
 
       {/* Stepper Navigation Indicator */}
-      <Card className="p-4 bg-card border-border shadow-xs">
+      <Card className="max-w-full overflow-x-auto p-4 bg-card border-border shadow-xs">
         <Stepper
           steps={STEPS}
           currentStep={currentStep}
@@ -395,7 +395,7 @@ export default function PatientRegistrationPage() {
                   <span className="text-xs font-mono uppercase text-muted-foreground block">
                     Computed Baseline BMI
                   </span>
-                  <span className="font-display font-bold text-2xl text-primary">
+                  <span className="font-display font-bold text-2xl text-foreground">
                     {computedBmi > 0 ? computedBmi : '—'}
                   </span>
                 </div>
@@ -444,18 +444,17 @@ export default function PatientRegistrationPage() {
                   {AVAILABLE_COMORBIDITIES.map((cond) => {
                     const isChecked = selectedConditions.includes(cond);
                     return (
-                      <div
+                      <label
                         key={cond}
-                        onClick={() => toggleCondition(cond)}
                         className={`flex items-center gap-2.5 p-3 rounded-lg border text-xs cursor-pointer transition-all ${
                           isChecked
                             ? 'bg-highlight/5 border-highlight text-foreground font-medium'
                             : 'bg-card border-border text-muted-foreground hover:bg-muted/40'
                         }`}
                       >
-                        <Checkbox checked={isChecked} />
+                        <Checkbox checked={isChecked} onCheckedChange={() => toggleCondition(cond)} />
                         <span>{cond}</span>
-                      </div>
+                      </label>
                     );
                   })}
                 </div>
@@ -485,7 +484,16 @@ export default function PatientRegistrationPage() {
                   return (
                     <div
                       key={prog.id}
+                      role="button"
+                      tabIndex={0}
+                      aria-pressed={isSelected}
                       onClick={() => setSelectedProgram(prog.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedProgram(prog.id);
+                        }
+                      }}
                       className={`p-3.5 rounded-xl border text-xs cursor-pointer transition-all flex flex-col justify-between gap-2 ${
                         isSelected
                           ? 'bg-highlight/10 border-highlight ring-1 ring-highlight/40'

@@ -6,7 +6,7 @@ import { X, Sparkles, ArrowRight } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 export const bannerVariants = cva(
-  'relative z-banner flex items-center justify-between px-4 py-2.5 text-xs sm:text-sm font-medium transition-all',
+  'relative z-banner flex items-center justify-between gap-2 px-4 py-2.5 text-xs sm:text-sm font-medium transition-all',
   {
     variants: {
       variant: {
@@ -82,26 +82,28 @@ export const Banner = React.forwardRef<HTMLDivElement, BannerProps>(
         aria-label="Announcement"
         {...props}
       >
-        <div className="mx-auto flex flex-1 items-center justify-center gap-2 sm:gap-3 text-center pr-6">
+        <div className="mx-auto flex min-w-0 flex-1 items-center justify-center gap-2 sm:gap-3 text-center">
           {Icon && <Icon className="h-4 w-4 shrink-0 text-highlight" />}
-          <span className="truncate">{children}</span>
-          {(actionText || actionHref) && (
-            <a
-              href={actionHref}
-              onClick={onActionClick}
-              className="inline-flex items-center gap-1 font-semibold underline underline-offset-2 hover:opacity-80 shrink-0 cursor-pointer"
-            >
-              <span>{actionText || 'Learn more'}</span>
-              <ArrowRight className="h-3 w-3" />
-            </a>
-          )}
+          <div className="flex min-w-0 flex-wrap items-center justify-center gap-x-2 gap-y-2 sm:gap-x-3">
+            <span className="min-w-0 max-w-full [overflow-wrap:anywhere]">{children}</span>
+            {(actionText || actionHref) && (
+              <a
+                href={actionHref}
+                onClick={onActionClick}
+                className="inline-flex min-w-0 max-w-full items-center gap-1 rounded-sm font-semibold underline underline-offset-2 hover:opacity-80 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <span className="min-w-0 [overflow-wrap:anywhere]">{actionText || 'Learn more'}</span>
+                <ArrowRight className="h-3 w-3 shrink-0" />
+              </a>
+            )}
+          </div>
         </div>
 
         {dismissible && (
           <button
             type="button"
             onClick={handleDismiss}
-            className="rounded-sm p-1 text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-sm p-1 text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             aria-label="Dismiss banner"
           >
             <X className="h-4 w-4" />

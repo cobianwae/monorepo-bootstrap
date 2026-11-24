@@ -21,6 +21,7 @@ Backend dan frontend konsumen melengkapi, bukan mendikte, arah design system.
 | Area | Teknologi |
 |---|---|
 | Design system | Tailwind CSS v4, Radix UI primitives, `class-variance-authority` |
+| Syntax highlight | Shiki 4.6.0 (`shiki/bundle/web`, dual-theme light/dark) di `packages/ui` |
 | Token | OKLCH, CSS variables, `@theme`, WCAG 2.1 AA/AAA |
 | Showcase | Next.js 15+ App Router, TypeScript |
 | Consumer frontend | Next.js 15+ App Router, TypeScript |

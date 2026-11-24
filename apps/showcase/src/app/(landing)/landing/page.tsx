@@ -175,6 +175,10 @@ export default function LandingPage() {
               </div>
 
               {/* CSS-first — snippet from real token values */}
+              {/* Pengecualian teronalisasi CR-063/W05: panel cuplikan kode fixed-dark.
+                Latar zinc-950/tinta zinc-50-400 + aksen sintaks pink/blue/amber sengaja tidak memakai
+                token semantik agar contoh @theme terbaca identik di light & dark. Kontras pasangan
+                diperiksa manual (tinta terang di atas zinc-950); bukan pola untuk panel umum. */}
               <div className="relative flex flex-col overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950 p-8 text-zinc-50 md:col-span-12 lg:col-span-7">
                 <GridPattern fade="top" className="opacity-10" />
                 <div className="relative z-10 flex h-full flex-col justify-between">

@@ -94,7 +94,7 @@ const PEOPLE: Person[] = [
     name: 'Maya Anindya',
     handle: 'maya.a',
     initials: 'MA',
-    avatarClass: 'bg-primary/15 text-primary ring-1 ring-primary/20',
+    avatarClass: 'bg-highlight/10 text-foreground ring-1 ring-highlight/20',
     role: 'Design Lead',
   },
   {

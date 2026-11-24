@@ -5,8 +5,21 @@
  * Semua warna dari token semantik; tanpa hex hardcode.
  */
 
-.driver-overlay {
-  background-color: color-mix(in oklch, var(--background) 80%, transparent);
+/*
+ * Backdrop diatur satu kali lewat `overlayColor` + `overlayOpacity` (tour.tsx).
+ * Jangan menambah background pada `.driver-overlay` (SVG): itu menumpuk redup ganda (CR-017).
+ */
+
+/* driver.js meletakkan overlay/popover di body, atau di lapisan khusus saat target di dialog. */
+body[data-tour-confirm='true'] .driver-layer,
+body[data-tour-confirm='true'] > .driver-overlay,
+body[data-tour-confirm='true'] > .ds-tour-popover {
+  display: none;
+}
+
+/* Driver menonaktifkan pointer di luar popover, termasuk tombol konfirmasi Radix. */
+body[data-tour-confirm='true'] [data-tour-confirm-dialog] button:not(:disabled) {
+  pointer-events: auto;
 }
 
 .driver-active-element {
@@ -23,6 +36,23 @@
   max-width: 320px;
 }
 
+/* §2.5 varian popover compact: lebar maks 260px untuk target padat. */
+.ds-tour-popover-compact.driver-popover {
+  max-width: 260px;
+}
+
+/* §5 responsif <md: popover full-width bawah (bottom-sheet), footer stacked. */
+@media (max-width: 767px) {
+  .ds-tour-popover.driver-popover {
+    max-width: calc(100vw - 32px);
+  }
+  .ds-tour-popover .driver-popover-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
 .ds-tour-popover .driver-popover-title {
   color: var(--foreground);
 }
@@ -37,6 +67,13 @@
 
 .ds-tour-popover .driver-popover-footer button {
   min-height: 44px;
+}
+
+/* Fokus keyboard tombol popover harus terlihat (§4/§6, CR-017). */
+.ds-tour-popover .driver-popover-footer button:focus-visible,
+.ds-tour-popover .driver-popover-close-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .ds-tour-popover .driver-popover-footer button.driver-popover-next-btn {

@@ -181,7 +181,14 @@ export default function NotificationCenterPage() {
             <div className="min-w-0 flex-1 space-y-0.5">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-sm font-medium text-foreground">{n.title}</span>
-                {!n.read && <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />}
+                {n.read ? (
+                  <span className="sr-only">Read</span>
+                ) : (
+                  <>
+                    <span className="sr-only">Unread</span>
+                    <span aria-hidden="true" className="h-2 w-2 shrink-0 rounded-full bg-primary" />
+                  </>
+                )}
               </div>
               <p className="text-xs text-muted-foreground">{n.description}</p>
               <div className="flex items-center gap-2 pt-0.5">
@@ -206,12 +213,12 @@ export default function NotificationCenterPage() {
         description="An inbox for system, billing, security, and team notifications — with unread indicators, bulk actions, per-type tabs, digest preferences, and an activity timeline."
       />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-3">
+        <div className="min-w-0 space-y-6 lg:col-span-2">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0">
-              <div>
-                <CardTitle className="flex items-center gap-2 text-base">
+            <CardHeader className="flex min-w-0 flex-row flex-wrap items-center justify-between gap-3 space-y-0">
+              <div className="min-w-0">
+                <CardTitle className="flex flex-wrap items-center gap-2 text-base">
                   <Bell className="h-4 w-4 text-highlight" />
                   Inbox
                   {unread > 0 && (
@@ -224,7 +231,7 @@ export default function NotificationCenterPage() {
                   Click an item to toggle read state.
                 </CardDescription>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex shrink-0 flex-wrap items-center gap-1.5">
                 <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-xs" onClick={markAllRead}>
                   <CheckCheck className="h-3.5 w-3.5" />
                   Mark all read

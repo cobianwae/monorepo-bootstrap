@@ -21,6 +21,16 @@ describe('Form Primitives', () => {
       expect(container.querySelector('input')).toBeDefined();
     });
 
+    it('sets aria-invalid when error is true (C05)', () => {
+      render(<Input error aria-label="invalid-field" />);
+      expect(screen.getByLabelText('invalid-field').getAttribute('aria-invalid')).toBe('true');
+    });
+
+    it('respects an explicit aria-invalid over the error flag', () => {
+      render(<Input error aria-invalid={false} aria-label="forced-valid" />);
+      expect(screen.getByLabelText('forced-valid').getAttribute('aria-invalid')).toBe('false');
+    });
+
     it('renders start and end adornments', () => {
       render(
         <Input
@@ -46,6 +56,11 @@ describe('Form Primitives', () => {
     it('renders and forwards value', () => {
       render(<Textarea aria-label="notes" defaultValue="hello" />);
       expect((screen.getByLabelText('notes') as HTMLTextAreaElement).value).toBe('hello');
+    });
+
+    it('sets aria-invalid when error is true (C05)', () => {
+      render(<Textarea error aria-label="invalid-notes" />);
+      expect(screen.getByLabelText('invalid-notes').getAttribute('aria-invalid')).toBe('true');
     });
   });
 

@@ -89,11 +89,28 @@ describe('TreeSelect', () => {
   it('filters nodes by label', () => {
     render(<TreeSelect options={OPTIONS} onChange={() => undefined} />);
     openPopover();
-
     fireEvent.change(screen.getByPlaceholderText('Search...'), {
       target: { value: 'lap' },
     });
     expect(screen.getByText('Laptop')).toBeDefined();
     expect(screen.queryByText('Pakaian')).toBeNull();
+  });
+
+  // C13: empty string = tidak ada pilihan, placeholder tetap tampil
+  it('treats empty string value as no selection and keeps placeholder', () => {
+    render(<TreeSelect options={OPTIONS} value="" placeholder="Pilih kategori" />);
+    expect(screen.getByText('Pilih kategori')).toBeDefined();
+    expect(screen.queryByLabelText('Bersihkan pilihan')).toBeNull();
+  });
+
+  it('filters out empty strings from multiple values', () => {
+    render(
+      <TreeSelect options={OPTIONS} multiple value={['', 'android']} placeholder="Pilih kategori" />
+    );
+    const trigger = screen.getByRole('combobox');
+    expect(trigger.textContent).toContain('Android');
+    expect(trigger.textContent).not.toContain('Pilih kategori');
+    // Hanya 1 tag valid, tidak ada chip kosong
+    expect(screen.queryByLabelText('Hapus ')).toBeNull();
   });
 });

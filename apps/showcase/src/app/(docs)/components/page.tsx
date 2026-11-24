@@ -112,7 +112,7 @@ export default function ComponentsIndexPage() {
         actions={
           <>
             <Link href="/components/forms">
-              <Button variant="highlight" className="gap-2 h-10 px-5 text-sm shadow-md">
+              <Button variant="default" className="gap-2 h-10 px-5 text-sm shadow-md">
                 Start with Forms
                 <ArrowRight className="h-4 w-4" />
               </Button>

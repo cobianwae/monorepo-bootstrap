@@ -274,11 +274,12 @@ export default function DynamicFormPage() {
               <Input
                 id="project-name"
                 error={Boolean(errors.project?.name)}
+                aria-describedby={errors.project?.name ? 'err-project-name' : undefined}
                 {...form.register('project.name')}
                 placeholder="e.g. Customer 360 Platform"
               />
               {errors.project?.name && (
-                <p className="text-xs font-medium text-destructive">{errors.project.name.message}</p>
+                <p id="err-project-name" className="text-xs font-medium text-destructive">{errors.project.name.message}</p>
               )}
             </div>
             <div className="space-y-2 md:col-span-2">
@@ -286,21 +287,24 @@ export default function DynamicFormPage() {
               <Textarea
                 id="project-desc"
                 error={Boolean(errors.project?.description)}
+                aria-describedby={errors.project?.description ? 'err-project-desc' : undefined}
                 {...form.register('project.description')}
                 rows={3}
                 placeholder="What does this project deliver?"
               />
               {errors.project?.description && (
-                <p className="text-xs font-medium text-destructive">{errors.project.description.message}</p>
+                <p id="err-project-desc" className="text-xs font-medium text-destructive">{errors.project.description.message}</p>
               )}
             </div>
             <div className="md:col-span-2 space-y-2">
-              <Label>Discovery tags</Label>
               <Controller
                 control={control}
                 name="project.tags"
                 render={({ field }) => (
                   <TagInput
+                    label="Discovery tags"
+                    id="project-tags"
+                    aria-describedby={errors.project?.tags ? 'err-project-tags' : undefined}
                     value={field.value ?? []}
                     onChange={field.onChange}
                     maxTags={5}
@@ -310,7 +314,7 @@ export default function DynamicFormPage() {
                 )}
               />
               {errors.project?.tags && (
-                <p className="text-xs font-medium text-destructive">{errors.project.tags.message}</p>
+                <p id="err-project-tags" className="text-xs font-medium text-destructive">{errors.project.tags.message}</p>
               )}
             </div>
           </div>
@@ -320,12 +324,14 @@ export default function DynamicFormPage() {
         <FormSection title="Schedule & Ownership" description="Timeline and who leads the project.">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label>Kickoff date</Label>
               <Controller
                 control={control}
                 name="schedule.kickoff"
                 render={({ field }) => (
                   <DatePicker
+                    label="Kickoff date"
+                    id="schedule-kickoff"
+                    aria-describedby={errors.schedule?.kickoff ? 'err-schedule-kickoff' : undefined}
                     value={field.value}
                     onValueChange={field.onChange}
                     error={Boolean(errors.schedule?.kickoff)}
@@ -337,16 +343,18 @@ export default function DynamicFormPage() {
                 )}
               />
               {errors.schedule?.kickoff && (
-                <p className="text-xs font-medium text-destructive">{errors.schedule.kickoff.message}</p>
+                <p id="err-schedule-kickoff" className="text-xs font-medium text-destructive">{errors.schedule.kickoff.message}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label>Owner</Label>
               <Controller
                 control={control}
                 name="schedule.owner"
                 render={({ field }) => (
                   <Combobox
+                    label="Owner"
+                    id="schedule-owner"
+                    aria-describedby={errors.schedule?.owner ? 'err-schedule-owner' : undefined}
                     options={OWNER_OPTIONS}
                     value={field.value}
                     onValueChange={(v) => field.onChange(v as string)}
@@ -356,21 +364,27 @@ export default function DynamicFormPage() {
                 )}
               />
               {errors.schedule?.owner && (
-                <p className="text-xs font-medium text-destructive">{errors.schedule.owner.message}</p>
+                <p id="err-schedule-owner" className="text-xs font-medium text-destructive">{errors.schedule.owner.message}</p>
               )}
             </div>
             <div className="md:col-span-2 space-y-2">
-              <Label>Engagement window</Label>
               <Controller
                 control={control}
                 name="schedule.period"
                 render={({ field }) => (
                   <DateRangePicker
+                    label="Engagement window"
+                    id="schedule-period"
+                    aria-describedby={errors.schedule?.period ? 'err-schedule-period' : undefined}
                     value={field.value}
                     onValueChange={(r) => field.onChange(r)}
+                    error={Boolean(errors.schedule?.period)}
                   />
                 )}
               />
+              {errors.schedule?.period && (
+                <p id="err-schedule-period" className="text-xs font-medium text-destructive">{errors.schedule.period.message}</p>
+              )}
             </div>
           </div>
         </FormSection>
@@ -383,8 +397,10 @@ export default function DynamicFormPage() {
               name="audience.sectors"
               render={({ field }) => (
                 <div className="space-y-2">
-                  <Label>Sectors targeted</Label>
                   <Combobox
+                    label="Sectors targeted"
+                    id="audience-sectors"
+                    aria-describedby={errors.audience?.sectors ? 'err-audience-sectors' : undefined}
                     multiple
                     options={SECTOR_OPTIONS}
                     value={field.value}
@@ -393,7 +409,7 @@ export default function DynamicFormPage() {
                     error={Boolean(errors.audience?.sectors)}
                   />
                   {errors.audience?.sectors && (
-                    <p className="text-xs font-medium text-destructive">{errors.audience.sectors.message}</p>
+                    <p id="err-audience-sectors" className="text-xs font-medium text-destructive">{errors.audience.sectors.message}</p>
                   )}
                 </div>
               )}
@@ -409,7 +425,7 @@ export default function DynamicFormPage() {
                       Send updates to stakeholders when the project changes.
                     </p>
                   </div>
-                  <Switch checked={field.value} onCheckedChange={field.onChange} />
+                  <Switch id="audience-notify" checked={field.value} onCheckedChange={field.onChange} aria-label="Email notifications" />
                 </div>
               )}
             />
@@ -446,16 +462,21 @@ export default function DynamicFormPage() {
               name="budget.amount"
               render={({ field }) => (
                 <div className="space-y-2">
-                  <Label>Budget allocation</Label>
                   <NumberInput
+                    label="Budget allocation"
+                    id="budget-amount"
+                    aria-describedby={errors.budget?.amount ? 'err-budget-amount' : undefined}
                     value={field.value}
                     onValueChange={field.onChange}
                     min={0}
                     max={100}
                     step={5}
                     suffix="%"
-                    aria-label="Budget allocation"
+                    error={Boolean(errors.budget?.amount)}
                   />
+                  {errors.budget?.amount && (
+                    <p id="err-budget-amount" className="text-xs font-medium text-destructive">{errors.budget.amount.message}</p>
+                  )}
                 </div>
               )}
             />
@@ -464,14 +485,19 @@ export default function DynamicFormPage() {
               name="budget.headcount"
               render={({ field }) => (
                 <div className="space-y-2">
-                  <Label>Headcount</Label>
                   <NumberInput
+                    label="Headcount"
+                    id="budget-headcount"
+                    aria-describedby={errors.budget?.headcount ? 'err-budget-headcount' : undefined}
                     value={field.value}
                     onValueChange={field.onChange}
                     min={1}
                     max={50}
-                    aria-label="Headcount"
+                    error={Boolean(errors.budget?.headcount)}
                   />
+                  {errors.budget?.headcount && (
+                    <p id="err-budget-headcount" className="text-xs font-medium text-destructive">{errors.budget.headcount.message}</p>
+                  )}
                 </div>
               )}
             />
@@ -497,13 +523,15 @@ export default function DynamicFormPage() {
                 >
                   <div className="space-y-1">
                     <Input
+                      id={`member-${index}-email`}
                       placeholder={`member-${index + 1}@company.com`}
+                      aria-label={`Email for member ${index + 1}`}
+                      aria-describedby={rowError?.email ? `err-member-${index}-email` : undefined}
                       error={Boolean(rowError?.email)}
                       {...form.register(`members.${index}.email`)}
-                      aria-invalid={Boolean(rowError?.email)}
                     />
                     {rowError?.email && (
-                      <p className="text-xs font-medium text-destructive">{rowError.email.message}</p>
+                      <p id={`err-member-${index}-email`} className="text-xs font-medium text-destructive">{rowError.email.message}</p>
                     )}
                   </div>
                   <Select

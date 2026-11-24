@@ -8,6 +8,8 @@ export interface TextareaProps
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, error, ...props }, ref) => {
+    const ariaInvalid = props['aria-invalid'] ?? (error ? true : undefined);
+
     return (
       <textarea
         className={cn(
@@ -17,6 +19,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         ref={ref}
         {...props}
+        aria-invalid={ariaInvalid}
       />
     );
   }

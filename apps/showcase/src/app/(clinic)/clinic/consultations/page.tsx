@@ -212,7 +212,7 @@ export default function ConsultationsPage() {
 
       {/* Multi-Role Consultation Tabs */}
       <Tabs defaultValue="doctor" className="space-y-6">
-        <TabsList className="grid grid-cols-3 w-full h-11 bg-muted/60 p-1">
+        <TabsList className="flex h-auto min-h-11 w-full max-w-full flex-wrap gap-1 bg-muted/60 p-1 sm:grid sm:grid-cols-3">
           <TabsTrigger value="doctor" className="text-xs gap-2 font-display">
             <Stethoscope className="h-4 w-4" />
             <span>Doctor SOAP Workspace</span>
@@ -233,8 +233,8 @@ export default function ConsultationsPage() {
             {/* Left 2 Cols: Doctor SOAP Form */}
             <Card className="lg:col-span-2 p-6 bg-card border-border shadow-xs space-y-5">
               <form onSubmit={handleSaveSoap} className="space-y-4">
-                <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                  <div>
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/40 pb-3">
+                  <div className="min-w-0">
                     <h3 className="font-display font-bold text-base text-foreground">
                       Physician SOAP Clinical Assessment
                     </h3>
@@ -243,7 +243,7 @@ export default function ConsultationsPage() {
                     </p>
                   </div>
                   <Select value={docName} onValueChange={setDocName}>
-                    <SelectTrigger className="h-8 w-56 text-xs">
+                    <SelectTrigger className="h-8 w-full min-w-0 text-xs sm:w-56">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -389,8 +389,8 @@ export default function ConsultationsPage() {
             {/* Left 2 Cols: Behavioral Assessment Form */}
             <Card className="lg:col-span-2 p-6 bg-card border-border shadow-xs space-y-5">
               <form onSubmit={handleSavePsych} className="space-y-4">
-                <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                  <div>
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/40 pb-3">
+                  <div className="min-w-0">
                     <h3 className="font-display font-bold text-base text-foreground">
                       Psychological Behavioral Assessment (CBT-E)
                     </h3>
@@ -398,9 +398,9 @@ export default function ConsultationsPage() {
                       Eating disorder screening, cognitive emotional triggers, and habit reframing.
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
                     <Select value={psychName} onValueChange={setPsychName}>
-                      <SelectTrigger className="h-8 w-48 text-xs">
+                      <SelectTrigger className="h-8 w-full min-w-0 text-xs sm:w-48">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -409,7 +409,7 @@ export default function ConsultationsPage() {
                       </SelectContent>
                     </Select>
                     <Select value={screeningType} onValueChange={(v) => setScreeningType(v as ScreeningType)}>
-                      <SelectTrigger className="h-8 w-36 text-xs font-mono">
+                      <SelectTrigger className="h-8 w-full min-w-0 text-xs font-mono sm:w-36">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -591,8 +591,8 @@ export default function ConsultationsPage() {
             {/* Left 2 Cols: Nutrition & Macro Builder */}
             <Card className="lg:col-span-2 p-6 bg-card border-border shadow-xs space-y-5">
               <form onSubmit={handleSaveDiet} className="space-y-5">
-                <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                  <div>
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/40 pb-3">
+                  <div className="min-w-0">
                     <h3 className="font-display font-bold text-base text-foreground">
                       Dietician Nutrition & Macro Prescription
                     </h3>
@@ -600,9 +600,9 @@ export default function ConsultationsPage() {
                       Calculate daily energy deficit, protein density, and structured meal guidelines.
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
                     <Select value={dietName} onValueChange={setDietName}>
-                      <SelectTrigger className="h-8 w-44 text-xs">
+                      <SelectTrigger className="h-8 w-full min-w-0 text-xs sm:w-44">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -611,7 +611,7 @@ export default function ConsultationsPage() {
                       </SelectContent>
                     </Select>
                     <Select value={dietPlanType} onValueChange={(v) => setDietPlanType(v as 'High Protein Balanced' | 'Keto Metabolic' | 'Intermittent 16:8' | 'Plant-Forward GLP-1')}>
-                      <SelectTrigger className="h-8 w-48 text-xs">
+                      <SelectTrigger className="h-8 w-full min-w-0 text-xs sm:w-48">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -628,7 +628,7 @@ export default function ConsultationsPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="p-3 rounded-xl bg-highlight/5 border border-highlight/30 text-center">
                     <span className="text-xs uppercase font-mono text-muted-foreground block">Target Energy</span>
-                    <span className="font-display font-bold text-lg text-primary">{calculatedCalories} kcal</span>
+                    <span className="font-display font-bold text-lg text-foreground">{calculatedCalories} kcal</span>
                     <span className="text-xs text-success font-mono block">(-{deficitKcal} deficit)</span>
                   </div>
 
@@ -764,7 +764,7 @@ export default function ConsultationsPage() {
                       <span className="font-semibold text-foreground font-display">{plan.planType}</span>
                       <span className="font-mono text-muted-foreground">{plan.date}</span>
                     </div>
-                    <p className="font-mono font-bold text-primary text-xs">{plan.targetCalories} kcal (P:{plan.proteinGrams}g C:{plan.carbsGrams}g F:{plan.fatGrams}g)</p>
+                    <p className="font-mono font-bold text-foreground text-xs">{plan.targetCalories} kcal (P:{plan.proteinGrams}g C:{plan.carbsGrams}g F:{plan.fatGrams}g)</p>
                     <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">{plan.notes}</p>
                   </div>
                 ))}

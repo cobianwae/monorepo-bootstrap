@@ -357,10 +357,13 @@ export default function MasterDetailPage() {
 
               <ul className="max-h-[560px] divide-y divide-border overflow-y-auto">
                 {filteredTickets.length === 0 ? (
-                  <div className="flex flex-col items-center gap-2 p-8 text-center text-sm text-muted-foreground">
-                    <Inbox className="h-6 w-6" />
-                    No tickets match your search.
-                  </div>
+                  <li className="flex flex-col items-center gap-3 p-8 text-center text-sm text-muted-foreground">
+                    <Inbox className="h-6 w-6" aria-hidden="true" />
+                    <p>No tickets match &quot;{search}&quot;.</p>
+                    <Button size="sm" variant="outline" onClick={() => setSearch('')}>
+                      Clear search
+                    </Button>
+                  </li>
                 ) : (
                   filteredTickets.map((ticket) => {
                     const isSelected = ticket.id === selectedId;

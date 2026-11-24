@@ -153,11 +153,18 @@ export default function LeadsPage() {
 
   // Simulated initial load to showcase skeleton states (table + kanban)
   const [isLoading, setIsLoading] = React.useState(true);
+  const [loadError, setLoadError] = React.useState(false);
 
   React.useEffect(() => {
+    if (!isLoading) return;
     const timer = setTimeout(() => setIsLoading(false), 450);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isLoading]);
+
+  const retryLoad = () => {
+    setLoadError(false);
+    setIsLoading(true);
+  };
 
   // Sorting & Selection state for Table
   const [sortField, setSortField] = React.useState<SortField>('aiScore');
@@ -464,10 +471,19 @@ export default function LeadsPage() {
             <HoverCard>
               <HoverCardTrigger asChild>
                 <div
+                  role="button"
+                  tabIndex={0}
                   className="flex items-center gap-3 py-1 cursor-pointer group"
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedLeadId(lead.id);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedLeadId(lead.id);
+                    }
                   }}
                 >
                   <Avatar className="h-8 w-8 border border-border group-hover:border-primary transition-colors">
@@ -932,7 +948,15 @@ export default function LeadsPage() {
                   <ContextMenu key={lead.id}>
                     <ContextMenuTrigger asChild>
                       <div
+                        role="button"
+                        tabIndex={0}
                         onClick={() => setSelectedLeadId(lead.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setSelectedLeadId(lead.id);
+                          }
+                        }}
                         className="rounded-lg border border-border bg-card p-3.5 shadow-xs hover:shadow-md hover:border-foreground/30 transition-all cursor-pointer space-y-2.5 group"
                       >
                         <div className="flex items-start justify-between gap-1.5">
@@ -1029,6 +1053,17 @@ export default function LeadsPage() {
         </div>
       ) : (
         <div className="space-y-4">
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLoadError(true)}
+              disabled={isLoading}
+              className="h-8 text-xs text-muted-foreground hover:text-destructive"
+            >
+              Test error
+            </Button>
+          </div>
           <DataTable
             columns={tableColumns}
             data={paginatedLeads}
@@ -1038,6 +1073,8 @@ export default function LeadsPage() {
             onRowClick={(row) => setSelectedLeadId(row.id)}
             loading={isLoading}
             skeletonRows={5}
+            error={loadError}
+            onRetry={retryLoad}
             emptyTitle="No leads match filters"
             emptyDescription="Try clearing your search query or stage filters to view more opportunities."
           />

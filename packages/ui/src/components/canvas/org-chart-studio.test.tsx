@@ -160,11 +160,11 @@ describe('OrgChartStudio fondasi (011-01)', () => {
   it('AC-04: reset 100% memakai setViewport dan fit memakai fitView', () => {
     render(<OrgChartStudio data={flatData} />);
     // CR-014: label Indonesia; reset hanya kembalikan zoom 100% di posisi sekarang.
-    fireEvent.click(screen.getByRole('button', { name: 'Atur ulang zoom 100%' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reset zoom to 100%' }));
     expect(mockSetViewport).toHaveBeenCalledWith({ x: 0, y: 0, zoom: 1 }, { duration: 200 });
-    fireEvent.click(screen.getByRole('button', { name: 'Perbesar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
     expect(mockZoomIn).toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: 'Paskan tampilan' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Fit view' }));
     // 011-04: durasi zoom eksplisit (200 default; 0 saat reduced-motion).
     expect(mockFitView).toHaveBeenCalledWith({ padding: 0.2, duration: 200 });
   });
@@ -190,7 +190,7 @@ describe('OrgChartStudio fondasi (011-01)', () => {
       <OrgChartStudio data={flatData} defaultExpandedIds={['cto']} />,
     );
     expect(nodeIds(container)).toEqual(['ceo', 'cto', 'cfo']);
-    const toggle = screen.getByRole('button', { name: 'Perluas CTO' });
+    const toggle = screen.getByRole('button', { name: 'Expand CTO' });
     fireEvent.click(toggle);
     expect(nodeIds(container)).toEqual(['ceo', 'cto', 'cfo', 'eng']);
     fireEvent.click(screen.getByRole('button', { name: 'Collapse CTO' }));
@@ -229,7 +229,7 @@ describe('OrgChartStudio fondasi (011-01)', () => {
     const empty = render(<OrgChartStudio data={[]} onEmptyAction={onEmptyAction} />);
     expect(empty.container.querySelector('[role="status"]')).not.toBeNull();
     const button = empty.container.querySelector('button');
-    expect(button?.textContent).toBe('Buat root');
+    expect(button?.textContent).toBe('Create root');
     fireEvent.click(button as HTMLElement);
     expect(onEmptyAction).toHaveBeenCalled();
     empty.unmount();
@@ -329,7 +329,7 @@ describe('OrgChartStudio tambah 1-klik + panel detail (011-02)', () => {
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(onChangeSpy).not.toHaveBeenCalled();
     expect(input.getAttribute('aria-invalid')).toBe('true');
-    expect(container.querySelector('[role="alert"]')?.textContent).toContain('Nama tidak boleh kosong');
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain("Name can't be empty");
     expect(container.querySelector('[data-testid="org-studio-inline-input-studio-baru-1"]')).not.toBeNull();
     fireEvent.change(input, { target: { value: 'Via Blur' } });
     fireEvent.blur(input);
@@ -340,27 +340,27 @@ describe('OrgChartStudio tambah 1-klik + panel detail (011-02)', () => {
 
   it('AC-03: panel hanya terbuka via [≡]/double-click/Shift+Enter dan berisi breadcrumb, meta, dan form edit', async () => {
     const { container } = render(<ControlledStudio minimap={false} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Detail CTO' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Details for CTO' }));
     // Panel terbuka (query role/text dipengaruhi aria-hidden Radix di jsdom,
     // sehingga assertion memakai testid + textContent; state sudah ter-flush
     // oleh fireEvent/act sehingga query sinkron cukup).
     expect(screen.queryByTestId('org-studio-detail-title')).not.toBeNull();
     expect(screen.getByTestId('org-studio-detail-path').textContent).toContain('Direktur Utama / CTO');
-    expect(screen.getByTestId('org-studio-detail-meta').textContent).toContain('Atasan');
-    expect(screen.getByTestId('org-studio-detail-meta').textContent).toContain('Anak');
+    expect(screen.getByTestId('org-studio-detail-meta').textContent).toContain('Parent');
+    expect(screen.getByTestId('org-studio-detail-meta').textContent).toContain('Children');
     expect(screen.getByTestId('org-studio-detail-title')).not.toBeNull();
     expect(screen.getByTestId('org-studio-detail-subtitle')).not.toBeNull();
     expect(screen.getByTestId('org-studio-detail-badge')).not.toBeNull();
     // 011-03: tombol pindah/hapus panel aktif (M-007/M-008); root tetap diproteksi.
     expect((screen.getByTestId('org-studio-detail-move') as HTMLButtonElement).disabled).toBe(false);
     expect((screen.getByTestId('org-studio-detail-delete') as HTMLButtonElement).disabled).toBe(false);
-    fireEvent.click(screen.getByRole('button', { name: 'Tutup' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     expect(screen.queryByTestId('org-studio-detail-title')).toBeNull();
     // double-click membuka panel (query ulang: node di-render ulang)
     const ctoCardAgain = container.querySelector('[data-node-id="cto"]') as HTMLElement;
     fireEvent.doubleClick(ctoCardAgain);
     expect(screen.queryByTestId('org-studio-detail-title')).not.toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Tutup' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     // Shift+Enter membuka panel
     const ctoCardLatest = container.querySelector('[data-node-id="cto"]') as HTMLElement;
     fireEvent.keyDown(ctoCardLatest, { key: 'Enter', shiftKey: true });
@@ -370,7 +370,7 @@ describe('OrgChartStudio tambah 1-klik + panel detail (011-02)', () => {
   it('AC-03/AC-04: simpan panel commit sekali via onChange; nama kosong ditolak', () => {
     const onChangeSpy = vi.fn();
     render(<ControlledStudio onChangeSpy={onChangeSpy} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Detail CFO' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Details for CFO' }));
     const titleInput = screen.getByTestId('org-studio-detail-title') as HTMLInputElement;
     fireEvent.change(titleInput, { target: { value: '  ' } });
     fireEvent.click(screen.getByTestId('org-studio-detail-save'));
@@ -391,10 +391,10 @@ describe('OrgChartStudio tambah 1-klik + panel detail (011-02)', () => {
     const visual = handle.querySelector('span') as HTMLElement;
     expect(visual.className).toContain('h-6');
     expect(visual.className).toContain('w-6');
-    expect(screen.getByRole('button', { name: 'Tambah bawahan untuk Direktur Utama' })).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Add report for Direktur Utama' })).not.toBeNull();
   });
 
-  it('AC-04: toast "Ditambah — Urungkan" memanggil undo mengembalikan snapshot asal', () => {
+  it('AC-04: toast "Added — Undo" memanggil undo mengembalikan snapshot asal', () => {
     const onChangeSpy = vi.fn();
     const { container } = render(
       <>
@@ -407,7 +407,7 @@ describe('OrgChartStudio tambah 1-klik + panel detail (011-02)', () => {
     commitViaEnter(input, 'Staff Baru');
     expect(onChangeSpy).toHaveBeenCalledTimes(1);
     // Toast terbaru paling akhir di DOM (Toaster merender urutan store); abaikan toast sisa test lain.
-    const undoButtons = within(document.body).getAllByRole('button', { name: 'Urungkan' });
+    const undoButtons = within(document.body).getAllByRole('button', { name: 'Undo' });
     fireEvent.click(undoButtons[undoButtons.length - 1]);
     expect(onChangeSpy).toHaveBeenCalledTimes(2);
     const undone = onChangeSpy.mock.calls[1][0] as { id: string }[];
@@ -448,15 +448,15 @@ describe('OrgChartStudio pindah/hapus/undo (011-03)', () => {
   function openPanel(container: HTMLElement, nodeId: string, title: string): void {
     const card = container.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
     fireEvent.click(card);
-    fireEvent.click(screen.getByRole('button', { name: `Detail ${title}` }));
+    fireEvent.click(screen.getByRole('button', { name: `Details for ${title}` }));
   }
 
   it('helper: isValidMove menolak diri/descendant/no-op dan menerima valid', () => {
     const flat = flatData as unknown as Parameters<typeof isValidMove>[0];
     expect(isValidMove(flat, 'cto', 'cto').valid).toBe(false);
-    expect(isValidMove(flat, 'cto', 'cto').reason).toContain('diri sendiri');
+    expect(isValidMove(flat, 'cto', 'cto').reason).toContain('onto itself');
     expect(isValidMove(flat, 'ceo', 'eng').valid).toBe(false);
-    expect(isValidMove(flat, 'ceo', 'eng').reason).toContain('siklus');
+    expect(isValidMove(flat, 'ceo', 'eng').reason).toContain('cycle');
     expect(isValidMove(flat, 'cto', 'ceo').valid).toBe(false);
     expect(isValidMove(flat, 'eng', 'cfo').valid).toBe(true);
     expect(getDescendants(flat, 'ceo').sort()).toEqual(['cfo', 'cto', 'eng']);
@@ -491,7 +491,7 @@ describe('OrgChartStudio pindah/hapus/undo (011-03)', () => {
     fireEvent.dragStart(source);
     fireEvent.dragOver(target);
     expect(target.getAttribute('data-drop')).toBe('valid');
-    expect(screen.getByTestId('org-studio-drag-feedback').textContent).toContain('Lepas untuk pindah');
+    expect(screen.getByTestId('org-studio-drag-feedback').textContent).toContain('Drop to move');
     expect(screen.getByTestId('org-studio-drag-feedback').textContent).toContain(
       'Direktur Utama / CFO / Engineer',
     );
@@ -499,7 +499,7 @@ describe('OrgChartStudio pindah/hapus/undo (011-03)', () => {
     expect(onChangeSpy).toHaveBeenCalledTimes(1);
     const next = onChangeSpy.mock.calls[0][0] as { id: string; parentId: string | null }[];
     expect(next.find((n) => n.id === 'eng')?.parentId).toBe('cfo');
-    expect(screen.getByTestId('org-studio-live').textContent).toContain('dipindah ke');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('moved to');
     fireEvent.dragEnd(source);
   });
 
@@ -513,7 +513,7 @@ describe('OrgChartStudio pindah/hapus/undo (011-03)', () => {
     expect(target.getAttribute('data-drop')).toBe('invalid');
     fireEvent.drop(target);
     expect(onChangeSpy).not.toHaveBeenCalled();
-    expect(screen.getByTestId('org-studio-drag-feedback').textContent).toContain('siklus');
+    expect(screen.getByTestId('org-studio-drag-feedback').textContent).toContain('cycle');
     expect(container.querySelector('[role="alert"]')).not.toBeNull();
     fireEvent.dragEnd(source);
   });
@@ -529,15 +529,15 @@ describe('OrgChartStudio pindah/hapus/undo (011-03)', () => {
     expect(onChangeSpy).toHaveBeenCalledTimes(1);
     const next = onChangeSpy.mock.calls[0][0] as { id: string; parentId: string | null }[];
     expect(next.find((n) => n.id === 'eng')?.parentId).toBe('cfo');
-    expect(screen.getByTestId('org-studio-live').textContent).toContain('dipindah ke');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('moved to');
   });
 
   it('AC-02: M-007 menonaktifkan diri + turunan beserta alasan', () => {
     const { container } = render(<ControlledStudio />);
     openPanel(container, 'cto', 'CTO');
     fireEvent.click(screen.getByTestId('org-studio-detail-move'));
-    expect(screen.getByRole('radio', { name: /CTO.*Node itu sendiri/ })).toHaveProperty('disabled', true);
-    expect(screen.getByRole('radio', { name: /Engineer.*Turunan/ })).toHaveProperty('disabled', true);
+    expect(screen.getByRole('radio', { name: /CTO.*The node itself/ })).toHaveProperty('disabled', true);
+    expect(screen.getByRole('radio', { name: /Engineer.*Descendant/ })).toHaveProperty('disabled', true);
     expect(screen.getByTestId('org-studio-move-confirm')).toHaveProperty('disabled', true);
   });
 
@@ -546,14 +546,14 @@ describe('OrgChartStudio pindah/hapus/undo (011-03)', () => {
     const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
     openPanel(container, 'cto', 'CTO');
     fireEvent.click(screen.getByTestId('org-studio-detail-delete'));
-    expect(screen.getByText(/beserta 1 turunan/)).not.toBeNull();
-    fireEvent.click(screen.getByRole('radio', { name: /atasan di atasnya/ }));
+    expect(screen.getByText(/and its 1 descendant/)).not.toBeNull();
+    fireEvent.click(screen.getByRole('radio', { name: /up to the parent above/ }));
     fireEvent.click(screen.getByTestId('org-studio-delete-confirm'));
     expect(onChangeSpy).toHaveBeenCalledTimes(1);
     const next = onChangeSpy.mock.calls[0][0] as { id: string; parentId: string | null }[];
     expect(next.find((n) => n.id === 'cto')).toBeUndefined();
     expect(next.find((n) => n.id === 'eng')?.parentId).toBe('ceo');
-    expect(screen.getByTestId('org-studio-live').textContent).toContain('dihapus');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('deleted');
   });
 
   it('AC-03: M-008 mode subtree menghapus seluruh turunan', () => {
@@ -561,7 +561,7 @@ describe('OrgChartStudio pindah/hapus/undo (011-03)', () => {
     const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
     openPanel(container, 'cto', 'CTO');
     fireEvent.click(screen.getByTestId('org-studio-detail-delete'));
-    fireEvent.click(screen.getByRole('radio', { name: /Hapus subtree/ }));
+    fireEvent.click(screen.getByRole('radio', { name: /Delete subtree/ }));
     fireEvent.click(screen.getByTestId('org-studio-delete-confirm'));
     const next = onChangeSpy.mock.calls[0][0] as { id: string }[];
     expect(next.map((n) => n.id).sort()).toEqual(['ceo', 'cfo']);
@@ -572,7 +572,7 @@ describe('OrgChartStudio pindah/hapus/undo (011-03)', () => {
     const { container } = render(<ControlledStudio onChangeSpy={onChangeSpy} />);
     openPanel(container, 'ceo', 'Direktur Utama');
     expect(screen.getByTestId('org-studio-detail-delete')).toHaveProperty('disabled', true);
-    fireEvent.click(screen.getByRole('button', { name: 'Tutup' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
     const ceoCard = container.querySelector('[data-node-id="ceo"]') as HTMLElement;
     fireEvent.keyDown(ceoCard, { key: 'Delete' });
     expect(screen.queryByTestId('org-studio-delete-confirm')).toBeNull();
@@ -596,13 +596,13 @@ describe('OrgChartStudio pindah/hapus/undo (011-03)', () => {
     expect(screen.getByTestId('org-studio-undo')).toHaveProperty('disabled', false);
     fireEvent.click(screen.getByTestId('org-studio-undo'));
     expect(onChangeSpy).toHaveBeenCalledTimes(2);
-    expect(screen.getByTestId('org-studio-live').textContent).toContain('dibatalkan');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('undone');
     const undone = onChangeSpy.mock.calls[1][0] as { id: string; parentId: string | null }[];
     expect(undone.find((n) => n.id === 'eng')?.parentId).toBe('cto');
     expect(screen.getByTestId('org-studio-redo')).toHaveProperty('disabled', false);
     fireEvent.click(screen.getByTestId('org-studio-redo'));
     expect(onChangeSpy).toHaveBeenCalledTimes(3);
-    expect(screen.getByTestId('org-studio-live').textContent).toContain('diulang');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('redone');
     const redone = onChangeSpy.mock.calls[2][0] as { id: string; parentId: string | null }[];
     expect(redone.find((n) => n.id === 'eng')?.parentId).toBe('cfo');
   });
@@ -637,29 +637,29 @@ describe('OrgChartStudio cari/keyboard/pohon SR/motion (011-04)', () => {
     );
   }
 
-  it('AC-01: highlightedIds auto-expand ancestor + ring/ badge Cocok + garis putus + live region', () => {
+  it('AC-01: highlightedIds auto-expand ancestor + ring/ badge Match + garis putus + live region', () => {
     const onExpandedChange = vi.fn();
     const { container, rerender } = render(<SearchStudio highlight={['eng']} onExpandedChange={onExpandedChange} />);
     // Ancestor cto yang collapsed otomatis dibuka.
     expect(container.querySelector('[data-node-id="eng"]')).not.toBeNull();
     expect(onExpandedChange).toHaveBeenCalledWith(expect.arrayContaining(['cto']));
-    expect(screen.getByTestId('org-studio-live').textContent).toContain('1 hasil pencarian ditemukan.');
-    // Sorotan non-warna-saja: ring + badge Cocok + garis putus.
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('1 search result found.');
+    // Sorotan non-warna-saja: ring + badge Match + garis putus.
     const eng = container.querySelector('[data-node-id="eng"]') as HTMLElement;
     expect(eng.className).toContain('border-dashed');
-    expect(eng.querySelector('[data-testid="org-studio-highlight-chip"]')?.textContent).toBe('Cocok');
-    expect(screen.getByTestId('org-studio-sr-tree').textContent).toContain('Engineer (cocok)');
+    expect(eng.querySelector('[data-testid="org-studio-highlight-chip"]')?.textContent).toBe('Match');
+    expect(screen.getByTestId('org-studio-sr-tree').textContent).toContain('Engineer (match)');
     // Hapus query menghilangkan sorotan (collapse yang sudah terbuka tetap) + mengumumkan.
     rerender(<SearchStudio highlight={[]} onExpandedChange={onExpandedChange} />);
     expect(container.querySelector('[data-node-id="eng"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="org-studio-highlight-chip"]')).toBeNull();
     expect((container.querySelector('[data-node-id="eng"]') as HTMLElement).className).not.toContain('border-dashed');
-    expect(screen.getByTestId('org-studio-live').textContent).toContain('Sorotan pencarian dihapus.');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('Search highlight cleared.');
   });
 
   it('AC-01: jumlah jamak diumumkan + edge ke node cocok bergaris putus primary', () => {
     const { container } = render(<SearchStudio highlight={['cto', 'cfo', 'eng']} />);
-    expect(screen.getByTestId('org-studio-live').textContent).toContain('3 hasil pencarian ditemukan.');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('3 search results found.');
     expect(container.querySelectorAll('[data-testid="org-studio-highlight-chip"]')).toHaveLength(3);
     const normalized = normalizeStudioInput(flatData);
     const edges = toStudioFlowEdges(
@@ -687,7 +687,7 @@ describe('OrgChartStudio cari/keyboard/pohon SR/motion (011-04)', () => {
     fireEvent.change(input, { target: { value: 'CTO Baru' } });
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(container.querySelector('[data-node-id="cto"]')?.textContent).toContain('CTO Baru');
-    expect(screen.getByTestId('org-studio-live').textContent).toContain('Diperbarui');
+    expect(screen.getByTestId('org-studio-live').textContent).toContain('Updated');
     const cfoCard = container.querySelector('[data-node-id="cfo"]') as HTMLElement;
     fireEvent.keyDown(cfoCard, { key: 'Enter', ctrlKey: true });
     expect(container.querySelector('[data-testid="org-studio-inline-input-cfo"]')).not.toBeNull();
@@ -745,7 +745,7 @@ describe('OrgChartStudio cari/keyboard/pohon SR/motion (011-04)', () => {
     fireEvent.keyDown(document.activeElement as HTMLElement, { key: 'Home' });
     expect(document.activeElement?.getAttribute('data-sr-node-id')).toBe('ceo');
     // Skip-link menuju pohon aksesibel.
-    const skip = screen.getByRole('link', { name: 'Lewati kanvas ke pohon aksesibel' });
+    const skip = screen.getByRole('link', { name: 'Skip canvas to accessible tree' });
     expect(skip.getAttribute('href')).toBe(`#${tree.getAttribute('id')}`);
   });
 
@@ -779,7 +779,7 @@ describe('OrgChartStudio cari/keyboard/pohon SR/motion (011-04)', () => {
     // Pindah + hapus via SR membuka dialog setara keyboard.
     fireEvent.click(screen.getByTestId('org-studio-sr-move-cfo'));
     expect(screen.getByTestId('org-studio-move-confirm')).not.toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Batal' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     fireEvent.click(screen.getByTestId('org-studio-sr-delete-cfo'));
     expect(screen.getByTestId('org-studio-delete-confirm')).not.toBeNull();
     expect(onChangeSpy).not.toHaveBeenCalled();
@@ -809,16 +809,16 @@ describe('OrgChartStudio state matrix + showcase (011-05)', () => {
     const { container } = render(<OrgChartStudio data={flatData} loading />);
     expect(container.querySelectorAll('[data-testid="org-studio-skeleton-box"]')).toHaveLength(8);
     expect(container.querySelector('[aria-busy="true"]')).not.toBeNull();
-    expect(screen.getByText('Memuat struktur organisasi…')).not.toBeNull();
+    expect(screen.getByText('Loading org structure…')).not.toBeNull();
   });
 
-  it('AC-01: empty — role=status + CTA Buat root memicu onEmptyAction', () => {
+  it('AC-01: empty — role=status + CTA Create root memicu onEmptyAction', () => {
     const onEmptyAction = vi.fn();
     const { container } = render(
-      <OrgChartStudio data={[]} emptyActionLabel="Buat root" onEmptyAction={onEmptyAction} />,
+      <OrgChartStudio data={[]} emptyActionLabel="Create root" onEmptyAction={onEmptyAction} />,
     );
     expect(container.querySelector('[role="status"]')).not.toBeNull();
-    const button = screen.getByRole('button', { name: 'Buat root' });
+    const button = screen.getByRole('button', { name: 'Create root' });
     fireEvent.click(button);
     expect(onEmptyAction).toHaveBeenCalledTimes(1);
   });
@@ -832,9 +832,9 @@ describe('OrgChartStudio state matrix + showcase (011-05)', () => {
     const { container } = render(<OrgChartStudio data={duplikat} />);
     const alert = container.querySelector('[role="alert"]');
     expect(alert).not.toBeNull();
-    expect(alert?.textContent).toContain('duplikat');
+    expect(alert?.textContent).toContain('Duplicate');
     expect(alert?.textContent).toContain('eng');
-    expect(screen.getByRole('button', { name: 'Salin detail error' })).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Copy error details' })).not.toBeNull();
   });
 
   it('AC-01: invalid parent-hilang dan siklus menyebut id pelanggar', () => {
@@ -857,7 +857,7 @@ describe('OrgChartStudio state matrix + showcase (011-05)', () => {
         ]}
       />,
     );
-    expect(cycle.container.querySelector('[role="alert"]')?.textContent).toContain('Siklus');
+    expect(cycle.container.querySelector('[role="alert"]')?.textContent).toContain('Cycle');
     cycle.unmount();
   });
 
@@ -916,7 +916,7 @@ describe('OrgChartStudio layak-pakai (CR-014)', () => {
     expect(handle).not.toBeNull();
     // Default: tersembunyi (kanvas bersih, tidak "keluar-keluar" penuh pil +).
     expect(handle.className).toMatch(/opacity-0/);
-    expect(handle.getAttribute('title')).toBe('Tambah bawahan untuk Direktur Utama');
+    expect(handle.getAttribute('title')).toBe('Add report for Direktur Utama');
     expect(handle.className).toMatch(/nodrag/);
     // Kartu diklik (terpilih) → gagang menetap terlihat, alur sentuh tanpa hover.
     fireEvent.click(container.querySelector('[data-node-id="ceo"]') as HTMLElement);
@@ -936,22 +936,20 @@ describe('OrgChartStudio layak-pakai (CR-014)', () => {
     expect(options.zoom).toBe(1);
   });
 
-  it('temuan #4: ikon Reset (RotateCcw) beda dari Fit dan berlabel Indonesia', () => {
+  it('temuan #4: ikon Reset (RotateCcw) beda dari Fit dan berlabel English', () => {
     render(<OrgChartStudio data={flatData} />);
-    expect(screen.getByRole('button', { name: 'Perkecil' })).not.toBeNull();
-    expect(screen.getByRole('button', { name: 'Perbesar' })).not.toBeNull();
-    expect(screen.getByRole('button', { name: 'Atur ulang zoom 100%' })).not.toBeNull();
-    expect(screen.getByRole('button', { name: 'Paskan tampilan' })).not.toBeNull();
-    expect(screen.queryByRole('button', { name: 'Reset zoom' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Fit view' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Zoom out' })).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Zoom in' })).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Reset zoom to 100%' })).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Fit view' })).not.toBeNull();
   });
 
   it('temuan #5: toggle minimap internal menyembunyikan/menampilkan peta', () => {
     const { container } = render(<OrgChartStudio data={flatData} />);
     expect(container.querySelector('[data-testid="org-studio-minimap"]')).not.toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Sembunyikan peta' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Hide minimap' }));
     expect(container.querySelector('[data-testid="org-studio-minimap"]')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Tampilkan peta' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Show minimap' }));
     expect(container.querySelector('[data-testid="org-studio-minimap"]')).not.toBeNull();
   });
 });

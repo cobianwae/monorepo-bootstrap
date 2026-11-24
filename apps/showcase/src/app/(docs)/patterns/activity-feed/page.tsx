@@ -42,6 +42,8 @@ import {
   EmptyState,
   Spinner,
   toast,
+  SegmentedControl,
+  SegmentedControlItem,
 } from '@ds/ui';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -235,7 +237,14 @@ export default function ActivityFeedPage() {
       <Card className="border-border">
         <CardContent className="p-4 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-1 rounded-lg border border-border bg-muted/20 p-1 flex-wrap">
+            <SegmentedControl
+              type="single"
+              value={tab}
+              onValueChange={(v) => {
+                if (v) setTab(v as 'all' | FeedCategory);
+              }}
+              aria-label="Filter activity by category"
+            >
               {([
                 ['all', 'All'],
                 ['users', 'Users'],
@@ -243,19 +252,11 @@ export default function ActivityFeedPage() {
                 ['system', 'System'],
                 ['payment', 'Payment'],
               ] as const).map(([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => setTab(key)}
-                  className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
-                    tab === key
-                      ? 'bg-highlight text-highlight-foreground shadow-sm'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
+                <SegmentedControlItem key={key} value={key}>
                   {label}
-                </button>
+                </SegmentedControlItem>
               ))}
-            </div>
+            </SegmentedControl>
 
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
