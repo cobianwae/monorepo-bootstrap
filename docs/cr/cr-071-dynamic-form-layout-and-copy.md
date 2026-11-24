@@ -1,6 +1,6 @@
 # CR-071 — Hierarki, Layout, dan Copy Dynamic Form
 
-**Status:** approved  
+**Status:** done (ditetapkan user 2026-11-24)  
 **Sumber:** audit `/improve-ui` — cluster A  
 **Ref:** `docs/design/sitemap.md` (S-005.09), `docs/design/visual-language.md`, `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx`
 
@@ -22,10 +22,10 @@ Lokasi `page.tsx` di tabel merujuk pada route Dynamic Form sebelum perubahan.
 
 ## Tasks
 
-- [ ] Rapikan struktur heading, ritme spacing, ukuran judul kelompok, dan lebar baca tanpa mengubah API `FormSection`.
-- [ ] Rapikan grid jadwal dan footer; uji kontrol tertutup dan popover, nilai panjang, serta dua tombol tanpa clipping atau scroll horizontal halaman yang dipicu form.
-- [ ] Ringkas copy Inggris pada pengantar, heading, dan panduan. Jelaskan bahwa demo tidak mengirim email; hapus badge sektor yang berulang. Jangan menambah klaim navigation guard.
-- [ ] Tambahkan tes hierarki heading dan copy yang relevan; jalankan tes route. Uji browser pada 320, 390, dan 1440 px, di light/dark.
+- [x] Rapikan struktur heading, ritme spacing, dan lebar baca tanpa mengubah API `FormSection`. Catatan deviasi: ukuran judul kelompok (h3) tetap `text-sm font-semibold` dari `FormSection` di `packages/ui`; mengubahnya berarti menyentuh `@ds/ui` di luar scope CR ini dan belum dilakukan.
+- [x] Rapikan grid jadwal dan footer (`min-w-0` pada grid, aksi footer `flex-col` lalu `sm:flex-row`, form `max-w-3xl`). Uji clipping/scroll horizontal di browser belum dilakukan.
+- [x] Ringkas copy Inggris pada pengantar, heading, dan panduan. Demo ditegaskan tidak mengirim email; badge sektor yang berulang dihapus; klaim navigation guard dihapus.
+- [x] Tambahkan tes hierarki heading dan copy (`page.test.tsx`, 5/5 lulus). Uji browser pada 320, 390, dan 1440 px, light/dark belum dilakukan.
 
 ## Keputusan
 
@@ -40,6 +40,9 @@ Lokasi `page.tsx` di tabel merujuk pada route Dynamic Form sebelum perubahan.
 - [ ] Light/dark tetap terbaca, termasuk callout bersyarat; fokus keyboard dan perilaku Radix tetap berfungsi.
 - [ ] Reflow diuji pada data contoh dan state dengan isi panjang; aksi utama tetap utuh dan dapat digunakan.
 - [ ] Jalankan `pnpm typecheck`, `pnpm lint`, `pnpm test`, dan `pnpm -C apps/showcase build`; catat baseline terpisah. Gunakan salinan sementara untuk build bila dev server aktif.
+  - Hasil: lint hijau; showcase `tsc --noEmit` exit 0; build showcase exit 0; `pnpm typecheck` gagal di `packages/ui` pada 12 error baseline `flow-editor.test.tsx` (sudah tercatat). Dynamic Form test 5/5 lulus.
+  - `pnpm test`: `packages/ui` 750/752 saat paralel (2 timeout MindMap undo dan OrgChartEditor undo; keduanya lulus 84/84 saat dijalankan sendiri). Showcase: 4 gagal di `patterns/flow-editor/page.test.tsx` (CR-019 inspector on-demand), gagal sama di `visual-polish` tanpa perubahan CR ini — baseline lama, belum dicatat di STATUS. Dynamic Form tidak ikut gagal.
+  - Uji browser (Chromium headless, dev server, 320/390/1440 × light/dark): semula overflow horizontal 3 px pada 320 px karena grid jadwal tanpa `grid-cols-1` mengikuti lebar tombol nowrap. Diperbaiki dengan `grid-cols-1` pada tiga grid form; setelah itu `scrollWidth` = lebar viewport di keenam kombinasi, dan tombol `Reset & clear draft` serta `Publish project` berada di dalam viewport. Screenshot 320 px light diperiksa visual: rapi. Catatan: nilai date picker di `Kickoff date` dan `Engagement window` terpotong ellipsis pada 320 px (perilaku trigger, belum diubah).
 
 ## Eksekusi
 

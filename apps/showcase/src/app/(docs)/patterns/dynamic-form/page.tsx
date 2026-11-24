@@ -40,6 +40,7 @@ import {
   GitFork,
 } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
+import { SectionHeading } from '../../../../components/section-heading';
 
 const DRAFT_KEY = 'ds:dynamic-form-draft';
 
@@ -171,7 +172,6 @@ export default function DynamicFormPage() {
   const { errors, isDirty } = formState;
   const members = useFieldArray({ control, name: 'members' });
 
-  const watchSectors = watch('audience.sectors');
   const watchNotifyEmail = watch('audience.notifyEmail');
 
   // Autosave draft every 1.2s when dirty
@@ -236,8 +236,8 @@ export default function DynamicFormPage() {
       <PageHeader
         eyebrow="UX Recipe Scenario"
         eyebrowIcon={GitFork}
-        title="Dynamic Form: Field Arrays, Autosave & Dirty Guard"
-        description="A production-grade React Hook Form + Zod recipe: dynamic member rows, conditional fields, real-time validation, autosave draft to localStorage with resumable state, and a dirty-state guard on navigation."
+        title="Dynamic Form"
+        description="A React Hook Form and Zod recipe with dynamic member rows, conditional fields, validation after submit, and a draft saved to localStorage that you can resume. The demo does not send email or publish anything."
         actions={
           <div className="flex items-center gap-2">
             {isDirty && (
@@ -263,10 +263,12 @@ export default function DynamicFormPage() {
         />
       )}
 
-      <form onSubmit={submit} className="space-y-6">
+      <section aria-labelledby="interactive-demo" className="scroll-mt-20 space-y-4">
+        <SectionHeading id="interactive-demo" title="Interactive demo" />
+      <form onSubmit={submit} className="mx-auto w-full max-w-3xl space-y-6 min-w-0">
         {/* Project Info */}
         <FormSection title="Project Information" description="Name, description and discovery tags.">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="project-name" className={errors.project?.name ? 'text-destructive' : ''}>
                 Project name
@@ -322,7 +324,7 @@ export default function DynamicFormPage() {
 
         {/* Schedule */}
         <FormSection title="Schedule & Ownership" description="Timeline and who leads the project.">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Controller
                 control={control}
@@ -422,7 +424,7 @@ export default function DynamicFormPage() {
                   <div>
                     <p className="text-sm font-medium text-foreground">Email notifications</p>
                     <p className="text-xs text-muted-foreground">
-                      Send updates to stakeholders when the project changes.
+                      Demo only: reveals a guidance block below. No email is sent.
                     </p>
                   </div>
                   <Switch id="audience-notify" checked={field.value} onCheckedChange={field.onChange} aria-label="Email notifications" />
@@ -434,21 +436,10 @@ export default function DynamicFormPage() {
                 <div className="flex items-start gap-2">
                   <Info className="h-4 w-4 text-highlight mt-0.5" />
                   <div className="text-xs text-muted-foreground">
-                    <p className="font-medium text-foreground">Conditional section revealed</p>
-                    <p>
-                      Because email notifications are enabled, this extra guidance block appears. This is a common
-                      pattern for context-dependent form content.
-                    </p>
+                    <p className="font-medium text-foreground">Conditional section</p>
+                    <p>Shown because email notifications are on. This demo does not send email.</p>
                   </div>
                 </div>
-              </div>
-            )}
-            {watchSectors.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {watchSectors.map((s) => {
-                  const opt = SECTOR_OPTIONS.find((o) => o.value === s);
-                  return <Badge key={s} variant="outline">{opt?.label ?? s}</Badge>;
-                })}
               </div>
             )}
           </div>
@@ -456,7 +447,7 @@ export default function DynamicFormPage() {
 
         {/* Budget */}
         <FormSection title="Budget & Capacity" description="Numerical constraints with live feedback.">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2">
             <Controller
               control={control}
               name="budget.amount"
@@ -593,12 +584,12 @@ export default function DynamicFormPage() {
                   : 'All changes are saved. Nothing pending.'}
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <Button type="button" variant="ghost" size="sm" onClick={handleReset} disabled={isResetting}>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+              <Button type="button" variant="ghost" size="sm" onClick={handleReset} disabled={isResetting} className="w-full sm:w-auto">
                 <RotateCcw className="h-4 w-4" />
                 Reset & clear draft
               </Button>
-              <Button type="submit" size="sm">
+              <Button type="submit" size="sm" className="w-full sm:w-auto">
                 <CheckCircle2 className="h-4 w-4" />
                 Publish project
               </Button>
@@ -606,6 +597,17 @@ export default function DynamicFormPage() {
           </CardContent>
         </Card>
       </form>
+      </section>
+
+      <section aria-labelledby="try-it" className="scroll-mt-20 space-y-4 max-w-3xl">
+        <SectionHeading id="try-it" title="Try it" />
+        <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
+          <li>Pick one or more sectors under Audience &amp; Targeting.</li>
+          <li>Turn on email notifications to reveal the guidance block. Nothing is sent.</li>
+          <li>Add a team member, then enter an invalid email to see the row message.</li>
+          <li>Clear the project name and press Publish project to see the error summary.</li>
+        </ol>
+      </section>
     </div>
   );
 }
