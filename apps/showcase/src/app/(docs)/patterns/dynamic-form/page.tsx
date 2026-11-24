@@ -268,7 +268,7 @@ export default function DynamicFormPage() {
       <form onSubmit={submit} className="mx-auto w-full max-w-3xl space-y-6 min-w-0">
         {/* Project Info */}
         <FormSection title="Project Information" description="Name, description and discovery tags.">
-          <div className="grid min-w-0 gap-4 md:grid-cols-2">
+          <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="project-name" className={errors.project?.name ? 'text-destructive' : ''}>
                 Project name
@@ -324,7 +324,7 @@ export default function DynamicFormPage() {
 
         {/* Schedule */}
         <FormSection title="Schedule & Ownership" description="Timeline and who leads the project.">
-          <div className="grid min-w-0 gap-4 md:grid-cols-2">
+          <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Controller
                 control={control}
@@ -447,7 +447,7 @@ export default function DynamicFormPage() {
 
         {/* Budget */}
         <FormSection title="Budget & Capacity" description="Numerical constraints with live feedback.">
-          <div className="grid min-w-0 gap-4 md:grid-cols-2">
+          <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2">
             <Controller
               control={control}
               name="budget.amount"

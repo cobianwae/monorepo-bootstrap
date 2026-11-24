@@ -42,7 +42,7 @@ Lokasi `page.tsx` di tabel merujuk pada route Dynamic Form sebelum perubahan.
 - [ ] Jalankan `pnpm typecheck`, `pnpm lint`, `pnpm test`, dan `pnpm -C apps/showcase build`; catat baseline terpisah. Gunakan salinan sementara untuk build bila dev server aktif.
   - Hasil: lint hijau; showcase `tsc --noEmit` exit 0; build showcase exit 0; `pnpm typecheck` gagal di `packages/ui` pada 12 error baseline `flow-editor.test.tsx` (sudah tercatat). Dynamic Form test 5/5 lulus.
   - `pnpm test`: `packages/ui` 750/752 saat paralel (2 timeout MindMap undo dan OrgChartEditor undo; keduanya lulus 84/84 saat dijalankan sendiri). Showcase: 4 gagal di `patterns/flow-editor/page.test.tsx` (CR-019 inspector on-demand), gagal sama di `visual-polish` tanpa perubahan CR ini — baseline lama, belum dicatat di STATUS. Dynamic Form tidak ikut gagal.
-  - Uji browser (320/390/1440, light/dark) belum dijalankan; belum terverifikasi.
+  - Uji browser (Chromium headless, dev server, 320/390/1440 × light/dark): semula overflow horizontal 3 px pada 320 px karena grid jadwal tanpa `grid-cols-1` mengikuti lebar tombol nowrap. Diperbaiki dengan `grid-cols-1` pada tiga grid form; setelah itu `scrollWidth` = lebar viewport di keenam kombinasi, dan tombol `Reset & clear draft` serta `Publish project` berada di dalam viewport. Screenshot 320 px light diperiksa visual: rapi. Catatan: nilai date picker di `Kickoff date` dan `Engagement window` terpotong ellipsis pada 320 px (perilaku trigger, belum diubah).
 
 ## Eksekusi
 
