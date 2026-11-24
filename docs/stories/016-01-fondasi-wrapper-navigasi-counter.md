@@ -1,6 +1,6 @@
 # 016-01 — Fondasi wrapper + navigasi + counter
 
-Status: review
+Status: done
 PRD: `docs/prd/016-lightbox-gallery.md` (approved, gate 1)
 Design: `docs/design/wireframes/lightbox-gallery.md` (approved, gate 2, K1/K2/K4/K5/K7 + §2.1/§2.2) + `docs/design/flows/lightbox-gallery.mmd` (diagram 1–2) + sitemap `S-005.16` / `M-012`
 FR: `FR-001`, `FR-004`
