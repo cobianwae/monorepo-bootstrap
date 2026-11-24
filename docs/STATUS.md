@@ -35,6 +35,7 @@ CR-071 (Dynamic Form: layout/copy) **done** atas persetujuan user dan di-merge k
 5. Antrean implementasi satu per sesi: 013-01, 015-03. 013-01 membuka S-005.36 (kini `in-design`); S-005.30/S-005.31 sudah `implemented`; S-005.41 tetap `in-design` sampai PRD 018 diimplementasi.
 6. 015-03 `done` atas persetujuan user 2026-11-24 dan dimerge ke `visual-polish`: route `/patterns/image-cropper` final + audit kontras.
 7. Audit UI/UX Import Wizard menghasilkan CR-076–081 (flow, a11y lokal, shared controls, English/kontrak demo, visual, data besar). User menetapkan **keenamnya `approved` pada 2026-11-25 tanpa memulai pengerjaan**; API aditif FileInput (CR-078) dan supersession keputusan bahasa (CR-079) ikut disetujui sebagaimana tertulis. Implementasi dimulai hanya atas instruksi baru, satu CR per sesi; prioritas usulan CR-076/077/078 → CR-079/080 → CR-081.
+8. 016-01 `done` atas persetujuan user 2026-11-25 dan dimerge ke `visual-polish`: Lightbox fondasi (wrapper `yet-another-react-lightbox`, navigasi + counter + strip + caption, controlled API). 016-02/016-03 masih `todo`. Antrean lain tetap 013-01.
 
 ## Known Issues
 

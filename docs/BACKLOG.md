@@ -62,7 +62,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | 015-01 | Image cropper fondasi wrapper + aspek + output blob | done | `docs/stories/015-01-fondasi-wrapper-output.md` |
 | 015-02 | Image cropper kontrol + pratinjau + keyboard + states | done | `docs/stories/015-02-kontrol-pratinjau-keyboard-states.md` |
 | 015-03 | Image cropper showcase avatar + cover + audit + smoke | done | `docs/stories/015-03-showcase-audit-smoke.md` |
-| 016-01 | Lightbox fondasi wrapper + navigasi + counter | todo | `docs/stories/016-01-fondasi-wrapper-navigasi-counter.md` |
+| 016-01 | Lightbox fondasi wrapper + navigasi + counter | done | `docs/stories/016-01-fondasi-wrapper-navigasi-counter.md` |
 | 016-02 | Lightbox zoom + video + keyboard + states | todo | `docs/stories/016-02-zoom-video-keyboard-states.md` |
 | 016-03 | Lightbox showcase + audit + smoke | todo | `docs/stories/016-03-showcase-audit-smoke.md` |
 | 017-01 | Product tour fondasi wrapper + navigasi + callback | done | `docs/stories/017-01-fondasi-wrapper-navigasi-callback.md` |

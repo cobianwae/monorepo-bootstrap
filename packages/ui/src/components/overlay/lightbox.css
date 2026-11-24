@@ -1,0 +1,60 @@
+/**
+ * lightbox.css — override terisolasi yet-another-react-lightbox agar mengikuti
+ * token DS (K1, PRD 016). Dimuat global via `@ds/ui/styles.css` (preseden
+ * driver.js/tour.css); konsumen cukup memakai `Lightbox` tanpa impor CSS.
+ * Semua warna dari token semantik; tanpa hex hardcode.
+ * Pemetaan lewat variabel `--yarl__*` milik library, bukan menimpa aturan
+ * internal library.
+ */
+
+.ds-lightbox {
+  --yarl__portal_zindex: var(--z-modal);
+  /* Backdrop `background/80` mengikuti tema (wireframe §6), bukan hitam. */
+  --yarl__container_background_color: color-mix(in oklch, var(--background) 80%, transparent);
+  --yarl__color_backdrop: color-mix(in oklch, var(--background) 80%, transparent);
+  --yarl__color_button: var(--foreground);
+  --yarl__color_button_active: var(--foreground);
+  --yarl__color_button_disabled: var(--muted-foreground);
+  --yarl__button_background_color: var(--card);
+  /* Strip thumbnail: permukaan card, ring aktif primary (wireframe §2.2). */
+  --yarl__thumbnails_container_background_color: var(--card);
+  --yarl__thumbnails_thumbnail_background: var(--muted);
+  --yarl__thumbnails_thumbnail_border_color: var(--border);
+  --yarl__thumbnails_thumbnail_active_border_color: var(--primary);
+  --yarl__thumbnails_thumbnail_focus_box_shadow:
+    var(--card) 0 0 0 2px, var(--primary) 0 0 0 4px;
+  --yarl__thumbnails_thumbnail_icon_color: var(--foreground);
+}
+
+.ds-lightbox .yarl__button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Bar atas chrome DS (counter + tutup + slot aksi), posisi absolut di root YARL. */
+.ds-lightbox-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Bar caption di tepi bawah slide; hanya dirender bila item punya caption. */
+.ds-lightbox-caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0.5rem 1rem;
+  background-color: color-mix(in oklch, var(--card) 92%, transparent);
+  border-top: 1px solid var(--border);
+  font-size: 0.875rem;
+  text-align: center;
+}
