@@ -225,7 +225,7 @@ describe('ImageCropper', () => {
     fireEvent.click(screen.getByText('mock-media-loaded'));
     fireEvent.click(screen.getByText('mock-crop-complete'));
 
-    const preview = screen.getByTestId('crop-preview');
+    const preview = screen.getByTestId('ic-preview');
     expect(preview.getAttribute('aria-label')).toBe('Pratinjau hasil');
     expect(preview.textContent).toContain('512×512');
   });

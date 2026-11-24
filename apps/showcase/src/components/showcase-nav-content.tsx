@@ -19,6 +19,7 @@ import {
   Compass,
   Component,
   CreditCard,
+  Crop,
   Database,
   FileCheck2,
   FileUp,
@@ -157,6 +158,7 @@ export const NAV_SECTIONS: NavSection[] = [
           { title: 'Settings & Preferences', href: '/patterns/settings', icon: Settings },
           { title: 'Rich Text Editor', href: '/patterns/rich-text-editor', icon: PenLine },
           { title: 'File Upload Queue', href: '/patterns/file-upload', icon: Upload },
+          { title: 'Image Cropper', href: '/patterns/image-cropper', icon: Crop },
         ],
       },
       {
