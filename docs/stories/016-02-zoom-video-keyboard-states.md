@@ -1,6 +1,6 @@
 # 016-02 — Zoom + video + keyboard + states
 
-Status: todo
+Status: done
 PRD: `docs/prd/016-lightbox-gallery.md` (approved, gate 1)
 Design: `docs/design/wireframes/lightbox-gallery.md` (approved, gate 2, K2/K3 + §2.3/§2.4/§2.5/§3/§4) + `docs/design/flows/lightbox-gallery.mmd` (diagram 2–3)
 FR: `FR-002`, `FR-003`, `FR-005`, `FR-006`, `FR-007`, `FR-008`
@@ -41,11 +41,11 @@ Goal: Lightbox robust dan aksesibel tanpa showcase final: zoom 1–4x + geser + 
 
 ## Tasks
 
-- [ ] Implementasi zoom §2.3 (plugin YARL `Zoom`, `maxZoomPixelRatio={4}`, tombol + keyboard, drag-geser > 1x, reset + umumkan tiap `onViewChange`) + slot aksi opsional K3 (render tanpa tombol bawaan)
-- [ ] Implementasi video §2.4 (`<video controls preload="metadata">`, larang autoplay bersuara, `pause()` saat navigasi menjauh, `poster` + `alt` sebagai label)
-- [ ] Implementasi keyboard + fokus §4 (simpan pemicu, trap cycling, `inert` belakang, `Esc`/panah/`+`/`-`, fokus kembali tepat, live region throttled 300 ms, ring `primary`)
-- [ ] Implementasi swipe §2.5 + reduced-motion (animasi 0 via media query, tanpa prop tambahan)
-- [ ] Implementasi state matrix §3 (empty/loading skeleton/`aria-busy`/error `alert` + fokus/success live) + test co-located tiap AC + peran ARIA; tanpa dependency/token baru
+- [x] Implementasi zoom §2.3 (plugin YARL `Zoom`, `maxZoomPixelRatio={4}`, tombol + keyboard, drag-geser > 1x, reset + umumkan tiap `onViewChange`) + slot aksi opsional K3 (render tanpa tombol bawaan)
+- [x] Implementasi video §2.4 (`<video controls preload="metadata">`, larang autoplay bersuara, `pause()` saat navigasi menjauh, `poster` + `alt` sebagai label)
+- [x] Implementasi keyboard + fokus §4 (simpan pemicu, trap cycling, `inert` belakang, `Esc`/panah/`+`/`-`, fokus kembali tepat, live region throttled 300 ms, ring `primary`)
+- [x] Implementasi swipe §2.5 + reduced-motion (animasi 0 via media query, tanpa prop tambahan)
+- [x] Implementasi state matrix §3 (empty/loading skeleton/`aria-busy`/error `alert` + fokus/success live) + test co-located tiap AC + peran ARIA; tanpa dependency/token baru
 
 ## Dependencies
 
@@ -56,3 +56,7 @@ Goal: Lightbox robust dan aksesibel tanpa showcase final: zoom 1–4x + geser + 
 
 - Risiko: live region cerewet saat zoom drag — mitigasi umumkan throttled; kontrol video native merebut panah saat fokus di slider volume — mitigasi catat edge case, navigasi panah prioritas di level overlay
 - Keputusan: C3 tidak melingkar tetap; K3 slot aksi tanpa tombol bawaan; showcase penuh + audit kontras di 016-03
+
+- Implementasi (2026-11-25, branch `016-02-zoom-video-keyboard-states`, worktree `arah-prd`, dari `visual-polish` `dbbaab8`): plugin YARL `Zoom` (`maxZoomPixelRatio={4}`, tombol Perbesar/Perkecil DS ring `primary`, reset + umumkan tiap `onViewChange`, live zoom throttled 300 ms) + plugin `Video` (slide `type:'video'`, `controls`/`preload="metadata"`, tanpa autoplay bersuara, `pause()` saat navigasi, `poster`+`alt`); fokus kembali ke pemicu via `document.activeElement` saat buka, live posisi kini "Gambar N dari total: <alt>"; swipe bawaan YARL + `prefers-reduced-motion` mematikan animasi swipe/zoom; state matrix: empty `role=status` tanpa overlay, `loading` skeleton + `aria-busy`, `error` `role=alert` + penyebab + [Coba lagi][Lewati ke berikut] + fokus ke Coba lagi (prop opsional `loading`/`error`/`onRetry` aditif, `width`/`height` opsional pada item; tanpa dependency/token baru). Trap/inert + panah/`+`/`-`/`Esc` milik YARL bawaan (terverifikasi via mock + test fokus-kembali); cek visual browser light/dark di 016-03.
+- Verifikasi: typecheck + lint workspace hijau (4 warning eslint-disable mock yang sudah ada); UI 734/734 (lightbox 20/20), tokens 10/10; showcase 111/115 dengan 4 gagal baseline `localStorage.getItem` FlowEditor (terdokumentasi, di luar scope).
+- Ditetapkan `done` atas persetujuan user 2026-11-25.

@@ -10,6 +10,10 @@ export interface LightboxItem {
   type?: LightboxItemType;
   /** Thumbnail video / poster. */
   poster?: string;
+  /** Lebar asli (px) — dipakai zoom maksimal & rasio video. */
+  width?: number;
+  /** Tinggi asli (px) — dipakai zoom maksimal & rasio video. */
+  height?: number;
   caption?: string;
   meta?: string;
 }
@@ -24,4 +28,10 @@ export interface LightboxProps {
   actions?: React.ReactNode;
   /** Default `true`. */
   closeOnBackdropClick?: boolean;
+  /** State loading komponen (FR-008): skeleton + `aria-busy`, navigasi antre. */
+  loading?: boolean;
+  /** Penyebab error item aktif untuk state error (FR-008); kosong = tidak error. */
+  error?: string | null;
+  /** Dipanggil saat [Coba lagi] pada state error; default muat ulang slide. */
+  onRetry?: (index: number) => void;
 }
