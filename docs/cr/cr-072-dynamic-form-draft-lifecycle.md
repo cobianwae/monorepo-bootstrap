@@ -25,10 +25,10 @@ Lokasi `page.tsx` di tabel merujuk pada route Dynamic Form sebelum perubahan.
 
 ## Tasks
 
-- [ ] Ikat debounce ke perubahan nilai; write terbaru saja yang boleh menandai status tersimpan. Batalkan write tertunda saat aksi reset/submit dikonfirmasi dan saat route unmount.
-- [ ] Tangani hasil baca/tulis/hapus storage secara eksplisit. Bedakan nilai kosong dari fallback seed dan uji pemulihan field biasa serta tanggal yang dihapus. Penanganan `members: []` diuji di CR-073.
-- [ ] Implementasikan satu status live, reset terkonfirmasi, dan copy submit Inggris yang menjelaskan simulasi serta batas penyimpanan.
-- [ ] Tambahkan regresi debounce dan reload, kegagalan storage, batal/konfirmasi reset, submit invalid, serta submit valid sebelum debounce selesai. Verifikasi dialog dan status di browser.
+- [x] Ikat debounce ke perubahan nilai; write terbaru saja yang boleh menandai status tersimpan. Batalkan write tertunda saat aksi reset/submit dikonfirmasi dan saat route unmount.
+- [x] Tangani hasil baca/tulis/hapus storage secara eksplisit. Bedakan nilai kosong dari fallback seed dan uji pemulihan field biasa serta tanggal yang dihapus. Penanganan `members: []` diuji di CR-073.
+- [x] Implementasikan satu status live, reset terkonfirmasi, dan copy submit Inggris yang menjelaskan simulasi serta batas penyimpanan.
+- [x] Tambahkan regresi debounce dan reload, kegagalan storage, batal/konfirmasi reset, submit invalid, serta submit valid sebelum debounce selesai. Verifikasi dialog dan status di browser.
 
 ## Keputusan
 
@@ -39,15 +39,27 @@ Lokasi `page.tsx` di tabel merujuk pada route Dynamic Form sebelum perubahan.
 
 ## Design System Checks
 
-- [ ] Status pending/saved/error dapat dipahami tanpa warna; token teks lolos kontras AA di light/dark, tanpa warna literal.
-- [ ] Dialog dapat dibuka, dibatalkan, dan dikonfirmasi dengan keyboard; fokus pulih setelah ditutup.
-- [ ] Jalankan tes route, `pnpm typecheck`, `pnpm lint`, `pnpm test`, dan `pnpm -C apps/showcase build`; catat baseline terpisah. Gunakan salinan sementara bila dev server aktif.
+- [x] Status pending/saved/error dapat dipahami tanpa warna; token teks lolos kontras AA di light/dark, tanpa warna literal.
+- [x] Dialog dapat dibuka, dibatalkan, dan dikonfirmasi dengan keyboard; fokus pulih setelah ditutup.
+- [x] Jalankan tes route, `pnpm typecheck`, `pnpm lint`, `pnpm test`, dan `pnpm -C apps/showcase build`; catat baseline terpisah. Gunakan salinan sementara bila dev server aktif.
 
 ## Eksekusi
 
 Branch: `cr-072-dynamic-form-draft-lifecycle`  
 Commit: `fix: make dynamic form draft lifecycle reliable [CR-072]`
 
-- [ ] CR disetujui user dan branch dibuat.
-- [ ] Implementasi dan verifikasi selesai; checklist CR dan status di `docs/BACKLOG.md` serta `docs/STATUS.md` diperbarui sesuai workflow.
-- [ ] Append `docs/STATUS-LOG.md` (`YYYY-MM-DD — ringkasan — referensi`); jalankan `node scripts/check-status-log.mjs` sebelum commit.
+- [x] CR disetujui user dan branch dibuat.
+- [x] Implementasi dan verifikasi selesai; checklist CR dan status di `docs/BACKLOG.md` serta `docs/STATUS.md` diperbarui sesuai workflow.
+- [x] Append `docs/STATUS-LOG.md` (`YYYY-MM-DD — ringkasan — referensi`); jalankan `node scripts/check-status-log.mjs` sebelum commit.
+
+## Hasil Implementasi dan Verifikasi — 2026-11-25
+
+- Status tetap **approved**, implementasi selesai dan menunggu review user; belum ditetapkan `done`, belum push/PR.
+- Debounce 1,2 detik mengikuti snapshot nilai, bukan `isDirty`; perubahan status/validasi tidak menjadwalkan write baru. Cleanup unmount, reset terkonfirmasi, dan submit valid membatalkan timer. Submit mempertahankan nilai tanpa membuat draft sampai edit berikutnya.
+- Restore membaca storage setelah mount dan memvalidasi bentuk data dengan skema draft terpisah dari validasi submit. String kosong, email belum valid, dan tanggal kosong dipertahankan; kickoff memakai `null` agar React Hook Form tidak mengembalikan tanggal seed. JSON/bentuk/tanggal rusak memakai seed dan status gagal baca.
+- Satu status `role="status"`/`aria-live="polite"`/`aria-atomic="true"` menjelaskan empty/pending/saved/restored/read-error/save-error/delete-error. Tidak ada klaim berhasil menyimpan/menghapus ketika operasi melempar error.
+- Tes route **19/19** lulus tanpa flag Node: mencakup debounce terbaru, remount, partial/empty field dan tanggal (range `null` maupun endpoint kosong), data rusak, gagal baca/tulis/hapus, cancel/confirm reset + fokus, unmount, submit invalid, serta submit valid sebelum debounce (termasuk gagal hapus).
+- `pnpm typecheck`: hanya **12 TS2339 baseline** di `packages/ui/src/components/canvas/flow-editor.test.tsx`; `pnpm -C apps/showcase build:types` lulus. `pnpm lint` lulus. Build showcase **76/76** lulus dari worktree terpisah; `.next` dev server root tidak disentuh.
+- `pnpm test` tanpa flag: tokens **10/10**, ui **714/714**, showcase **108/112** (sebelum tiga tambahan kasus bentuk/tanggal rusak/range kosong); empat kegagalan FlowEditor CR-019 adalah baseline `localStorage.getItem is not a function` pada Node 25. Ulang final dengan `NODE_OPTIONS=--no-experimental-webstorage pnpm test`: tokens **10/10**, ui **714/714**, showcase **115/115**, termasuk **19/19** route ini. Tidak mengubah konfigurasi workspace.
+- Chromium headless pada build worktree port 4072: edit→saved→reload/restored, dialog via Enter, Cancel via Escape, Tab→Enter untuk konfirmasi, fokus kembali ke reset, dan status polite lulus. Cancel diuji light/dark; teks status `text-foreground` berkontras **18,80:1 light / 16,74:1 dark** terhadap permukaan aktual. Viewport 390×844 tidak overflow horizontal. Bukti sementara: `/tmp/opencode/cr-072-browser.mjs` dan `/tmp/opencode/cr-072-browser.png`; pembaca layar bersuara native belum diuji.
+- Scope tetap route + tes + dokumen tracking. Regresi `members: []`, role, dan audit field/a11y lanjutan tetap CR-073.
