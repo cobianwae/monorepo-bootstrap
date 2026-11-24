@@ -70,14 +70,14 @@ Status: `planned`, `in-design`, `implemented`, `documented`.
 | S-005.27 | File Manager | `/patterns/file-manager` | in-design |
 | S-005.27.01 | File Manager — konten list/grid | `/patterns/file-manager` (panel konten) | in-design |
 | S-005.27.02 | File Manager — panel konteks | `/patterns/file-manager` (panel upload/quota/detail) | in-design |
-| S-005.28 | Org Chart (legacy, diganti 011) | `/patterns/org-chart` | deprecated |
+| S-005.28 | Org Chart | `/patterns/org-chart` | implemented |
 | S-005.29 | Flow Editor | `/patterns/flow-editor` | implemented |
 | S-005.29.01 | Flow Editor — palette node (panel kiri) | `/patterns/flow-editor` (panel kiri) | implemented |
 | S-005.29.02 | Flow Editor — inspector properti (panel kanan/sheet) | `/patterns/flow-editor` (panel kanan) | implemented |
 | S-005.30 | Transfer List | `/patterns/transfer-list` | implemented |
 | S-005.31 | Cascader & Tree Select | `/patterns/cascader-tree-select` | implemented |
 | S-005.32 | Mention & Emoji | `/patterns/mention-emoji` | implemented |
-| S-005.33 | Org Chart Editor (legacy, diganti 011) | `/patterns/org-chart-editor` | deprecated |
+| S-005.33 | Org Chart Editor (dihapus CR-074) | `/patterns/org-chart-editor` | deprecated (dihapus CR-074) |
 | S-005.34 | Org Chart Studio (PRD 011) | `/patterns/org-chart-studio` | implemented |
 | S-005.34.01 | Org Chart Studio — panel detail (inspector + tab pohon SR) | `/patterns/org-chart-studio` (panel kanan) | implemented |
 | S-005.35 | Mind Map (PRD 012) | `/patterns/mind-map` | implemented |

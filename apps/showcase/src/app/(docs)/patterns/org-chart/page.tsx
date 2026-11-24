@@ -1,12 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
 import { Network, Sparkles } from 'lucide-react';
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
   Button,
   OrgChart,
   PageHeader,
@@ -136,20 +132,6 @@ export default function OrgChartPage() {
         title="Org Chart / Diagram Organisasi"
         description="Pattern OrgChart (S-005.28): diagram hierarki 40 orang, 4 tingkat, 4 departemen beda aksen — dengan state matrix (loading/empty/error), highlight pencarian yang membuka path, toggle orientasi, dan pan/zoom keyboard. Handler demo mock; logika pencarian milik konsumen."
       />
-
-      <Alert variant="warning">
-        <AlertTitle>Deprecated — digantikan Org Chart Studio (PRD 011)</AlertTitle>
-        <AlertDescription>
-          <p>
-            Komponen <code>OrgChart</code> dan halaman ini (S-005.28) berstatus deprecated dan akan dihapus saat 011
-            shipped. Untuk fitur baru gunakan{' '}
-            <Link href="/patterns/org-chart-studio" className="font-medium underline underline-offset-4">
-              Org Chart Studio (/patterns/org-chart-studio)
-            </Link>
-            .
-          </p>
-        </AlertDescription>
-      </Alert>
 
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">

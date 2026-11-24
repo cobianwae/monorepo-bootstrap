@@ -1,6 +1,7 @@
 # 010-03 — Reparent drag + move dialog + undo/redo
 
 Status: done
+Catatan: Removed — digantikan PRD 011 (CR-074). Status historis tidak diubah.
 PRD: `docs/prd/010-org-chart-editor.md`
 Design: `docs/design/org-chart-editor.md`
 FR: `FR-004`, `FR-012`, `FR-015`

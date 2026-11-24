@@ -1,6 +1,7 @@
 # 010 — Org Chart Editor
 
 Status: approved
+Catatan: Removed — digantikan PRD 011 (CR-074). Status historis tidak diubah.
 Owner: —
 Tanggal: 2026-11-20
 Sumber: keluhan UX terhadap PRD 003 v1 read-only (node kepotong, tidak jelas, tidak bisa tambah/pindah node)

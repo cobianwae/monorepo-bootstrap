@@ -60,13 +60,13 @@ Dampak API publik `@ds/ui`: hilang `OrgChartEditor`, `getDescendantIds`, `valida
 
 ## Tasks
 
-- [ ] Hapus 5 titik kode (komponen, test, export, route, nav).
-- [ ] Hapus 3 dokumen hidup editor.
-- [ ] Beri catatan superseded pada PRD 010 + 4 story 010-xx.
-- [ ] Perbarui sitemap (S-005.28, S-005.33) dan object-model (2 baris).
-- [ ] Hapus banner deprecation OrgChart (`org-chart/page.tsx:143-151`).
-- [ ] Append `STATUS-LOG`, perbarui `BACKLOG` + `STATUS`, jalankan `node scripts/check-status-log.mjs`.
-- [ ] Verifikasi: grep `OrgChartEditor|org-chart-editor` di `packages apps` = 0; `@ds/ui build:types` tetap 12 error baseline FlowEditor; suite ui turun tepat 34 test tanpa kegagalan baru; `@ds/showcase` test + lint hijau.
+- [x] Hapus 5 titik kode (komponen, test, export, route, nav).
+- [x] Hapus 3 dokumen hidup editor.
+- [x] Beri catatan superseded pada PRD 010 + 4 story 010-xx.
+- [x] Perbarui sitemap (S-005.28, S-005.33) dan object-model (2 baris).
+- [x] Hapus banner deprecation OrgChart (`org-chart/page.tsx:143-151`).
+- [x] Append `STATUS-LOG`, perbarui `BACKLOG` + `STATUS`, jalankan `node scripts/check-status-log.mjs`.
+- [ ] Verifikasi: tidak ada import/export/pemakaian aktif `OrgChartEditor|org-chart-editor` di `packages apps`; tiga komentar historis di `org-chart-studio.tsx` dikecualikan sesuai keputusan user (Studio tetap utuh). `@ds/ui build:types` tetap 12 error baseline FlowEditor; suite ui turun tepat 34 test tanpa kegagalan baru; `@ds/showcase` test + lint hijau.
 
 ## Keputusan
 
@@ -84,8 +84,8 @@ Dampak API publik `@ds/ui`: hilang `OrgChartEditor`, `getDescendantIds`, `valida
 - [x] Tidak relevan — komponen dihapus, bukan diubah.
 - [x] API export konsisten: penghapusan eksplisit dan terdokumentasi.
 - [x] State loading/empty/error tidak hilang dari DS: Studio menyediakan state matrix sendiri.
-- [ ] Showcase/docs diperbarui bila perlu — dikerjakan di Tasks.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass — dikerjakan di verifikasi.
+- [x] Showcase/docs diperbarui bila perlu — dikerjakan di Tasks.
+- [x] Verifikasi dijalankan: `pnpm lint` hijau; `pnpm typecheck` tetap 12 error baseline FlowEditor; `pnpm test` UI 714/714 (turun 34 test editor). Test showcase dengan 2 worker dan timeout 30 detik: 90/94 lulus, empat FlowEditor gagal (`localStorage.getItem`); build showcase lulus.
 
 ## Eksekusi
 
@@ -93,9 +93,9 @@ Branch: `cr-074-remove-org-chart-editor`
 Commit: `refactor: hapus OrgChartEditor legacy dan pulihkan OrgChart [CR-074]`
 
 - [x] CR disetujui user (2026-11-24).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui.
-- [ ] `docs/STATUS-LOG.md` di-append dan `check-status-log` hijau.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan; kegagalan baseline/lingkungan dicatat, bukan diperbaiki di luar scope.
+- [x] CR di-tick dan status `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui.
+- [x] `docs/STATUS-LOG.md` di-append dan `check-status-log` hijau.

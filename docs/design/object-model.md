@@ -37,14 +37,14 @@ Tema baru wajib punya `ThemeDefinition` lengkap dan masuk ke `THEMES`.
 |---|---|---|
 | `base` | Primitive visual dan kontrol dasar | button, badge, card, input, textarea, label, separator, skeleton, avatar, tabs, checkbox, switch, tooltip, progress, spinner, radio-group, slider, accordion, collapsible, kbd, toggle, aspect-ratio, scroll-area, palette-switcher, theme-provider |
 | `form` | Input dan validasi | form, select, combobox, tag-input, date-picker, input-otp, number-input, time-picker, filter-builder, stepper, segmented-control, file-input, file-upload, rich-text-editor (baru, PRD 006), image-cropper (baru, PRD 015) |
-| `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart (legacy PRD 003, diganti 011), event-calendar (baru, PRD 004), diff-viewer (baru, PRD 013), permission-matrix (baru, PRD 018) |
+| `data-display` | Menampilkan data | table, data-table, stat-card, bulk-action-bar, timeline, description-list, chart, chart-a11y-table, code-block, rating, chat, metric-tiles-card, org-chart, event-calendar (baru, PRD 004), diff-viewer (baru, PRD 013), permission-matrix (baru, PRD 018) |
 | `feedback` | Status dan respons sistem | dialog, alert, alert-dialog, toast, toaster, empty-state, use-toast |
 | `navigation` | Navigasi dan pencarian | dropdown-menu, breadcrumb, pagination, command-palette, context-menu, navigation-menu |
 | `overlay` | Lapisan di atas konten | sheet, popover, hover-card, tour (baru, PRD 017), lightbox (baru, PRD 016) |
 | `layout` | Kerangka halaman | app-shell, page-header, page-shell, page-skeleton, container, section, prose, demo-section, resizable, skip-link |
 | `marketing` | Blok presentasi | hero, hero-band, feature-grid, faq, logo-cloud, carousel, cta-band, statement-card, art-background, grid-pattern, dot-pattern, glow-orb, stats-band, section-number, pricing, testimonial, gradient-text |
 | `dnd` | Drag and drop | sortable-list, tree-view, kanban |
-| `canvas` | Kanvas interaktif (xyflow, token-mapped) | org-chart-editor (legacy PRD 010, diganti 011), org-chart-studio (baru, PRD 011), flow-editor (baru, PRD 005), mind-map (baru, PRD 012) |
+| `canvas` | Kanvas interaktif (xyflow, token-mapped) | org-chart-studio (baru, PRD 011), flow-editor (baru, PRD 005), mind-map (baru, PRD 012) |
 
 ## 4. Pattern Inventory
 

@@ -49,7 +49,6 @@ export * from './components/base/slider';
 export * from './components/form/number-input';
 export * from './components/form/time-picker';
 export * from './components/data-display/org-chart';
-export * from './components/canvas/org-chart-editor';
 export * from './components/canvas/flow-editor';
 // org-chart-studio mengekspor getAncestors sendiri (FR-001 self-contained);
 // dialias di barrel agar tidak tabrakan dengan org-chart (TS2308).
@@ -199,6 +198,5 @@ export * from './components/data-display/chat-composer-tools';
 export * from './components/layout/prose';
 export * from './components/form/search-input';
 export * from './components/feedback/banner';
-
 
 

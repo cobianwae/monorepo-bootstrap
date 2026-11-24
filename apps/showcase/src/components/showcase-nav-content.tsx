@@ -165,7 +165,6 @@ export const NAV_SECTIONS: NavSection[] = [
           { title: 'Data Table & Filtering', href: '/patterns/data-table', icon: TableProperties },
           { title: 'File Manager', href: '/patterns/file-manager', icon: FolderOpen },
           { title: 'Org Chart', href: '/patterns/org-chart', icon: Network },
-          { title: 'Org Chart Editor', href: '/patterns/org-chart-editor', icon: Network },
           { title: 'Org Chart Studio', href: '/patterns/org-chart-studio', icon: Network },
           { title: 'Mind Map', href: '/patterns/mind-map', icon: Network },
           { title: 'Calendar & Scheduling', href: '/patterns/calendar', icon: CalendarDays },

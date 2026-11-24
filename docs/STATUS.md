@@ -18,6 +18,7 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 - CR-065 done dan ter-merge ke `visual-polish`. CR-067 (uplift halaman Org Chart Studio) done dan di-merge ke `visual-polish` (branch `cr-067-org-chart-studio-page-uplift`). CR-066 (File Manager: demo, copy English, target sentuh segmented) `done` atas persetujuan user dan di-merge ke `visual-polish`.
 - CR-070 `done` (CodeBlock syntax highlighting Shiki dual-theme light/dark, fallback flat, copy-failure state) dan di-merge ke `visual-polish`; ui 742/743 (1 gagal RTE tak terkait), lint ui + showcase build:types/guard hijau. Cek visual browser light/dark belum.
 - CR-012 `done` (branch `cr-012-calendar-theme-docs-polish`, worktree `arah-cr`, dari `visual-polish` `355f01f`): agenda empty → EmptyState + CTA, min-height 18→24px, skeleton per-view, audit kontras AA berangka, blok week/day diperkuat (`border-l-4`, tint `/15`), demo 3 fieldset + tabel Pattern notes, copy showcase Inggris. Verifikasi: ui 737/737, tokens 10/10, lint/build hijau; baseline FlowEditor 12 error tidak berubah.
+- CR-074 diimplementasikan pada branch `cr-074-remove-org-chart-editor` (worktree `arah-prd`, dari `visual-polish`): komponen/route/nav OrgChartEditor dan spec hidupnya dihapus, PRD 010 + story historis diberi catatan superseded; OrgChart tetap `implemented`, OrgChartStudio tidak disentuh. Status CR tetap `approved` menunggu keputusan user; tiga komentar historis Studio dikecualikan dari pemeriksaan referensi aktif.
 
 ## Next
 

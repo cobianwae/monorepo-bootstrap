@@ -1,6 +1,7 @@
 # 010-04 — Search + states + showcase + a11y penuh
 
 Status: done
+Catatan: Removed — digantikan PRD 011 (CR-074). Status historis tidak diubah.
 PRD: `docs/prd/010-org-chart-editor.md`
 Design: `docs/design/org-chart-editor.md`
 FR: `FR-010`, `FR-012`, `FR-013`, `FR-014`, `FR-016`
