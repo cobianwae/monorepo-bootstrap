@@ -34,6 +34,7 @@ CR-071 (Dynamic Form: layout/copy) diimplementasikan di branch `cr-071-dynamic-f
 4. CR-075 `done` atas persetujuan user 2026-11-24; implementasi `cc21e6c` di `cr-075-flow-editor-test-button-types` (worktree `arah-prd`, dari `visual-polish` `014d0f2`), merge dan push ke `visual-polish` diizinkan user. Enam query bertipe tombol menghilangkan 12 TS2339; typecheck/lint workspace hijau, FlowEditor 49/49, UI 714/714. Test showcase 92/96 (4 gagal baseline localStorage). Smoke RTE + timing worker tetap terpisah; cek visual CR-070 belum.
 5. Antrean implementasi satu per sesi: 013-01, 015-03. 013-01 membuka S-005.36 (kini `in-design`); S-005.30/S-005.31 sudah `implemented`; S-005.41 tetap `in-design` sampai PRD 018 diimplementasi.
 6. 015-03 `done` atas persetujuan user 2026-11-24 dan dimerge ke `visual-polish`: route `/patterns/image-cropper` final + audit kontras.
+7. Audit UI/UX Import Wizard menghasilkan CR-076–081 (flow, a11y lokal, shared controls, English/kontrak demo, visual, data besar). User menetapkan **keenamnya `approved` pada 2026-11-25 tanpa memulai pengerjaan**; API aditif FileInput (CR-078) dan supersession keputusan bahasa (CR-079) ikut disetujui sebagaimana tertulis. Implementasi dimulai hanya atas instruksi baru, satu CR per sesi; prioritas usulan CR-076/077/078 → CR-079/080 → CR-081.
 
 ## Known Issues
 

@@ -137,6 +137,12 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-073 | Dynamic Form C: role dan empty state anggota, ringkasan validasi, fokus keyboard, dan kontras | approved | `docs/cr/cr-073-dynamic-form-fields-and-accessibility.md` |
 | CR-074 | OrgChartEditor legacy dihapus (komponen, test, export, route, nav); OrgChart dipulihkan, Studio tetap utuh; done atas persetujuan user 2026-11-24 | done | `docs/cr/cr-074-remove-org-chart-editor.md` |
 | CR-075 | Tipe tombol test FlowEditor diperbaiki; typecheck/lint hijau, FlowEditor 49/49; test showcase tetap 4 gagal baseline localStorage; done atas persetujuan user | done | `docs/cr/cr-075-flow-editor-test-button-types.md` |
+| CR-076 | Import Wizard: completion terminal, rejection sinkron, dan ringkasan konfirmasi jujur | approved | `docs/cr/cr-076-import-wizard-completion-feedback.md` |
+| CR-077 | Import Wizard: kontras error, label/deskripsi, fokus, target sentuh lokal dan reduced motion | approved | `docs/cr/cr-077-import-wizard-accessibility.md` |
+| CR-078 | Shared Stepper/FileInput: current-step terlihat, messages configurable dan replacement opt-in (API aditif disetujui) | approved | `docs/cr/cr-078-import-wizard-shared-form-controls.md` |
+| CR-079 | Import Wizard: copy English, soft-limit warning dan kontrak demo/recipe jujur (supersession bahasa disetujui) | approved | `docs/cr/cr-079-import-wizard-english-copy.md` |
+| CR-080 | Import Wizard: hierarki section, CodeBlock, density preview dan empty-filter recovery | approved | `docs/cr/cr-080-import-wizard-visual-hierarchy.md` |
+| CR-081 | Import Wizard: memo validasi, pemrosesan data besar nonblocking, skeleton dan demo parse-error | approved | `docs/cr/cr-081-import-wizard-large-data-states.md` |
 
 ## Catatan
 
