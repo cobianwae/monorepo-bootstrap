@@ -55,6 +55,30 @@ describe('DynamicFormPage (CR-058 C05)', () => {
     expect(screen.getAllByText('Project name must be at least 3 characters.')).toHaveLength(2);
   });
 
+  it('uses one h1, two section h2 headings, and five group h3 headings (CR-071)', () => {
+    render(<DynamicFormPage />);
+    expect(screen.getAllByRole('heading', { level: 1 }).map((h) => h.textContent)).toEqual(['Dynamic Form']);
+    expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual([
+      'Interactive demo',
+      'Try it',
+    ]);
+    expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([
+      'Project Information',
+      'Schedule & Ownership',
+      'Audience & Targeting',
+      'Budget & Capacity',
+      'Team Members',
+    ]);
+  });
+
+  it('describes the demo without production or navigation-guard claims (CR-071)', () => {
+    const { container } = render(<DynamicFormPage />);
+    const text = container.textContent ?? '';
+    expect(text).toContain('The demo does not send email or publish anything.');
+    expect(text).toContain('No email is sent.');
+    expect(text).not.toMatch(/production-grade|real-time validation|dirty-state guard|navigation/i);
+  });
+
   it('does not mark valid fields as invalid before submit', () => {
     render(<DynamicFormPage />);
     expect(screen.getByLabelText('Project name').getAttribute('aria-invalid')).toBeNull();
