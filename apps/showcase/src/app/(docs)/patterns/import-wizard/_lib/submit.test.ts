@@ -29,6 +29,11 @@ describe('planSubmit', () => {
     );
   });
 
+  it('submit diblokir: label tidak menjanjikan impor', () => {
+    expect(submitLabel(planSubmit(200, 3, 'fail'))).toBe('Perbaiki error untuk impor');
+    expect(submitLabel(planSubmit(0, 2, 'skip'))).toBe('Tidak ada baris untuk diimpor');
+  });
+
   it('policy fail tanpa error: submit boleh', () => {
     expect(planSubmit(5, 0, 'fail').canSubmit).toBe(true);
   });

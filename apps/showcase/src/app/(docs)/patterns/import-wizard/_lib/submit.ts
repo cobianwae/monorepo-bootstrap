@@ -101,7 +101,13 @@ export function buildImportResult(
   };
 }
 
-/** Label tombol submit: "Impor N baris" (N = baris valid). */
+/**
+ * Label tombol submit. Saat submit diblokir, label tidak boleh menjanjikan impor
+ * (CR-076): tombol menyebut alasan yang harus diselesaikan.
+ */
 export function submitLabel(plan: SubmitPlan): string {
+  if (!plan.canSubmit) {
+    return plan.valid === 0 ? 'Tidak ada baris untuk diimpor' : 'Perbaiki error untuk impor';
+  }
   return `Impor ${plan.valid} baris`;
 }
