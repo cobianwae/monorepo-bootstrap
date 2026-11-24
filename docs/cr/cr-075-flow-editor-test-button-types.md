@@ -1,6 +1,6 @@
 # CR-075 — Perbaiki tipe tombol pada test FlowEditor
 
-**Status:** approved (implementasi selesai; menunggu review dan penetapan done oleh user)
+**Status:** done (disetujui dan ditetapkan user 2026-11-24)
 **Sumber:** baseline typecheck; permintaan user 2026-11-24
 **Ref:** `packages/ui/src/components/canvas/flow-editor.test.tsx:706–753`, `docs/STATUS.md` (Known Issues)
 
