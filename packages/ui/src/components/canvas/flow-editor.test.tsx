@@ -683,7 +683,7 @@ describe('FlowEditor undo/redo + toolbar (005-05)', () => {
     expect(countEdges()).toBe(1); // e1 hilang, sisa edge baru
 
     // undo ×3 kembali ke state awal
-    const undo = screen.getByTestId('flow-toolbar-undo');
+    const undo = screen.getByTestId<HTMLButtonElement>('flow-toolbar-undo');
     fireEvent.click(undo); // undo hapus e1 → e1 kembali
     expect(countEdges()).toBe(2);
     fireEvent.click(undo); // undo sambung edge baru
@@ -693,7 +693,7 @@ describe('FlowEditor undo/redo + toolbar (005-05)', () => {
     expect(countEdges()).toBe(1);
 
     // redo ×3 kembali ke state setelah hapus e1
-    const redo = screen.getByTestId('flow-toolbar-redo');
+    const redo = screen.getByTestId<HTMLButtonElement>('flow-toolbar-redo');
     fireEvent.click(redo); // tambah node
     expect(countNodes()).toBe(3);
     fireEvent.click(redo); // sambung edge baru
@@ -713,7 +713,7 @@ describe('FlowEditor undo/redo + toolbar (005-05)', () => {
     for (let i = 0; i < 55; i++) fireEvent.click(add);
     expect(countNodes()).toBe(55);
 
-    const undo = screen.getByTestId('flow-toolbar-undo');
+    const undo = screen.getByTestId<HTMLButtonElement>('flow-toolbar-undo');
     for (let i = 0; i < 50; i++) fireEvent.click(undo);
     // stack terbatas 50: 5 state terpanjang terbuang, sisa 5 node
     expect(countNodes()).toBe(5);
@@ -722,13 +722,13 @@ describe('FlowEditor undo/redo + toolbar (005-05)', () => {
     // cabang baru: tambah 1 node → redo stack dibersihkan
     fireEvent.click(add);
     expect(countNodes()).toBe(6);
-    expect(screen.getByTestId('flow-toolbar-redo').disabled).toBe(true);
+    expect(screen.getByTestId<HTMLButtonElement>('flow-toolbar-redo').disabled).toBe(true);
   }, 30000); // 105+ klik di jsdom; melampaui 5 detik default saat suite penuh berjalan
 
   it('AC-03: toolbar + keyboard (Ctrl+Z / Ctrl+Y) setara + disabled + live region', () => {
     renderUndo();
-    const undo = screen.getByTestId('flow-toolbar-undo');
-    const redo = screen.getByTestId('flow-toolbar-redo');
+    const undo = screen.getByTestId<HTMLButtonElement>('flow-toolbar-undo');
+    const redo = screen.getByTestId<HTMLButtonElement>('flow-toolbar-redo');
     expect(undo.disabled).toBe(true);
     expect(redo.disabled).toBe(true);
 

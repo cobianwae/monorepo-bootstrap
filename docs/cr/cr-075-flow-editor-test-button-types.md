@@ -1,6 +1,6 @@
 # CR-075 — Perbaiki tipe tombol pada test FlowEditor
 
-**Status:** approved (disetujui user 2026-11-24; implementasi belum dimulai)
+**Status:** done (disetujui dan ditetapkan user 2026-11-24)
 **Sumber:** baseline typecheck; permintaan user 2026-11-24
 **Ref:** `packages/ui/src/components/canvas/flow-editor.test.tsx:706–753`, `docs/STATUS.md` (Known Issues)
 
@@ -35,12 +35,12 @@ Nomor baris ini memperbarui rentang historis 702–749 di STATUS; bukan error ba
 
 ## Tasks (jalur small-fix)
 
-- [ ] Setelah approval, buat branch `cr-075-flow-editor-test-button-types`.
-- [ ] Perbaiki tipe query tombol undo/redo terkait di test FlowEditor.
-- [ ] Jalankan `pnpm --filter @ds/ui build:types`.
-- [ ] Jalankan `pnpm --filter @ds/ui test -- src/components/canvas/flow-editor.test.tsx`.
-- [ ] Jalankan berurutan `pnpm typecheck`, `pnpm lint`, `pnpm test`; catat hasil dan kegagalan di luar scope.
-- [ ] Tick tasks, perbarui BACKLOG dan STATUS berdasarkan bukti baru, append STATUS-LOG, lalu jalankan `node scripts/check-status-log.mjs`.
+- [x] Setelah approval, buat branch `cr-075-flow-editor-test-button-types`.
+- [x] Perbaiki tipe query tombol undo/redo terkait di test FlowEditor.
+- [x] Jalankan `pnpm --filter @ds/ui build:types`.
+- [x] Jalankan `pnpm --filter @ds/ui test -- src/components/canvas/flow-editor.test.tsx`.
+- [x] Jalankan berurutan `pnpm typecheck`, `pnpm lint`, `pnpm test`; catat hasil dan kegagalan di luar scope.
+- [x] Tick tasks, perbarui BACKLOG dan STATUS berdasarkan bukti baru, append STATUS-LOG, lalu jalankan `node scripts/check-status-log.mjs`.
 
 ## Keputusan
 
@@ -52,22 +52,31 @@ Nomor baris ini memperbarui rentang historis 702–749 di STATUS; bukan error ba
 
 ## Design System Checks
 
-- [ ] Token/kontras: tidak relevan; tidak ada perubahan warna atau visual.
-- [ ] Radix/a11y: tidak ada perubahan runtime; assertion keyboard dan live region dipertahankan.
-- [ ] API `cva` dan export tidak berubah.
-- [ ] State loading, empty, dan error tidak berubah.
-- [ ] Docs pelacakan diperbarui; showcase tidak perlu diubah.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` dijalankan; hasil dan baseline lain dicatat.
+- [x] Token/kontras: tidak relevan; tidak ada perubahan warna atau visual.
+- [x] Radix/a11y: tidak ada perubahan runtime; assertion keyboard dan live region dipertahankan.
+- [x] API `cva` dan export tidak berubah.
+- [x] State loading, empty, dan error tidak berubah.
+- [x] Docs pelacakan diperbarui; showcase tidak perlu diubah.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` dijalankan; hasil dan baseline lain dicatat.
 
 ## Eksekusi
 
 Branch rencana: `cr-075-flow-editor-test-button-types`
 Commit rencana: `fix: correct FlowEditor test button types [CR-075]`
 
-- [x] CR disetujui user (2026-11-24); user meminta tidak diimplementasikan dahulu.
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] CR disetujui user (2026-11-24); penundaan dicabut dengan approval rencana implementasi pada sesi ini.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+
+### Hasil implementasi dan verifikasi
+
+- Worktree `arah-prd`, branch dari `visual-polish` `014d0f2`; enam query diberi generic `HTMLButtonElement`. Seluruh assertion tetap utuh.
+- Blast radius terbatas pada tipe test, tanpa relasi produksi/API berubah; graphify tidak relevan untuk perubahan ini. PRD 005 FR-007 dan design FlowEditor D8 tetap dipertahankan.
+- Baseline direproduksi sebelum perubahan: tepat 12 TS2339. Sesudah perubahan, `pnpm --filter @ds/ui build:types` dan `pnpm typecheck` workspace lulus.
+- Perintah test UI pada task di atas ternyata menjalankan seluruh suite: 714/714 lulus. Verifikasi targeted tambahan via `pnpm --filter @ds/ui exec vitest run src/components/canvas/flow-editor.test.tsx`: 49/49 lulus.
+- `pnpm lint` lulus. `pnpm test`: token 10/10, UI 714/714; showcase 92/96, empat kasus `patterns/flow-editor/page.test.tsx` gagal `localStorage.getItem is not a function` di `theme-provider.tsx:27`. Ini baseline terdokumentasi, tidak diperbaiki dalam CR ini.
+- Tidak ada perubahan token/showcase; audit token tambahan dan build showcase tidak diperlukan. Tidak ada dependency, konfigurasi, kode produksi, atau suppression TypeScript yang diubah.
