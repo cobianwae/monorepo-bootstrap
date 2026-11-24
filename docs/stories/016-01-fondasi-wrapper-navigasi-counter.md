@@ -1,6 +1,6 @@
 # 016-01 — Fondasi wrapper + navigasi + counter
 
-Status: todo
+Status: review
 PRD: `docs/prd/016-lightbox-gallery.md` (approved, gate 1)
 Design: `docs/design/wireframes/lightbox-gallery.md` (approved, gate 2, K1/K2/K4/K5/K7 + §2.1/§2.2) + `docs/design/flows/lightbox-gallery.mmd` (diagram 1–2) + sitemap `S-005.16` / `M-012`
 FR: `FR-001`, `FR-004`
@@ -29,11 +29,11 @@ Goal: Komponen `Lightbox` controlled berdiri tanpa showcase final: wrapper `yet-
 
 ## Tasks
 
-- [ ] Tambah dependency `yet-another-react-lightbox` ke `packages/ui` — butuh approval eksplisit per CONVENTIONS (konsep approved gate 1, K1/C1); isolasi CSS wrapper agar tidak menabrak token
-- [ ] Buat `packages/ui/src/components/overlay/lightbox-types.ts` (`LightboxItem/LightboxProps` §2.1 wireframe, `alt` wajib, `openIndex: number | null`, `renderCaption` + `actions` slot K3) + `lightbox.tsx` (named export, `overlay/dialog` sebagai basis trap fokus) + barrel export; tanpa token baru
-- [ ] Implementasi overlay fullscreen + tombol Sebelum/Berikut/Tutup berlabel ID + counter badge "N / total" (`aria-live` polite) + strip thumbnail sinkron + caption slot + microcopy Bahasa Indonesia (§2.1–§2.2)
-- [ ] Tulis test co-located (mock YARL bila perlu di jsdom): navigasi 12 item ujung-ke-ujung, counter benar, ujung disabled, strip sinkron dua arah, caption slot, controlled open/close + clamp, preload 1+1
-- [ ] Verifikasi `pnpm typecheck`, `lint`, `test` untuk file baru; catat default K1/K2/K4/K5/K7 di story
+- [x] Tambah dependency `yet-another-react-lightbox` ke `packages/ui` — butuh approval eksplisit per CONVENTIONS (konsep approved gate 1, K1/C1); isolasi CSS wrapper agar tidak menabrak token
+- [x] Buat `packages/ui/src/components/overlay/lightbox-types.ts` (`LightboxItem/LightboxProps` §2.1 wireframe, `alt` wajib, `openIndex: number | null`, `renderCaption` + `actions` slot K3) + `lightbox.tsx` (named export, `overlay/dialog` sebagai basis trap fokus) + barrel export; tanpa token baru
+- [x] Implementasi overlay fullscreen + tombol Sebelum/Berikut/Tutup berlabel ID + counter badge "N / total" (`aria-live` polite) + strip thumbnail sinkron + caption slot + microcopy Bahasa Indonesia (§2.1–§2.2)
+- [x] Tulis test co-located (mock YARL bila perlu di jsdom): navigasi 12 item ujung-ke-ujung, counter benar, ujung disabled, strip sinkron dua arah, caption slot, controlled open/close + clamp, preload 1+1
+- [x] Verifikasi `pnpm typecheck`, `lint`, `test` untuk file baru; catat default K1/K2/K4/K5/K7 di story
 
 ## Dependencies
 
@@ -44,3 +44,5 @@ Goal: Komponen `Lightbox` controlled berdiri tanpa showcase final: wrapper `yet-
 
 - Risiko: CSS library menabrak token — mitigasi override terisolasi di wrapper + audit visual di 016-03; jsdom tanpa layout — mitigasi mock + uji integrasi ringan di showcase 016-03
 - Keputusan: K1 wrapper token-first; K2 preload 1+1; K4 kategori `overlay`; K5 controlled `openIndex/null`; K7 tanpa ganti `M-001`; C3 tidak melingkar; zoom/video/keyboard/states di 016-02
+- Implementasi (2026-11-25, branch `016-01-lightbox-fondasi`, worktree `arah-prd`, dari `visual-polish` `5512a09`): `yet-another-react-lightbox@3.33.1` di `packages/ui`; `lightbox-types.ts` + `lightbox.tsx` + `lightbox.css` (override `--yarl__*` ke token, diimpor via `styles.css` seperti driver.js) + barrel; chrome DS lewat `render.controls` (tutup via controller ref, counter Badge, live region) dan `render.slideFooter` (caption); strip lewat plugin `Thumbnails` (`aria-current` bawaan, `hidden` bila ≤1 item); item video memakai poster sebagai slide gambar sementara (playback di 016-02). Trap fokus/fokus-kembali milik YARL bawaan; membungkus Radix `Dialog` akan menggandakan portal, jadi tidak dipakai.
+- Verifikasi: typecheck workspace hijau; lint workspace hijau; `packages/ui` 62 file 729/729 lolos (lightbox 15/15); showcase 97/101 dengan 4 gagal baseline localStorage yang sudah terdokumentasi; timeout mind-map pada run paralel lulus 46/46 saat dijalankan sendiri. Cek visual browser light/dark belum dilakukan (di 016-03).

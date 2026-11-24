@@ -24,6 +24,8 @@ export * from './components/base/tooltip';
 export * from './components/overlay/popover';
 export * from './components/overlay/tour-types';
 export * from './components/overlay/tour';
+export * from './components/overlay/lightbox-types';
+export * from './components/overlay/lightbox';
 export * from './components/base/progress';
 export * from './components/navigation/breadcrumb';
 export * from './components/form/stepper';
