@@ -1,6 +1,6 @@
 # CR-071 — Hierarki, Layout, dan Copy Dynamic Form
 
-**Status:** approved  
+**Status:** done (ditetapkan user 2026-11-24)  
 **Sumber:** audit `/improve-ui` — cluster A  
 **Ref:** `docs/design/sitemap.md` (S-005.09), `docs/design/visual-language.md`, `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx`
 
