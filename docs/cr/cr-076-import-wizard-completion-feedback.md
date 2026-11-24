@@ -1,6 +1,6 @@
 # CR-076 — Import Wizard: Lifecycle Selesai dan Feedback Konfirmasi
 
-**Status:** approved (2026-11-25; implementasi belum dimulai)  
+**Status:** done (ditetapkan user 2026-11-25; implementasi `e050589`, `f3c1cf6`)  
 **Sumber:** audit UI/UX `/improve-ui` Import Wizard, 2026-11-25 — cluster flow  
 **Ref:** `docs/prd/014-import-wizard.md` (FR-004/005/008/009), `docs/design/import-wizard.md`, story 014-03, S-005.37.04  
 **Prioritas:** tinggi; dapat dikerjakan sebelum CR-077–081.
@@ -33,10 +33,10 @@ Lokasi relatif di bawah berada dalam `apps/showcase/src/app/(docs)/patterns/impo
 
 ## Tasks
 
-- [ ] Lindungi navigasi sesudah completion dan definisikan reset hasil aktif; pertahankan histori demo hanya bila diberi label sebagai histori.
-- [ ] Sinkronkan rejection dengan perubahan sumber/mapping/policy; perjelas hitungan dan kondisi submit.
-- [ ] Tambah regression test success → stepper, success → restart, fail → skip, revisi mapping, zero-valid, dan backward-state preservation.
-- [ ] Verifikasi focus/live region dan semua state di light/dark, termasuk invalid-skip dan invalid-fail.
+- [x] Lindungi navigasi sesudah completion dan definisikan reset hasil aktif; pertahankan histori demo hanya bila diberi label sebagai histori.
+- [x] Sinkronkan rejection dengan perubahan sumber/mapping/policy; perjelas hitungan dan kondisi submit.
+- [x] Tambah regression test success → stepper, success → restart, fail → skip, revisi mapping, zero-valid, dan backward-state preservation.
+- [x] Verifikasi focus/live region dan semua state di light/dark, termasuk invalid-skip dan invalid-fail. (Chromium headless light/dark; pembaca layar dan kontras numerik belum.)
 
 ## Keputusan
 
@@ -57,6 +57,6 @@ Lokasi relatif di bawah berada dalam `apps/showcase/src/app/(docs)/patterns/impo
 Branch: `cr-076-import-wizard-completion-feedback`  
 Commit: `fix: align import wizard completion and feedback [CR-076]`
 
-- [ ] CR disetujui user dan branch dibuat.
-- [ ] Implementasi/verifikasi selesai; checklist dan BACKLOG/STATUS diperbarui; hanya user menetapkan done.
-- [ ] Append STATUS-LOG (`YYYY-MM-DD — ringkasan — referensi`); `node scripts/check-status-log.mjs` hijau sebelum commit.
+- [x] CR disetujui user dan branch dibuat.
+- [x] Implementasi/verifikasi selesai; checklist dan BACKLOG/STATUS diperbarui; hanya user menetapkan done.
+- [x] Append STATUS-LOG (`YYYY-MM-DD — ringkasan — referensi`); `node scripts/check-status-log.mjs` hijau sebelum commit.

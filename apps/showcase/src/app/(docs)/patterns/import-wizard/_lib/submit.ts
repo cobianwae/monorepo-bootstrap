@@ -47,6 +47,27 @@ export function planSubmit(validCount: number, invalidCount: number, policy: Fai
   };
 }
 
+export interface SummaryBuckets {
+  valid: number;
+  /** Baris error yang dilewati (policy `skip`). */
+  skipped: number;
+  /** Baris error yang memblokir impor (policy `fail`). */
+  failed: number;
+}
+
+/**
+ * Kelompok untuk ringkasan konfirmasi. Setiap baris tidak valid hanya masuk satu
+ * kelompok sesuai policy, sehingga tidak dihitung ganda sebagai dilewati dan gagal.
+ * `ImportResult` tidak berubah; ini hanya tampilan ringkasan.
+ */
+export function summaryBuckets(plan: SubmitPlan, policy: FailPolicy): SummaryBuckets {
+  return {
+    valid: plan.valid,
+    skipped: policy === 'skip' ? plan.failedRows : 0,
+    failed: policy === 'fail' ? plan.failedRows : 0,
+  };
+}
+
 export type BuildResult = { ok: true; result: ImportResult } | { ok: false; reason: string };
 
 /**
@@ -80,7 +101,13 @@ export function buildImportResult(
   };
 }
 
-/** Label tombol submit: "Impor N baris" (N = baris valid). */
+/**
+ * Label tombol submit. Saat submit diblokir, label tidak boleh menjanjikan impor
+ * (CR-076): tombol menyebut alasan yang harus diselesaikan.
+ */
 export function submitLabel(plan: SubmitPlan): string {
+  if (!plan.canSubmit) {
+    return plan.valid === 0 ? 'Tidak ada baris untuk diimpor' : 'Perbaiki error untuk impor';
+  }
   return `Impor ${plan.valid} baris`;
 }

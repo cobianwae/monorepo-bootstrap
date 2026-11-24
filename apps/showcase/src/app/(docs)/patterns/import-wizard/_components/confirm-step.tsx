@@ -12,7 +12,7 @@ import {
   StatCard,
 } from '@ds/ui';
 import type { ImportResult } from '../_lib/types';
-import { submitLabel, type FailPolicy, type SubmitPlan } from '../_lib/submit';
+import { submitLabel, summaryBuckets, type FailPolicy, type SubmitPlan } from '../_lib/submit';
 
 export interface ConfirmStepProps {
   plan: SubmitPlan;
@@ -54,27 +54,29 @@ export function ConfirmStep({
     );
   }
 
+  const buckets = summaryBuckets(plan, policy);
+
   return (
     <div className="space-y-6">
       <div ref={summaryRef} tabIndex={-1} data-testid="iw-summary" className="space-y-4 focus:outline-none">
         <div className="grid gap-3 sm:grid-cols-3">
           <StatCard
             title="Valid"
-            value={plan.valid}
+            value={buckets.valid}
             icon={CheckCircle2}
-            description="Akan diimpor"
+            description={plan.canSubmit ? 'Akan diimpor' : 'Belum bisa diimpor'}
           />
           <StatCard
             title="Lewati"
-            value={plan.skipped}
+            value={buckets.skipped}
             icon={MinusCircle}
-            description="Dilewati karena error"
+            description="Error; tidak ikut impor"
           />
           <StatCard
             title="Gagal"
-            value={plan.failedRows}
+            value={buckets.failed}
             icon={AlertCircle}
-            description="Baris dengan error"
+            description="Error; memblokir impor"
           />
         </div>
 

@@ -69,6 +69,7 @@ export default function ImportWizardPage() {
     async (source: WizardSource, chosen: DelimiterChoice, delayMs = 0) => {
       const id = ++requestId.current;
       setParsing(true);
+      setRejection(null);
       setState((prev) => setSource(prev, source));
       if (delayMs > 0) await new Promise((resolve) => setTimeout(resolve, delayMs));
       const parsed = await parseCsv(source.kind === 'file' ? source.file : source.text, {
@@ -90,6 +91,7 @@ export default function ImportWizardPage() {
       requestId.current++;
       setParsing(false);
       setPasteNotice(null);
+      setRejection(null);
       setState((prev) => ({ ...prev, source: null, parsed: null, mapping: {}, suggested: [] }));
       return;
     }
@@ -125,6 +127,7 @@ export default function ImportWizardPage() {
     const next = setTarget(state, header, key, DEMO_FIELDS);
     if (next.error) return next.error;
     setState(next.state);
+    setRejection(null);
     return null;
   };
 
@@ -211,7 +214,11 @@ export default function ImportWizardPage() {
             aria-label="Langkah impor"
             steps={STEP_LABELS.map((title, index) => ({ id: index + 1, title }))}
             currentStep={stepIndex}
-            onStepClick={(index) => setState((prev) => goToStep(prev, index + 1, DEMO_FIELDS))}
+            onStepClick={(index) => {
+              // Setelah selesai, stepper hanya menunjukkan posisi terakhir (CR-076).
+              if (completed) return;
+              setState((prev) => goToStep(prev, index + 1, DEMO_FIELDS));
+            }}
             data-testid="iw-stepper"
           />
           <p className="text-xs text-muted-foreground">
@@ -280,7 +287,11 @@ export default function ImportWizardPage() {
               <ConfirmStep
                 plan={plan}
                 policy={policy}
-                onPolicyChange={setPolicy}
+                onPolicyChange={(next) => {
+                  // Penolakan lama tidak relevan setelah policy berubah.
+                  setPolicy(next);
+                  setRejection(null);
+                }}
                 onSubmit={handleSubmit}
                 rejection={rejection}
                 summaryRef={summaryRef}
