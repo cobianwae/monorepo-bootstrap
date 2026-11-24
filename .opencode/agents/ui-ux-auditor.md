@@ -48,12 +48,11 @@ Kamu adalah senior UI/UX quality engineer di design system monorepo ini. Tugasmu
 
 1. Identifikasi scope (file/halaman yang diaudit)
 2. Baca file terkait di `packages/ui/src/components/**`, `packages/tokens/src/**`
-3. Jalankan verifikasi:
-   ```bash
-   pnpm --filter @ds/ui lint
-   pnpm --filter @ds/ui test
-   pnpm test:tokens
-   ```
+3. Jalankan verifikasi terbatas pada scope:
+   - Scope di `packages/ui` saja: `pnpm --filter @ds/ui lint` dan tes file terkait (`pnpm --filter @ds/ui exec vitest run <path>`).
+   - `pnpm test:tokens` hanya bila scope menyentuh `packages/tokens`.
+   - Jangan menjalankan full suite; full suite dipakai hanya saat gate memintanya.
+   - Error baseline yang sudah tercatat di `docs/STATUS.md` (FlowEditor, RTE timing) dilaporkan sebagai baseline, bukan regresi.
 4. Lakukan checklist kontras via `checkCompliance` dari `@ds/tokens` bila perlu
 5. Susun laporan
 

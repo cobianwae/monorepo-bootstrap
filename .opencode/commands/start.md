@@ -1,6 +1,6 @@
 ---
 description: Bootstrap sesi dengan membaca STATUS, BACKLOG aktif, dan kondisi git
-agent: build
+agent: plan
 ---
 
 Bootstrap sesi kerja.

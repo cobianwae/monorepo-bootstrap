@@ -1,6 +1,6 @@
 ---
 description: Audit kode UI/UX via subagent ui-ux-auditor
-agent: build
+agent: plan
 ---
 
 Scope: `$ARGUMENTS`

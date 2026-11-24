@@ -1,6 +1,6 @@
 ---
 description: Review artefak dan hasilkan temuan dengan severity
-agent: build
+agent: plan
 ---
 
 Artefak: `$ARGUMENTS`
@@ -20,8 +20,8 @@ Artefak: `$ARGUMENTS`
    # | severity | lensa | lokasi | deskripsi | rekomendasi
    ```
 
-5. Temuan pada artefak approved/shipped atau story `review`/`done` harus menjadi **draft CR**, bukan edit langsung.
-6. Artefak draft boleh diedit hanya dengan konfirmasi user.
+5. Temuan pada artefak approved/shipped atau story `review`/`done` harus menjadi **draft CR**. Command ini hanya membaca dan melaporkan; draft CR ditulis di sesi terpisah (agent `build`) setelah user meminta.
+6. Artefak draft tidak diedit di command ini.
 7. Ringkas temuan dan tanyakan next action.
 
-Jangan mengubah kode kecuali diminta eksplisit.
+Command ini read-only. Jangan mengubah file atau kode.

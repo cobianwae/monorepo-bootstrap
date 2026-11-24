@@ -8,7 +8,7 @@ Target: `$ARGUMENTS`
 ## Langkah
 
 1. Tentukan jenis target:
-   - **Story**: harus berstatus `todo` atau lebih; branch `NNN-MM-slug`.
+   - **Story**: harus sudah lolos Gate 3 (disetujui user, status `todo`) dan belum `done`; branch `NNN-MM-slug`. Jika story masih draft atau belum disetujui, berhenti.
    - **CR**: harus berstatus `approved`; branch `cr-NNN-slug`; commit trailer `[CR-NNN]`.
 2. Baca story/CR, PRD, dan design terkait. Story/CR adalah source of truth.
 3. Buat todo list task.
