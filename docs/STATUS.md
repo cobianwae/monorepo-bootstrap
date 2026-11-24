@@ -25,6 +25,8 @@ CR-013 `done` atas persetujuan user 2026-11-23, implementasi `d900985` dari `cr-
 
 CR-069 (copy English OrgChartStudio) done atas persetujuan user; dimerge ke `visual-polish`. Dokumen CR-054 disinkronkan `edd5bea`; CR-054–064 done. CR-068 done atas persetujuan user; diimplementasikan di branch `cr-068-org-chart-studio-demo-polish` (worktree `arah-story`).
 
+CR-071–073 (Dynamic Form: layout/copy, draft lifecycle, field/a11y) disetujui user 2026-11-24; implementasi satu CR per sesi, mulai CR-071.
+
 1. CR-063–064 done; antrean berikutnya 013-01/015-03 (butir 5). Batas CSS consumer/overflow non-Banner CR-056 tetap tercatat. Status done hanya oleh user.
 2. CR-017 ditetapkan **done** oleh user setelah uji klik dan pemulihan fokus di Chrome light/dark. Audit visual dan pembaca layar belum. CR-018 dan CR-036 tetap **done**.
 3. Jangan membuka ulang temuan yang sudah ditangani: eyebrow PageHeader CR-046 done, Directional Motion CR-048 done, deviasi h1/weight dipertahankan CR-051. Sisa teks kecil → CR-055; guard heading seluruh docs sudah diperluas di CR-052; flaky RTE tetap baseline.

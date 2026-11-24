@@ -132,6 +132,10 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-068 | Org Chart Studio: poles demo (search di state non-data, reset seed, klaim dari data, toast Loading) dan section keyboard (sub-heading, `<kbd>`); 2 cluster A/B | done | `docs/cr/cr-068-org-chart-studio-demo-polish.md` |
 | CR-069 | OrgChartStudio: seluruh copy runtime (label, dialog, toast, live region, pesan validasi, default `emptyActionLabel`) ke English + update test; 4 cluster A–D | done | `docs/cr/cr-069-org-chart-studio-english-copy.md` |
 | CR-070 | CodeBlock syntax highlighting (Shiki): dual-theme light/dark + audit kontras + fallback flat; done atas persetujuan user, visual browser belum diverifikasi | done | `docs/cr/cr-070-codeblock-shiki-highlighting.md` |
+| CR-071 | Dynamic Form A: hierarki halaman, reflow 320 px, dan copy English yang sesuai perilaku demo | approved | `docs/cr/cr-071-dynamic-form-layout-and-copy.md` |
+| CR-072 | Dynamic Form B: status autosave, pemulihan draft, reset terkonfirmasi, dan simulasi submit | approved | `docs/cr/cr-072-dynamic-form-draft-lifecycle.md` |
+| CR-073 | Dynamic Form C: role dan empty state anggota, ringkasan validasi, fokus keyboard, dan kontras | approved | `docs/cr/cr-073-dynamic-form-fields-and-accessibility.md` |
+| CR-074 | Hapus OrgChartEditor legacy (komponen, test, export, route, nav) dan pulihkan status OrgChart; approved 2026-11-24 | approved | `docs/cr/cr-074-remove-org-chart-editor.md` |
 
 ## Catatan
 
