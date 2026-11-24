@@ -1,6 +1,6 @@
 # CR-072 — Siklus Draft, Reset, dan Submit Dynamic Form
 
-**Status:** approved  
+**Status:** done (disetujui user 2026-11-25)  
 **Sumber:** audit `/improve-ui` — cluster B  
 **Ref:** S-005.09, `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx`  
 **Urutan usulan:** setelah CR-071; CR-073 menambahkan regresi role dan daftar anggota kosong terhadap kontrak draft ini.
@@ -54,7 +54,7 @@ Commit: `fix: make dynamic form draft lifecycle reliable [CR-072]`
 
 ## Hasil Implementasi dan Verifikasi — 2026-11-25
 
-- Status tetap **approved**, implementasi selesai dan menunggu review user; belum ditetapkan `done`, belum push/PR.
+- Implementasi `6c85ab3` disetujui user dan ditetapkan **done** pada 2026-11-25; user mengizinkan merge ke `visual-polish` dan push. Hasil verifikasi di bawah berasal dari branch implementasi.
 - Debounce 1,2 detik mengikuti snapshot nilai, bukan `isDirty`; perubahan status/validasi tidak menjadwalkan write baru. Cleanup unmount, reset terkonfirmasi, dan submit valid membatalkan timer. Submit mempertahankan nilai tanpa membuat draft sampai edit berikutnya.
 - Restore membaca storage setelah mount dan memvalidasi bentuk data dengan skema draft terpisah dari validasi submit. String kosong, email belum valid, dan tanggal kosong dipertahankan; kickoff memakai `null` agar React Hook Form tidak mengembalikan tanggal seed. JSON/bentuk/tanggal rusak memakai seed dan status gagal baca.
 - Satu status `role="status"`/`aria-live="polite"`/`aria-atomic="true"` menjelaskan empty/pending/saved/restored/read-error/save-error/delete-error. Tidak ada klaim berhasil menyimpan/menghapus ketika operasi melempar error.
