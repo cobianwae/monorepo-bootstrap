@@ -1,21 +1,33 @@
 import * as React from 'react';
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { Lightbox } from './lightbox';
 import type { LightboxItem, LightboxProps } from './lightbox-types';
 
 type CapturedProps = {
   open?: boolean;
   index?: number;
-  slides?: Array<{ src: string; alt: string; thumbnail?: string }>;
+  slides?: Array<{ src?: string; alt: string; thumbnail?: string; type?: string; sources?: Array<{ src: string; type: string }>; poster?: string }>;
   carousel?: { finite?: boolean; preload?: number };
   thumbnails?: { position?: string; hidden?: boolean };
+  animation?: { swipe?: number; zoom?: number };
+  zoom?: { maxZoomPixelRatio?: number };
+  video?: { controls?: boolean; preload?: string; autoPlay?: boolean };
+  plugins?: unknown[];
   labels?: Record<string, string>;
   close?: () => void;
-  on?: { view?: (props: { index: number }) => void };
+  on?: { view?: (props: { index: number }) => void; zoom?: (props: { zoom: number }) => void };
   controller?: { ref?: React.RefObject<{ close: () => void } | null> };
   render?: {
     controls?: () => React.ReactNode;
+    buttonZoom?: (zoom: {
+      zoom: number;
+      maxZoom: number;
+      disabled: boolean;
+      zoomIn: () => void;
+      zoomOut: () => void;
+      changeZoom: (targetZoom: number, rapid?: boolean) => void;
+    }) => React.ReactNode;
     slideFooter?: (props: {
       slide: { src: string; alt: string; thumbnail?: string };
     }) => React.ReactNode;
@@ -36,19 +48,42 @@ vi.mock('yet-another-react-lightbox', () => ({
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [idx, setIdx] = React.useState(props.index ?? 0);
     // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [zoomLevel, setZoomLevel] = React.useState(1);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     React.useEffect(() => {
       const ref = props.controller?.ref;
       if (ref && typeof ref === 'object') {
         ref.current = { close: () => props.close?.() };
       }
     }, [props]);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    React.useEffect(() => {
+      const zoomPropRef = (props as { zoom?: { ref?: React.RefObject<unknown> } }).zoom?.ref;
+      if (zoomPropRef && typeof zoomPropRef === 'object') {
+        (zoomPropRef as React.RefObject<unknown>).current = zoomRef;
+      }
+    });
     if (!props.open) return null;
     const go = (next: number) => {
       setIdx(next);
       props.on?.view?.({ index: next });
     };
+    const changeZoom = (next: number) => {
+      const clamped = Math.min(Math.max(next, 1), 4);
+      setZoomLevel(clamped);
+      props.on?.zoom?.({ zoom: clamped });
+    };
+    const zoomRef = {
+      zoom: zoomLevel,
+      maxZoom: 4,
+      disabled: false,
+      zoomIn: () => changeZoom(zoomLevel * 2),
+      zoomOut: () => changeZoom(zoomLevel / 2),
+      changeZoom: (target: number) => changeZoom(target),
+    };
+    const activeSlide = slides[idx];
     return (
-      <div data-testid="yarl-mock">
+      <div data-testid="yarl-mock" className="ds-lightbox">
         <button
           type="button"
           aria-label={props.labels?.['Previous']}
@@ -65,6 +100,10 @@ vi.mock('yet-another-react-lightbox', () => ({
         >
           next
         </button>
+        {activeSlide?.type === 'video' ? (
+          <video data-testid="mock-video" src={activeSlide.sources?.[0]?.src} poster={activeSlide.poster} controls preload="metadata" />
+        ) : null}
+        {props.render?.buttonZoom?.(zoomRef)}
         <div role="group" aria-label={props.labels?.['Thumbnails']}>
           {slides.map((slide, i) => (
             <button
@@ -79,13 +118,23 @@ vi.mock('yet-another-react-lightbox', () => ({
           ))}
         </div>
         {props.render?.controls?.()}
-        {props.render?.slideFooter?.({ slide: slides[idx] })}
+        {props.render?.slideFooter?.({
+          slide: slides[idx] as { src: string; alt: string; thumbnail?: string },
+        })}
       </div>
     );
   },
 }));
 
 vi.mock('yet-another-react-lightbox/plugins/thumbnails', () => ({
+  default: () => undefined,
+}));
+
+vi.mock('yet-another-react-lightbox/plugins/zoom', () => ({
+  default: () => undefined,
+}));
+
+vi.mock('yet-another-react-lightbox/plugins/video', () => ({
   default: () => undefined,
 }));
 
@@ -284,5 +333,130 @@ describe('Lightbox', () => {
     const items = [{ id: 'x', src: 'https://example.com/x.jpg', alt: '' }];
     render(<Lightbox items={items} openIndex={0} onOpenChange={() => undefined} />);
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('tanpa alt'));
+  });
+
+  it('AC-01: live region mengumumkan posisi + alt, fokus kembali ke pemicu saat tutup', () => {
+    function FocusHarness() {
+      const [openIndex, setOpenIndex] = React.useState<number | null>(null);
+      return (
+        <>
+          <button type="button" onClick={() => setOpenIndex(1)}>
+            buka galeri
+          </button>
+          <Lightbox items={makeItems(3)} openIndex={openIndex} onOpenChange={setOpenIndex} />
+        </>
+      );
+    }
+    render(<FocusHarness />);
+    const trigger = screen.getByText('buka galeri');
+    trigger.focus();
+    fireEvent.click(trigger);
+    expect(screen.getByText(/Gambar 2 dari 3: Foto 2/)).toBeTruthy();
+    fireEvent.click(screen.getByLabelText('Gambar berikut'));
+    expect(screen.getByText(/Gambar 3 dari 3: Foto 3/)).toBeTruthy();
+    fireEvent.click(screen.getByLabelText('Tutup galeri'));
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('AC-02: item video memakai slide video native tanpa autoplay bersuara', () => {
+    const items: LightboxItem[] = [
+      ...makeItems(1),
+      {
+        id: 'video-1',
+        src: 'https://example.com/movie.mp4',
+        alt: 'Video demo',
+        type: 'video',
+        poster: 'https://example.com/poster.jpg',
+      },
+    ];
+    render(<Lightbox items={items} openIndex={1} onOpenChange={() => undefined} />);
+    const videoSlide = capturedProps.slides?.[1];
+    expect(videoSlide?.type).toBe('video');
+    expect(videoSlide?.sources?.[0]?.src).toBe('https://example.com/movie.mp4');
+    expect(capturedProps.video).toMatchObject({ controls: true, preload: 'metadata', autoPlay: false });
+    expect(screen.getByTestId('mock-video')).toBeTruthy();
+    // Navigasi menjauh memanggil pause() pada elemen video.
+    const video = screen.getByTestId('mock-video') as HTMLVideoElement;
+    const pause = vi.spyOn(video, 'pause').mockImplementation(() => undefined);
+    fireEvent.click(screen.getByLabelText('Gambar sebelumnya'));
+    expect(pause).toHaveBeenCalled();
+  });
+
+  it('AC-03: tombol Perbesar/Perkecil mengubah zoom, pindah item mereset + mengumumkan', () => {
+    vi.useFakeTimers();
+    try {
+      render(<Harness items={makeItems(3)} initialIndex={0} />);
+      expect(capturedProps.zoom).toMatchObject({ maxZoomPixelRatio: 4 });
+      fireEvent.click(screen.getByLabelText('Perbesar'));
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
+      expect(screen.getByText('Zoom 200 persen')).toBeTruthy();
+      fireEvent.click(screen.getByLabelText('Perbesar'));
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
+      expect(screen.getByText('Zoom 400 persen')).toBeTruthy();
+      // Perkecil kembali ke 200 lalu pindah: reset diumumkan.
+      fireEvent.click(screen.getByLabelText('Perkecil'));
+      fireEvent.click(screen.getByLabelText('Gambar berikut'));
+      expect(screen.getByText('Zoom diatur ulang')).toBeTruthy();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('AC-04: reduced-motion mematikan animasi swipe dan zoom', () => {
+    const listeners: Array<(event: { matches: boolean }) => void> = [];
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: (_type: string, cb: (event: { matches: boolean }) => void) =>
+        listeners.push(cb),
+      removeEventListener: () => undefined,
+    }));
+    try {
+      render(<Lightbox items={makeItems(3)} openIndex={0} onOpenChange={() => undefined} />);
+      expect(capturedProps.animation).toEqual({ swipe: 0, zoom: 0 });
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('AC-05: empty role=status tanpa overlay, loading aria-busy, error alert + fokus Coba lagi', () => {
+    const { unmount } = render(
+      <Lightbox items={[]} openIndex={0} onOpenChange={() => undefined} />,
+    );
+    expect(screen.getByRole('status')).toBeTruthy();
+    expect(screen.queryByTestId('yarl-mock')).toBeNull();
+    unmount();
+
+    const { unmount: unmountLoading } = render(
+      <Lightbox items={makeItems(3)} openIndex={0} onOpenChange={() => undefined} loading />,
+    );
+    const loadingRegion = screen.getByRole('status');
+    expect(loadingRegion.getAttribute('aria-busy')).toBe('true');
+    expect(screen.getByText('Memuat gambar…')).toBeTruthy();
+    unmountLoading();
+
+    const onRetry = vi.fn();
+    const onOpenChange = vi.fn();
+    render(
+      <Lightbox
+        items={makeItems(3)}
+        openIndex={0}
+        onOpenChange={onOpenChange}
+        error="Gagal memuat https://example.com/0.jpg"
+        onRetry={onRetry}
+      />,
+    );
+    expect(screen.getByRole('alert')).toBeTruthy();
+    expect(screen.getByText(/Gagal memuat/)).toBeTruthy();
+    const retry = screen.getByText('Coba lagi');
+    expect(document.activeElement).toBe(retry);
+    fireEvent.click(retry);
+    expect(onRetry).toHaveBeenCalledWith(0);
+    fireEvent.click(screen.getByText('Lewati ke berikut'));
+    expect(onOpenChange).toHaveBeenCalledWith(1);
   });
 });

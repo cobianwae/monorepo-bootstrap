@@ -46,7 +46,39 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* Bar caption di tepi bawah slide; hanya dirender bila item punya caption. */
+/* Overlay state loading/error di atas slide (FR-008), token semantik. */
+.ds-lightbox-state {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: color-mix(in oklch, var(--background) 80%, transparent);
+  text-align: center;
+}
+
+.ds-lightbox-skeleton {
+  width: min(80vw, 32rem);
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius);
+  background-color: var(--muted);
+}
+
+.ds-lightbox-state--error {
+  background-color: var(--card);
+  border: 1px solid color-mix(in oklch, var(--destructive) 40%, var(--border));
+}
+
+.ds-lightbox-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
 .ds-lightbox-caption {
   position: absolute;
   right: 0;
