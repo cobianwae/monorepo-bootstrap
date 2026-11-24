@@ -6,6 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
   Button,
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
   Card,
   CardContent,
   Input,
@@ -24,7 +31,6 @@ import {
   NumberInput,
   FormSection,
   FormErrorSummary,
-  Badge,
   toast,
   type ComboboxOption,
 } from '@ds/ui';
@@ -32,11 +38,8 @@ import {
   CheckCircle2,
   Plus,
   Trash2,
-  Save,
   RotateCcw,
-  ShieldCheck,
   Info,
-  AlertTriangle,
   GitFork,
 } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
@@ -52,7 +55,7 @@ const schema = z
       tags: z.array(z.string()).max(5, 'Maximum 5 tags.').optional(),
     }),
     schedule: z.object({
-      kickoff: z.date({ message: 'Pick a kickoff date.' }),
+      kickoff: z.date({ message: 'Pick a kickoff date.' }).nullable().refine((value) => value !== null, 'Pick a kickoff date.'),
       period: z
         .object({
           from: z.date().optional(),
@@ -81,7 +84,7 @@ const schema = z
     message: 'Start date must be before end date.',
   });
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.input<typeof schema>;
 
 const OWNER_OPTIONS: ComboboxOption[] = [
   { value: 'sarah@acme.io', label: 'Sarah Connor', description: 'sarah@acme.io' },
@@ -99,73 +102,56 @@ const SECTOR_OPTIONS: ComboboxOption[] = [
 
 const EMPTY_MEMBER = { email: '', role: 'editor' as const };
 
-function loadDraft(): Partial<FormValues> | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = window.localStorage.getItem(DRAFT_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    return parsed as Partial<FormValues>;
-  } catch {
-    return null;
-  }
+function seedValues(): FormValues {
+  return {
+    project: { name: 'Acme Data Platform', description: 'Unified analytics and reporting for all teams.', tags: ['Analytics', '2026'] },
+    schedule: { kickoff: new Date(2026, 8, 1), period: { from: new Date(2026, 8, 1), to: new Date(2026, 11, 31) }, owner: '' },
+    audience: { sectors: ['fintech'], notifyEmail: true },
+    budget: { amount: 60, headcount: 5 },
+    members: [{ email: 'sarah.connor@acme.io', role: 'admin' }, { email: 'john.doe@acme.io', role: 'editor' }],
+  };
 }
 
-function saveDraft(values: Partial<FormValues>) {
-  try {
-    window.localStorage.setItem(DRAFT_KEY, JSON.stringify(values));
-  } catch {
-    // storage full or unavailable — ignore
-  }
+// Drafts may be incomplete or invalid for submission, but must be safe to render.
+const draftDate = z.union([z.string().datetime(), z.null()]).transform((value) => value === null ? undefined : new Date(value));
+const draftSchema = z.object({
+  project: z.object({ name: z.string(), description: z.string(), tags: z.array(z.string()) }).partial().optional(),
+  schedule: z.object({
+    kickoff: z.union([z.string().datetime(), z.null()]).transform((value) => value === null ? null : new Date(value)),
+    period: z.object({ from: draftDate.optional(), to: draftDate.optional() }).nullable().transform((value) => value ?? { from: undefined, to: undefined }).optional(),
+    owner: z.string(),
+  }).partial().optional(),
+  audience: z.object({ sectors: z.array(z.string()), notifyEmail: z.boolean() }).partial().optional(),
+  budget: z.object({ amount: z.number().finite(), headcount: z.number().finite() }).partial().optional(),
+  members: z.array(z.object({ email: z.string(), role: z.enum(['admin', 'editor', 'viewer']) })).optional(),
+});
+
+function serializeDraft(values: unknown) {
+  return JSON.stringify(values, (_key, value: unknown) => value === undefined ? null : value);
 }
 
-function clearDraft() {
-  try {
-    window.localStorage.removeItem(DRAFT_KEY);
-  } catch {
-    // ignore
-  }
-}
+type DraftStatus = 'empty' | 'pending' | 'saved' | 'restored' | 'read-error' | 'save-error' | 'delete-error';
+const DRAFT_MESSAGES: Record<DraftStatus, string> = {
+  empty: 'No draft saved on this browser.',
+  pending: 'Changes are waiting to be saved on this browser.',
+  saved: 'Draft saved on this browser.',
+  restored: 'Draft restored from this browser.',
+  'read-error': "Couldn't read this draft. The demo is showing sample values.",
+  'save-error': "Couldn't save this draft. Your changes are still in this tab.",
+  'delete-error': "Couldn't delete this draft from this browser. It may return after reload.",
+};
 
 export default function DynamicFormPage() {
-  const [lastSavedAt, setLastSavedAt] = React.useState<string | null>(null);
-  const [isResetting, setIsResetting] = React.useState(false);
+  const [draftStatus, setDraftStatus] = React.useState<DraftStatus>('empty');
+  const [resetOpen, setResetOpen] = React.useState(false);
+  const resetTrigger = React.useRef<HTMLButtonElement>(null);
+  const timer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const hasDraft = React.useRef(false);
+  const suppressSave = React.useRef(false);
 
-  const draft = React.useMemo(loadDraft, []);
-
-  const form = useForm<FormValues>({
+  const form = useForm<FormValues, unknown, z.output<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      project: {
-        name: draft?.project?.name ?? 'Acme Data Platform',
-        description: draft?.project?.description ?? 'Unified analytics and reporting for all teams.',
-        tags: draft?.project?.tags ?? ['Analytics', '2026'],
-      },
-      schedule: {
-        kickoff: draft?.schedule?.kickoff ? new Date(draft.schedule.kickoff) : new Date(2026, 8, 1),
-        period: draft?.schedule?.period
-          ? {
-              from: draft.schedule.period.from ? new Date(draft.schedule.period.from) : undefined,
-              to: draft.schedule.period.to ? new Date(draft.schedule.period.to) : undefined,
-            }
-          : { from: new Date(2026, 8, 1), to: new Date(2026, 11, 31) },
-        owner: draft?.schedule?.owner ?? '',
-      },
-      audience: {
-        sectors: draft?.audience?.sectors ?? ['fintech'],
-        notifyEmail: draft?.audience?.notifyEmail ?? true,
-      },
-      budget: {
-        amount: draft?.budget?.amount ?? 60,
-        headcount: draft?.budget?.headcount ?? 5,
-      },
-      members: draft?.members?.length
-        ? draft.members
-        : [
-            { email: 'sarah.connor@acme.io', role: 'admin' },
-            { email: 'john.doe@acme.io', role: 'editor' },
-          ],
-    },
+    defaultValues: seedValues(),
   });
 
   const { control, watch, handleSubmit, formState, reset } = form;
@@ -174,39 +160,76 @@ export default function DynamicFormPage() {
 
   const watchNotifyEmail = watch('audience.notifyEmail');
 
-  // Autosave draft every 1.2s when dirty
   React.useEffect(() => {
-    if (!isDirty) return;
-    const id = window.setTimeout(() => {
-      const values = form.getValues();
-      saveDraft(values);
-      setLastSavedAt(new Date().toLocaleTimeString());
-    }, 1200);
-    return () => window.clearTimeout(id);
-  }, [isDirty, formState, form]);
+    try {
+      const raw = window.localStorage.getItem(DRAFT_KEY);
+      hasDraft.current = raw !== null;
+      if (raw !== null) {
+        const draft = draftSchema.parse(JSON.parse(raw));
+        const seed = seedValues();
+        reset({
+          project: { ...seed.project, ...draft.project },
+          schedule: { ...seed.schedule, ...draft.schedule },
+          audience: { ...seed.audience, ...draft.audience },
+          budget: { ...seed.budget, ...draft.budget },
+          members: draft.members ?? seed.members,
+        });
+        setDraftStatus('restored');
+      }
+    } catch {
+      hasDraft.current = true;
+      setDraftStatus('read-error');
+    }
+    let latest = serializeDraft(form.getValues());
+    const subscription = watch(() => {
+      const snapshot = serializeDraft(form.getValues());
+      if (snapshot === latest) return;
+      latest = snapshot;
+      if (suppressSave.current) return;
+      clearTimeout(timer.current);
+      setDraftStatus('pending');
+      timer.current = setTimeout(() => {
+        try {
+          window.localStorage.setItem(DRAFT_KEY, snapshot);
+          hasDraft.current = true;
+          setDraftStatus('saved');
+        } catch {
+          setDraftStatus('save-error');
+        }
+      }, 1200);
+    });
+    return () => {
+      clearTimeout(timer.current);
+      subscription.unsubscribe();
+    };
+  }, [form, reset, watch]);
+
+  const clearDraft = () => {
+    clearTimeout(timer.current);
+    try {
+      window.localStorage.removeItem(DRAFT_KEY);
+      hasDraft.current = false;
+      setDraftStatus('empty');
+    } catch {
+      hasDraft.current = true;
+      setDraftStatus('delete-error');
+    }
+  };
 
   const submit = handleSubmit((values) => {
     clearDraft();
-    setLastSavedAt(null);
     toast({
       variant: 'success',
-      title: 'Project published',
-      description: `“${values.project.name}” was created with ${values.members.length} members.`,
+      title: 'Demo submitted',
+      description: `Validation passed for “${values.project.name}”. No project was created and no notifications were sent.`,
     });
   });
 
   const handleReset = () => {
     clearDraft();
-    reset({
-      project: { name: '', description: '', tags: [] },
-      schedule: { kickoff: new Date(), period: { from: undefined, to: undefined }, owner: '' },
-      audience: { sectors: [], notifyEmail: true },
-      budget: { amount: 50, headcount: 3 },
-      members: [{ email: '', role: 'editor' }],
-    });
-    setIsResetting(true);
-    window.setTimeout(() => setIsResetting(false), 400);
-    toast({ variant: 'info', title: 'Draft cleared', description: 'All fields reset.' });
+    suppressSave.current = true;
+    reset(seedValues());
+    suppressSave.current = false;
   };
 
   const memberErrorCount = errors.members?.length ?? 0;
@@ -238,22 +261,6 @@ export default function DynamicFormPage() {
         eyebrowIcon={GitFork}
         title="Dynamic Form"
         description="A React Hook Form and Zod recipe with dynamic member rows, conditional fields, validation after submit, and a draft saved to localStorage that you can resume. The demo does not send email or publish anything."
-        actions={
-          <div className="flex items-center gap-2">
-            {isDirty && (
-              <Badge variant="secondary" className="gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-warning animate-pulse" />
-                Unsaved changes
-              </Badge>
-            )}
-            {lastSavedAt && (
-              <Badge variant="outline" className="gap-1.5 text-muted-foreground">
-                <Save className="h-3 w-3" />
-                Draft saved {lastSavedAt}
-              </Badge>
-            )}
-          </div>
-        }
       />
 
       {allErrors.length > 0 && (
@@ -334,8 +341,8 @@ export default function DynamicFormPage() {
                     label="Kickoff date"
                     id="schedule-kickoff"
                     aria-describedby={errors.schedule?.kickoff ? 'err-schedule-kickoff' : undefined}
-                    value={field.value}
-                    onValueChange={field.onChange}
+                    value={field.value ?? undefined}
+                    onValueChange={(value) => field.onChange(value ?? null)}
                     error={Boolean(errors.schedule?.kickoff)}
                     presets={[
                       { label: 'Today', from: new Date() },
@@ -379,7 +386,7 @@ export default function DynamicFormPage() {
                     id="schedule-period"
                     aria-describedby={errors.schedule?.period ? 'err-schedule-period' : undefined}
                     value={field.value}
-                    onValueChange={(r) => field.onChange(r)}
+                    onValueChange={(range) => field.onChange(range ?? { from: undefined, to: undefined })}
                     error={Boolean(errors.schedule?.period)}
                   />
                 )}
@@ -572,32 +579,42 @@ export default function DynamicFormPage() {
 
         <Card className="border-border">
           <CardContent className="p-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-2">
-              {isDirty ? (
-                <AlertTriangle className="h-4 w-4 text-warning-text mt-0.5" />
-              ) : (
-                <ShieldCheck className="h-4 w-4 text-highlight mt-0.5" />
-              )}
-              <p className="text-xs text-muted-foreground">
-                {isDirty
-                  ? 'You have unsaved changes. They will be auto-saved as a draft you can resume later.'
-                  : 'All changes are saved. Nothing pending.'}
+            <div className="space-y-1">
+              <p role="status" aria-live="polite" aria-atomic="true" className="text-sm text-foreground">
+                {DRAFT_MESSAGES[draftStatus]}
               </p>
+              <p className="text-xs text-muted-foreground">Drafts stay in this browser only. Submit demo validates without creating a project or sending notifications.</p>
             </div>
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
-              <Button type="button" variant="ghost" size="sm" onClick={handleReset} disabled={isResetting} className="w-full sm:w-auto">
+              <Button ref={resetTrigger} type="button" variant="ghost" size="sm" onClick={() => {
+                if (isDirty || hasDraft.current || draftStatus === 'pending' || draftStatus === 'save-error') setResetOpen(true);
+                else handleReset();
+              }} className="w-full sm:w-auto">
                 <RotateCcw className="h-4 w-4" />
-                Reset & clear draft
+                Reset demo
               </Button>
               <Button type="submit" size="sm" className="w-full sm:w-auto">
                 <CheckCircle2 className="h-4 w-4" />
-                Publish project
+                Submit demo
               </Button>
             </div>
           </CardContent>
         </Card>
       </form>
       </section>
+      <AlertDialog open={resetOpen} onOpenChange={setResetOpen}>
+        <AlertDialogContent onCloseAutoFocus={(event) => {
+          event.preventDefault();
+          resetTrigger.current?.focus();
+        }}>
+          <AlertDialogTitle>Reset this demo?</AlertDialogTitle>
+          <AlertDialogDescription>Your changes and any draft saved on this browser will be discarded. Sample values will be restored.</AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleReset}>Reset demo</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <section aria-labelledby="try-it" className="scroll-mt-20 space-y-4 max-w-3xl">
         <SectionHeading id="try-it" title="Try it" />
@@ -605,7 +622,8 @@ export default function DynamicFormPage() {
           <li>Pick one or more sectors under Audience &amp; Targeting.</li>
           <li>Turn on email notifications to reveal the guidance block. Nothing is sent.</li>
           <li>Add a team member, then enter an invalid email to see the row message.</li>
-          <li>Clear the project name and press Publish project to see the error summary.</li>
+          <li>Edit a field, wait for the draft saved status, then reload to resume it in this browser.</li>
+          <li>Clear the project name and press Submit demo to see the error summary. Nothing is published.</li>
         </ol>
       </section>
     </div>
