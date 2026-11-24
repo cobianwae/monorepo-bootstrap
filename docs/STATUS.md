@@ -31,12 +31,12 @@ CR-071 (Dynamic Form: layout/copy) diimplementasikan di branch `cr-071-dynamic-f
 1. CR-063–064 done; antrean berikutnya 013-01/015-03 (butir 5). Batas CSS consumer/overflow non-Banner CR-056 tetap tercatat. Status done hanya oleh user.
 2. CR-017 ditetapkan **done** oleh user setelah uji klik dan pemulihan fokus di Chrome light/dark. Audit visual dan pembaca layar belum. CR-018 dan CR-036 tetap **done**.
 3. Jangan membuka ulang temuan yang sudah ditangani: eyebrow PageHeader CR-046 done, Directional Motion CR-048 done, deviasi h1/weight dipertahankan CR-051. Sisa teks kecil → CR-055; guard heading seluruh docs sudah diperluas di CR-052; flaky RTE tetap baseline.
-4. CR-075 `approved` oleh user 2026-11-24: perbaikan 12 error TS2339 pada query tombol test FlowEditor; implementasi ditunda atas permintaan user. Smoke RTE + timing worker tetap terpisah. Cek visual browser CR-070 (Shiki light/dark) belum dilakukan.
+4. CR-075 diimplementasikan di `cr-075-flow-editor-test-button-types` (worktree `arah-prd`, dari `visual-polish` `014d0f2`); status tetap `approved`, menunggu review user. Enam query bertipe tombol menghilangkan 12 TS2339; typecheck/lint workspace hijau, FlowEditor 49/49, UI 714/714. Test showcase 92/96 (4 gagal baseline localStorage). Smoke RTE + timing worker tetap terpisah; cek visual CR-070 belum.
 5. Antrean implementasi satu per sesi: 013-01, 015-03. 013-01 membuka S-005.36 (kini `in-design`); S-005.30/S-005.31 sudah `implemented`; S-005.41 tetap `in-design` sampai PRD 018 diimplementasi.
 
 ## Known Issues
 
-- Baseline: 12 error tipe `packages/ui/src/components/canvas/flow-editor.test.tsx:702–749` (typecheck workspace); smoke RichTextEditor `rte-link-save` gagal (baris ~543); test paralel default kena timing FlowEditor/OrgChartEditor/FileUpload — pakai `--maxWorkers=2 --testTimeout=30000` bila perlu (konfigurasi tidak diubah). `pnpm --filter @ds/showcase lint` dan `build:types` hijau.
+- Baseline 12 error tipe test FlowEditor sudah hilang di branch CR-075; typecheck workspace hijau. `pnpm test` masih gagal 4 kasus showcase FlowEditor (`localStorage.getItem is not a function`, `theme-provider.tsx:27`); token 10/10 dan UI 714/714 lulus. Smoke RichTextEditor `rte-link-save` dan timing paralel tetap isu historis terpisah; tidak direproduksi pada run ini.
 - Graphify bersifat per-machine; graph tidak di-commit.
 - `apps/web` dan `apps/api` masih tipis; integration test belum aktif.
 - Scope tema bersarang diperbaiki di CR-033 (`--color-*`); `--font-*`/art direction bersarang punya jebakan serupa (di luar scope).
