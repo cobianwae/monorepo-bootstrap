@@ -65,4 +65,56 @@ describe('ImportWizardPage — alur 4 langkah', () => {
     expect(document.activeElement).toBe(screen.getByTestId('iw-summary'));
     expect(screen.queryByTestId('iw-success')).toBeNull();
   });
+
+  it('setelah sukses, klik stepper tidak membuka form lama dan judul tetap selesai', async () => {
+    render(<ImportWizardPage />);
+    await pasteAndGoTo('Konfirmasi impor');
+    fireEvent.click(screen.getByTestId('iw-submit'));
+    await waitFor(() => expect(screen.getByTestId('iw-success')).toBeTruthy());
+
+    const firstStep = screen.getByTestId('iw-stepper').querySelectorAll('button')[0];
+    if (!firstStep) throw new Error('stepper tidak punya tombol');
+    fireEvent.click(firstStep);
+
+    expect(screen.getByTestId('iw-success')).toBeTruthy();
+    expect(screen.queryByTestId('iw-paste')).toBeNull();
+    expect(screen.queryByTestId('iw-mapping-row-Nama Lengkap')).toBeNull();
+    expect(screen.getByRole('heading', { level: 2, name: 'Impor siap diproses' })).toBeTruthy();
+  });
+
+  it('setelah sukses, Mulai ulang kembali ke Upload tanpa hasil lama dan fokus ke judul', async () => {
+    render(<ImportWizardPage />);
+    await pasteAndGoTo('Konfirmasi impor');
+    fireEvent.click(screen.getByTestId('iw-submit'));
+    await waitFor(() => expect(screen.getByTestId('iw-success')).toBeTruthy());
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mulai ulang' }));
+
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 2, name: 'Unggah file CSV' })).toBeTruthy()
+    );
+    expect(screen.queryByTestId('iw-success')).toBeNull();
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 2, name: 'Unggah file CSV' }));
+  });
+
+  it('fail → skip: penolakan lama hilang dan ringkasan mengikuti policy baru', async () => {
+    render(<ImportWizardPage />);
+    fireEvent.click(screen.getByTestId('iw-demo-invalid'));
+    await waitFor(() => expect(screen.getByTestId('iw-next').getAttribute('aria-disabled')).toBe('false'));
+    for (const heading of ['Petakan kolom', 'Validasi data', 'Konfirmasi impor']) {
+      await act(async () => {
+        fireEvent.click(screen.getByTestId('iw-next'));
+      });
+      await waitFor(() => expect(screen.getByRole('heading', { level: 2, name: heading })).toBeTruthy());
+    }
+    fireEvent.click(screen.getByTestId('iw-policy-fail'));
+    fireEvent.click(screen.getByTestId('iw-submit'));
+    await waitFor(() => expect(screen.getByTestId('iw-reject')).toBeTruthy());
+
+    fireEvent.click(screen.getByTestId('iw-policy-skip'));
+
+    expect(screen.queryByTestId('iw-reject')).toBeNull();
+    expect(screen.getByTestId('iw-summary').textContent).toContain('Lewati');
+    expect(screen.getByTestId('iw-submit').getAttribute('aria-disabled')).toBe('false');
+  });
 });

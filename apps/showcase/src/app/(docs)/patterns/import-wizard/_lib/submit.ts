@@ -47,6 +47,27 @@ export function planSubmit(validCount: number, invalidCount: number, policy: Fai
   };
 }
 
+export interface SummaryBuckets {
+  valid: number;
+  /** Baris error yang dilewati (policy `skip`). */
+  skipped: number;
+  /** Baris error yang memblokir impor (policy `fail`). */
+  failed: number;
+}
+
+/**
+ * Kelompok untuk ringkasan konfirmasi. Setiap baris tidak valid hanya masuk satu
+ * kelompok sesuai policy, sehingga tidak dihitung ganda sebagai dilewati dan gagal.
+ * `ImportResult` tidak berubah; ini hanya tampilan ringkasan.
+ */
+export function summaryBuckets(plan: SubmitPlan, policy: FailPolicy): SummaryBuckets {
+  return {
+    valid: plan.valid,
+    skipped: policy === 'skip' ? plan.failedRows : 0,
+    failed: policy === 'fail' ? plan.failedRows : 0,
+  };
+}
+
 export type BuildResult = { ok: true; result: ImportResult } | { ok: false; reason: string };
 
 /**

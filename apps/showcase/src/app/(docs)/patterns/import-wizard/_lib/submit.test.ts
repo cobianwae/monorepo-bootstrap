@@ -3,7 +3,7 @@ import { DEMO_FIELDS } from './demo-fields';
 import { INVALID_TEXT } from './demo-datasets';
 import { parseCsv } from './parse-csv';
 import { buildValidation } from './validation-view';
-import { buildImportResult, planSubmit, submitLabel } from './submit';
+import { buildImportResult, planSubmit, submitLabel, summaryBuckets } from './submit';
 import type { Mapping } from './wizard-state';
 
 const MAPPING: Mapping = {
@@ -35,6 +35,24 @@ describe('planSubmit', () => {
 
   it('tanpa baris valid: submit ditolak', () => {
     expect(planSubmit(0, 2, 'skip').canSubmit).toBe(false);
+  });
+});
+
+describe('summaryBuckets', () => {
+  it('policy skip: baris error hanya masuk Lewati, tidak dihitung ganda sebagai Gagal', () => {
+    const plan = planSubmit(200, 3, 'skip');
+    expect(summaryBuckets(plan, 'skip')).toEqual({ valid: 200, skipped: 3, failed: 0 });
+  });
+
+  it('policy fail: baris error masuk Gagal dan tidak ada Lewati', () => {
+    const plan = planSubmit(200, 3, 'fail');
+    expect(summaryBuckets(plan, 'fail')).toEqual({ valid: 200, skipped: 0, failed: 3 });
+  });
+
+  it('tanpa baris valid (skip): hitungan tetap satu kelompok per baris', () => {
+    const plan = planSubmit(0, 2, 'skip');
+    expect(summaryBuckets(plan, 'skip')).toEqual({ valid: 0, skipped: 2, failed: 0 });
+    expect(plan.canSubmit).toBe(false);
   });
 });
 
