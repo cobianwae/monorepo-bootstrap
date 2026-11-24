@@ -136,6 +136,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-072 | Dynamic Form B: status autosave, pemulihan draft, reset terkonfirmasi, dan simulasi submit | approved | `docs/cr/cr-072-dynamic-form-draft-lifecycle.md` |
 | CR-073 | Dynamic Form C: role dan empty state anggota, ringkasan validasi, fokus keyboard, dan kontras | approved | `docs/cr/cr-073-dynamic-form-fields-and-accessibility.md` |
 | CR-074 | OrgChartEditor legacy dihapus (komponen, test, export, route, nav); OrgChart dipulihkan, Studio tetap utuh; done atas persetujuan user 2026-11-24 | done | `docs/cr/cr-074-remove-org-chart-editor.md` |
+| CR-075 | Perbaiki 12 error tipe tombol undo/redo pada test FlowEditor tanpa perubahan runtime/API; approved, implementasi ditunda atas permintaan user | approved | `docs/cr/cr-075-flow-editor-test-button-types.md` |
 
 ## Catatan
 

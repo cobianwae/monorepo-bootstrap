@@ -31,7 +31,7 @@ CR-071–073 (Dynamic Form: layout/copy, draft lifecycle, field/a11y) disetujui 
 1. CR-063–064 done; antrean berikutnya 013-01/015-03 (butir 5). Batas CSS consumer/overflow non-Banner CR-056 tetap tercatat. Status done hanya oleh user.
 2. CR-017 ditetapkan **done** oleh user setelah uji klik dan pemulihan fokus di Chrome light/dark. Audit visual dan pembaca layar belum. CR-018 dan CR-036 tetap **done**.
 3. Jangan membuka ulang temuan yang sudah ditangani: eyebrow PageHeader CR-046 done, Directional Motion CR-048 done, deviasi h1/weight dipertahankan CR-051. Sisa teks kecil → CR-055; guard heading seluruh docs sudah diperluas di CR-052; flaky RTE tetap baseline.
-4. Baseline baru pengganti CR-015 — verifikasi 12 error tipe FlowEditor + smoke RTE + timing worker (CR baru bila perlu). Cek visual browser CR-070 (Shiki light/dark) belum dilakukan.
+4. CR-075 `approved` oleh user 2026-11-24: perbaikan 12 error TS2339 pada query tombol test FlowEditor; implementasi ditunda atas permintaan user. Smoke RTE + timing worker tetap terpisah. Cek visual browser CR-070 (Shiki light/dark) belum dilakukan.
 5. Antrean implementasi satu per sesi: 013-01, 015-03. 013-01 membuka S-005.36 (kini `in-design`); S-005.30/S-005.31 sudah `implemented`; S-005.41 tetap `in-design` sampai PRD 018 diimplementasi.
 
 ## Known Issues
