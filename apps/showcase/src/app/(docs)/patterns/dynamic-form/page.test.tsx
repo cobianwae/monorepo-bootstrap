@@ -25,6 +25,7 @@ afterEach(() => {
 
 // Halaman memakai matchMedia untuk deteksi layar kecil; jsdom tidak menyediakannya.
 beforeAll(() => {
+  if (!HTMLElement.prototype.scrollIntoView) HTMLElement.prototype.scrollIntoView = () => {};
   if (!globalThis.ResizeObserver) {
     globalThis.ResizeObserver = class {
       observe() {}
@@ -103,6 +104,93 @@ describe('DynamicFormPage (CR-058 C05)', () => {
     render(<DynamicFormPage />);
     expect(screen.getByLabelText('Project name').getAttribute('aria-invalid')).toBeNull();
     expect(screen.getByLabelText('Project name').getAttribute('aria-describedby')).toBeNull();
+  });
+});
+
+describe('DynamicFormPage fields and accessibility (CR-073)', () => {
+  it('updates a role alone, autosaves it and restores it on reload', async () => {
+    const view = render(<DynamicFormPage />);
+    fireEvent.click(screen.getByLabelText('Role for member 1'));
+    fireEvent.click(await screen.findByRole('option', { name: 'Viewer' }));
+    expect(screen.getByLabelText('Role for member 1').textContent).toContain('Viewer');
+    await waitFor(() => expect(JSON.parse(localStorage.getItem(DRAFT_KEY) ?? '{}').members?.[0].role).toBe('viewer'), { timeout: 2500 });
+    view.unmount();
+    render(<DynamicFormPage />);
+    expect(screen.getByLabelText('Role for member 1').textContent).toContain('Viewer');
+  });
+
+  it('keeps zero members after autosave/reload and focuses new rows', async () => {
+    const view = render(<DynamicFormPage />);
+    fireEvent.click(screen.getByRole('button', { name: 'Remove member 1' }));
+    expect(document.activeElement).toBe(screen.getByLabelText('Email for member 1'));
+    fireEvent.click(screen.getByRole('button', { name: 'Remove member 1' }));
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Add member' }));
+    expect(screen.getByText(/No team members/)).toBeDefined();
+    await waitFor(() => expect(JSON.parse(localStorage.getItem(DRAFT_KEY) ?? '{}').members).toEqual([]), { timeout: 2500 });
+    view.unmount();
+    render(<DynamicFormPage />);
+    expect(screen.queryByLabelText('Email for member 1')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Add member' }));
+    expect(document.activeElement).toBe(screen.getByLabelText('Email for member 1'));
+    expect(screen.getByRole('button', { name: 'Remove member 1' }).className).toContain('h-11 w-11');
+  });
+
+  it('focuses Add member when the last row is removed, even with preceding rows', () => {
+    render(<DynamicFormPage />);
+    fireEvent.click(screen.getByRole('button', { name: 'Remove member 2' }));
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Add member' }));
+  });
+
+  it('validates touched fields without marking a new form invalid and associates the switch helper', async () => {
+    render(<DynamicFormPage />);
+    expect(document.querySelector('[aria-invalid="true"]')).toBeNull();
+    const email = screen.getByLabelText('Email for member 1');
+    fireEvent.change(email, { target: { value: 'bad' } });
+    expect(email.getAttribute('aria-invalid')).toBeNull();
+    fireEvent.blur(email);
+    await waitFor(() => expect(email.getAttribute('aria-invalid')).toBe('true'));
+    expect(email.getAttribute('aria-describedby')).toBe('err-member-0-email');
+    fireEvent.change(email, { target: { value: 'valid@example.com' } });
+    await waitFor(() => expect(email.getAttribute('aria-invalid')).toBeNull());
+    expect(screen.getByRole('switch', { name: 'Email notifications' }).getAttribute('aria-describedby')).toBe('audience-notify-help');
+  });
+
+  it('identifies duplicate email errors and links native and composite controls', async () => {
+    render(<DynamicFormPage />);
+    fireEvent.change(screen.getByLabelText('Email for member 1'), { target: { value: 'bad' } });
+    fireEvent.change(screen.getByLabelText('Email for member 2'), { target: { value: 'also-bad' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Submit demo' }));
+    const summary = await screen.findByRole('region', { name: 'The form needs your attention' });
+    await waitFor(() => expect(document.activeElement).toBe(summary));
+    const links = within(summary).getAllByRole('link');
+    expect(links.map((link) => link.textContent)).toEqual([
+      'Owner: Assign an owner.',
+      'Member 1 email: Invalid email address.',
+      'Member 2 email: Invalid email address.',
+    ]);
+    for (const link of links) {
+      fireEvent.click(link);
+      expect(document.activeElement?.id).toBe(link.getAttribute('href')?.slice(1));
+    }
+    expect(screen.queryByText(/2 invalid emails/)).toBeNull();
+  });
+
+  it('accepts a 200-character description and a same-day engagement window', async () => {
+    const date = new Date(2026, 8, 1).toISOString();
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      project: { description: 'x'.repeat(200) },
+      schedule: { owner: 'sarah@acme.io', period: { from: date, to: date } },
+    }));
+    render(<DynamicFormPage />);
+    fireEvent.click(screen.getByRole('button', { name: 'Submit demo' }));
+    await waitFor(() => expect(localStorage.getItem(DRAFT_KEY)).toBeNull());
+    expect(screen.queryByRole('region', { name: 'The form needs your attention' })).toBeNull();
+  });
+
+  it('respects reduced motion on the route and conditional panel', () => {
+    const { container } = render(<DynamicFormPage />);
+    expect(container.firstElementChild?.className).toContain('motion-reduce:animate-none');
+    expect(screen.getByText('Conditional section').closest('.animate-in')?.className).toContain('motion-reduce:animate-none');
   });
 });
 

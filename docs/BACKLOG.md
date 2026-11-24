@@ -134,7 +134,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-070 | CodeBlock syntax highlighting (Shiki): dual-theme light/dark + audit kontras + fallback flat; done atas persetujuan user, visual browser belum diverifikasi | done | `docs/cr/cr-070-codeblock-shiki-highlighting.md` |
 | CR-071 | Dynamic Form A: hierarki halaman, reflow 320 px, dan copy English yang sesuai perilaku demo; done atas persetujuan user, uji browser 320/390/1440 light/dark lulus (metrik layout) | done | `docs/cr/cr-071-dynamic-form-layout-and-copy.md` |
 | CR-072 | Dynamic Form B: status autosave, pemulihan draft, reset terkonfirmasi, dan simulasi submit — disetujui user 2026-11-25 | done | `docs/cr/cr-072-dynamic-form-draft-lifecycle.md` |
-| CR-073 | Dynamic Form C: role dan empty state anggota, ringkasan validasi, fokus keyboard, dan kontras | approved | `docs/cr/cr-073-dynamic-form-fields-and-accessibility.md` |
+| CR-073 | Dynamic Form C: role/empty state, summary tertaut, fokus dan a11y; route 26/26, suite terkontrol hijau, kontras 16/16; done atas persetujuan user 2026-11-25 | done | `docs/cr/cr-073-dynamic-form-fields-and-accessibility.md` |
 | CR-074 | OrgChartEditor legacy dihapus (komponen, test, export, route, nav); OrgChart dipulihkan, Studio tetap utuh; done atas persetujuan user 2026-11-24 | done | `docs/cr/cr-074-remove-org-chart-editor.md` |
 | CR-075 | Tipe tombol test FlowEditor diperbaiki; typecheck/lint hijau, FlowEditor 49/49; test showcase tetap 4 gagal baseline localStorage; done atas persetujuan user | done | `docs/cr/cr-075-flow-editor-test-button-types.md` |
 | CR-076 | Import Wizard: completion terminal, rejection sinkron, dan ringkasan konfirmasi jujur | approved | `docs/cr/cr-076-import-wizard-completion-feedback.md` |
