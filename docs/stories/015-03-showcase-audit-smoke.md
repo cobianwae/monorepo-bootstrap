@@ -1,6 +1,6 @@
 # 015-03 — Showcase avatar + cover + audit + smoke
 
-Status: review
+Status: done
 PRD: `docs/prd/015-image-cropper.md` (approved, gate 1)
 Design: `docs/design/wireframes/image-cropper.md` (approved, gate 2, §1, §5–§7) + `docs/design/flows/image-cropper.mmd` (diagram 4) + sitemap `S-005.38.01/.02`
 FR: `FR-007`, `FR-008`, `FR-009`
