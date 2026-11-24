@@ -1,6 +1,6 @@
 # 016-02 — Zoom + video + keyboard + states
 
-Status: review
+Status: done
 PRD: `docs/prd/016-lightbox-gallery.md` (approved, gate 1)
 Design: `docs/design/wireframes/lightbox-gallery.md` (approved, gate 2, K2/K3 + §2.3/§2.4/§2.5/§3/§4) + `docs/design/flows/lightbox-gallery.mmd` (diagram 2–3)
 FR: `FR-002`, `FR-003`, `FR-005`, `FR-006`, `FR-007`, `FR-008`
@@ -59,3 +59,4 @@ Goal: Lightbox robust dan aksesibel tanpa showcase final: zoom 1–4x + geser + 
 
 - Implementasi (2026-11-25, branch `016-02-zoom-video-keyboard-states`, worktree `arah-prd`, dari `visual-polish` `dbbaab8`): plugin YARL `Zoom` (`maxZoomPixelRatio={4}`, tombol Perbesar/Perkecil DS ring `primary`, reset + umumkan tiap `onViewChange`, live zoom throttled 300 ms) + plugin `Video` (slide `type:'video'`, `controls`/`preload="metadata"`, tanpa autoplay bersuara, `pause()` saat navigasi, `poster`+`alt`); fokus kembali ke pemicu via `document.activeElement` saat buka, live posisi kini "Gambar N dari total: <alt>"; swipe bawaan YARL + `prefers-reduced-motion` mematikan animasi swipe/zoom; state matrix: empty `role=status` tanpa overlay, `loading` skeleton + `aria-busy`, `error` `role=alert` + penyebab + [Coba lagi][Lewati ke berikut] + fokus ke Coba lagi (prop opsional `loading`/`error`/`onRetry` aditif, `width`/`height` opsional pada item; tanpa dependency/token baru). Trap/inert + panah/`+`/`-`/`Esc` milik YARL bawaan (terverifikasi via mock + test fokus-kembali); cek visual browser light/dark di 016-03.
 - Verifikasi: typecheck + lint workspace hijau (4 warning eslint-disable mock yang sudah ada); UI 734/734 (lightbox 20/20), tokens 10/10; showcase 111/115 dengan 4 gagal baseline `localStorage.getItem` FlowEditor (terdokumentasi, di luar scope).
+- Ditetapkan `done` atas persetujuan user 2026-11-25.
