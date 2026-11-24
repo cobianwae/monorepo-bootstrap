@@ -1,6 +1,6 @@
 # CR-074 — Hapus OrgChartEditor (legacy PRD 010), pulihkan status OrgChart
 
-**Status:** approved (disetujui user 2026-11-24)
+**Status:** done (disetujui user 2026-11-24; ditetapkan done oleh user 2026-11-24)
 **Catatan nomor:** memakai CR-074 karena CR-071–073 sudah dipakai rangkaian CR Dynamic Form.
 **Sumber:** keputusan user 2026-11-24 — konsolidasi org chart: pertahankan OrgChart + OrgChartStudio, hapus OrgChartEditor
 **Ref:** `docs/prd/010-org-chart-editor.md`, `docs/prd/011-org-chart-studio.md` (FR-001, FR-015), `packages/ui/src/components/canvas/org-chart-editor.tsx`, `apps/showcase/src/app/(docs)/patterns/org-chart-editor/page.tsx`

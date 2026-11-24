@@ -135,7 +135,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-071 | Dynamic Form A: hierarki halaman, reflow 320 px, dan copy English yang sesuai perilaku demo | approved | `docs/cr/cr-071-dynamic-form-layout-and-copy.md` |
 | CR-072 | Dynamic Form B: status autosave, pemulihan draft, reset terkonfirmasi, dan simulasi submit | approved | `docs/cr/cr-072-dynamic-form-draft-lifecycle.md` |
 | CR-073 | Dynamic Form C: role dan empty state anggota, ringkasan validasi, fokus keyboard, dan kontras | approved | `docs/cr/cr-073-dynamic-form-fields-and-accessibility.md` |
-| CR-074 | OrgChartEditor legacy dihapus (komponen, test, export, route, nav); OrgChart dipulihkan, Studio tetap utuh; implementasi menunggu review user | approved | `docs/cr/cr-074-remove-org-chart-editor.md` |
+| CR-074 | OrgChartEditor legacy dihapus (komponen, test, export, route, nav); OrgChart dipulihkan, Studio tetap utuh; done atas persetujuan user 2026-11-24 | done | `docs/cr/cr-074-remove-org-chart-editor.md` |
 
 ## Catatan
 
