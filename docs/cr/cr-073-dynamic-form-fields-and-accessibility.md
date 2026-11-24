@@ -1,6 +1,6 @@
 # CR-073 — Field Dinamis, Validasi, dan Aksesibilitas Dynamic Form
 
-**Status:** approved  
+**Status:** done (disetujui user 2026-11-25)  
 **Sumber:** audit `/improve-ui` — cluster C  
 **Ref:** S-005.09, `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx`, `docs/cr/cr-058-form-accessibility.md`  
 **Urutan usulan:** setelah CR-071 dan CR-072 agar layout dan kontrak autosave sudah stabil.
@@ -54,7 +54,7 @@ Commit: `fix: improve dynamic form fields and accessibility [CR-073]`
 
 ## Hasil Implementasi dan Verifikasi — 2026-11-25
 
-- Rencana disetujui user; branch dibuat dari `visual-polish` `32a245e` dalam worktree `arah-story`. Status tetap **approved**, menunggu review dan penetapan done oleh user.
+- Rencana disetujui user; branch dibuat dari `visual-polish` `32a245e` dalam worktree `arah-story`. Implementasi `83c8234` disetujui dan ditetapkan **done** oleh user pada 2026-11-25, dengan izin merge ke `visual-polish` dan push.
 - Blast radius: Graphify `graph_stats` dan `get_neighbors(DynamicFormPage)` menunjukkan pemanggilan komponen DS serta tes route. Graph pada `80a6a92` tertinggal dari base; temuan dicocokkan ke kode aktual. Perubahan hanya route, tes co-located, dan tracking; tanpa perubahan API publik, dependency, validator global, token, atau halaman lain.
 - Role memakai `Controller` dengan nilai aktif dan `onChange` RHF sehingga perubahan role saja memicu autosave. Restore `members: []` sudah benar sejak CR-072 (`??`); dipertahankan dan diberi regresi autosave/remount serta add kembali.
 - Label Email/Role terlihat, nama aksesibel unik, tombol hapus 44×44 px. Add memfokuskan email baru; remove memfokuskan email berikutnya pada indeks yang sama, atau Add member bila tidak ada baris berikutnya.
@@ -78,5 +78,5 @@ Commit: `fix: improve dynamic form fields and accessibility [CR-073]`
 - `pnpm typecheck` dan `pnpm lint` workspace lulus; `pnpm test:tokens` 10/10; showcase build lulus. Tidak ada dev server pada worktree ini saat build; `.next` dev server root tidak disentuh.
 - `pnpm test` awal berhenti pada timeout FileUpload (713/714 UI). Pengulangan paralel bersamaan build dengan flag Web Storage menghasilkan lima kegagalan UI (timeout FlowEditor/MindMap/PermissionMatrix dan assertion status FileUpload). File UI tidak diubah. Showcase sendiri tanpa flag: 118/122, empat gagal baseline FlowEditor (`localStorage.getItem is not a function`). Hasil run terkontrol di bawah memisahkan kegagalan environment/timing tersebut; tidak mengubah konfigurasi repo.
 - Run final `NODE_OPTIONS=--no-experimental-webstorage pnpm -r test --maxWorkers=1` lulus: tokens **10/10**, UI **714/714**, showcase **122/122** (termasuk route **26/26**). Flag/worker hanya parameter verifikasi untuk mengisolasi baseline Web Storage Node dan timing paralel; tidak ada perubahan konfigurasi repo. Build menghasilkan **76/76** halaman.
-- `node scripts/check-status-log.mjs` hijau: 127 artefak done terverifikasi. CR ini tidak ditetapkan done oleh agent.
+- `node scripts/check-status-log.mjs` hijau saat implementasi: 127 artefak done terverifikasi. Penetapan done berikutnya berdasarkan instruksi eksplisit user.
 - Bukti sementara: `/tmp/opencode/cr-073-browser.mjs`, `/tmp/opencode/cr-073-browser-results.json`, `/tmp/opencode/cr-073-{route,typecheck,lint,test,test-retry,showcase-test,controlled-test,tokens,build}.log`.
