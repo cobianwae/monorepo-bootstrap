@@ -1,6 +1,6 @@
 # 015-03 — Showcase avatar + cover + audit + smoke
 
-Status: approved
+Status: done
 PRD: `docs/prd/015-image-cropper.md` (approved, gate 1)
 Design: `docs/design/wireframes/image-cropper.md` (approved, gate 2, §1, §5–§7) + `docs/design/flows/image-cropper.mmd` (diagram 4) + sitemap `S-005.38.01/.02`
 FR: `FR-007`, `FR-008`, `FR-009`
@@ -41,11 +41,20 @@ Goal: Scenario showcase final membuktikan alur avatar/cover ujung-ke-ujung di li
 
 ## Tasks
 
-- [ ] Buat route `/patterns/image-cropper` final: `PageHeader` + card crop 2 kolom (≥md) / stacked (<md) + panel pratinjau + bar kontrol + footer [Pilih][Simpan] + `ol` 6 langkah + panel demo (wireframe §1)
-- [ ] Wiring komponen 015-01/015-02: scenario avatar (1:1 + round + 512) dan cover (16:9 + rect + 1280) + dataset valid/rusak/raksasa + resep `onComplete` 15 baris tersalin + `data-testid` (`ic-dropzone`, `ic-area`, `ic-zoom`, `ic-rotate`, `ic-reset`, `ic-preview`, `ic-save`)
-- [ ] Audit: keyboard penuh, SR live, fokus ring, `prefers-reduced-motion`, sentuh ≥44px; `test:tokens` light & dark + tabel audit
-- [ ] Smoke `pnpm -C apps/showcase build`; tanpa token/dependency baru; responsif <md terverifikasi (fungsi §5 tidak hilang)
-- [ ] Update `sitemap.md` S-005.38 series → `implemented` + catat `STATUS-LOG.md` setelah merge per AGENTS.md
+- [x] Buat route `/patterns/image-cropper` final: `PageHeader` + card crop 2 kolom (≥md) / stacked (<md) + panel pratinjau + bar kontrol + footer [Pilih][Simpan] + `ol` 6 langkah + panel demo (wireframe §1)
+- [x] Wiring komponen 015-01/015-02: scenario avatar (1:1 + round + 512) dan cover (16:9 + rect + 1280) + dataset valid/rusak/raksasa + resep `onComplete` 15 baris tersalin + `data-testid` (`ic-dropzone`, `ic-area`, `ic-zoom`, `ic-rotate`, `ic-reset`, `ic-preview`, `ic-save`)
+- [x] Audit: keyboard penuh, SR live, fokus ring, `prefers-reduced-motion`, sentuh ≥44px; `test:tokens` light & dark + tabel audit
+- [x] Smoke `pnpm -C apps/showcase build`; tanpa token/dependency baru; responsif <md terverifikasi (fungsi §5 tidak hilang)
+- [x] Update `sitemap.md` S-005.38 series → `implemented` + catat `STATUS-LOG.md` setelah merge per AGENTS.md
+
+## Hasil implementasi (2026-11-24)
+
+- Route `apps/showcase/src/app/(docs)/patterns/image-cropper/` (`page.tsx` + `_lib/demo-data.ts` + `_lib/recipe.ts` + `page.test.tsx` 5 test).
+- `data-testid` `ic-*` ditambah di `packages/ui/src/components/form/image-cropper.tsx` (aditif, tanpa perubahan props); test existing diperbarui `crop-preview` → `ic-preview`.
+- Dataset demo: valid (default), rusak (`accept="image/png"`), raksasa (`maxBytes={1024}` mock ukuran tercatat, bukan file biner).
+- Nav: `Image Cropper` di grup Forms & Flows (`Crop` icon). Sitemap: S-005.38/.01/.02 → `implemented`.
+- Audit kontras (validator `@ds/tokens`, `auditSemanticTokenPairs`, pulse light/dark): teks utama 17,11/17,52:1; muted 7,47/7,51:1; tombol primary 8,97/5,65:1; destructive 4,83/6,96:1 — semua ≥4,5:1. Grafis primary (garis viewport/gagang/ring) memakai hue yang sama dengan pasangan tombol ≥5,65:1 (≥3:1). Overlay `background/80` tergantung foto sumber; mengikuti tema + garis `primary`, bukan diukur statis.
+- Verifikasi: ui image-cropper 34/34; showcase page 5/5; lint hijau; showcase build:types hijau; build hijau (route terdaftar 16,9 kB); tokens 10/10. Baseline di luar scope: typecheck 12 error FlowEditor; ui 751/752 (timeout OrgChartEditor lulus 38/38 saat suite sendiri); showcase 95/99 (4 gagal flow-editor, sama di baseline `visual-polish`).
 
 ## Dependencies
 

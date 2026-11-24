@@ -33,6 +33,7 @@ CR-071 (Dynamic Form: layout/copy) diimplementasikan di branch `cr-071-dynamic-f
 3. Jangan membuka ulang temuan yang sudah ditangani: eyebrow PageHeader CR-046 done, Directional Motion CR-048 done, deviasi h1/weight dipertahankan CR-051. Sisa teks kecil → CR-055; guard heading seluruh docs sudah diperluas di CR-052; flaky RTE tetap baseline.
 4. CR-075 `approved` oleh user 2026-11-24: perbaikan 12 error TS2339 pada query tombol test FlowEditor; implementasi ditunda atas permintaan user. Smoke RTE + timing worker tetap terpisah. Cek visual browser CR-070 (Shiki light/dark) belum dilakukan.
 5. Antrean implementasi satu per sesi: 013-01, 015-03. 013-01 membuka S-005.36 (kini `in-design`); S-005.30/S-005.31 sudah `implemented`; S-005.41 tetap `in-design` sampai PRD 018 diimplementasi.
+6. 015-03 `done` atas persetujuan user 2026-11-24 dan dimerge ke `visual-polish`: route `/patterns/image-cropper` final + audit kontras.
 
 ## Known Issues
 

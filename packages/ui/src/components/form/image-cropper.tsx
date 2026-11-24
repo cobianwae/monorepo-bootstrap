@@ -326,16 +326,18 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
             <p role="status" className="text-sm text-muted-foreground">
               Belum ada gambar. Pilih foto untuk mulai memotong.
             </p>
-            <FileInput
-              value={[]}
-              onChange={handleFiles}
-              maxFiles={1}
-              accept={accept}
-              showFileList={false}
-              helperText={`PNG, JPG, atau WebP · Maks ${formatMegabytes(maxBytes)}`}
-              errorMessage={undefined}
-              aria-label="Pilih foto"
-            />
+            <div data-testid="ic-dropzone">
+              <FileInput
+                value={[]}
+                onChange={handleFiles}
+                maxFiles={1}
+                accept={accept}
+                showFileList={false}
+                helperText={`PNG, JPG, atau WebP · Maks ${formatMegabytes(maxBytes)}`}
+                errorMessage={undefined}
+                aria-label="Pilih foto"
+              />
+            </div>
           </>
         ) : null}
 
@@ -346,16 +348,18 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
                 <AlertDescription>{errorMessage}</AlertDescription>
               </Alert>
             </div>
-            <FileInput
-              value={[]}
-              onChange={handleFiles}
-              maxFiles={1}
-              accept={accept}
-              showFileList={false}
-              helperText={`PNG, JPG, atau WebP · Maks ${formatMegabytes(maxBytes)}`}
-              errorMessage={undefined}
-              aria-label="Pilih foto lain"
-            />
+            <div data-testid="ic-dropzone">
+              <FileInput
+                value={[]}
+                onChange={handleFiles}
+                maxFiles={1}
+                accept={accept}
+                showFileList={false}
+                helperText={`PNG, JPG, atau WebP · Maks ${formatMegabytes(maxBytes)}`}
+                errorMessage={undefined}
+                aria-label="Pilih foto lain"
+              />
+            </div>
           </>
         ) : null}
 
@@ -367,6 +371,7 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
             aria-label="Area crop. Panah geser, tambah kurang zoom, R putar, nol reset."
             aria-describedby={targetDescId}
             aria-busy={status === 'loading'}
+            data-testid="ic-area"
             tabIndex={0}
             onKeyDown={handleCropKeyDown}
             className={cn(
@@ -461,6 +466,7 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
                   type="button"
                   onClick={handleSave}
                   disabled={status !== 'ready' || !croppedAreaPixels}
+                  data-testid="ic-save"
                   className="min-h-11 min-w-11"
                 >
                   Simpan hasil
@@ -476,7 +482,7 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
               role="region"
               aria-live="polite"
               aria-label="Pratinjau hasil"
-              data-testid="crop-preview"
+              data-testid="ic-preview"
               className="flex items-center gap-3"
             >
               <span
@@ -510,6 +516,7 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
                 </label>
                 <Slider
                   id="cropper-zoom"
+                  data-testid="ic-zoom"
                   aria-label="Zoom"
                   min={MIN_ZOOM}
                   max={MAX_ZOOM}
@@ -544,6 +551,7 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
                   variant="outline"
                   onClick={() => handleRotate(1)}
                   disabled={status !== 'ready'}
+                  data-testid="ic-rotate"
                   className="min-h-11"
                 >
                   Putar 90° <kbd aria-hidden="true" className="ml-1 text-xs">R</kbd>
@@ -555,6 +563,7 @@ export const ImageCropper = React.forwardRef<HTMLDivElement, ImageCropperProps>(
                   variant="ghost"
                   onClick={handleResetTransforms}
                   disabled={status !== 'ready'}
+                  data-testid="ic-reset"
                   className="min-h-11"
                 >
                   Atur ulang <kbd aria-hidden="true" className="ml-1 text-xs">0</kbd>
