@@ -62,8 +62,32 @@ const CATEGORY: TreeSelectNode[] = [
   { id: 'wanita', parentId: 'fashion', label: 'Wanita' },
 ];
 
+function labelOf(nodes: readonly { id: string; label: string }[], id: string): string {
+  return nodes.find((node) => node.id === id)?.label ?? id;
+}
+
+function pathLabels(
+  nodes: readonly { id: string; label: string }[],
+  ids: string[],
+): string[] {
+  return ids.map((id) => labelOf(nodes, id));
+}
+
 export default function CascaderTreeSelectPatternPage() {
   const [value, setValue] = React.useState<string[]>(['id', 'jabar', 'bdg', 'coblong']);
+  const [clearableValue, setClearableValue] = React.useState<string[]>([
+    'id',
+    'jabar',
+    'bdg',
+    'coblong',
+  ]);
+  const [disabledValue, setDisabledValue] = React.useState<string[]>([
+    'id',
+    'jabar',
+    'bdg',
+    'coblong',
+  ]);
+  const [errorValue, setErrorValue] = React.useState<string[]>([]);
   const [displayMode, setDisplayMode] = React.useState<'full' | 'last'>('full');
   const [lazyValue, setLazyValue] = React.useState<string[]>([]);
   const [single, setSingle] = React.useState<string | string[]>('');
@@ -72,15 +96,15 @@ export default function CascaderTreeSelectPatternPage() {
   return (
     <div className="space-y-10 animate-in fade-in-50 duration-200 motion-reduce:animate-none">
       <PageHeader
-        title="Cascader & Tree Select — Alamat/Kategori (S-005.31)"
-        description="Dropdown kolom bertingkat 3 tingkat (provinsi → kota → kecamatan) dengan lazy load, pencarian, dan keyboard penuh. Tree Select membuka tree-view di popover: single menutup saat leaf dipilih, multiple maks. 3 tag + collapse. Coba light & dark via theme toggle."
+        title="Cascader & Tree Select — Address/Category (S-005.31)"
+        description="Pick a three-level address (province → city → district) or a product category from a nested tree. Try selecting a leaf, switching display mode, and navigating with the keyboard."
       />
 
       <section id="cascader" aria-labelledby="cascader-heading" className="space-y-4 scroll-mt-20">
         <SectionHeading id="cascader-heading" title="Cascader" />
 
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
-          <h3 className="text-sm font-semibold text-foreground">Demo utama — alamat bertingkat</h3>
+          <h3 className="text-sm font-semibold text-foreground">Main demo — nested address</h3>
           <SegmentedControl
             type="single"
             value={displayMode}
@@ -89,67 +113,92 @@ export default function CascaderTreeSelectPatternPage() {
             }}
             aria-label="Display mode"
           >
-            <SegmentedControlItem value="full">Mode penuh</SegmentedControlItem>
-            <SegmentedControlItem value="last">Mode level-terakhir</SegmentedControlItem>
+            <SegmentedControlItem value="full">Full mode</SegmentedControlItem>
+            <SegmentedControlItem value="last">Last level only</SegmentedControlItem>
           </SegmentedControl>
           <Cascader
             options={ADDRESS}
             value={value}
             onChange={setValue}
             displayMode={displayMode}
-            label="Alamat domisili"
-            placeholder="Pilih provinsi → kota → kecamatan"
+            label="Home address"
+            placeholder="Select province → city → district"
           />
           <p className="text-sm text-muted-foreground" aria-live="polite">
-            Nilai: {value.length === 0 ? '—' : value.join(' → ')}
+            Value:{' '}
+            {value.length === 0
+              ? '—'
+              : displayMode === 'last'
+                ? labelOf(ADDRESS, value[value.length - 1])
+                : pathLabels(ADDRESS, value).join(' → ')}
           </p>
         </div>
 
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
-          <h3 className="text-sm font-semibold text-foreground">Lazy load per kolom (tiruan fetch 400ms)</h3>
+          <h3 className="text-sm font-semibold text-foreground">Lazy load per column</h3>
           <Cascader
             options={LAZY_ROOT}
             value={lazyValue}
             onChange={setLazyValue}
             loadChildren={fakeFetch}
-            label="Alamat lazy"
-            placeholder="Buka tiap kolom untuk memuat anak"
+            label="Address"
+            placeholder="Select a region — options load gradually"
           />
           <p className="text-sm text-muted-foreground" aria-live="polite">
-            Nilai lazy: {lazyValue.length === 0 ? '—' : lazyValue.join(' → ')}
+            Value:{' '}
+            {lazyValue.length === 0
+              ? '—'
+              : pathLabels([...LAZY_ROOT, ...ADDRESS], lazyValue).join(' → ')}
           </p>
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
           <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
             <h3 className="text-sm font-semibold text-foreground">Clearable</h3>
-            <Cascader options={ADDRESS} value={value} onChange={setValue} label="Bisa dihapus" />
+            <Cascader
+              options={ADDRESS}
+              value={clearableValue}
+              onChange={setClearableValue}
+              label="Address"
+            />
+            <p className="text-sm text-muted-foreground" aria-live="polite">
+              Value: {clearableValue.length === 0 ? '—' : pathLabels(ADDRESS, clearableValue).join(' → ')}
+            </p>
           </div>
           <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
             <h3 className="text-sm font-semibold text-foreground">Disabled</h3>
-            <Cascader options={ADDRESS} value={value} onChange={setValue} disabled label="Nonaktif" />
+            <Cascader
+              options={ADDRESS}
+              value={disabledValue}
+              onChange={setDisabledValue}
+              disabled
+              label="Address"
+            />
           </div>
           <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
             <h3 className="text-sm font-semibold text-foreground">Error</h3>
             <Cascader
               options={ADDRESS}
-              value={[]}
-              onChange={() => undefined}
-              error="Wilayah wajib dipilih"
-              label="Alamat wajib"
+              value={errorValue}
+              onChange={setErrorValue}
+              error={errorValue.length === 0 ? 'Address is required' : undefined}
+              label="Address (required)"
             />
+            <p className="text-sm text-muted-foreground" aria-live="polite">
+              Value: {errorValue.length === 0 ? '—' : pathLabels(ADDRESS, errorValue).join(' → ')}
+            </p>
           </div>
         </div>
 
         <div className="flex flex-col gap-1">
-          <h3 className="text-sm font-semibold text-foreground">Cara mencoba</h3>
+          <h3 className="text-sm font-semibold text-foreground">How to try</h3>
           <ol className="flex flex-col gap-1 text-sm text-muted-foreground">
-            <li>Pilih ID → provinsi → kota → kecamatan; kolom anak terbuka di sebelah tiap pilihan.</li>
-            <li>Memilih kecamatan (leaf) menutup dropdown dan mengisi nilai path lengkap.</li>
-            <li>Toggle mode penuh vs level-terakhir untuk dua tampilan nilai.</li>
-            <li>Ketik di kolom pencarian untuk hasil flat; memilih hasil mengisi path lengkap.</li>
-            <li>Keyboard: Tab ke trigger, Enter buka, panah navigasi antar kolom/opsi, Enter pilih, Escape tutup.</li>
-            <li>Lazy: buka kolom untuk fetch tiruan dengan skeleton per kolom.</li>
+            <li>Select ID → province → city → district; child columns open beside each selection.</li>
+            <li>Selecting a district (leaf) closes the dropdown and fills the full path.</li>
+            <li>Toggle full vs last-level mode for the two value displays.</li>
+            <li>Type in the search column for flat results; selecting a result fills the full path.</li>
+            <li>Keyboard: Tab to the trigger, Enter opens, arrows navigate columns/options, Enter selects, Escape closes.</li>
+            <li>Lazy: open a column to load children with a per-column skeleton (400 ms simulated).</li>
           </ol>
         </div>
       </section>
@@ -159,63 +208,66 @@ export default function CascaderTreeSelectPatternPage() {
 
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
           <h3 className="text-sm font-semibold text-foreground">
-            Tree Select — kategori produk (single)
+            Tree Select — product category (single)
           </h3>
           <TreeSelect
             options={[...CATEGORY]}
             value={single}
             onChange={setSingle}
-            label="Kategori utama"
-            placeholder="Pilih kategori"
+            label="Primary category"
+            placeholder="Select a category"
           />
           <p className="text-sm text-muted-foreground" aria-live="polite">
-            Nilai: {single === '' ? '—' : String(single)}
+            Value: {single === '' ? '—' : labelOf(CATEGORY, String(single))}
           </p>
         </div>
 
         <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
           <h3 className="text-sm font-semibold text-foreground">
-            Tree Select — multiple maks. 3 tag + collapse
+            Tree Select — multiple, max 3 tags + collapse
           </h3>
           <TreeSelect
             options={[...CATEGORY]}
             multiple
             value={multi}
             onChange={setMulti}
-            label="Kategori favorit"
-            placeholder="Pilih beberapa kategori"
+            label="Favorite categories"
+            placeholder="Select multiple categories"
           />
           <p className="text-sm text-muted-foreground" aria-live="polite">
-            Nilai: {Array.isArray(multi) && multi.length > 0 ? multi.join(', ') : '—'}
+            Value:{' '}
+            {Array.isArray(multi) && multi.length > 0
+              ? pathLabels(CATEGORY, multi).join(', ')
+              : '—'}
           </p>
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
           <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-            <h3 className="text-sm font-semibold text-foreground">Tree Select loading</h3>
-            <TreeSelect options={[]} loading label="Memuat" />
+            <h3 className="text-sm font-semibold text-foreground">Tree Select — loading</h3>
+            <TreeSelect options={[]} loading label="Category" />
           </div>
           <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-            <h3 className="text-sm font-semibold text-foreground">Tree Select empty</h3>
-            <TreeSelect options={[]} label="Kosong" emptyText="Belum ada kategori." />
+            <h3 className="text-sm font-semibold text-foreground">Tree Select — empty</h3>
+            <TreeSelect options={[]} label="Category" emptyText="No categories yet." />
           </div>
           <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-            <h3 className="text-sm font-semibold text-foreground">Tree Select error</h3>
+            <h3 className="text-sm font-semibold text-foreground">Tree Select — error</h3>
             <TreeSelect
               options={[...CATEGORY]}
-              label="Gagal"
-              error="Kategori gagal dimuat, coba lagi."
+              label="Category"
+              error="Failed to load categories. Try again."
             />
           </div>
         </div>
 
         <div className="flex flex-col gap-1">
-          <h3 className="text-sm font-semibold text-foreground">Cara mencoba</h3>
+          <h3 className="text-sm font-semibold text-foreground">How to try</h3>
           <ol className="flex flex-col gap-1 text-sm text-muted-foreground">
-            <li>Tree Select: buka popover berisi tree-view; klik leaf mengisi nilai dan menutup.</li>
-            <li>Nilai awal dalam (mis. Android) otomatis men-expand ancestors saat popover dibuka.</li>
-            <li>Multiple menampilkan maks. 3 tag + collapse +N; hapus via tombol × tiap tag.</li>
-            <li>Keyboard: Tab ke trigger, Enter buka, panah/Enter/Space di tree, Escape tutup.</li>
+            <li>Tree Select: open the popover with the tree; clicking a leaf fills the value and closes.</li>
+            <li>A nested initial value (e.g. Android) auto-expands its ancestors when the popover opens.</li>
+            <li>Multiple shows max 3 tags + a +N collapse; remove via the × button on each tag.</li>
+            <li>Keyboard: Tab to the trigger, Enter opens, arrows/Enter/Space in the tree, Escape closes.</li>
           </ol>
         </div>
       </section>
