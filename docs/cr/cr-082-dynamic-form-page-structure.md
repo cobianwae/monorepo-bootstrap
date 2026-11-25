@@ -1,6 +1,6 @@
 # CR-082 — Uplift halaman Dynamic Form: struktur demo dan accessibility notes
 
-**Status:** approved
+**Status:** done
 **Sumber:** visual uplift (`/polish-ui`), audit gap vs `docs/design/visual-language.md` (approved 2026-11-23), 2026-11-25
 **Ref:** `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx`, acuan pola `apps/showcase/src/app/(docs)/patterns/file-manager/page.tsx:196-294` (hasil CR-065/066)
 
@@ -62,6 +62,6 @@ Commit: `refactor: uplift struktur halaman dynamic form [CR-082]`
 - [x] Branch dibuat (`cr-082-dynamic-form-page-structure` dari `visual-polish` `ad91fb0`, worktree `arah-prd`).
 - [x] Perubahan diimplementasikan (page.tsx + ekspektasi heading di page.test.tsx).
 - [x] Verifikasi dijalankan.
-- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui. Status tetap `approved` (hanya user boleh menetapkan `done`); baris BACKLOG tidak diubah.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui. Status tetap `approved` (hanya user boleh menetapkan `done`); baris BACKLOG tidak diubah. Ditetapkan `done` oleh user 2026-11-25 setelah review; di-merge ke `visual-polish` dan di-push.
 - [x] `docs/STATUS.md` diperbarui bila relevan.
 - [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
