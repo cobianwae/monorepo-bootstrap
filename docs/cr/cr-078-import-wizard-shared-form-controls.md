@@ -1,6 +1,6 @@
 # CR-078 — Stepper dan FileInput: Visibilitas Langkah serta Integrasi Import Wizard
 
-**Status:** approved (2026-11-25; API aditif disetujui sebagaimana tertulis) — implementasi selesai 2026-11-26 di branch `cr-078-import-wizard-shared-form-controls` (worktree `arah-prd`, dari `visual-polish` `a215ea1`) atas approval rencana user, menunggu review user; hanya user menetapkan done  
+**Status:** done (ditetapkan user 2026-11-26; API aditif disetujui sebagaimana tertulis) — implementasi selesai 2026-11-26 di branch `cr-078-import-wizard-shared-form-controls` (worktree `arah-prd`, dari `visual-polish` `a215ea1`), di-merge ke `visual-polish` dan di-push atas izin eksplisit user  
 **Sumber:** audit UI/UX `/improve-ui` Import Wizard, 2026-11-25 — cluster shared  
 **Ref:** `docs/design/import-wizard.md` (D6/D9), `docs/cr/cr-061-responsive-controls.md`, route `/patterns/import-wizard`  
 **Prioritas:** tinggi untuk Stepper; CR-079 bergantung pada dukungan copy FileInput.
