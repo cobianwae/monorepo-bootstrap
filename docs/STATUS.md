@@ -29,6 +29,8 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 ## Next
 
+CR-078 diimplementasikan di branch `cr-078-import-wizard-shared-form-controls` (worktree `arah-prd`), status tetap `approved` menunggu review user; belum merge/push. Berikutnya setelah penetapan user: CR-079.
+
 CR-077 ditetapkan done oleh user (2026-11-25) dan di-merge ke `visual-polish`. Verifikasi: typecheck/lint/test/build hijau; matriks kontras numerik, reflow browser, keyboard walkthrough, dan screen reader belum diverifikasi (lihat `docs/cr/cr-077-import-wizard-accessibility.md`). Berikutnya: CR-078.
 
 CR-073 **done** atas persetujuan user 2026-11-25; implementasi `83c8234` pada `cr-073-dynamic-form-fields-and-accessibility` disetujui untuk merge ke `visual-polish` dan push. Catatan implementasi di bawah adalah bukti sebelum penetapan done ini.

@@ -70,6 +70,7 @@ export function UploadStep({
             ref={fileInputRef}
             accept=".csv,text/csv"
             maxFiles={1}
+            replaceOnSelect
             value={files}
             onChange={onFiles}
             disabled={parsing}

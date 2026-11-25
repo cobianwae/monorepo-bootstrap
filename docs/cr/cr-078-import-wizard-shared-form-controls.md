@@ -1,6 +1,6 @@
 # CR-078 — Stepper dan FileInput: Visibilitas Langkah serta Integrasi Import Wizard
 
-**Status:** approved (2026-11-25; API aditif disetujui sebagaimana tertulis, implementasi belum dimulai)  
+**Status:** approved (2026-11-25; API aditif disetujui sebagaimana tertulis) — implementasi selesai 2026-11-26 di branch `cr-078-import-wizard-shared-form-controls` (worktree `arah-prd`, dari `visual-polish` `a215ea1`) atas approval rencana user, menunggu review user; hanya user menetapkan done  
 **Sumber:** audit UI/UX `/improve-ui` Import Wizard, 2026-11-25 — cluster shared  
 **Ref:** `docs/design/import-wizard.md` (D6/D9), `docs/cr/cr-061-responsive-controls.md`, route `/patterns/import-wizard`  
 **Prioritas:** tinggi untuk Stepper; CR-079 bergantung pada dukungan copy FileInput.
@@ -33,10 +33,10 @@
 
 ## Tasks
 
-- [ ] Periksa caller melalui graphify lalu pencarian targeted; reproduksi replacement dan dokumentasikan blast radius.
-- [ ] Perbaiki scroll current-step lokal, termasuk resize dan reduced motion; tambah regression test.
-- [ ] Implement API aditif FileInput setelah disetujui; uji default/backward compatibility, replace, invalid replacement, multi-file, remove, keyboard/dropzone dan nama aksesibel.
-- [ ] Wiring opt-in wizard; uji halaman docs FileInput/Stepper dan Import Wizard di320/390/1440 light/dark.
+- [x] Periksa caller melalui graphify lalu pencarian targeted; reproduksi replacement dan dokumentasikan blast radius.
+- [x] Perbaiki scroll current-step lokal, termasuk resize dan reduced motion; tambah regression test.
+- [x] Implement API aditif FileInput setelah disetujui; uji default/backward compatibility, replace, invalid replacement, multi-file, remove, keyboard/dropzone dan nama aksesibel.
+- [x] Wiring opt-in wizard; uji halaman docs FileInput/Stepper dan Import Wizard di320/390/1440 light/dark.
 
 ## Keputusan
 
@@ -47,16 +47,18 @@
 
 ## Design System Checks
 
-- [ ] Token, kontras light/dark dan target44px; Radix/keyboard/fokus tidak regresi.
-- [ ] API baru aditif, tipe/export konsisten dan tanpa dependency baru.
-- [ ] Empty/loading/error, disabled, picker/drop dan multi-file diuji.
-- [ ] Test targeted UI/caller, lalu `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`; catat baseline terpisah.
+- [x] Token, kontras light/dark dan target44px; Radix/keyboard/fokus tidak regresi.
+- [x] API baru aditif, tipe/export konsisten dan tanpa dependency baru.
+- [x] Empty/loading/error, disabled, picker/drop dan multi-file diuji.
+- [x] Test targeted UI/caller, lalu `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`; catat baseline terpisah.
 
 ## Eksekusi
 
 Branch: `cr-078-import-wizard-shared-form-controls`  
 Commit: `fix: improve stepper visibility and file input integration [CR-078]`
 
-- [ ] CR dan API aditif disetujui user; branch dibuat.
-- [ ] Implementasi/verifikasi selesai; checklist dan BACKLOG/STATUS diperbarui; hanya user menetapkan done.
-- [ ] Append STATUS-LOG; `node scripts/check-status-log.mjs` hijau sebelum commit.
+- [x] CR dan API aditif disetujui user; branch dibuat.
+- [x] Implementasi/verifikasi selesai; checklist dan BACKLOG/STATUS diperbarui; hanya user menetapkan done.
+- [x] Append STATUS-LOG; `node scripts/check-status-log.mjs` hijau sebelum commit.
+
+Catatan implementasi (2026-11-26): Stepper menggeser scroller lokalnya sendiri (hitung `scrollLeft` dari rect langkah `aria-current`, bukan `scrollIntoView`, listener `resize`, `smooth`/`auto` mengikuti `prefers-reduced-motion`); FileInput menambah `messages?: Partial<FileInputMessages>` (formatter bertipe untuk format/ukuran/remove/error) dan `replaceOnSelect?: boolean` (default `false`, file pengganti invalid mempertahankan file aktif), tombol remove `h-11 w-11`, dropzone/input terhubung `aria-describedby` helper/error tanpa duplikasi id; wizard memakai `replaceOnSelect` saja (copy English = CR-079). Verifikasi: typecheck hijau, lint 0 error (4 warning pre-existing), tokens 10/10, showcase 132/132, build showcase hijau; `pnpm test` penuh 1 gagal flaky baseline `rte-link-save` di `@ds/ui` (suite UI dijalankan ulang 749/749 lulus). Browser headless Chrome + CDP 320/390/1440 mode dark: `scrollWidth == innerWidth` (tanpa overflow halaman), scroller Stepper lokal `scrollWidth 551 > clientWidth 222/292`; regresi geometri langkah-4 di luar viewport ditutup test unit Stepper (mock rect 320px). Interaksi browser langkah 3/4 dan mode light tidak diverifikasi manual.
