@@ -1,6 +1,6 @@
 # CR-086 — Cascader & Tree Select: kemandirian demo, umpan balik nilai, dan microcopy halaman
 
-**Status:** approved (ditetapkan user 2026-11-25; diimplementasikan 2026-11-25 di branch `cr-086-cascader-tree-select-demo-feedback`, menunggu penetapan done oleh user)
+**Status:** done (ditetapkan user 2026-11-25; diimplementasikan 2026-11-25 di branch `cr-086-cascader-tree-select-demo-feedback`, di-merge ke `visual-polish` dan di-push atas izin eksplisit)
 **Sumber:** audit `/improve-ui` (skill `ui-designer`), 2026-11-25
 **Ref:** `apps/showcase/src/app/(docs)/patterns/cascader-tree-select/page.tsx:56-204`
 **Ketergantungan:** dilaksanakan setelah CR-085 (struktur halaman) agar tidak mengedit wilayah JSX yang sama dua kali.
