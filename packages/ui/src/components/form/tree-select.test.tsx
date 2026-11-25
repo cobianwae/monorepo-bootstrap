@@ -81,7 +81,7 @@ describe('TreeSelect', () => {
   it('clears value via clear button', () => {
     const onChange = vi.fn();
     render(<TreeSelect options={OPTIONS} value="android" onChange={onChange} />);
-    fireEvent.click(screen.getByLabelText('Bersihkan pilihan'));
+    fireEvent.click(screen.getByLabelText('Clear selection'));
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange.mock.calls[0][0]).toBe('');
   });
@@ -100,7 +100,7 @@ describe('TreeSelect', () => {
   it('treats empty string value as no selection and keeps placeholder', () => {
     render(<TreeSelect options={OPTIONS} value="" placeholder="Pilih kategori" />);
     expect(screen.getByText('Pilih kategori')).toBeDefined();
-    expect(screen.queryByLabelText('Bersihkan pilihan')).toBeNull();
+    expect(screen.queryByLabelText('Clear selection')).toBeNull();
   });
 
   it('links error to trigger with aria-invalid and a single alert', () => {
@@ -127,7 +127,7 @@ describe('TreeSelect', () => {
       />
     );
     const trigger = screen.getByRole('combobox');
-    const removeButtons = screen.getAllByRole('button', { name: /^Hapus / });
+    const removeButtons = screen.getAllByRole('button', { name: /^Remove / });
     expect(removeButtons).toHaveLength(2);
     for (const removeButton of removeButtons) {
       expect(removeButton.tagName).toBe('BUTTON');
@@ -136,7 +136,7 @@ describe('TreeSelect', () => {
     fireEvent.click(removeButtons[0]);
     expect(onChange).toHaveBeenCalledWith(['ios'], expect.anything());
 
-    const clear = screen.getByRole('button', { name: 'Bersihkan pilihan' });
+    const clear = screen.getByRole('button', { name: 'Clear selection' });
     expect(trigger.contains(clear)).toBe(false);
     fireEvent.click(clear);
     expect(document.activeElement).toBe(trigger);
@@ -150,6 +150,33 @@ describe('TreeSelect', () => {
     expect(trigger.textContent).toContain('Android');
     expect(trigger.textContent).not.toContain('Pilih kategori');
     // Hanya 1 tag valid, tidak ada chip kosong
-    expect(screen.queryByLabelText('Hapus ')).toBeNull();
+    expect(screen.queryByLabelText('Remove ')).toBeNull();
+  });
+
+  it('distinguishes empty options from no search results', () => {
+    const { unmount } = render(<TreeSelect options={[]} emptyText="No categories yet." />);
+    openPopover();
+    expect(screen.getByText('No data')).toBeDefined();
+    expect(screen.getByText('No categories yet.')).toBeDefined();
+    unmount();
+
+    render(<TreeSelect options={OPTIONS} />);
+    openPopover();
+    fireEvent.change(screen.getByPlaceholderText('Search...'), {
+      target: { value: 'zzz-no-match' },
+    });
+    expect(screen.getByText('No results found')).toBeDefined();
+  });
+
+  it('shows selected count in English for multiple', () => {
+    render(<TreeSelect options={OPTIONS} multiple value={['android', 'ios']} />);
+    openPopover();
+    expect(screen.getByText(/2 selected/)).toBeDefined();
+  });
+
+  it('announces loading state in English', () => {
+    render(<TreeSelect options={OPTIONS} loading />);
+    openPopover();
+    expect(screen.getByLabelText('Loading options')).toBeDefined();
   });
 });

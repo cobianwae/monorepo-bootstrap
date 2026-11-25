@@ -354,7 +354,7 @@ export function Cascader({
           {query ? (
             <div className="max-h-64 overflow-y-auto p-1" role="listbox" aria-label="Search results">
               {searchResults.length === 0 ? (
-                <p className="px-2 py-6 text-center text-sm text-muted-foreground">{emptyText}</p>
+                <p className="px-2 py-6 text-center text-sm text-muted-foreground">No results found.</p>
               ) : (
                 searchResults.map((node) => {
                   const path = getPathTo(node.id);

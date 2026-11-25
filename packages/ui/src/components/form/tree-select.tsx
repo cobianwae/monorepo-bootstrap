@@ -285,7 +285,7 @@ export function TreeSelect({
                           {tagLabel}
                           <button
                             type="button"
-                            aria-label={`Hapus ${tagLabel}`}
+                            aria-label={`Remove ${tagLabel}`}
                             disabled={disabled}
                             onClick={() => handleRemoveTag(tagId)}
                             className="pointer-events-auto inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
@@ -317,7 +317,7 @@ export function TreeSelect({
           {showClear && (
             <button
               type="button"
-              aria-label="Bersihkan pilihan"
+              aria-label="Clear selection"
               onClick={handleClear}
               className="absolute top-1/2 right-3 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
             >
@@ -351,7 +351,7 @@ export function TreeSelect({
               <div
                 className="flex flex-col gap-2 p-2"
                 role="status"
-                aria-label="Memuat pilihan"
+                aria-label="Loading options"
               >
                 <Skeleton className="h-6 w-full" />
                 <Skeleton className="h-6 w-11/12" />
@@ -359,7 +359,7 @@ export function TreeSelect({
               </div>
             ) : visibleNodes.length === 0 ? (
               <EmptyState
-                title="Tidak ada data"
+                title={query ? 'No results found' : 'No data'}
                 description={emptyText}
                 className="border-none bg-transparent p-4"
               />
@@ -380,7 +380,7 @@ export function TreeSelect({
             {multiple && selectedIds.length > 0 ? (
               <p className="flex items-center gap-1 px-2 pb-1 text-xs text-muted-foreground">
                 <Check className="h-3 w-3" aria-hidden="true" />
-                {selectedIds.length} dipilih
+                {selectedIds.length} selected
               </p>
             ) : null}
           </div>
