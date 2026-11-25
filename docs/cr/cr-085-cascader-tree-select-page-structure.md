@@ -1,6 +1,6 @@
 # CR-085 — Cascader & Tree Select: struktur dan hierarki halaman
 
-**Status:** approved (ditetapkan user 2026-11-25; belum dikerjakan atas instruksi user)
+**Status:** done
 **Sumber:** audit `/improve-ui` (skill `ui-designer`), 2026-11-25
 **Ref:** `apps/showcase/src/app/(docs)/patterns/cascader-tree-select/page.tsx`, `docs/design/visual-language.md` (Spacing & Density, Section Heading, Color Roles)
 
@@ -43,11 +43,11 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Samakan root halaman ke ritme `space-y-10 …` halaman docs.
-- [ ] Tambah dua section ber-`SectionHeading` (Cascader, Tree Select) dengan `id`/`scroll-mt-20`/`aria-labelledby`; sesuaikan level judul demo di dalamnya.
-- [ ] Ganti toggle mode tampilan manual ke `SegmentedControl` dari `@ds/ui`.
-- [ ] Pindah daftar langkah menjadi petunjuk per kelompok; hapus nomor manual di `<li>`.
-- [ ] Verifikasi: guard visual-language, test showcase terkait, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`.
+- [x] Samakan root halaman ke ritme `space-y-10 …` halaman docs.
+- [x] Tambah dua section ber-`SectionHeading` (Cascader, Tree Select) dengan `id`/`scroll-mt-20`/`aria-labelledby`; sesuaikan level judul demo di dalamnya.
+- [x] Ganti toggle mode tampilan manual ke `SegmentedControl` dari `@ds/ui`.
+- [x] Pindah daftar langkah menjadi petunjuk per kelompok; hapus nomor manual di `<li>`.
+- [x] Verifikasi: guard visual-language, test showcase terkait, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`.
 - [ ] Cek light/dark dan 320/390/1440 best-effort; cek tidak ada overflow horizontal baru.
 
 ## Keputusan
@@ -59,13 +59,13 @@
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA (state terpilih mengikuti `SegmentedControl`).
-- [ ] Perilaku Radix/a11y tidak rusak; hierarki heading h1 → h2 → (h3 terbatas) utuh.
-- [ ] API `cva` dan export tetap konsisten (tanpa perubahan `@ds/ui`).
-- [ ] State loading, empty, dan error relevan tersedia (tidak diubah di CR ini).
-- [ ] Showcase/docs diperbarui bila perlu.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA (state terpilih mengikuti `SegmentedControl`).
+- [x] Perilaku Radix/a11y tidak rusak; hierarki heading h1 → h2 → (h3 terbatas) utuh.
+- [x] API `cva` dan export tetap konsisten (tanpa perubahan `@ds/ui`).
+- [x] State loading, empty, dan error relevan tersedia (tidak diubah di CR ini).
+- [x] Showcase/docs diperbarui bila perlu.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
 
 ## Eksekusi
 
@@ -73,9 +73,9 @@ Branch: `cr-085-cascader-tree-select-page-structure`
 Commit: `fix: struktur halaman cascader tree select [CR-085]`
 
 - [x] CR disetujui user (2026-11-25; implementasi ditunda atas instruksi user — “gak usah dikerjain”).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
