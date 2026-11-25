@@ -1,6 +1,6 @@
 # CR-086 — Cascader & Tree Select: kemandirian demo, umpan balik nilai, dan microcopy halaman
 
-**Status:** approved (ditetapkan user 2026-11-25; belum dikerjakan atas instruksi user)
+**Status:** approved (ditetapkan user 2026-11-25; diimplementasikan 2026-11-25 di branch `cr-086-cascader-tree-select-demo-feedback`, menunggu penetapan done oleh user)
 **Sumber:** audit `/improve-ui` (skill `ui-designer`), 2026-11-25
 **Ref:** `apps/showcase/src/app/(docs)/patterns/cascader-tree-select/page.tsx:56-204`
 **Ketergantungan:** dilaksanakan setelah CR-085 (struktur halaman) agar tidak mengedit wilayah JSX yang sama dua kali.
@@ -29,12 +29,12 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Pisahkan state demo clearable/disabled/error dari demo utama.
-- [ ] Render umpan balik nilai dari label (path lengkap / label terakhir sesuai mode).
-- [ ] Persingkat description `PageHeader`; selaraskan label demo menjadi label field realistis.
-- [ ] Buat demo error dapat pulih lewat pilihan user.
-- [ ] Verifikasi: test showcase terkait, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`.
-- [ ] Cek light/dark dan keyboard pada demo yang statenya berubah.
+- [x] Pisahkan state demo clearable/disabled/error dari demo utama.
+- [x] Render umpan balik nilai dari label (path lengkap / label terakhir sesuai mode).
+- [x] Persingkat description `PageHeader`; selaraskan label demo menjadi label field realistis.
+- [x] Buat demo error dapat pulih lewat pilihan user.
+- [x] Verifikasi: test showcase terkait, `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`.
+- [ ] Cek light/dark dan keyboard pada demo yang statenya berubah (belum — tool browser tidak tersedia di environment ini).
 
 ## Keputusan
 
@@ -45,13 +45,13 @@
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA (tidak ada pasangan warna baru).
-- [ ] Perilaku Radix/a11y tidak rusak; `aria-live` pada umpan balik dipertahankan.
-- [ ] API `cva` dan export tetap konsisten (tanpa perubahan `@ds/ui`).
-- [ ] State loading, empty, dan error relevan tersedia dan kini dapat dibandingkan secara mandiri.
-- [ ] Showcase/docs diperbarui bila perlu.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA (tidak ada pasangan warna baru).
+- [x] Perilaku Radix/a11y tidak rusak; `aria-live` pada umpan balik dipertahankan.
+- [x] API `cva` dan export tetap konsisten (tanpa perubahan `@ds/ui`).
+- [x] State loading, empty, dan error relevan tersedia dan kini dapat dibandingkan secara mandiri.
+- [x] Showcase/docs diperbarui bila perlu.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass (test `@ds/ui` 733/734 — 1 gagal baseline `rte-link-save` pada environment worktree ini, terbukti gagal identik tanpa perubahan CR-086 dan lulus di workspace utama).
 
 ## Eksekusi
 
@@ -59,9 +59,9 @@ Branch: `cr-086-cascader-tree-select-demo-feedback`
 Commit: `fix: demo dan umpan balik cascader tree select [CR-086]`
 
 - [x] CR disetujui user (2026-11-25; implementasi ditunda atas instruksi user — “gak usah dikerjain”).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
