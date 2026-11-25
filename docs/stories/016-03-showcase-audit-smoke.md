@@ -1,6 +1,6 @@
 # 016-03 — Showcase + audit + smoke
 
-Status: review
+Status: done
 PRD: `docs/prd/016-lightbox-gallery.md` (approved, gate 1)
 Design: `docs/design/wireframes/lightbox-gallery.md` (approved, gate 2, §1/`ol` 6 langkah + §6) + `docs/design/flows/lightbox-gallery.mmd` (diagram 4)
 FR: `FR-009` (verifikasi penuh `FR-001`–`FR-008` di showcase)
@@ -32,7 +32,7 @@ Goal: Route `/patterns/media-gallery` terupgrade memakai `overlay/lightbox` reus
 - [x] Upgrade `apps/showcase/src/app/(docs)/patterns/media-gallery/page.tsx`: ganti Dialog rakitan dengan `overlay/lightbox` (`openIndex`/`onOpenChange`), pertahankan filter kategori + grid + bulk action; tambah 1 item video + 1 item rusak untuk demo
 - [x] Tambah panel demo (DemoSection): dataset + pemicu loading/empty/error/success + toggle light/dark + resep controlled 15 baris (§1 wireframe)
 - [x] Audit kontras light & dark via `pnpm test:tokens` + audit keyboard/SR/swipe/reduced-motion di route; tulis tabel audit di story
-- [ ] Verifikasi `pnpm typecheck`, `lint`, `test`, `pnpm -C apps/showcase build` (selesai, lihat audit); update sitemap `S-005.16` + `M-012` → `implemented` setelah merge; tanpa dependency/token baru
+- [x] Verifikasi `pnpm typecheck`, `lint`, `test`, `pnpm -C apps/showcase build` (selesai, lihat audit); update sitemap `S-005.16` + `M-012` → `implemented` setelah merge; tanpa dependency/token baru
 
 ## Laporan Audit (2026-11-26)
 
@@ -48,7 +48,7 @@ Implementasi: grid utama tetap 12 gambar (counter `3 / 12` sesuai AC-01); panel 
 | State demo | `page.test.tsx` | Loading (mock 1,6 dtk), empty (filter ke kosong), error (Coba lagi/Lewati), success (item 3), video, toggle light/dark via `SegmentedControl` + `useTheme` |
 | Verifikasi repo | `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build` | Typecheck hijau; lint 0 error (4 warning lama di `packages/ui`); test hijau (tokens 10, ui 742, showcase 135); build showcase hijau. Catatan: 1 test rich-text-editor flaky pada lari paralel pertama, lolos terisolasi (33/33) dan pada lari ulang penuh |
 
-Sisa setelah merge: sitemap `S-005.16` + `M-012` → `implemented` (task ke-4 ditick saat itu).
+Ditetapkan `done` atas persetujuan user 2026-11-26 dan di-merge ke `visual-polish`; sitemap `S-005.16` + `M-012` → `implemented`.
 
 ## Dependencies
 
