@@ -140,4 +140,18 @@ describe('Cascader', () => {
     await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
     expect(onChange.mock.calls[0][0]).toEqual(['id', 'jabar', 'bgr']);
   });
+
+  it('shows emptyText for empty options and No results found for empty search', () => {
+    const { unmount } = render(<Cascader options={[]} />);
+    openDropdown();
+    expect(screen.getByText('No options available.')).toBeDefined();
+    unmount();
+
+    render(<Cascader options={OPTIONS} />);
+    openDropdown();
+    fireEvent.change(screen.getByLabelText('Search...'), {
+      target: { value: 'zzz-no-match' },
+    });
+    expect(screen.getByText('No results found.')).toBeDefined();
+  });
 });

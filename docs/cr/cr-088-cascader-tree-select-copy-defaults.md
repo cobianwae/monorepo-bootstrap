@@ -1,6 +1,6 @@
 # CR-088 — Cascader & TreeSelect: konsistensi microcopy dan teks default komponen
 
-**Status:** approved (ditetapkan user 2026-11-25; belum dikerjakan atas instruksi user)
+**Status:** done (ditetapkan user 2026-11-25; diimplementasikan di branch `cr-088-cascader-tree-select-copy-defaults`, di-merge dan di-push ke `visual-polish` atas izin eksplisit; cek browser light/dark manual tidak dilakukan)
 **Sumber:** audit `/improve-ui` (skill `ui-designer`), 2026-11-25
 **Ref:** `packages/ui/src/components/form/cascader.tsx:63-65,299,311`, `packages/ui/src/components/form/tree-select.tsx:90-92,286,345-367`
 **Keputusan bahasa:** English — ditetapkan user 2026-11-25.
@@ -28,10 +28,10 @@
 ## Tasks (jalur small-fix)
 
 - [x] Catat keputusan bahasa user di tabel Keputusan CR ini sebelum mulai. (English, 2026-11-25)
-- [ ] Grep konsumen dan test yang menegaskan teks default lama.
-- [ ] Samakan placeholder/search/loading/empty/aria-clear/hitungan di `Cascader` dan `TreeSelect`.
-- [ ] Bedakan copy kosong-awal vs tanpa-hasil; sesuaikan pemakaian `EmptyState`.
-- [ ] Verifikasi: test `@ds/ui` terkait, `pnpm typecheck`, `pnpm lint`, `pnpm test`, build showcase; cek halaman pola light/dark.
+- [x] Grep konsumen dan test yang menegaskan teks default lama.
+- [x] Samakan placeholder/search/loading/empty/aria-clear/hitungan di `Cascader` dan `TreeSelect`.
+- [x] Bedakan copy kosong-awal vs tanpa-hasil; sesuaikan pemakaian `EmptyState`.
+- [x] Verifikasi: test `@ds/ui` terkait, `pnpm typecheck`, `pnpm lint`, `pnpm test`, build showcase; cek halaman pola light/dark **belum dilakukan di browser** (verifikasi otomatis lulus; lihat Eksekusi).
 
 ## Keputusan
 
@@ -42,13 +42,13 @@
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA (tidak ada pasangan warna baru).
-- [ ] Perilaku Radix/a11y tidak rusak; aria-label tetap deskriptif setelah pergantian bahasa.
-- [ ] API `cva` dan export tetap konsisten.
-- [ ] State loading, empty, dan error relevan tersedia dengan copy yang dapat dibedakan.
-- [ ] Showcase/docs diperbarui bila perlu.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA (tidak ada pasangan warna baru).
+- [x] Perilaku Radix/a11y tidak rusak; aria-label tetap deskriptif setelah pergantian bahasa.
+- [x] API `cva` dan export tetap konsisten.
+- [x] State loading, empty, dan error relevan tersedia dengan copy yang dapat dibedakan.
+- [x] Showcase/docs diperbarui bila perlu.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
 
 ## Eksekusi
 
@@ -57,9 +57,10 @@ Commit: `fix: samakan microcopy cascader tree select [CR-088]`
 
 - [x] Keputusan bahasa ditetapkan user (Keputusan #1: English, 2026-11-25).
 - [x] CR disetujui user (2026-11-25; implementasi ditunda atas instruksi user — “gak usah dikerjain”).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Cek light/dark manual di browser pada route `/patterns/cascader-tree-select` — tidak dilakukan; user menetapkan `done` tanpa cek browser ini (dicatat di STATUS-LOG).
