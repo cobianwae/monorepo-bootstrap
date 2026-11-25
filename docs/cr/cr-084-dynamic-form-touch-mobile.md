@@ -1,6 +1,6 @@
 # CR-084 — Dynamic Form: target sentuh baris member dan state kosong
 
-**Status:** approved
+**Status:** done
 **Sumber:** visual uplift (`/polish-ui`), audit gap vs `docs/design/visual-language.md` (approved 2026-11-23), 2026-11-25
 **Ref:** `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx:516-579`, preseden target sentuh CR-056/CR-066
 

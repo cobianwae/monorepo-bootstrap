@@ -145,7 +145,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-081 | Import Wizard: memo validasi, pemrosesan data besar nonblocking, skeleton dan demo parse-error | approved | `docs/cr/cr-081-import-wizard-large-data-states.md` |
 | CR-082 | Uplift halaman Dynamic Form: struktur demo (SectionHeading) dan accessibility notes | done | `docs/cr/cr-082-dynamic-form-page-structure.md` |
 | CR-083 | Dynamic Form: peran warna status (success, bukan highlight) dan reduced motion | done | `docs/cr/cr-083-dynamic-form-status-motion.md` |
-| CR-084 | Dynamic Form: target sentuh baris member ≥44px dan empty state members | approved | `docs/cr/cr-084-dynamic-form-touch-mobile.md` |
+| CR-084 | Dynamic Form: target sentuh baris member ≥44px dan empty state members | done | `docs/cr/cr-084-dynamic-form-touch-mobile.md` |
 
 ## Catatan
 
