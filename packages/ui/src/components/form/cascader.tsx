@@ -273,25 +273,39 @@ export function Cascader({
     }
   };
 
-  const errorId = error ? 'cascader-error' : undefined;
+  const triggerId = React.useId();
+  const searchId = React.useId();
+  const errorId = error ? `${triggerId}-error` : undefined;
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+
+  const handleClear = () => {
+    onChange?.([], []);
+    setActivePath([]);
+    triggerRef.current?.focus();
+  };
 
   return (
     <div className={cn('w-full', className)}>
       {label && (
-        <label className="mb-1.5 block text-sm font-medium text-foreground">{label}</label>
+        <label htmlFor={triggerId} className="mb-1.5 block text-sm font-medium text-foreground">
+          {label}
+        </label>
       )}
+      <div className="relative w-full">
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <button
+            ref={triggerRef}
+            id={triggerId}
             type="button"
             role="combobox"
             aria-expanded={open}
             aria-haspopup="listbox"
-            aria-label={label ?? placeholder}
+            aria-label={label ? undefined : placeholder}
             aria-invalid={error ? true : undefined}
             aria-describedby={errorId}
             disabled={disabled}
-            className={cn(cascaderVariants({ error: !!error }), triggerClassName)}
+            className={cn(cascaderVariants({ error: !!error }), showClear && 'pr-14', triggerClassName)}
           >
             {loading ? (
               <span className="flex items-center gap-2 text-muted-foreground">
@@ -304,46 +318,36 @@ export function Cascader({
               <span className="text-muted-foreground">{placeholder}</span>
             )}
             <span className="ml-2 flex shrink-0 items-center gap-1">
-              {showClear && (
-                <span
-                  role="button"
-                  tabIndex={0}
-                  aria-label="Clear selection"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onChange?.([], []);
-                    setActivePath([]);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      onChange?.([], []);
-                      setActivePath([]);
-                    }
-                  }}
-                  className="rounded-sm p-0.5 text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <X className="h-3.5 w-3.5" aria-hidden="true" />
-                </span>
-              )}
               <ChevronDown className="h-4 w-4 opacity-50" aria-hidden="true" />
             </span>
           </button>
         </PopoverTrigger>
+        {showClear && (
+          <button
+            type="button"
+            aria-label="Clear selection"
+            onClick={handleClear}
+            className="absolute top-1/2 right-9 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <X className="h-3.5 w-3.5" aria-hidden="true" />
+          </button>
+        )}
         <PopoverContent
           className={cn('w-auto min-w-[var(--radix-popover-trigger-width)] p-0', contentClassName)}
           align="start"
           sideOffset={4}
         >
           {searchable && (
-            <div className="border-b border-border px-3">
+            <div className="border-b border-border px-3 py-2">
+              <label htmlFor={searchId} className="sr-only">
+                {searchPlaceholder}
+              </label>
               <input
+                id={searchId}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={searchPlaceholder}
-                aria-label={searchPlaceholder}
-                className="h-10 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+                className="h-8 w-full rounded-md border border-input bg-background px-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
               />
             </div>
           )}
@@ -440,8 +444,9 @@ export function Cascader({
           )}
         </PopoverContent>
       </Popover>
+      </div>
       {error && (
-        <p id="cascader-error" role="alert" className="mt-1.5 text-xs text-destructive">
+        <p id={errorId} role="alert" className="mt-1.5 text-xs text-destructive">
           {error}
         </p>
       )}

@@ -94,6 +94,42 @@ describe('Cascader', () => {
     expect(screen.getByRole('alert').textContent).toContain('Wilayah wajib dipilih');
   });
 
+  it('gives each instance unique trigger and error ids linked to its label', () => {
+    render(
+      <>
+        <Cascader options={OPTIONS} label="First address" error="First address is required" />
+        <Cascader options={OPTIONS} label="Second address" error="Second address is required" />
+      </>
+    );
+    const triggers = screen.getAllByRole('combobox');
+    expect(triggers).toHaveLength(2);
+    expect(triggers[0].id).not.toBe(triggers[1].id);
+    expect(triggers[0].id).not.toBe('');
+    // Label terasosiasi ke trigger masing-masing
+    expect((screen.getByLabelText('First address') as HTMLElement).id).toBe(triggers[0].id);
+    expect((screen.getByLabelText('Second address') as HTMLElement).id).toBe(triggers[1].id);
+    // aria-describedby menunjuk ke error masing-masing, bukan error instance lain
+    const firstError = screen.getByText('First address is required');
+    const secondError = screen.getByText('Second address is required');
+    expect(triggers[0].getAttribute('aria-describedby')).toBe(firstError.id);
+    expect(triggers[1].getAttribute('aria-describedby')).toBe(secondError.id);
+    expect(firstError.id).not.toBe(secondError.id);
+    expect(triggers[0].getAttribute('aria-invalid')).toBe('true');
+    expect(triggers[1].getAttribute('aria-invalid')).toBe('true');
+  });
+
+  it('renders clear as a sibling button outside the trigger and returns focus to it', () => {
+    const onChange = vi.fn();
+    render(<Cascader options={OPTIONS} value={['id', 'jabar', 'bdg']} onChange={onChange} />);
+    const trigger = screen.getByRole('combobox');
+    const clear = screen.getByRole('button', { name: 'Clear selection' });
+    expect(trigger.contains(clear)).toBe(false);
+    expect(clear.tagName).toBe('BUTTON');
+    fireEvent.click(clear);
+    expect(onChange).toHaveBeenCalledWith([], []);
+    expect(document.activeElement).toBe(trigger);
+  });
+
   it('searches flat and selects result with full path', async () => {
     const onChange = vi.fn();
     render(<Cascader options={OPTIONS} onChange={onChange} />);
