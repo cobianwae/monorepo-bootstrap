@@ -130,6 +130,9 @@ describe('DynamicFormPage fields and accessibility (CR-073)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Remove member 1' }));
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Add member' }));
     expect(screen.getByText(/No team members/)).toBeDefined();
+    expect(screen.getByRole('heading', { name: 'No team members yet' })).toBeDefined();
+    expect(screen.getAllByRole('button', { name: 'Add member' })).toHaveLength(1);
+    expect(screen.getByRole('button', { name: 'Add member' }).className).toContain('h-11');
     await waitFor(() => expect(JSON.parse(localStorage.getItem(DRAFT_KEY) ?? '{}').members).toEqual([]), { timeout: 2500 });
     view.unmount();
     render(<DynamicFormPage />);

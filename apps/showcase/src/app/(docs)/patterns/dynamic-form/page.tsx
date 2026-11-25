@@ -30,6 +30,7 @@ import {
   TagInput,
   NumberInput,
   FormSection,
+  EmptyState,
   toast,
   type ComboboxOption,
 } from '@ds/ui';
@@ -40,6 +41,7 @@ import {
   RotateCcw,
   Info,
   GitFork,
+  Users,
 } from 'lucide-react';
 import { PageHeader } from '@ds/ui';
 import { SectionHeading } from '../../../../components/section-heading';
@@ -196,6 +198,11 @@ export default function DynamicFormPage() {
     else document.getElementById(pendingMemberFocus)?.focus();
     setPendingMemberFocus(null);
   }, [members.fields, pendingMemberFocus]);
+
+  const handleAddMember = React.useCallback(() => {
+    members.append(EMPTY_MEMBER, { shouldFocus: false });
+    setPendingMemberFocus(`member-${members.fields.length}-email`);
+  }, [members]);
 
   React.useEffect(() => {
     try {
@@ -576,7 +583,25 @@ export default function DynamicFormPage() {
           }
         >
           <div className="space-y-3">
-            {members.fields.length === 0 && <p className="rounded-lg border border-border p-3 text-sm text-muted-foreground">No team members. You can continue without members or add one below.</p>}
+            {members.fields.length === 0 && (
+              <EmptyState
+                icon={Users}
+                title="No team members yet"
+                description="Add team members to the project, or continue without members."
+              >
+                <Button
+                  ref={addMemberRef}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-11 px-4 text-sm"
+                  onClick={handleAddMember}
+                >
+                  <Plus className="h-4 w-4" />
+                  Add member
+                </Button>
+              </EmptyState>
+            )}
             {members.fields.map((field, index) => {
               const rowError = errors.members?.[index];
               return (
@@ -630,21 +655,21 @@ export default function DynamicFormPage() {
                 </div>
               );
             })}
-            <div className="flex items-center gap-2">
-              <Button
-                ref={addMemberRef}
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  members.append(EMPTY_MEMBER, { shouldFocus: false });
-                  setPendingMemberFocus(`member-${members.fields.length}-email`);
-                }}
-              >
-                <Plus className="h-4 w-4" />
-                Add member
-              </Button>
-            </div>
+            {members.fields.length > 0 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  ref={addMemberRef}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-11 px-4 text-sm"
+                  onClick={handleAddMember}
+                >
+                  <Plus className="h-4 w-4" />
+                  Add member
+                </Button>
+              </div>
+            )}
           </div>
         </FormSection>
 
