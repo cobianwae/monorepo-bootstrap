@@ -61,6 +61,7 @@ export function DemoPanel({ onLoad, lastResultSummary }: DemoPanelProps) {
               type="button"
               variant="outline"
               size="sm"
+              className="h-11"
               data-testid={item.testId}
               onClick={() => onLoad(item.id, item.delayMs)}
             >
@@ -78,7 +79,7 @@ export function DemoPanel({ onLoad, lastResultSummary }: DemoPanelProps) {
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-medium text-foreground">Resep onComplete</p>
-            <Button type="button" variant="outline" size="sm" onClick={handleCopy} data-testid="iw-recipe-copy">
+            <Button type="button" variant="outline" size="sm" className="h-11" onClick={handleCopy} data-testid="iw-recipe-copy">
               {copied ? 'Tersalin' : 'Salin resep'}
             </Button>
           </div>

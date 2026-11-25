@@ -197,7 +197,7 @@ export default function ImportWizardPage() {
   const plan = view ? planSubmit(view.validCount, view.invalidCount, policy) : null;
 
   return (
-    <div className="space-y-10 animate-in fade-in-50 duration-200">
+    <div className="space-y-10 animate-in fade-in-50 duration-200 motion-reduce:animate-none">
       <PageHeader
         eyebrow="Pattern"
         title="Import Wizard CSV"

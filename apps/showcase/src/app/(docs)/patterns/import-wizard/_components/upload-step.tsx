@@ -63,9 +63,10 @@ export function UploadStep({
       </p>
 
       <div className="space-y-2">
-        <Label htmlFor="iw-file-label">Berkas CSV</Label>
-        <div id="iw-file-label" data-testid="iw-dropzone">
+        <Label htmlFor="iw-file">Berkas CSV</Label>
+        <div data-testid="iw-dropzone">
           <FileInput
+            id="iw-file"
             ref={fileInputRef}
             accept=".csv,text/csv"
             maxFiles={1}
@@ -96,6 +97,7 @@ export function UploadStep({
             variant="outline"
             size="sm"
             data-testid="iw-paste-submit"
+            className="h-11"
             onClick={onProcessPaste}
             disabled={parsing || pasteText.trim().length === 0}
           >
@@ -137,6 +139,7 @@ export function UploadStep({
           variant="outline"
           size="sm"
           data-testid="iw-template"
+          className="h-11"
           onClick={onDownloadTemplate}
         >
           Unduh template CSV

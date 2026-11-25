@@ -58,7 +58,12 @@ export function ConfirmStep({
 
   return (
     <div className="space-y-6">
-      <div ref={summaryRef} tabIndex={-1} data-testid="iw-summary" className="space-y-4 focus:outline-none">
+      <div
+        ref={summaryRef}
+        tabIndex={-1}
+        data-testid="iw-summary"
+        className="space-y-4 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
         <div className="grid gap-3 sm:grid-cols-3">
           <StatCard
             title="Valid"
@@ -81,12 +86,12 @@ export function ConfirmStep({
         </div>
 
         {rejection && (
-          <Alert variant="destructive" role="alert" data-testid="iw-reject">
+          <Alert id="iw-gate-reject" variant="destructive" role="alert" data-testid="iw-reject">
             <AlertDescription>{rejection}</AlertDescription>
           </Alert>
         )}
         {!rejection && plan.reason && (
-          <Alert variant="warning" data-testid="iw-plan-reason">
+          <Alert id="iw-gate-reason" variant="warning" data-testid="iw-plan-reason">
             <AlertDescription>{plan.reason}</AlertDescription>
           </Alert>
         )}
@@ -115,7 +120,10 @@ export function ConfirmStep({
           type="button"
           data-testid="iw-submit"
           aria-disabled={!plan.canSubmit}
-          className={plan.canSubmit ? undefined : 'opacity-50'}
+          aria-describedby={
+            rejection ? 'iw-gate-reject' : plan.reason ? 'iw-gate-reason' : undefined
+          }
+          className={plan.canSubmit ? 'h-11' : 'h-11 opacity-50'}
           onClick={onSubmit}
         >
           {submitLabel(plan)}
