@@ -1,6 +1,6 @@
 # CR-077 — Import Wizard: Kontras, Label, Fokus, dan Target Sentuh Lokal
 
-**Status:** approved (2026-11-25; implementasi belum dimulai)  
+**Status:** done (ditetapkan user 2026-11-25; implementasi di `cr-077-import-wizard-accessibility`, commit `5d592b3`; verifikasi kontras numerik, reflow browser, dan keyboard/screen reader belum dilakukan)  
 **Sumber:** audit UI/UX `/improve-ui` Import Wizard, 2026-11-25 — cluster a11y lokal  
 **Ref:** `docs/prd/014-import-wizard.md` (FR-008/009/011), `docs/design/import-wizard.md`, S-005.37.01–.04  
 **Prioritas:** tinggi; shared Stepper/FileInput dipisahkan ke CR-078.
