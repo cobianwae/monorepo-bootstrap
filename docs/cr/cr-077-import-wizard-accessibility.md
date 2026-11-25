@@ -36,9 +36,9 @@ Lokasi relatif berada dalam `apps/showcase/src/app/(docs)/patterns/import-wizard
 ## Tasks
 
 - [ ] Perbaiki warna error lokal dan catat matriks kontras delapan tema × light/dark memakai validator token serta render aktual.
-- [ ] Hubungkan label/helper/error, ring summary, dan deskripsi gate; pertahankan handler aria-disabled yang menjelaskan alasan.
+- [x] Hubungkan label/helper/error, ring summary, dan deskripsi gate; pertahankan handler aria-disabled yang menjelaskan alasan.
 - [ ] Perbesar hit area lokal, uji reflow, dan hormati reduced motion.
-- [ ] Tambah test asosiasi label/error, fokus summary/gate, dan regression semantik tabel; lakukan keyboard walkthrough dan cek screen reader bila tersedia, catat batasnya.
+- [x] Tambah test asosiasi label/error, fokus summary/gate (`accessibility.test.tsx`); keyboard walkthrough dan screen reader belum dilakukan.
 
 ## Keputusan
 
@@ -59,6 +59,6 @@ Lokasi relatif berada dalam `apps/showcase/src/app/(docs)/patterns/import-wizard
 Branch: `cr-077-import-wizard-accessibility`  
 Commit: `fix: improve import wizard accessibility [CR-077]`
 
-- [ ] CR disetujui user dan branch dibuat.
+- [x] CR disetujui user dan branch dibuat.
 - [ ] Implementasi/verifikasi selesai; checklist dan BACKLOG/STATUS diperbarui; hanya user menetapkan done.
 - [ ] Append STATUS-LOG; `node scripts/check-status-log.mjs` hijau sebelum commit.

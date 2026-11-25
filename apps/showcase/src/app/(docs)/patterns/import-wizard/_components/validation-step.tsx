@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@ds/ui';
+import { AlertCircle } from 'lucide-react';
 import type { TargetField } from '../_lib/types';
 import {
   cellKey,
@@ -93,10 +94,10 @@ export function ValidationStep({
           </SegmentedControlItem>
         </SegmentedControl>
         <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={onFixMapping}>
+          <Button type="button" variant="outline" size="sm" className="h-11" onClick={onFixMapping}>
             Perbaiki mapping
           </Button>
-          <Button type="button" variant="outline" size="sm" onClick={onReupload}>
+          <Button type="button" variant="outline" size="sm" className="h-11" onClick={onReupload}>
             Unggah ulang
           </Button>
         </div>
@@ -136,8 +137,9 @@ export function ValidationStep({
                         >
                           <span>{row[header] ?? ''}</span>
                           {error && (
-                            <span id={errorId} className="block text-xs font-medium text-destructive">
-                              {error.message}
+                            <span id={errorId} className="mt-1 flex items-start gap-1 text-xs font-medium text-foreground">
+                              <AlertCircle aria-hidden="true" className="mt-px h-3.5 w-3.5 shrink-0 text-destructive" />
+                              <span>Error: {error.message}</span>
                             </span>
                           )}
                         </TableCell>
@@ -152,11 +154,12 @@ export function ValidationStep({
       )}
 
       {slice.pageCount > 1 && (
-        <nav aria-label="Halaman validasi" className="flex items-center justify-between text-sm">
+        <nav aria-label="Halaman validasi" className="flex flex-wrap items-center justify-between gap-2 text-sm">
           <Button
             type="button"
             variant="outline"
             size="sm"
+            className="h-11"
             disabled={slice.page <= 1}
             onClick={() => onPageChange(slice.page - 1)}
           >
@@ -169,6 +172,7 @@ export function ValidationStep({
             type="button"
             variant="outline"
             size="sm"
+            className="h-11"
             disabled={slice.page >= slice.pageCount}
             onClick={() => onPageChange(slice.page + 1)}
           >

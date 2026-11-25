@@ -56,7 +56,7 @@ export function MappingStep({
       </p>
 
       {rejection && (
-        <Alert variant="destructive" role="alert" data-testid="iw-duplicate">
+        <Alert id="iw-mapping-error" variant="destructive" role="alert" data-testid="iw-duplicate">
           <AlertDescription>
             Kolom &quot;{rejection.header}&quot;: {rejection.message}
           </AlertDescription>
@@ -96,6 +96,7 @@ export function MappingStep({
                       <SelectTrigger
                         aria-label={`Target untuk kolom ${header}`}
                         aria-invalid={isRejected || undefined}
+                        aria-describedby={isRejected ? 'iw-mapping-error' : undefined}
                         className="w-full max-w-xs"
                         data-testid={`iw-mapping-select-${header}`}
                       >
