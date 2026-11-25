@@ -1,6 +1,6 @@
 # CR-083 — Dynamic Form: peran warna status dan reduced motion
 
-**Status:** approved
+**Status:** done
 **Sumber:** visual uplift (`/polish-ui`), audit gap vs `docs/design/visual-language.md` (approved 2026-11-23), 2026-11-25
 **Ref:** `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx`, Color Roles dan Motion di `docs/design/visual-language.md`
 
