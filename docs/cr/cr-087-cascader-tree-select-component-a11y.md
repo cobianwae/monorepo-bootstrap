@@ -1,6 +1,6 @@
 # CR-087 — Cascader & TreeSelect: aksesibilitas label, error, dan kontrol bersarang
 
-**Status:** approved (ditetapkan user 2026-11-25; diimplementasikan 2026-11-25 di branch `cr-087-cascader-tree-select-component-a11y`, menunggu review user — cek browser keyboard/light-dark manual belum dilakukan)
+**Status:** done (ditetapkan user 2026-11-25; diimplementasikan di branch `cr-087-cascader-tree-select-component-a11y`, di-merge dan di-push ke `visual-polish` atas izin eksplisit; cek browser keyboard/light-dark manual tidak dilakukan)
 **Sumber:** audit `/improve-ui` (skill `ui-designer`), 2026-11-25
 **Ref:** `packages/ui/src/components/form/cascader.tsx`, `packages/ui/src/components/form/tree-select.tsx`
 
@@ -63,4 +63,4 @@ Commit: `fix: a11y label dan error cascader tree select [CR-087]`
 - [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
 - [x] `docs/STATUS.md` diperbarui bila relevan.
 - [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
-- [ ] Cek keyboard + light/dark manual di browser pada route `/patterns/cascader-tree-select` (belum dilakukan; menunggu review user).
+- [x] Cek keyboard + light/dark manual di browser pada route `/patterns/cascader-tree-select` — tidak dilakukan; user menetapkan `done` tanpa cek browser ini (dicatat di STATUS-LOG).
