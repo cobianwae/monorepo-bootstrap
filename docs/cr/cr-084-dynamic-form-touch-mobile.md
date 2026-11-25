@@ -23,12 +23,12 @@ Hanya `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx`. Tidak ada p
 
 ## Tasks (jalur small-fix)
 
-- [ ] Naikkan target hapus member ke ≥44px (tombol + kolom grid) dan cek perataan baris `md`/mobile.
-- [ ] Tambah `EmptyState` untuk 0 member dengan aksi Add member; hindari aksi ganda.
-- [ ] Cek tinggi aksi Add member di viewport 320/390px; sesuaikan bila <44px.
-- [ ] Verifikasi manual/test: tambah–hapus member, error email per baris (`err-member-*-email`) tetap terhubung.
-- [ ] Verifikasi: test halaman, guard, `pnpm typecheck`, `pnpm lint`, `pnpm test`, build showcase.
-- [ ] Cek visual 320/390/1440 light/dark best-effort bila Playwright tersedia.
+- [x] Naikkan target hapus member ke ≥44px (tombol + kolom grid) dan cek perataan baris `md`/mobile. **Terbukti sudah teratasi sejak CR-073** (`page.tsx:610` kolom `44px`, `page.tsx:651` `h-11 w-11`); tidak ada perubahan, hanya diverifikasi ulang.
+- [x] Tambah `EmptyState` untuk 0 member dengan aksi Add member; hindari aksi ganda.
+- [x] Cek tinggi aksi Add member di viewport 320/390px; sesuaikan bila <44px.
+- [x] Verifikasi manual/test: tambah–hapus member, error email per baris (`err-member-*-email`) tetap terhubung.
+- [x] Verifikasi: test halaman, guard, `pnpm typecheck`, `pnpm lint`, `pnpm test`, build showcase.
+- [x] Cek visual 320/390/1440 light/dark best-effort bila Playwright tersedia. **Playwright tidak tersedia, tidak dilakukan.**
 
 ## Keputusan
 
@@ -39,13 +39,13 @@ Hanya `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx`. Tidak ada p
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA.
-- [ ] Perilaku Radix/a11y tidak rusak.
-- [ ] API `cva` dan export tetap konsisten.
-- [ ] State loading, empty, dan error relevan tersedia.
-- [ ] Showcase/docs diperbarui bila perlu.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA (EmptyState `default` memakai `border-border`/`text-muted-foreground` yang sudah diaudit; tidak ada pasangan warna baru).
+- [x] Perilaku Radix/a11y tidak rusak (tombol tetap `<button>`, fokus Add member dipertahankan via `addMemberRef`; EmptyState `h3` tidak memecah hierarki saat member ada).
+- [x] API `cva` dan export tetap konsisten (tanpa perubahan `@ds/ui`).
+- [x] State loading, empty, dan error relevan tersedia (empty diperkuat; error per baris tidak berubah).
+- [x] Showcase/docs diperbarui bila perlu.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
 
 ## Eksekusi
 
@@ -53,9 +53,9 @@ Branch: `cr-084-dynamic-form-touch-mobile`
 Commit: `fix: target sentuh dan empty state dynamic form [CR-084]`
 
 - [x] CR disetujui user (2026-11-25).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
