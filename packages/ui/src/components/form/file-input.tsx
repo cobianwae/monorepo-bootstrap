@@ -21,6 +21,39 @@ export const fileInputVariants = cva(
   }
 );
 
+export interface FileInputMessages {
+  dropzoneLabel: string;
+  clickToUpload: string;
+  dragAndDrop: string;
+  selectFile: string;
+  allFileTypes: string;
+  formatLabel: (accept: string) => string;
+  maxSizeLabel: (formattedMaxSize: string) => string;
+  uploadFile: string;
+  browse: string;
+  uploadedFilesLabel: string;
+  removeFile: (fileName: string) => string;
+  fileTooLarge: (fileName: string, formattedMaxSize: string) => string;
+  tooManyFiles: (maxFiles: number) => string;
+}
+
+const defaultFileInputMessages: FileInputMessages = {
+  dropzoneLabel: 'File upload dropzone',
+  clickToUpload: 'Klik untuk upload',
+  dragAndDrop: 'atau drag & drop',
+  selectFile: 'Pilih file',
+  allFileTypes: 'Semua jenis file',
+  formatLabel: (accept) => `Format: ${accept}`,
+  maxSizeLabel: (formattedMaxSize) => `Maks: ${formattedMaxSize}`,
+  uploadFile: 'Upload file',
+  browse: 'Browse',
+  uploadedFilesLabel: 'Uploaded files',
+  removeFile: (fileName) => `Hapus ${fileName}`,
+  fileTooLarge: (fileName, formattedMaxSize) =>
+    `File "${fileName}" melebihi ukuran maksimum (${formattedMaxSize}).`,
+  tooManyFiles: (maxFiles) => `Maksimal ${maxFiles} file yang diizinkan.`,
+};
+
 export interface FileInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'type'>,
     VariantProps<typeof fileInputVariants> {
@@ -33,6 +66,8 @@ export interface FileInputProps
   errorMessage?: string;
   showFileList?: boolean;
   error?: boolean;
+  messages?: Partial<FileInputMessages>;
+  replaceOnSelect?: boolean;
 }
 
 export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
@@ -50,6 +85,11 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
       helperText,
       errorMessage,
       showFileList = true,
+      messages,
+      replaceOnSelect = false,
+      id,
+      'aria-describedby': ariaDescribedBy,
+      'aria-invalid': ariaInvalid,
       ...props
     },
     ref
@@ -57,6 +97,10 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
     const inputRef = React.useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = React.useState(false);
     const [localError, setLocalError] = React.useState<string | null>(null);
+    const mergedMessages: FileInputMessages = { ...defaultFileInputMessages, ...messages };
+    const uid = React.useId().replace(/[^a-zA-Z0-9_-]/g, '');
+    const helperId = `${uid}-helper`;
+    const errorId = `${uid}-error`;
 
     React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement);
 
@@ -67,15 +111,15 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 
       for (const file of incoming) {
         if (maxSize && file.size > maxSize) {
-          setLocalError(`File "${file.name}" melebihi ukuran maksimum (${formatBytes(maxSize)}).`);
+          setLocalError(mergedMessages.fileTooLarge(file.name, formatBytes(maxSize)));
           return;
         }
         valid.push(file);
       }
 
-      let updated = [...value, ...valid];
+      let updated = replaceOnSelect ? [...valid] : [...value, ...valid];
       if (maxFiles && updated.length > maxFiles) {
-        setLocalError(`Maksimal ${maxFiles} file yang diizinkan.`);
+        setLocalError(mergedMessages.tooManyFiles(maxFiles));
         updated = updated.slice(0, maxFiles);
       }
 
@@ -117,12 +161,17 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
 
     const activeError = errorMessage || localError;
     const isError = Boolean(error || activeError);
+    const describedBy =
+      [ariaDescribedBy, helperId, activeError ? errorId : undefined]
+        .filter(Boolean)
+        .join(' ') || undefined;
 
     return (
       <div className="w-full space-y-3">
         <div
           role="region"
-          aria-label="File upload dropzone"
+          aria-label={mergedMessages.dropzoneLabel}
+          aria-describedby={describedBy}
           tabIndex={disabled ? -1 : 0}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -145,12 +194,15 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
         >
           <input
             ref={inputRef}
+            id={id}
             type="file"
             accept={accept}
             multiple={maxFiles ? maxFiles > 1 : true}
             disabled={disabled}
             onChange={handleInputChange}
             className="sr-only"
+            aria-describedby={describedBy}
+            aria-invalid={isError ? true : ariaInvalid}
             {...props}
           />
 
@@ -161,11 +213,13 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-medium text-foreground">
-                  <span className="text-primary hover:underline">Klik untuk upload</span> atau drag & drop
+                  <span className="text-primary hover:underline">{mergedMessages.clickToUpload}</span>{' '}
+                  {mergedMessages.dragAndDrop}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {helperText || (accept ? `Format: ${accept}` : 'Semua jenis file')}
-                  {maxSize && ` · Maks: ${formatBytes(maxSize)}`}
+                <p id={helperId} className="text-xs text-muted-foreground">
+                  {helperText ||
+                    (accept ? mergedMessages.formatLabel(accept) : mergedMessages.allFileTypes)}
+                  {maxSize && ` · ${mergedMessages.maxSizeLabel(formatBytes(maxSize))}`}
                 </p>
               </div>
             </div>
@@ -176,28 +230,29 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
                   <UploadCloud className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">Pilih file</p>
-                  <p className="text-xs text-muted-foreground">
-                    {helperText || (accept ? `Format: ${accept}` : 'Upload file')}
+                  <p className="text-sm font-medium text-foreground">{mergedMessages.selectFile}</p>
+                  <p id={helperId} className="text-xs text-muted-foreground">
+                    {helperText ||
+                      (accept ? mergedMessages.formatLabel(accept) : mergedMessages.uploadFile)}
                   </p>
                 </div>
               </div>
               <Button type="button" variant="outline" size="sm" disabled={disabled}>
-                Browse
+                {mergedMessages.browse}
               </Button>
             </>
           )}
         </div>
 
         {activeError && (
-          <div className="flex items-center gap-1.5 text-xs text-destructive">
+          <div id={errorId} role="alert" className="flex items-center gap-1.5 text-xs text-destructive">
             <AlertCircle className="h-3.5 w-3.5 shrink-0" />
             <span>{activeError}</span>
           </div>
         )}
 
         {showFileList && value.length > 0 && (
-          <ul className="space-y-1.5" aria-label="Uploaded files">
+          <ul className="space-y-1.5" aria-label={mergedMessages.uploadedFilesLabel}>
             {value.map((file, idx) => (
               <li
                 key={`${file.name}-${idx}`}
@@ -217,8 +272,8 @@ export const FileInput = React.forwardRef<HTMLInputElement, FileInputProps>(
                       e.stopPropagation();
                       removeFile(idx);
                     }}
-                    aria-label={`Hapus ${file.name}`}
-                    className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label={mergedMessages.removeFile(file.name)}
+                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <X className="h-4 w-4" />
                   </button>

@@ -27,9 +27,59 @@ export const Stepper = React.forwardRef<HTMLElement, StepperProps>(
     },
     ref
   ) => {
+    const navRef = React.useRef<HTMLElement | null>(null);
+    const currentItemRef = React.useRef<HTMLLIElement | null>(null);
+
+    const setNavRef = React.useCallback(
+      (node: HTMLElement | null) => {
+        navRef.current = node;
+        if (typeof ref === 'function') {
+          ref(node);
+        } else if (ref) {
+          ref.current = node;
+        }
+      },
+      [ref]
+    );
+
+    React.useEffect(() => {
+      if (orientation !== 'horizontal') return;
+
+      const ensureCurrentVisible = () => {
+        const nav = navRef.current;
+        const item = currentItemRef.current;
+        if (!nav || !item || typeof nav.scrollTo !== 'function') return;
+
+        const navRect = nav.getBoundingClientRect();
+        const itemRect = item.getBoundingClientRect();
+        if (navRect.width === 0 || itemRect.width === 0) return;
+
+        let target: number | null = null;
+        if (itemRect.left < navRect.left || itemRect.width > navRect.width) {
+          target = nav.scrollLeft + itemRect.left - navRect.left;
+        } else if (itemRect.right > navRect.right) {
+          target = nav.scrollLeft + itemRect.right - navRect.right;
+        }
+        if (target === null) return;
+
+        const maxScroll = Math.max(0, nav.scrollWidth - nav.clientWidth);
+        const clamped = Math.min(Math.max(0, target), maxScroll);
+        if (Math.abs(clamped - nav.scrollLeft) < 1) return;
+
+        const reduceMotion =
+          typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        nav.scrollTo({ left: clamped, behavior: reduceMotion ? 'auto' : 'smooth' });
+      };
+
+      ensureCurrentVisible();
+      window.addEventListener('resize', ensureCurrentVisible);
+      return () => window.removeEventListener('resize', ensureCurrentVisible);
+    }, [currentStep, orientation, steps.length]);
+
     return (
       <nav
-        ref={ref}
+        ref={setNavRef}
         aria-label="Progress"
         className={cn(
           orientation === 'horizontal'
@@ -102,6 +152,7 @@ export const Stepper = React.forwardRef<HTMLElement, StepperProps>(
             return (
               <li
                 key={step.id}
+                ref={isCurrent ? currentItemRef : undefined}
                 aria-current={isCurrent ? 'step' : undefined}
                 className={cn(
                   'relative flex items-center',
