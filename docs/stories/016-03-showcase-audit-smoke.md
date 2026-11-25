@@ -1,6 +1,6 @@
 # 016-03 — Showcase + audit + smoke
 
-Status: todo
+Status: review
 PRD: `docs/prd/016-lightbox-gallery.md` (approved, gate 1)
 Design: `docs/design/wireframes/lightbox-gallery.md` (approved, gate 2, §1/`ol` 6 langkah + §6) + `docs/design/flows/lightbox-gallery.mmd` (diagram 4)
 FR: `FR-009` (verifikasi penuh `FR-001`–`FR-008` di showcase)
@@ -29,10 +29,26 @@ Goal: Route `/patterns/media-gallery` terupgrade memakai `overlay/lightbox` reus
 
 ## Tasks
 
-- [ ] Upgrade `apps/showcase/src/app/(docs)/patterns/media-gallery/page.tsx`: ganti Dialog rakitan dengan `overlay/lightbox` (`openIndex`/`onOpenChange`), pertahankan filter kategori + grid + bulk action; tambah 1 item video + 1 item rusak untuk demo
-- [ ] Tambah panel demo (DemoSection): dataset + pemicu loading/empty/error/success + toggle light/dark + resep controlled 15 baris (§1 wireframe)
-- [ ] Audit kontras light & dark via `pnpm test:tokens` + audit keyboard/SR/swipe/reduced-motion di route; tulis tabel audit di story
-- [ ] Verifikasi `pnpm typecheck`, `lint`, `test`, `pnpm -C apps/showcase build`; update sitemap `S-005.16` + `M-012` → `implemented` setelah merge; tanpa dependency/token baru
+- [x] Upgrade `apps/showcase/src/app/(docs)/patterns/media-gallery/page.tsx`: ganti Dialog rakitan dengan `overlay/lightbox` (`openIndex`/`onOpenChange`), pertahankan filter kategori + grid + bulk action; tambah 1 item video + 1 item rusak untuk demo
+- [x] Tambah panel demo (DemoSection): dataset + pemicu loading/empty/error/success + toggle light/dark + resep controlled 15 baris (§1 wireframe)
+- [x] Audit kontras light & dark via `pnpm test:tokens` + audit keyboard/SR/swipe/reduced-motion di route; tulis tabel audit di story
+- [ ] Verifikasi `pnpm typecheck`, `lint`, `test`, `pnpm -C apps/showcase build` (selesai, lihat audit); update sitemap `S-005.16` + `M-012` → `implemented` setelah merge; tanpa dependency/token baru
+
+## Laporan Audit (2026-11-26)
+
+Implementasi: grid utama tetap 12 gambar (counter `3 / 12` sesuai AC-01); panel demo memakai dataset terpisah 12 gambar + 1 video lokal (`apps/showcase/public/examples/media-gallery/demo-video.mp4`, 37 KB, dibuat lokal via AVFoundation) + 1 item rusak (`missing-image.png` → 404 lokal). Gambar memakai placeholder SVG data-URI lokal dari palet gradien — tanpa URL eksternal, tanpa dependency/token baru. Dialog DIY dihapus; dua instance `Lightbox` controlled (`openIndex`/`onOpenChange`): grid dan panel demo. Test halaman baru: `page.test.tsx` (3 test: counter 3/12, video 13/14 + error 14/14 + empty, resep tampil).
+
+| Area | Metode | Hasil |
+|---|---|---|
+| Kontras token light & dark | `pnpm test:tokens` (10 test) + `auditThemeTokenPairs()` | 160 pasangan (8 tema × 10 pasangan × 2 mode) semua ≥ 4,5:1; minimum 4,64:1. Tema Pulse: body text 17,11 (light) / 17,52 (dark); card content 17,72 / 16,39; muted caption 7,47 / 7,51; destructive 4,83 / 6,96; highlight accent (grafis) 4,64 / 10,34 ≥ 3:1 |
+| Teks di atas backdrop | Inspeksi komponen + halaman | Caption, bar atas, dan state error memakai permukaan `card` solid; tidak ada teks di atas backdrop `background/80` transparan |
+| Keyboard + fokus kembali | Test komponen 016-02 (`lightbox.test.tsx`, 20 test) + `ol` 6 langkah di halaman | Panah/zoom/Esc dan pengembalian fokus ke thumbnail pemicu teruji di komponen; langkah manual 6 langkah tercantum di route untuk verifikasi reviewer |
+| Screen reader | Test komponen 016-02 | Status live region (`Memuat media`/`Media dimuat`) dan label tombol teruji |
+| Swipe + reduced-motion | Library YARL (built-in) + komponen 016-02 | Swipe bawaan library; `prefers-reduced-motion` mematikan transisi/animasi (komponen + kelas `motion-reduce:` showcase); tidak terotomasi di jsdom — verifikasi manual reviewer |
+| State demo | `page.test.tsx` | Loading (mock 1,6 dtk), empty (filter ke kosong), error (Coba lagi/Lewati), success (item 3), video, toggle light/dark via `SegmentedControl` + `useTheme` |
+| Verifikasi repo | `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build` | Typecheck hijau; lint 0 error (4 warning lama di `packages/ui`); test hijau (tokens 10, ui 742, showcase 135); build showcase hijau. Catatan: 1 test rich-text-editor flaky pada lari paralel pertama, lolos terisolasi (33/33) dan pada lari ulang penuh |
+
+Sisa setelah merge: sitemap `S-005.16` + `M-012` → `implemented` (task ke-4 ditick saat itu).
 
 ## Dependencies
 
