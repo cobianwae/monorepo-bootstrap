@@ -103,6 +103,45 @@ describe('TreeSelect', () => {
     expect(screen.queryByLabelText('Bersihkan pilihan')).toBeNull();
   });
 
+  it('links error to trigger with aria-invalid and a single alert', () => {
+    render(<TreeSelect options={OPTIONS} label="Category" error="Category is required" />);
+    const trigger = screen.getByRole('combobox');
+    expect(trigger.getAttribute('aria-invalid')).toBe('true');
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toContain('Category is required');
+    expect(trigger.getAttribute('aria-describedby')).toBe(alert.id);
+    expect(alert.id).not.toBe('');
+    // Error tetap satu sumber kebenaran saat popover dibuka
+    fireEvent.click(trigger);
+    expect(screen.getAllByRole('alert')).toHaveLength(1);
+  });
+
+  it('renders clear and tag-remove as sibling buttons outside the trigger', () => {
+    const onChange = vi.fn();
+    render(
+      <TreeSelect
+        options={OPTIONS}
+        multiple
+        value={['android', 'ios']}
+        onChange={onChange}
+      />
+    );
+    const trigger = screen.getByRole('combobox');
+    const removeButtons = screen.getAllByRole('button', { name: /^Hapus / });
+    expect(removeButtons).toHaveLength(2);
+    for (const removeButton of removeButtons) {
+      expect(removeButton.tagName).toBe('BUTTON');
+      expect(trigger.contains(removeButton)).toBe(false);
+    }
+    fireEvent.click(removeButtons[0]);
+    expect(onChange).toHaveBeenCalledWith(['ios'], expect.anything());
+
+    const clear = screen.getByRole('button', { name: 'Bersihkan pilihan' });
+    expect(trigger.contains(clear)).toBe(false);
+    fireEvent.click(clear);
+    expect(document.activeElement).toBe(trigger);
+  });
+
   it('filters out empty strings from multiple values', () => {
     render(
       <TreeSelect options={OPTIONS} multiple value={['', 'android']} placeholder="Pilih kategori" />

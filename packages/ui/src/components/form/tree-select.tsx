@@ -188,16 +188,18 @@ export function TreeSelect({
     }
   };
 
-  const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const triggerRef = React.useRef<HTMLButtonElement>(null);
+
+  const handleClear = () => {
     if (disabled) return;
     emit([]);
+    triggerRef.current?.focus();
   };
 
-  const handleRemoveTag = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
+  const handleRemoveTag = (id: string) => {
     if (disabled) return;
     emit(selectedIds.filter((v) => v !== id));
+    triggerRef.current?.focus();
   };
 
   const selectedLabels = selectedIds.map((id) => nodeMap.get(id)?.label ?? id);
@@ -208,6 +210,22 @@ export function TreeSelect({
 
   const triggerId = React.useId();
   const searchId = React.useId();
+  const errorId = error ? `${triggerId}-error` : undefined;
+
+  const displayText = loading
+    ? 'Loading...'
+    : multiple
+      ? selectedIds.length === 0
+        ? placeholder
+        : [
+            visibleTags.join(', '),
+            hiddenCount > 0 ? `+${hiddenCount}` : '',
+          ]
+            .filter(Boolean)
+            .join(' ')
+      : selectedIds.length === 0
+        ? placeholder
+        : (nodeMap.get(selectedIds[0])?.label ?? selectedIds[0]);
 
   return (
     <div className={cn('flex w-full flex-col gap-1.5', className)}>
@@ -217,18 +235,45 @@ export function TreeSelect({
         </label>
       ) : null}
       <Popover open={open} onOpenChange={handleOpenChange}>
-        <PopoverTrigger asChild>
-          <button
-            id={triggerId}
-            type="button"
-            role="combobox"
-            aria-expanded={open}
-            aria-haspopup="tree"
-            disabled={disabled}
-            className={cn(treeSelectVariants({ error: Boolean(error) }), triggerClassName)}
-          >
+        <div
+          className={cn(
+            'relative min-h-9 w-full',
+            treeSelectVariants({ error: Boolean(error) }),
+            triggerClassName
+          )}
+        >
+          <PopoverTrigger asChild>
+            <button
+              ref={triggerRef}
+              id={triggerId}
+              type="button"
+              role="combobox"
+              aria-expanded={open}
+              aria-haspopup="tree"
+              aria-label={label ? undefined : displayText}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={errorId}
+              disabled={disabled}
+              className="absolute inset-0 flex w-full items-center justify-end rounded-md px-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <span className="sr-only">
+                {selectedIds.length > 0 ? displayText : undefined}
+              </span>
+              <span className="flex shrink-0 items-center gap-1">
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-hidden="true" />
+                ) : showClear ? null : (
+                  <ChevronDown
+                    className="h-4 w-4 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                )}
+              </span>
+            </button>
+          </PopoverTrigger>
+          <div className="pointer-events-none flex min-h-9 flex-wrap items-center gap-1 px-3 py-2 pr-12 text-sm">
             {multiple ? (
-              <span className="flex flex-wrap items-center gap-1">
+              <>
                 {selectedIds.length === 0 ? (
                   <span className="text-muted-foreground">{placeholder}</span>
                 ) : (
@@ -238,22 +283,15 @@ export function TreeSelect({
                       return (
                         <Badge key={tagId} variant="secondary" className="gap-1">
                           {tagLabel}
-                          <span
-                            role="button"
-                            tabIndex={0}
+                          <button
+                            type="button"
                             aria-label={`Hapus ${tagLabel}`}
-                            onClick={(e) => handleRemoveTag(e, tagId)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                emit(selectedIds.filter((v) => v !== tagId));
-                              }
-                            }}
-                            className="inline-flex cursor-pointer rounded-full outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                            disabled={disabled}
+                            onClick={() => handleRemoveTag(tagId)}
+                            className="pointer-events-auto inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             <X className="h-3 w-3" aria-hidden="true" />
-                          </span>
+                          </button>
                         </Badge>
                       );
                     })}
@@ -262,7 +300,7 @@ export function TreeSelect({
                     ) : null}
                   </>
                 )}
-              </span>
+              </>
             ) : (
               <span
                 className={cn(
@@ -275,36 +313,18 @@ export function TreeSelect({
                   : (nodeMap.get(selectedIds[0])?.label ?? selectedIds[0])}
               </span>
             )}
-            <span className="flex shrink-0 items-center gap-1">
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-hidden="true" />
-              ) : null}
-              {showClear ? (
-                <span
-                  role="button"
-                  tabIndex={0}
-                  aria-label="Bersihkan pilihan"
-                  onClick={handleClear}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      emit([]);
-                    }
-                  }}
-                  className="inline-flex cursor-pointer rounded-full p-0.5 text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <X className="h-4 w-4" aria-hidden="true" />
-                </span>
-              ) : (
-                <ChevronDown
-                  className="h-4 w-4 shrink-0 text-muted-foreground"
-                  aria-hidden="true"
-                />
-              )}
-            </span>
-          </button>
-        </PopoverTrigger>
+          </div>
+          {showClear && (
+            <button
+              type="button"
+              aria-label="Bersihkan pilihan"
+              onClick={handleClear}
+              className="absolute top-1/2 right-3 inline-flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          )}
+        </div>
         <PopoverContent
           align="start"
           sideOffset={4}
@@ -337,10 +357,6 @@ export function TreeSelect({
                 <Skeleton className="h-6 w-11/12" />
                 <Skeleton className="h-6 w-4/5" />
               </div>
-            ) : error ? (
-              <p role="alert" className="px-3 py-4 text-sm text-destructive">
-                {error}
-              </p>
             ) : visibleNodes.length === 0 ? (
               <EmptyState
                 title="Tidak ada data"
@@ -370,8 +386,8 @@ export function TreeSelect({
           </div>
         </PopoverContent>
       </Popover>
-      {typeof error === 'string' && error && !open ? (
-        <p role="alert" className="text-xs text-destructive">
+      {error ? (
+        <p id={errorId} role="alert" className="text-xs text-destructive">
           {error}
         </p>
       ) : null}
