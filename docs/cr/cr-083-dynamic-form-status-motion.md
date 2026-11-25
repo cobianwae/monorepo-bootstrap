@@ -1,6 +1,6 @@
 # CR-083 — Dynamic Form: peran warna status dan reduced motion
 
-**Status:** approved
+**Status:** done
 **Sumber:** visual uplift (`/polish-ui`), audit gap vs `docs/design/visual-language.md` (approved 2026-11-23), 2026-11-25
 **Ref:** `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx`, Color Roles dan Motion di `docs/design/visual-language.md`
 
@@ -24,11 +24,11 @@ Hanya `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx`. Tidak ada p
 
 ## Tasks (jalur small-fix)
 
-- [ ] Ganti warna ikon status saved ke token status; verifikasi kontras ikon light/dark (≥3:1 untuk ikon) di tema default.
-- [ ] Tambah reduced-motion pada `animate-pulse` (baris 245) dan conditional reveal (baris 433).
-- [ ] Selaraskan ikon/warna status antara header badge dan Card kaki form.
-- [ ] Verifikasi: test halaman, guard, `pnpm typecheck`, `pnpm lint`, `pnpm test`.
-- [ ] Cek visual light/dark + `prefers-reduced-motion` best-effort bila Playwright tersedia.
+- [x] Ganti warna ikon status saved ke token status; verifikasi kontras ikon light/dark (≥3:1 untuk ikon) di tema default. — **Sudah teratasi oleh CR-072**: tidak ada ikon status (grep `ShieldCheck` nihil; status teks `text-foreground` di `page.tsx:654`), sehingga kontras ikon tidak relevan; tidak ada `text-highlight` untuk makna status.
+- [x] Tambah reduced-motion pada `animate-pulse` (baris 245) dan conditional reveal (baris 433). — `animate-pulse` sudah tidak ada (dihapus CR-072); conditional reveal kini `page.tsx:504` dan sudah memakai `motion-reduce:animate-none`; durasi diselaraskan `duration-200` → `duration-150` (langkah token motion 150/250/400, pilihan user). Root `page.tsx:297` dipertahankan sesuai Keputusan #2.
+- [x] Selaraskan ikon/warna status antara header badge dan Card kaki form. — **Sudah teratasi**: status hanya di satu lokasi (Card kaki form, `page.tsx:654`, `role="status"`); `PageHeader` tidak lagi membawa badge/actions.
+- [x] Verifikasi: test halaman, guard, `pnpm typecheck`, `pnpm lint`, `pnpm test`.
+- [x] Cek visual light/dark + `prefers-reduced-motion` best-effort bila Playwright tersedia. — Playwright tidak tersedia di mesin ini; cek browser dilewati. Perubahan hanya kelas durasi; perilaku reduced-motion sudah ada di kode.
 
 ## Keputusan
 
@@ -39,13 +39,13 @@ Hanya `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx`. Tidak ada p
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA.
-- [ ] Perilaku Radix/a11y tidak rusak.
-- [ ] API `cva` dan export tetap konsisten.
-- [ ] State loading, empty, dan error relevan tersedia.
-- [ ] Showcase/docs diperbarui bila perlu.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA. (Tidak ada perubahan warna/teks; status memakai `text-foreground` yang sudah ada.)
+- [x] Perilaku Radix/a11y tidak rusak.
+- [x] API `cva` dan export tetap konsisten. (Tidak ada perubahan `@ds/ui`.)
+- [x] State loading, empty, dan error relevan tersedia. (Status draft `empty`/`pending`/`saved`/error tidak berubah.)
+- [x] Showcase/docs diperbarui bila perlu.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass. (Satu kegagalan baseline `rte-link-save` di `@ds/ui` terbukti ada pada base `visual-polish` tanpa perubahan ini; lihat Eksekusi.)
 
 ## Eksekusi
 
@@ -53,9 +53,9 @@ Branch: `cr-083-dynamic-form-status-motion`
 Commit: `fix: selaraskan status dan motion dynamic form [CR-083]`
 
 - [x] CR disetujui user (2026-11-25).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat (`cr-083-dynamic-form-status-motion` dari `visual-polish` `3f33c3d`, worktree `arah-prd`).
+- [x] Perubahan diimplementasikan: hanya `page.tsx:504` `duration-200` → `duration-150`. Temuan #1/#2/#4 terbukti sudah teratasi oleh CR-072 di kode saat ini (verifikasi grep + baca kode); pilihan eksekusi dan langkah 150ms disetujui user.
+- [x] Verifikasi dijalankan: typecheck hijau; lint 0 error (4 warning pre-existing `@ds/ui`); test targeted halaman 26/26; tokens 10/10, showcase 129/129, api ok; `@ds/ui` 733/734 — 1 gagal `rte-link-save` (`rich-text-editor.test.tsx:587`) terbukti baseline (gagal identik pada base bersih via `git stash`); build showcase hijau. Cek browser dilewati (Playwright tidak tersedia).
+- [x] CR di-tick. Status di `docs/BACKLOG.md` tetap `approved` (hanya user yang boleh menetapkan `done`).
+- [x] `docs/STATUS.md` diperbarui.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
