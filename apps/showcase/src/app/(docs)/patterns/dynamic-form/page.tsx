@@ -501,7 +501,7 @@ export default function DynamicFormPage() {
               )}
             />
             {watchNotifyEmail && (
-              <div className="rounded-md border border-highlight/30 bg-highlight/5 p-3 animate-in slide-in-from-top-1 fade-in duration-200 motion-reduce:animate-none">
+              <div className="rounded-md border border-highlight/30 bg-highlight/5 p-3 animate-in slide-in-from-top-1 fade-in duration-150 motion-reduce:animate-none">
                 <div className="flex items-start gap-2">
                   <Info className="h-4 w-4 text-highlight mt-0.5" />
                   <div className="text-xs text-muted-foreground">
