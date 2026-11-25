@@ -149,7 +149,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-085 | Cascader & Tree Select: struktur dan hierarki halaman (SectionHeading, SegmentedControl, ritme section) | done | `docs/cr/cr-085-cascader-tree-select-page-structure.md` |
 | CR-086 | Cascader & Tree Select: kemandirian demo, umpan balik label, dan microcopy halaman (English); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-086-cascader-tree-select-demo-feedback.md` |
 | CR-087 | Cascader & TreeSelect: a11y label/error (useId, aria-invalid) dan kontrol clear/tag bersarang; done dan di-merge ke `visual-polish` | done | `docs/cr/cr-087-cascader-tree-select-component-a11y.md` |
-| CR-088 | Cascader & TreeSelect: konsistensi microcopy/teks default komponen (English, ditetapkan user 2026-11-25) | approved | `docs/cr/cr-088-cascader-tree-select-copy-defaults.md` |
+| CR-088 | Cascader & TreeSelect: konsistensi microcopy/teks default komponen (English, ditetapkan user 2026-11-25); diimplementasikan di `cr-088-cascader-tree-select-copy-defaults`, menunggu review user | approved | `docs/cr/cr-088-cascader-tree-select-copy-defaults.md` |
 
 ## Catatan
 
