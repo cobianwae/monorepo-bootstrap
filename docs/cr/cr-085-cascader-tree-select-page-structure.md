@@ -1,6 +1,6 @@
 # CR-085 — Cascader & Tree Select: struktur dan hierarki halaman
 
-**Status:** approved (ditetapkan user 2026-11-25; belum dikerjakan atas instruksi user)
+**Status:** done
 **Sumber:** audit `/improve-ui` (skill `ui-designer`), 2026-11-25
 **Ref:** `apps/showcase/src/app/(docs)/patterns/cascader-tree-select/page.tsx`, `docs/design/visual-language.md` (Spacing & Density, Section Heading, Color Roles)
 
