@@ -76,12 +76,13 @@ describe('DynamicFormPage (CR-058 C05)', () => {
     expect(screen.getAllByText('Project name must be at least 3 characters.')).toHaveLength(2);
   });
 
-  it('uses one h1, two section h2 headings, and five group h3 headings (CR-071)', () => {
+  it('uses one h1, three section h2 headings, and eight group h3 headings (CR-071, CR-082)', () => {
     render(<DynamicFormPage />);
     expect(screen.getAllByRole('heading', { level: 1 }).map((h) => h.textContent)).toEqual(['Dynamic Form']);
     expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual([
       'Interactive demo',
       'Try it',
+      'Accessibility notes',
     ]);
     expect(screen.getAllByRole('heading', { level: 3 }).map((h) => h.textContent)).toEqual([
       'Project Information',
@@ -89,6 +90,9 @@ describe('DynamicFormPage (CR-058 C05)', () => {
       'Audience & Targeting',
       'Budget & Capacity',
       'Team Members',
+      'Errors & validation',
+      'Conditional & dynamic rows',
+      'Autosave & status',
     ]);
   });
 

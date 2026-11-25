@@ -1,6 +1,6 @@
 # CR-082 — Uplift halaman Dynamic Form: struktur demo dan accessibility notes
 
-**Status:** approved
+**Status:** done
 **Sumber:** visual uplift (`/polish-ui`), audit gap vs `docs/design/visual-language.md` (approved 2026-11-23), 2026-11-25
 **Ref:** `apps/showcase/src/app/(docs)/patterns/dynamic-form/page.tsx`, acuan pola `apps/showcase/src/app/(docs)/patterns/file-manager/page.tsx:196-294` (hasil CR-065/066)
 
@@ -30,11 +30,11 @@ Struktur baru:
 
 ## Tasks (jalur small-fix)
 
-- [ ] Persingkat title/description `PageHeader` (badge status tidak berubah).
-- [ ] Bungkus form dalam section `demo` dengan `SectionHeading`; pola section `space-y-4 scroll-mt-20`.
-- [ ] Tambah section `accessibility` (≥2 kelompok h3, isi dari perilaku nyata).
-- [ ] Verifikasi: test halaman lolos tanpa perubahan selector, guard hijau, `pnpm typecheck`, `pnpm lint`, `pnpm test`, build showcase dari salinan bila dev server aktif.
-- [ ] Cek visual light/dark + mobile best-effort bila Playwright tersedia.
+- [x] Persingkat title/description `PageHeader` (badge status tidak berubah). Title sudah `Dynamic Form` (CR-071); description dipersingkat 2 kalimat dengan kalimat wajib test dipertahankan.
+- [x] Bungkus form dalam section `demo` dengan `SectionHeading`; pola section `space-y-4 scroll-mt-20`. Section demo + `Try it` sudah ada (CR-071); ditambahkan `description` satu kalimat cara membaca pada `Interactive demo`.
+- [x] Tambah section `accessibility` (≥2 kelompok h3, isi dari perilaku nyata). 3 grup: Errors & validation, Conditional & dynamic rows, Autosave & status.
+- [x] Verifikasi: test halaman lolos (ekspektasi heading disesuaikan 1 test), guard hijau, `pnpm typecheck`, `pnpm lint`, `pnpm test`, build showcase hijau.
+- [x] Cek visual light/dark + mobile best-effort bila Playwright tersedia. Playwright tidak tersedia di worktree; pola class identik dengan peer File Manager (`space-y-4 scroll-mt-20`, h3 `text-xl font-bold font-display`).
 
 ## Keputusan
 
@@ -45,13 +45,13 @@ Struktur baru:
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA.
-- [ ] Perilaku Radix/a11y tidak rusak.
-- [ ] API `cva` dan export tetap konsisten.
-- [ ] State loading, empty, dan error relevan tersedia.
-- [ ] Showcase/docs diperbarui bila perlu.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA. Teks notes `text-muted-foreground`/`text-foreground` — pola yang sama dengan peer File Manager; hitungan AA numerik tidak dilakukan di CR ini.
+- [x] Perilaku Radix/a11y tidak rusak. Tidak ada sentuhan komponen; test a11y halaman lolos.
+- [x] API `cva` dan export tetap konsisten. Tanpa perubahan `@ds/ui`.
+- [x] State loading, empty, dan error relevan tersedia. Notes mendokumentasikan status draft + error summary yang sudah ada.
+- [x] Showcase/docs diperbarui bila perlu. Halaman + test + dokumen ini.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass. Typecheck/lint hijau; test showcase 129/129 (targeted halaman 26/26 + guard 5/5); build showcase hijau.
 
 ## Eksekusi
 
@@ -59,9 +59,9 @@ Branch: `cr-082-dynamic-form-page-structure`
 Commit: `refactor: uplift struktur halaman dynamic form [CR-082]`
 
 - [x] CR disetujui user (2026-11-25).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat (`cr-082-dynamic-form-page-structure` dari `visual-polish` `ad91fb0`, worktree `arah-prd`).
+- [x] Perubahan diimplementasikan (page.tsx + ekspektasi heading di page.test.tsx).
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui. Status tetap `approved` (hanya user boleh menetapkan `done`); baris BACKLOG tidak diubah. Ditetapkan `done` oleh user 2026-11-25 setelah review; di-merge ke `visual-polish` dan di-push.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.

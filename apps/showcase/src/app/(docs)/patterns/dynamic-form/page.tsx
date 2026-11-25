@@ -140,6 +140,33 @@ const DRAFT_MESSAGES: Record<DraftStatus, string> = {
   'delete-error': "Couldn't delete this draft from this browser. It may return after reload.",
 };
 
+const accessibilityGroups: { title: string; notes: string[] }[] = [
+  {
+    title: 'Errors & validation',
+    notes: [
+      'Validation runs after blur (onTouched), so fields are not marked invalid before they are touched.',
+      'Every invalid field is linked to its message with aria-describedby and aria-invalid.',
+      'On submit with errors, focus moves to the error summary region, and each summary link moves focus to its field.',
+    ],
+  },
+  {
+    title: 'Conditional & dynamic rows',
+    notes: [
+      'The email notifications switch reveals a guidance block; no email is sent.',
+      'Each member row is labelled by position (Email for member 2, Role for member 2), and the remove button is a 44 px target with its own label.',
+      'Adding a member moves focus to the new row\u2019s email field; removing a member moves focus to the next row or back to Add member.',
+    ],
+  },
+  {
+    title: 'Autosave & status',
+    notes: [
+      'Draft status (pending, saved, errors) is announced through a polite live region (role="status").',
+      'Drafts are saved to localStorage only, debounced by 1.2 seconds; nothing leaves this browser.',
+      'Read, save, and delete failures keep sample values on screen and say so in the status message.',
+    ],
+  },
+];
+
 export default function DynamicFormPage() {
   const [draftStatus, setDraftStatus] = React.useState<DraftStatus>('empty');
   const [resetOpen, setResetOpen] = React.useState(false);
@@ -272,7 +299,7 @@ export default function DynamicFormPage() {
         eyebrow="UX Recipe Scenario"
         eyebrowIcon={GitFork}
         title="Dynamic Form"
-        description="A React Hook Form and Zod recipe with dynamic member rows, conditional fields, validation after blur, and a draft saved to localStorage that you can resume. The demo does not send email or publish anything."
+        description="Dynamic member rows, conditional fields, and a draft autosaved in this browser that you can resume after reload. The demo does not send email or publish anything."
       />
 
       {allErrors.length > 0 && (
@@ -292,7 +319,7 @@ export default function DynamicFormPage() {
       )}
 
       <section aria-labelledby="interactive-demo" className="scroll-mt-20 space-y-4">
-        <SectionHeading id="interactive-demo" title="Interactive demo" />
+        <SectionHeading id="interactive-demo" title="Interactive demo" description="Fill the form below to try field arrays, validation, and autosave in this browser." />
       <form onSubmit={submit} onBlurCapture={(event) => {
         const compositeFields = {
           'schedule-kickoff': 'schedule.kickoff',
@@ -669,6 +696,27 @@ export default function DynamicFormPage() {
           <li>Edit a field, wait for the draft saved status, then reload to resume it in this browser.</li>
           <li>Clear the project name and press Submit demo to see the error summary. Nothing is published.</li>
         </ol>
+      </section>
+
+      <section id="accessibility" aria-labelledby="accessibility-heading" className="space-y-4 scroll-mt-20">
+        <SectionHeading
+          id="accessibility-heading"
+          title="Accessibility notes"
+          description="What the pattern guarantees for errors, dynamic rows, and draft status."
+        />
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {accessibilityGroups.map((group) => (
+            <div key={group.title} className="space-y-2">
+              <h3 className="text-xl font-bold font-display text-foreground">{group.title}</h3>
+              <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                {group.notes.map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );
