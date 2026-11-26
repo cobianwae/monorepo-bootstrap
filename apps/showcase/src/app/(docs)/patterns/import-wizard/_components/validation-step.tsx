@@ -13,6 +13,7 @@ import {
   TableRow,
 } from '@ds/ui';
 import { AlertCircle } from 'lucide-react';
+import { plural } from '../_lib/plural';
 import type { TargetField } from '../_lib/types';
 import {
   cellKey,
@@ -62,17 +63,17 @@ export function ValidationStep({
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">
-        Periksa baris sebelum impor. Sel bermasalah diberi tanda dan pesan teks di dalam sel.
+        Review rows before importing. Problem cells are flagged with a text message inside the cell.
       </p>
 
       <div data-testid="iw-validation-summary" className="flex flex-wrap items-center gap-2 text-sm">
         <Badge variant="secondary">{view.validCount} valid</Badge>
         <Badge variant={view.invalidCount > 0 ? 'destructive' : 'secondary'}>
-          {view.invalidCount} gagal
+          {view.invalidCount} failed
         </Badge>
         {errorColumns.map((field) => (
           <span key={field.key} className="text-xs text-muted-foreground">
-            {field.label}: {view.errorsByColumn[field.key]} sel error
+            {field.label}: {plural(view.errorsByColumn[field.key] ?? 0, 'cell error')}
           </span>
         ))}
       </div>
@@ -80,37 +81,37 @@ export function ValidationStep({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <SegmentedControl
           type="single"
-          aria-label="Filter baris"
+          aria-label="Filter rows"
           value={filter}
           onValueChange={(value) => {
             if (value === 'all' || value === 'error') onFilterChange(value);
           }}
         >
           <SegmentedControlItem value="all" data-testid="iw-filter-all">
-            Semua ({rows.length})
+            All ({rows.length})
           </SegmentedControlItem>
           <SegmentedControlItem value="error" data-testid="iw-filter-error">
-            Hanya error ({view.invalidCount})
+            Errors only ({view.invalidCount})
           </SegmentedControlItem>
         </SegmentedControl>
         <div className="flex flex-wrap gap-2">
           <Button type="button" variant="outline" size="sm" className="h-11" onClick={onFixMapping}>
-            Perbaiki mapping
+            Fix mapping
           </Button>
           <Button type="button" variant="outline" size="sm" className="h-11" onClick={onReupload}>
-            Unggah ulang
+            Re-upload
           </Button>
         </div>
       </div>
 
       {filter === 'error' && view.invalidCount === 0 ? (
-        <p className="text-sm text-muted-foreground">Tidak ada baris error.</p>
+        <p className="text-sm text-muted-foreground">No rows with errors.</p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border">
-          <Table aria-label="Hasil validasi per baris" data-testid="iw-validation-table">
+          <Table aria-label="Validation results by row" data-testid="iw-validation-table">
             <TableHeader>
               <TableRow>
-                <TableHead scope="col">Baris</TableHead>
+                <TableHead scope="col">Row</TableHead>
                 {columns.map((field) => (
                   <TableHead scope="col" key={field.key}>
                     {field.label}
@@ -154,7 +155,7 @@ export function ValidationStep({
       )}
 
       {slice.pageCount > 1 && (
-        <nav aria-label="Halaman validasi" className="flex flex-wrap items-center justify-between gap-2 text-sm">
+        <nav aria-label="Validation pages" className="flex flex-wrap items-center justify-between gap-2 text-sm">
           <Button
             type="button"
             variant="outline"
@@ -163,10 +164,10 @@ export function ValidationStep({
             disabled={slice.page <= 1}
             onClick={() => onPageChange(slice.page - 1)}
           >
-            Sebelumnya
+            Previous
           </Button>
           <span aria-live="polite">
-            Halaman {slice.page} dari {slice.pageCount}
+            Page {slice.page} of {slice.pageCount}
           </span>
           <Button
             type="button"
@@ -176,7 +177,7 @@ export function ValidationStep({
             disabled={slice.page >= slice.pageCount}
             onClick={() => onPageChange(slice.page + 1)}
           >
-            Berikutnya
+            Next
           </Button>
         </nav>
       )}

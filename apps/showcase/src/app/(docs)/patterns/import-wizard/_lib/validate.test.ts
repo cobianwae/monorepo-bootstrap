@@ -31,7 +31,7 @@ const MAPPING = {
 };
 
 describe('validateRows', () => {
-  it('AC-04 pelanggaran per sel dengan pesan Bahasa Indonesia + validCount', () => {
+  it('AC-04 pelanggaran per sel dengan pesan English + validCount', () => {
     const rows = [
       { Nama: 'Budi', Email: 'unique@x.com', 'Tgl Lahir': '1990-01-01', Telepon: '0812', ID: 'M001' }, // valid
       { Nama: 'Sari', Email: 'dup@x.com', 'Tgl Lahir': '1991-02-02', Telepon: '0813', ID: 'M002' }, // email ganda
@@ -47,11 +47,11 @@ describe('validateRows', () => {
     expect(rowErrors).toHaveLength(5); // baris 2,3,4,5,6
 
     const errRow = (row: number) => rowErrors.find((e) => e.row === row)!;
-    expect(errRow(2).message).toBe('Ganda di file (baris 2 & 6)');
-    expect(errRow(3).message).toBe('Tanggal tidak valid (YYYY-MM-DD)');
-    expect(errRow(4).message).toBe('Wajib diisi');
-    expect(errRow(5).message).toBe('Format tidak sesuai');
-    expect(errRow(6).message).toBe('Ganda di file (baris 2 & 6)');
+    expect(errRow(2).message).toBe('Duplicate in file (rows 2 & 6)');
+    expect(errRow(3).message).toBe('Invalid date (YYYY-MM-DD)');
+    expect(errRow(4).message).toBe('Required');
+    expect(errRow(5).message).toBe('Invalid format');
+    expect(errRow(6).message).toBe('Duplicate in file (rows 2 & 6)');
   });
 
   it('tidak throw untuk data invalid (hanya struktur error)', () => {
@@ -77,10 +77,10 @@ describe('validateRows', () => {
     const rows = [{ Nama: 'Budi' }];
     const mapping = { Nama: 'tidakAdaField' };
 
-    expect(() => validateRows(rows, mapping, FIELDS)).toThrow(/tidak dikenal/);
+    expect(() => validateRows(rows, mapping, FIELDS)).toThrow(/Unknown target field/);
   });
 
-  it('custom validate konsumen menghasilkan pesan ID', () => {
+  it('pesan custom validate konsumen diteruskan apa adanya, data tidak diubah', () => {
     const rows = [
       { Nama: 'Budi', Email: 'b@x.com', ID: 'X001' }, // custom invalid
       { Nama: 'Sari', Email: 's@x.com', ID: 'M002' }, // valid
@@ -90,6 +90,7 @@ describe('validateRows', () => {
     expect(validCount).toBe(1);
     expect(rowErrors[0].message).toBe('ID harus diawali M');
     expect(rowErrors[0].column).toBe('memberId');
+    expect(rows[0]).toEqual({ Nama: 'Budi', Email: 'b@x.com', ID: 'X001' });
     expect(rowErrors[0].row).toBe(1);
   });
 });

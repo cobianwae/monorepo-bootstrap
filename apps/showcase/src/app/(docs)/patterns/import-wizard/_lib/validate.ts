@@ -1,5 +1,5 @@
 /**
- * Validasi deklaratif per sel, Bahasa Indonesia.
+ * Validasi deklaratif per sel; pesan bawaan English (CR-079).
  *
  * Urutan per sel: wajib → tipe → pola → unik-dalam-file → custom.
  * Satu sel menampilkan pelanggaran pertama saja. Tidak melempar untuk data
@@ -41,9 +41,9 @@ function isValidDate(value: string): boolean {
 type TypeRule = { check: (value: string) => boolean; message: string };
 
 const TYPE_RULES: Record<Exclude<FieldType, 'string'>, TypeRule> = {
-  email: { check: isValidEmail, message: 'Email tidak valid' },
-  number: { check: isValidNumber, message: 'Bukan angka' },
-  date: { check: isValidDate, message: 'Tanggal tidak valid (YYYY-MM-DD)' },
+  email: { check: isValidEmail, message: 'Invalid email' },
+  number: { check: isValidNumber, message: 'Not a number' },
+  date: { check: isValidDate, message: 'Invalid date (YYYY-MM-DD)' },
 };
 
 export function validateRows(
@@ -84,7 +84,7 @@ export function validateRows(
       const field = fieldByKey.get(key);
       if (!field) {
         // Kesalahan programmer: field target tidak dikenal.
-        throw new Error(`Field target tidak dikenal: ${key}`);
+        throw new Error(`Unknown target field: ${key}`);
       }
       const value = row[header] ?? '';
       const message = validateCell(value, row, field, uniqueMap);
@@ -107,7 +107,7 @@ function validateCell(
   uniqueMap: Map<string, number[]>
 ): string | null {
   // 1. Wajib
-  if (field.required && isEmpty(value)) return 'Wajib diisi';
+  if (field.required && isEmpty(value)) return 'Required';
   if (isEmpty(value)) return null; // kosong & bukan wajib → lolos sisa aturan
 
   // 2. Tipe
@@ -117,14 +117,14 @@ function validateCell(
   }
 
   // 3. Pola
-  if (field.pattern && !field.pattern.test(value)) return 'Format tidak sesuai';
+  if (field.pattern && !field.pattern.test(value)) return 'Invalid format';
 
   // 4. Unik dalam file
   if (field.unique) {
     const k = `${field.key}\u0000${value}`;
     const rowsWith = uniqueMap.get(k);
     if (rowsWith && rowsWith.length > 1) {
-      return `Ganda di file (baris ${rowsWith.join(' & ')})`;
+      return `Duplicate in file (rows ${rowsWith.join(' & ')})`;
     }
   }
 

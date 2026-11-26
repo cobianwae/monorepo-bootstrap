@@ -50,7 +50,7 @@ describe('setTarget', () => {
   it('menolak target yang sudah dipakai kolom lain', async () => {
     const state = await parsedState(CSV_NAMA);
     const result = setTarget(state, 'Tgl Lahir', 'name', DEMO_FIELDS);
-    expect(result.error).toContain('sudah dipakai');
+    expect(result.error).toContain('is already used');
     expect(result.state.mapping).toEqual(state.mapping);
   });
 
@@ -118,7 +118,7 @@ describe('mundur tidak menghilangkan state', () => {
 
   it('file error tidak menyisakan mapping', async () => {
     const state = await parsedState(CSV_NAMA);
-    const failed = applyParsed(state, { headers: [], rows: [], rowCount: 0, warnings: [], error: 'Gagal membaca berkas CSV' }, DEMO_FIELDS);
+    const failed = applyParsed(state, { headers: [], rows: [], rowCount: 0, warnings: [], error: 'Failed to read the CSV file' }, DEMO_FIELDS);
     expect(failed.mapping).toEqual({});
     expect(canContinue(failed, DEMO_FIELDS).ok).toBe(false);
   });

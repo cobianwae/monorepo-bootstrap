@@ -20,8 +20,8 @@ describe('demo datasets', () => {
   it('invalid: 203 baris data, baris 3 & 7 email ganda, baris 9 tanggal salah', () => {
     const data = lines(INVALID_TEXT).slice(1);
     expect(data).toHaveLength(203);
-    expect(data[2]).toContain('dup@contoh.id');
-    expect(data[6]).toContain('dup@contoh.id');
+    expect(data[2]).toContain('dup@example.com');
+    expect(data[6]).toContain('dup@example.com');
     expect(data[8]).toContain('32/13/1990');
   });
 
@@ -36,7 +36,7 @@ describe('demo datasets', () => {
 
   it('toDemoFile membawa nama dan mime dataset', () => {
     const file = toDemoFile(DEMO_DATASETS.format);
-    expect(file.name).toBe('anggota.xlsx');
+    expect(file.name).toBe('members.xlsx');
     expect(file.type).toBe(DEMO_DATASETS.format.mime);
   });
 });

@@ -7,13 +7,13 @@ export type FieldType = 'string' | 'number' | 'date' | 'email';
 
 export interface TargetField {
   key: string; // mis. 'name'
-  label: string; // mis. 'Nama lengkap'
+  label: string; // mis. 'Full name'
   required: boolean;
   type: FieldType;
   pattern?: RegExp; // FR-006 pola
   unique?: boolean; // FR-003 unik dalam file
   example?: string; // FR-007 baris contoh
-  validate?: (value: string, row: Record<string, string>) => string | null; // custom → pesan ID
+  validate?: (value: string, row: Record<string, string>) => string | null; // custom → pesan konsumen, diteruskan apa adanya
 }
 
 export interface ImportResult {
@@ -35,7 +35,7 @@ export interface ImportWizardConfig {
 export interface RowError {
   row: number; // 1-based
   column: string; // field key
-  message: string; // Bahasa Indonesia
+  message: string; // bawaan English; custom diteruskan apa adanya
 }
 
 export interface CsvParseResult {
@@ -43,7 +43,7 @@ export interface CsvParseResult {
   rows: Record<string, string>[];
   rowCount: number;
   warnings: string[];
-  error?: string; // mis. 'v1 CSV saja' (FR-010)
+  error?: string; // mis. 'Only CSV files are supported' (FR-010)
 }
 
 export interface ParseCsvOptions {

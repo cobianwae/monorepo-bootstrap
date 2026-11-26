@@ -7,12 +7,14 @@ import {
   AlertTitle,
   Button,
   FileInput,
+  type FileInputMessages,
   Label,
   Progress,
   RadioGroup,
   RadioGroupItem,
   Textarea,
 } from '@ds/ui';
+import { UNSUPPORTED_FORMAT_ERROR } from '../_lib/parse-csv';
 import type { CsvParseResult } from '../_lib/types';
 
 export type DelimiterChoice = 'auto' | ',' | ';' | '\t';
@@ -33,11 +35,29 @@ export interface UploadStepProps {
 }
 
 const DELIMITERS: { value: DelimiterChoice; label: string; testId: string }[] = [
-  { value: 'auto', label: 'Otomatis', testId: 'iw-delimiter-auto' },
-  { value: ',', label: 'Koma (,)', testId: 'iw-delimiter-comma' },
-  { value: ';', label: 'Titik koma (;)', testId: 'iw-delimiter-semicolon' },
+  { value: 'auto', label: 'Auto', testId: 'iw-delimiter-auto' },
+  { value: ',', label: 'Comma (,)', testId: 'iw-delimiter-comma' },
+  { value: ';', label: 'Semicolon (;)', testId: 'iw-delimiter-semicolon' },
   { value: '\t', label: 'Tab', testId: 'iw-delimiter-tab' },
 ];
+
+/** Opt-in English copy; the shared FileInput defaults stay unchanged. */
+const FILE_INPUT_MESSAGES: FileInputMessages = {
+  dropzoneLabel: 'File upload dropzone',
+  clickToUpload: 'Click to upload',
+  dragAndDrop: 'or drag and drop',
+  selectFile: 'Choose a file',
+  allFileTypes: 'All file types',
+  formatLabel: (accept) => `Format: ${accept}`,
+  maxSizeLabel: (formattedMaxSize) => `Max: ${formattedMaxSize}`,
+  uploadFile: 'Upload file',
+  browse: 'Browse',
+  uploadedFilesLabel: 'Uploaded files',
+  removeFile: (fileName) => `Remove ${fileName}`,
+  fileTooLarge: (fileName, formattedMaxSize) =>
+    `File "${fileName}" exceeds the maximum size (${formattedMaxSize}).`,
+  tooManyFiles: (maxFiles) => `Only ${maxFiles} file(s) allowed.`,
+};
 
 export function UploadStep({
   files,
@@ -58,12 +78,12 @@ export function UploadStep({
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">
-        Unggah file <span className="font-medium text-foreground">.csv</span>, atau tempel isinya.
-        Format XLSX belum didukung (v1 CSV saja).
+        Upload a <span className="font-medium text-foreground">.csv</span> file or paste its contents.
+        XLSX is not supported yet (CSV only).
       </p>
 
       <div className="space-y-2">
-        <Label htmlFor="iw-file">Berkas CSV</Label>
+        <Label htmlFor="iw-file">CSV file</Label>
         <div data-testid="iw-dropzone">
           <FileInput
             id="iw-file"
@@ -75,19 +95,20 @@ export function UploadStep({
             onChange={onFiles}
             disabled={parsing}
             data-testid="iw-file-input"
-            helperText="CSV, maks 5 MB / 10.000 baris"
+            helperText="CSV. Recommended up to 5 MB / 10,000 rows. Larger files are still processed."
+            messages={FILE_INPUT_MESSAGES}
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="iw-paste">atau tempel isi CSV</Label>
+        <Label htmlFor="iw-paste">or paste CSV content</Label>
         <Textarea
           id="iw-paste"
           data-testid="iw-paste"
           rows={6}
           className="font-mono text-xs"
-          placeholder={'nama,email\nBudi,budi@contoh.id'}
+          placeholder={'name,email\nBudi,budi@example.com'}
           value={pasteText}
           onChange={(event) => onPasteChange(event.target.value)}
           disabled={parsing}
@@ -102,7 +123,7 @@ export function UploadStep({
             onClick={onProcessPaste}
             disabled={parsing || pasteText.trim().length === 0}
           >
-            Proses tempel
+            Process pasted text
           </Button>
         </div>
         {pasteNotice && (
@@ -143,36 +164,36 @@ export function UploadStep({
           className="h-11"
           onClick={onDownloadTemplate}
         >
-          Unduh template CSV
+          Download CSV template
         </Button>
-        <span className="text-xs text-muted-foreground">Header kolom + 1 baris contoh.</span>
+        <span className="text-xs text-muted-foreground">Column headers + 1 sample row.</span>
       </div>
 
       <div aria-busy={parsing} className="space-y-3">
         {parsing && (
           <div className="space-y-2" data-testid="iw-loading">
             <p role="status" className="text-sm text-muted-foreground">
-              Memparsing berkas…
+              Parsing file…
             </p>
-            <Progress value={null} aria-label="Memparsing berkas" />
+            <Progress value={null} aria-label="Parsing file" />
           </div>
         )}
 
         {!parsing && parsed?.error && (
           <Alert variant="destructive" role="alert" data-testid="iw-error">
-            <AlertTitle>Berkas tidak dapat dibaca</AlertTitle>
+            <AlertTitle>The file couldn&apos;t be read</AlertTitle>
             <AlertDescription>
-              {parsed.error === 'v1 CSV saja'
-                ? 'Hanya CSV (v1 CSV saja). Simpan berkas sebagai .csv lalu unggah ulang.'
-                : `${parsed.error}. Coba pilih delimiter manual atau simpan ulang sebagai UTF-8, lalu unggah ulang.`}
+              {parsed.error === UNSUPPORTED_FORMAT_ERROR
+                ? `${UNSUPPORTED_FORMAT_ERROR}. XLSX is not supported yet; save the file as .csv and upload it again.`
+                : `${parsed.error}. Try choosing a delimiter manually or save the file again as UTF-8, then re-upload it.`}
             </AlertDescription>
           </Alert>
         )}
 
         {!parsing && isEmptyFile && (
           <div role="status" data-testid="iw-empty" className="rounded-lg border border-dashed border-border p-4 text-sm">
-            <p className="font-medium text-foreground">File kosong — hanya header tanpa baris.</p>
-            <p className="mt-1 text-muted-foreground">Pilih file lain atau tempel isi CSV yang berisi data.</p>
+            <p className="font-medium text-foreground">Empty file: headers only, no rows.</p>
+            <p className="mt-1 text-muted-foreground">Choose another file or paste CSV content that has data.</p>
           </div>
         )}
 
@@ -184,7 +205,7 @@ export function UploadStep({
 
         {!parsing && !parsed && files.length === 0 && pasteText.trim().length === 0 && (
           <p role="status" className="text-sm text-muted-foreground" data-testid="iw-no-source">
-            Belum ada berkas. Pilih file, seret ke area unggah, atau tempel isi CSV.
+            No file yet. Choose a file, drop it on the upload area, or paste CSV content.
           </p>
         )}
       </div>

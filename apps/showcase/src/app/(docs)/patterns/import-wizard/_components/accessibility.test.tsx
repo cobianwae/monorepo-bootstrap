@@ -29,9 +29,9 @@ function renderUpload() {
 }
 
 describe('Import Wizard — asosiasi aksesibilitas (CR-077)', () => {
-  it('label "Berkas CSV" terhubung ke input file native', () => {
+  it('label "CSV file" terhubung ke input file native', () => {
     renderUpload();
-    const input = screen.getByLabelText('Berkas CSV');
+    const input = screen.getByLabelText('CSV file');
     expect(input).toBeInstanceOf(HTMLInputElement);
     expect((input as HTMLInputElement).type).toBe('file');
   });
@@ -42,7 +42,7 @@ describe('Import Wizard — asosiasi aksesibilitas (CR-077)', () => {
       failedRows: 1,
       skipped: 0,
       canSubmit: false,
-      reason: 'Masih ada 1 baris error. Perbaiki di langkah validasi atau pilih "Dilewati".',
+      reason: '1 row with errors. Fix them in the validation step or choose "Skip failed rows".',
     };
     render(
       <ConfirmStep
@@ -59,7 +59,7 @@ describe('Import Wizard — asosiasi aksesibilitas (CR-077)', () => {
     const submit = screen.getByTestId('iw-submit');
     const describedBy = submit.getAttribute('aria-describedby');
     expect(describedBy).toBe('iw-gate-reason');
-    expect(document.getElementById('iw-gate-reason')?.textContent).toContain('baris error');
+    expect(document.getElementById('iw-gate-reason')?.textContent).toContain('with errors');
     expect(submit.getAttribute('aria-disabled')).toBe('true');
   });
 

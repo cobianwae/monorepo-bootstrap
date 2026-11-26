@@ -51,14 +51,14 @@ export function MappingStep({
   return (
     <div className="space-y-6">
       <p className="text-sm text-muted-foreground">
-        Hubungkan setiap kolom CSV ke field target. Saran ditandai &quot;disarankan&quot; dan bisa diubah.
-        Target yang wajib harus terpetakan sebelum lanjut.
+        Connect each CSV column to a target field. Suggestions are marked &quot;suggested&quot; and can be
+        changed. Required targets must be mapped before you continue.
       </p>
 
       {rejection && (
         <Alert id="iw-mapping-error" variant="destructive" role="alert" data-testid="iw-duplicate">
           <AlertDescription>
-            Kolom &quot;{rejection.header}&quot;: {rejection.message}
+            Column &quot;{rejection.header}&quot;: {rejection.message}
           </AlertDescription>
         </Alert>
       )}
@@ -66,16 +66,16 @@ export function MappingStep({
       {missing.length > 0 && (
         <Alert variant="warning" data-testid="iw-missing">
           <AlertDescription>
-            Wajib belum terpetakan: {missing.map((field) => field.label).join(', ')}.
+            Required fields not mapped: {missing.map((field) => field.label).join(', ')}.
           </AlertDescription>
         </Alert>
       )}
 
       <div className="overflow-x-auto rounded-lg border border-border">
-        <Table aria-label="Pemetaan kolom CSV ke field target">
+        <Table aria-label="CSV column to target field mapping">
           <TableHeader>
             <TableRow>
-              <TableHead scope="col">Kolom CSV</TableHead>
+              <TableHead scope="col">CSV column</TableHead>
               <TableHead scope="col">Target field</TableHead>
               <TableHead scope="col">Status</TableHead>
             </TableRow>
@@ -94,7 +94,7 @@ export function MappingStep({
                       onValueChange={(value) => handleChange(header, value)}
                     >
                       <SelectTrigger
-                        aria-label={`Target untuk kolom ${header}`}
+                        aria-label={`Target for column ${header}`}
                         aria-invalid={isRejected || undefined}
                         aria-describedby={isRejected ? 'iw-mapping-error' : undefined}
                         className="w-full max-w-xs"
@@ -103,7 +103,7 @@ export function MappingStep({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value={IGNORE_VALUE}>Abaikan</SelectItem>
+                        <SelectItem value={IGNORE_VALUE}>Ignore</SelectItem>
                         {fields.map((f) => (
                           <SelectItem key={f.key} value={f.key}>
                             {f.label}
@@ -117,13 +117,13 @@ export function MappingStep({
                       {field?.required && (
                         <Badge variant="outline">
                           <span aria-hidden="true" className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-destructive" />
-                          wajib
+                          required
                         </Badge>
                       )}
                       {suggested.includes(header) && current !== null && (
-                        <Badge variant="info-outline">disarankan</Badge>
+                        <Badge variant="info-outline">suggested</Badge>
                       )}
-                      {current === null && <span className="text-xs text-muted-foreground">Diabaikan</span>}
+                      {current === null && <span className="text-xs text-muted-foreground">Ignored</span>}
                     </div>
                   </TableCell>
                 </TableRow>

@@ -13,10 +13,10 @@ function exampleFor(type: FieldType): string {
     case 'date':
       return '1990-01-01';
     case 'email':
-      return 'nama@contoh.id';
+      return 'name@example.com';
     case 'string':
     default:
-      return 'contoh';
+      return 'example';
   }
 }
 
@@ -29,8 +29,8 @@ function escapeCsv(value: string): string {
 
 export function toTemplateCsv(fields: TargetField[]): string {
   const header = fields.map((f) => f.key).join(',');
-  const contoh = fields
+  const sample = fields
     .map((f) => escapeCsv(f.example ?? exampleFor(f.type)))
     .join(',');
-  return `${header}\n${contoh}\n`;
+  return `${header}\n${sample}\n`;
 }

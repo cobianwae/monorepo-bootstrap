@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DEMO_FIELDS } from './demo-fields';
 import { suggestMapping } from './mapping';
 import type { TargetField } from './types';
 
@@ -50,5 +51,31 @@ describe('suggestMapping', () => {
     const mapping = suggestMapping(['Nama Lengkap'], FIELDS);
 
     expect(mapping['Nama Lengkap']).toBe('name');
+  });
+});
+
+describe('suggestMapping dengan field demo berlabel English (CR-079)', () => {
+  it('memetakan header English', () => {
+    expect(suggestMapping(['Full name', 'Email', 'Date of birth', 'Phone'], DEMO_FIELDS)).toEqual({
+      'Full name': 'name',
+      Email: 'email',
+      'Date of birth': 'dob',
+      Phone: 'phone',
+    });
+  });
+
+  it('tetap memetakan header Indonesia, termasuk surel', () => {
+    expect(suggestMapping(['Nama Lengkap', 'Surel', 'Tanggal Lahir', 'Telepon'], DEMO_FIELDS)).toEqual({
+      'Nama Lengkap': 'name',
+      Surel: 'email',
+      'Tanggal Lahir': 'dob',
+      Telepon: 'phone',
+    });
+  });
+
+  it('mempertahankan pencocokan substring Indonesia', () => {
+    expect(suggestMapping(['Telepon Rumah'], DEMO_FIELDS)['Telepon Rumah']).toBe('phone');
+    expect(suggestMapping(['Lengkap'], DEMO_FIELDS)['Lengkap']).toBe('name');
+    expect(suggestMapping(['Lahir'], DEMO_FIELDS)['Lahir']).toBe('dob');
   });
 });

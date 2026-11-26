@@ -1,6 +1,6 @@
 # CR-079 — Import Wizard: Copy English dan Kejelasan Kontrak Demo
 
-**Status:** approved (2026-11-25; supersession bahasa disetujui, implementasi belum dimulai)  
+**Status:** done (ditetapkan user 2026-11-26; supersession bahasa disetujui) — diimplementasikan 2026-11-26 di branch `cr-079-import-wizard-english-copy`, di-merge ke `visual-polish` dan di-push atas izin eksplisit user  
 **Sumber:** audit UI/UX `/improve-ui` Import Wizard, 2026-11-25 — cluster copy/kejujuran demo  
 **Ref:** `docs/prd/014-import-wizard.md` (FR-001/003/004/007/010/011), `docs/design/import-wizard.md` (D1/D2/D5 dan §2), S-005.37  
 **Dependensi:** dukungan messages FileInput CR-078; selaraskan feedback dengan CR-076.
@@ -36,10 +36,10 @@ Lokasi relatif berada dalam `apps/showcase/src/app/(docs)/patterns/import-wizard
 
 ## Tasks
 
-- [ ] Inventaris dan terjemahkan copy page, komponen, helper, field/template demo, announcement dan recipe; perbarui test relevan.
-- [ ] Konfigurasi messages FileInput setelah CR-078; uji unsupported file, duplicate mapping, required/type/pattern/unique dan warning.
-- [ ] Tambah test header bilingual serta data/custom error yang tidak diterjemahkan.
-- [ ] Verifikasi semua state, last-result history, dan kejujuran recipe; koordinasikan rendering/copy-feedback dengan CR-080.
+- [x] Inventaris dan terjemahkan copy page, komponen, helper, field/template demo, announcement dan recipe; perbarui test relevan.
+- [x] Konfigurasi messages FileInput setelah CR-078; uji unsupported file, duplicate mapping, required/type/pattern/unique dan warning.
+- [x] Tambah test header bilingual serta data/custom error yang tidak diterjemahkan.
+- [x] Verifikasi semua state, last-result history, dan kejujuran recipe; koordinasikan rendering/copy-feedback dengan CR-080.
 
 ## Keputusan
 
@@ -50,16 +50,25 @@ Lokasi relatif berada dalam `apps/showcase/src/app/(docs)/patterns/import-wizard
 
 ## Design System Checks
 
-- [ ] Copy tidak terpotong di320/390/1440 light/dark; nama aksesibel/deskripsi tetap terhubung.
-- [ ] Token/kontras, loading/empty/error/success dan gate tidak regresi.
-- [ ] Tidak ada perubahan kontrak domain, dependency, atau default bahasa shared.
-- [ ] Test targeted, lalu `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`; baseline dicatat terpisah.
+- [x] Copy tidak terpotong di320/390/1440 light/dark; nama aksesibel/deskripsi tetap terhubung.
+- [x] Token/kontras, loading/empty/error/success dan gate tidak regresi.
+- [x] Tidak ada perubahan kontrak domain, dependency, atau default bahasa shared.
+- [x] Test targeted, lalu `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm -C apps/showcase build`; baseline dicatat terpisah.
 
 ## Eksekusi
 
 Branch: `cr-079-import-wizard-english-copy`  
 Commit: `fix: clarify import wizard demo and English copy [CR-079]`
 
-- [ ] CR dan supersession bahasa disetujui user; branch dibuat.
-- [ ] Implementasi/verifikasi selesai; checklist dan BACKLOG/STATUS diperbarui; hanya user menetapkan done.
-- [ ] Append STATUS-LOG; `node scripts/check-status-log.mjs` hijau sebelum commit.
+- [x] CR dan supersession bahasa disetujui user; branch dibuat.
+- [x] Implementasi/verifikasi selesai; checklist dan BACKLOG/STATUS diperbarui; hanya user menetapkan done.
+- [x] Append STATUS-LOG; `node scripts/check-status-log.mjs` hijau sebelum commit.
+
+## Catatan Implementasi (2026-11-26)
+
+- Disetujui bersama rencana teknis: data demo ikut English (`Full name,Email,Date of birth,Phone`, `members-*.csv`, `members-template.csv`); dukungan header Indonesia dijamin test.
+- Disetujui bersama rencana teknis: typo sinonim `sulam` di `_lib/mapping.ts` diperbaiki menjadi `surel` (design D4); alias substring Indonesia dipertahankan setelah label field diterjemahkan.
+- Aksi akhir `Prepare import`; recipe menjadi "Integration sketch" berbasis `buildImportResult`. Feedback clipboard tetap lingkup CR-080.
+- Verifikasi: test route 73/73; `pnpm typecheck`, `pnpm lint` (0 error, 4 warning lama), `pnpm test`, `pnpm -C apps/showcase build` hijau. Cek Chrome headless 320/390/1440 light/dark tanpa teks Indonesia atau overflow halaman; nama file di daftar FileInput shared terpotong pada 320/390 (perilaku komponen). Pembaca layar native tidak diuji.
+- Baseline: smoke `rich-text-editor.test.tsx` (packages/ui, tidak disentuh) flaky; lulus pada run ulang.
+- Temuan di luar lingkup (tidak diubah): pada policy skip, layar sukses dan riwayat melaporkan baris yang sama sebagai skipped dan failed karena `buildImportResult` mengisi `failed` juga saat skip.

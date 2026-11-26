@@ -6,6 +6,7 @@ import { DEMO_FIELDS, DEMO_TEMPLATE_NAME } from './_lib/demo-fields';
 import { DEMO_DATASETS, toDemoFile, type DemoDatasetId } from './_lib/demo-datasets';
 import { parseCsv } from './_lib/parse-csv';
 import { toTemplateCsv } from './_lib/template';
+import { plural } from './_lib/plural';
 import { buildValidation, type ValidationFilter } from './_lib/validation-view';
 import { buildImportResult, planSubmit, type FailPolicy } from './_lib/submit';
 import type { ImportResult } from './_lib/types';
@@ -28,11 +29,11 @@ import { ValidationStep } from './_components/validation-step';
 import { ConfirmStep } from './_components/confirm-step';
 import { DemoPanel } from './_components/demo-panel';
 
-const STEP_LABELS = ['Upload', 'Mapping', 'Validasi', 'Konfirmasi'];
-const STEP_HEADINGS = ['Unggah file CSV', 'Petakan kolom', 'Validasi data', 'Konfirmasi impor'];
-const DONE_HEADING = 'Impor siap diproses';
-const NEXT_LABELS = ['Lanjut ke mapping', 'Lanjut ke validasi', 'Lanjut ke konfirmasi'];
-const FILE_WINS_NOTICE = 'Berkas sudah dipakai; teks tempel diabaikan. Hapus berkas untuk memakai teks tempel.';
+const STEP_LABELS = ['Upload', 'Mapping', 'Validation', 'Confirm'];
+const STEP_HEADINGS = ['Upload CSV file', 'Map columns', 'Validate data', 'Confirm import'];
+const DONE_HEADING = 'Import ready';
+const NEXT_LABELS = ['Continue to mapping', 'Continue to validation', 'Continue to confirm'];
+const FILE_WINS_NOTICE = 'The file is in use, so pasted text is ignored. Remove the file to use pasted text.';
 
 export default function ImportWizardPage() {
   const [state, setState] = React.useState<WizardState>(initialWizardState);
@@ -168,7 +169,7 @@ export default function ImportWizardPage() {
     setRejection(null);
     setResult(built.result);
     setLastSummary(
-      `${built.result.rows.length} baris, dilewati ${built.result.skipped}, gagal ${built.result.failed}`
+      `${plural(built.result.rows.length, 'row')}, ${built.result.skipped} skipped, ${built.result.failed} failed`
     );
   };
 
@@ -200,18 +201,18 @@ export default function ImportWizardPage() {
     <div className="space-y-10 animate-in fade-in-50 duration-200 motion-reduce:animate-none">
       <PageHeader
         eyebrow="Pattern"
-        title="Import Wizard CSV"
-        description="Wizard impor CSV 4 langkah: unggah atau tempel, petakan kolom, validasi, lalu konfirmasi."
+        title="CSV Import Wizard"
+        description="Four-step CSV import wizard: upload or paste, map columns, validate, then confirm."
       />
 
       <Card className="mx-auto w-full min-w-0 max-w-4xl overflow-hidden" data-testid="iw-card">
         <CardHeader>
-          <CardTitle>Impor anggota</CardTitle>
+          <CardTitle>Import members</CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-8 min-w-0">
           <Stepper
-            aria-label="Langkah impor"
+            aria-label="Import steps"
             steps={STEP_LABELS.map((title, index) => ({ id: index + 1, title }))}
             currentStep={stepIndex}
             onStepClick={(index) => {
@@ -222,7 +223,7 @@ export default function ImportWizardPage() {
             data-testid="iw-stepper"
           />
           <p className="text-xs text-muted-foreground">
-            Langkah yang sudah terbuka bisa diklik; langkah berikutnya terbuka setelah gate lolos.
+            Unlocked steps are clickable; the next step unlocks once its requirements are met.
           </p>
 
           <div className="space-y-4">
@@ -234,7 +235,7 @@ export default function ImportWizardPage() {
               {headingText}
             </h2>
             <p role="status" aria-live="polite" className="sr-only" data-testid="iw-live">
-              Langkah {state.step} dari {TOTAL_STEPS}: {headingText}
+              Step {state.step} of {TOTAL_STEPS}: {headingText}
             </p>
 
             {state.step === 1 && (
@@ -303,7 +304,7 @@ export default function ImportWizardPage() {
 
           {state.source && state.parsed && !state.parsed.error && (
             <p data-testid="iw-status" className="text-xs text-muted-foreground">
-              Sumber: {state.source.kind === 'file' ? state.source.file.name : 'teks tempel'} · Baris:{' '}
+              Source: {state.source.kind === 'file' ? state.source.file.name : 'pasted text'} · Rows:{' '}
               {state.parsed.rowCount} · Delimiter: {delimiter === '\t' ? 'tab' : delimiter}
             </p>
           )}
@@ -317,7 +318,7 @@ export default function ImportWizardPage() {
             disabled={state.step === 1 || completed}
             onClick={() => setState((prev) => goToStep(prev, prev.step - 1, DEMO_FIELDS))}
           >
-            Kembali
+            Back
           </Button>
           {nextAvailable && (
             <div className="flex flex-col items-stretch gap-2 sm:items-end">

@@ -10,28 +10,27 @@ const DEMO_BUTTONS: { id: DemoDatasetId; delayMs?: number; label: string; testId
   { id: 'invalid', label: DEMO_DATASETS.invalid.label, testId: 'iw-demo-invalid' },
   { id: 'empty', label: DEMO_DATASETS.empty.label, testId: 'iw-demo-empty' },
   { id: 'large', label: DEMO_DATASETS.large.label, testId: 'iw-demo-large' },
-  { id: 'valid', delayMs: 1200, label: 'Loading (parse lambat)', testId: 'iw-demo-loading' },
+  { id: 'valid', delayMs: 1200, label: 'Loading (slow parse)', testId: 'iw-demo-loading' },
   { id: 'format', label: DEMO_DATASETS.format.label, testId: 'iw-demo-error' },
 ];
 
-/** Resep consumer: cara menangani hasil onComplete (15 baris). */
+/** Integration sketch for the composed pattern; the demo itself never sends data. */
 export const ONCOMPLETE_RECIPE = [
-  '// ImportResult: { rows, skipped, failed }',
-  'function handleComplete(result: ImportResult) {',
-  '  // result.rows: hanya baris valid, key = field target',
-  '  // result.skipped: baris dilewati (policy "Lewati")',
-  '  // result.failed: baris gagal (policy "Gagalkan")',
-  '  const { rows, skipped, failed } = result;',
-  '  console.info(`Diimpor ${rows.length}, dilewati ${skipped}, gagal ${failed}`);',
-  '  void fetch("/api/members/import", {',
-  '    method: "POST",',
-  '    headers: { "Content-Type": "application/json" },',
-  '    body: JSON.stringify({ rows }),',
-  '  });',
+  '// Integration sketch for the composed pattern, not an @ds/ui export.',
+  "// buildImportResult lives in this demo's _lib/submit.ts.",
+  'function handleSubmit() {',
+  '  const built = buildImportResult(rows, mapping, rowErrors, policy);',
+  '  if (!built.ok) {',
+  '    setRejection(built.reason);',
+  '    return;',
+  '  }',
+  '  // The demo stops here and keeps the result in local state.',
+  '  setResult(built.result);',
+  '',
+  '  // In your app, pass built.result.rows to your own code, for example',
+  '  // an endpoint that your application provides and owns:',
+  '  // await sendToYourApi(built.result.rows);',
   '}',
-  '',
-  '',
-  '<ImportWizard onComplete={handleComplete} />',
 ].join('\n');
 
 export interface DemoPanelProps {
@@ -52,7 +51,7 @@ export function DemoPanel({ onLoad, lastResultSummary }: DemoPanelProps) {
   };
 
   return (
-    <DemoSection label="Panel demo" description="Muat dataset contoh atau picu state tertentu.">
+    <DemoSection label="Demo panel" description="Load a sample dataset or trigger a specific state.">
       <div className="space-y-6" data-testid="iw-demo-panel">
         <div className="flex flex-wrap gap-2">
           {DEMO_BUTTONS.map((item) => (
@@ -72,15 +71,15 @@ export function DemoPanel({ onLoad, lastResultSummary }: DemoPanelProps) {
 
         {lastResultSummary && (
           <p className="text-sm text-muted-foreground" data-testid="iw-demo-result">
-            Hasil onComplete: {lastResultSummary}
+            Previous simulated result: {lastResultSummary}
           </p>
         )}
 
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-medium text-foreground">Resep onComplete</p>
+            <p className="text-sm font-medium text-foreground">Integration sketch</p>
             <Button type="button" variant="outline" size="sm" className="h-11" onClick={handleCopy} data-testid="iw-recipe-copy">
-              {copied ? 'Tersalin' : 'Salin resep'}
+              {copied ? 'Copied' : 'Copy sketch'}
             </Button>
           </div>
           <pre className="overflow-x-auto rounded-md bg-muted p-4 text-xs text-foreground" data-testid="iw-recipe">
