@@ -1,6 +1,6 @@
 # CR-091 — Command dan skill workflow: port gerbang prosedural CRM
 
-**Status:** approved (ditetapkan user 2026-11-26 atas rencana review config; "approve dulu semua, dan kerjakan")
+**Status:** done (ditetapkan user 2026-11-26 atas izin eksplisit; sebelumnya approved atas rencana review config — "approve dulu semua, dan kerjakan"; diimplementasikan di branch `cr-091-command-skill-gerbang-prosedural`, di-merge dan di-push ke `visual-polish`)
 **Sumber:** review config OpenCode — perbandingan dengan project sibling CRM (sesi 2026-11-26); lanjutan CR-090
 **Ref:** `.opencode/commands/implement.md`, `start.md`, `design.md`, `story.md`, `improve-ui.md`, `polish-ui.md`, `design-language.md`; `.opencode/skills/{designer,prd-writer,story-writer,reviewer,ui-designer,visual-designer}/`
 

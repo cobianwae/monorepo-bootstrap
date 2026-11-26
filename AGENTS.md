@@ -29,7 +29,7 @@ diskusi → PRD (gate 1) → design (gate 2) → stories (gate 3) → implementa
 1. Baca `docs/STATUS.md`. Grep `docs/BACKLOG.md` hanya untuk baris aktif; bila tidak ada target, tawarkan item dari bagian **Next** di STATUS.
 2. Keputusan stack dan arah di `ARCHITECTURE.md`/`CONVENTIONS.md` final — jangan menawarkan alternatif stack.
 3. Pertanyaan struktural kode (dependensi, blast radius, relasi komponen) → **wajib** query MCP `graphify` lebih dulu; grep hanya untuk melengkapi. Panggil lewat `execute` tanpa `search()` — nama tool persis: `tools.graphify.get_node({label})` (satu simbol), `get_neighbors({label})` (caller/dependensi langsung), `shortest_path({source, target})` (jalur antar-simbol), `get_community({community_id})` (blast radius satu klaster), `query_graph({question})` (pertanyaan bebas); `token_budget` default 2000, kecilkan bila hanya butuh ringkasan. Bila graphify tidak connected atau tidak relevan, catat alasannya lalu lanjut dengan grep (setup: `docs/graphify-setup.md`).
-4. Baca file secara targeted (`offset`/`limit`); jangan dump file >200 baris. Eksplorasi luas didelegasikan ke subagent `explore`.
+4. Baca file secara targeted (`offset`/`limit`); jangan dump file >200 baris. Eksplorasi luas didelegasikan ke subagent `explore`. Bila `explore` gagal (proxy `nim-coder` di `localhost:4101` mati atau membalas 429), telusuri sendiri dengan grep dan jangan ulangi panggilan yang gagal; proxy dijalankan manual dari `~/Documents/proxy` (`node nim-coder-proxy.mjs`).
 5. Satu sesi = satu story atau satu CR. Bootstrap sesi lewat `/start`.
 
 ## Workflow & Gates
