@@ -1,8 +1,10 @@
 'use client';
 
+import * as React from 'react';
 import {
   Badge,
   Button,
+  EmptyState,
   SegmentedControl,
   SegmentedControlItem,
   Table,
@@ -59,6 +61,13 @@ export function ValidationStep({
   const rowNumbers = visibleRowNumbers(rows.length, view, filter);
   const slice = paginate(rowNumbers, page);
   const errorColumns = fields.filter((field) => (view.errorsByColumn[field.key] ?? 0) > 0);
+  const allFilterRef = React.useRef<HTMLButtonElement>(null);
+
+  const showAllRows = () => {
+    onFilterChange('all');
+    // Tombol pemulihan ikut hilang; fokus dipindah ke filter agar tidak jatuh ke body.
+    allFilterRef.current?.focus();
+  };
 
   return (
     <div className="space-y-6">
@@ -87,7 +96,7 @@ export function ValidationStep({
             if (value === 'all' || value === 'error') onFilterChange(value);
           }}
         >
-          <SegmentedControlItem value="all" data-testid="iw-filter-all">
+          <SegmentedControlItem ref={allFilterRef} value="all" data-testid="iw-filter-all">
             All ({rows.length})
           </SegmentedControlItem>
           <SegmentedControlItem value="error" data-testid="iw-filter-error">
@@ -105,11 +114,26 @@ export function ValidationStep({
       </div>
 
       {filter === 'error' && view.invalidCount === 0 ? (
-        <p className="text-sm text-muted-foreground">No rows with errors.</p>
+        <EmptyState
+          data-testid="iw-filter-empty"
+          title="No rows with errors"
+          description={`No rows match this filter. All ${plural(rows.length, 'row')} passed validation.`}
+          actionLabel="Show all rows"
+          onAction={showAllRows}
+        />
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-border">
+        /* key: ganti halaman/filter memulai lagi dari atas. Wrapper bawaan Table dinetralkan
+           agar hanya region ini yang menggulung (header sticky). */
+        <div
+          key={`${filter}-${slice.page}`}
+          role="region"
+          aria-label="Validation preview"
+          tabIndex={0}
+          data-testid="iw-validation-scroller"
+          className="max-h-80 overflow-auto rounded-lg border border-border focus:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:max-h-96 [&>div]:overflow-visible"
+        >
           <Table aria-label="Validation results by row" data-testid="iw-validation-table">
-            <TableHeader>
+            <TableHeader className="sticky top-0 z-10 bg-card [&_th]:shadow-[inset_0_-1px_0_var(--color-border)]">
               <TableRow>
                 <TableHead scope="col">Row</TableHead>
                 {columns.map((field) => (

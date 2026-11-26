@@ -6,6 +6,23 @@ import { cn } from '../../lib/utils';
 import { Button } from '../base/button';
 import { highlightCode } from './code-block-highlight';
 
+/** Teks tombol salin; yang tidak diisi memakai default bawaan. */
+export interface CodeBlockCopyLabels {
+  copy?: string;
+  copyAriaLabel?: string;
+  copied?: string;
+  failed?: string;
+  failedAriaLabel?: string;
+}
+
+const DEFAULT_COPY_LABELS: Required<CodeBlockCopyLabels> = {
+  copy: 'Salin',
+  copyAriaLabel: 'Salin kode',
+  copied: 'Tersalin',
+  failed: 'Gagal disalin',
+  failedAriaLabel: 'Gagal menyalin',
+};
+
 export interface CodeBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   code: string;
   language?: string;
@@ -15,6 +32,7 @@ export interface CodeBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   collapsible?: boolean;
   defaultExpanded?: boolean;
   maxHeight?: string;
+  copyLabels?: CodeBlockCopyLabels;
 }
 
 type CopyState = 'idle' | 'copied' | 'failed';
@@ -30,6 +48,7 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
       collapsible = false,
       defaultExpanded = false,
       maxHeight = '360px',
+      copyLabels,
       className,
       ...props
     },
@@ -63,6 +82,7 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
     };
 
     const lines = code.split('\n');
+    const labels = { ...DEFAULT_COPY_LABELS, ...copyLabels };
 
     return (
       <div
@@ -102,26 +122,26 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
                   className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground gap-1.5"
                   aria-label={
                     copyState === 'copied'
-                      ? 'Tersalin'
+                      ? labels.copied
                       : copyState === 'failed'
-                        ? 'Gagal menyalin'
-                        : 'Salin kode'
+                        ? labels.failedAriaLabel
+                        : labels.copyAriaLabel
                   }
                 >
                   {copyState === 'copied' ? (
                     <>
                       <Check className="h-3.5 w-3.5 text-success" />
-                      <span className="text-success font-medium">Tersalin</span>
+                      <span className="text-success font-medium">{labels.copied}</span>
                     </>
                   ) : copyState === 'failed' ? (
                     <>
                       <X className="h-3.5 w-3.5 text-destructive" />
-                      <span className="text-foreground font-medium">Gagal disalin</span>
+                      <span className="text-foreground font-medium">{labels.failed}</span>
                     </>
                   ) : (
                     <>
                       <Copy className="h-3.5 w-3.5" />
-                      <span>Salin</span>
+                      <span>{labels.copy}</span>
                     </>
                   )}
                 </Button>
