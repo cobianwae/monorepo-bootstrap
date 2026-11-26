@@ -105,6 +105,7 @@ Snippet berikut hanya untuk bentuk section docs (pola `file-manager/page.tsx:205
 | 6 | CR-094 di-amend atas persetujuan user 2026-11-26: satu urutan baku dan snippet diganti aturan per bentuk halaman serta kriteria heading; pilot per bentuk; Temuan #4 naik jadi major; Temuan #5–#10 dari review ditambahkan; tindak lanjut CR-093 (pengantar, eyebrow, ID) digabung ke CR ini, bukan CR terpisah. | Review 2026-11-26 mengonfirmasi koreksi user: “kayak lo gak bisa generalisasi misal dashboard page ama setting semua section dikasih header”. Dashboard dan Settings tidak mempunyai isi docs untuk diberi heading. Preseden amendemen: CR-020. |
 | 7 | Satu label eyebrow untuk semua route Patterns; default `UX Recipe Scenario` (28 route; CR-026, CR-029, CR-082), dikonfirmasi user sebelum Task 4. | CR-065/CR-067 memakai `UX Recipe`, tiga route memakai `Pattern`; CR-026 menilai halaman tanpa eyebrow sebagai identitas lemah. CR-046 (kontras eyebrow) tidak dibuka ulang. |
 | 8 | Gaya heading (h2 berikon manual, `CardTitle` `text-sm` untuk judul docs), presentasi resep, dan ritme root bukan scope CR ini; instans dicatat di inventaris sebagai input CR-095. | Satu masalah satu CR; CR-095:17 sudah mencakup audit 37 route. Judul kartu kecil `text-sm` di calendar/org-chart tetap sesuai keputusan CR-041/CR-052. |
+| 9 | CR-094 tidak dieksekusi sebagai rollout 37 route. Seri Patterns dipecah menjadi CR per halaman, dimulai dari halaman pilot; CR-094 menjadi payung aturan (komposisi per bentuk halaman, lokasi kontrol menurut peran, kriteria heading) dan CR-095 payung dimensi visual. CR halaman pertama: CR-096 (Rich Text Editor). | Keputusan user 2026-11-26 setelah audit visual 37 route: “harus dipecah jadi beberapa crs”. Pilot menunjukkan satu aturan tidak bisa diterapkan seragam; tiap halaman diaudit dan dirancang dari prinsip. Aset audit: `~/Projects/monorepo-bootstrap-audit/`. |
 
 ### Input untuk CR-095 (bukan scope CR ini)
 
@@ -126,7 +127,6 @@ Commit: `fix: align patterns content composition [CR-094]`
 
 - [x] CR disetujui user (2026-11-26); amendemen atas persetujuan user 2026-11-26.
 - [x] CR-093 diintegrasikan (`42436a4`).
-- [ ] Branch `cr-094-patterns-content-composition` di-fast-forward ke `pattern-polish` (branch yang ada masih di `42436a4`); perubahan diimplementasikan.
-- [ ] Preview `pnpm -C apps/showcase dev`, pilot per bentuk halaman + pembanding, screenshot dibaca sebagai image, iterasi bersama user.
-- [ ] Verifikasi targeted lalu typecheck → lint → test; build dari salinan sementara bila server user aktif.
-- [ ] CR dimutakhirkan sebelum PR; tick → append STATUS-LOG → update BACKLOG/STATUS; check-status-log hijau.
+- [x] Rollout 37 route dibatalkan dan diganti CR per halaman (Keputusan 9); branch `cr-094-patterns-content-composition` tidak dipakai untuk eksekusi.
+
+CR halaman (urutan gelombang pertama): CR-096 Rich Text Editor (`docs/cr/cr-096-patterns-rich-text-editor-page.md`), lalu Image Cropper, Settings, Dashboard (edit pilot yang disetujui user 2026-11-26, belum di-commit). Tugas inventaris, pengantar, eyebrow, dan ID pada Tasks di atas dikerjakan di dalam CR halaman masing-masing.
