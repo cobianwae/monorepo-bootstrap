@@ -14,6 +14,19 @@ vi.mock('react-easy-crop', async () => {
   return { default: MockCropper };
 });
 
+vi.mock('@ds/ui', async (importOriginal) => {
+  const original = await importOriginal<Record<string, unknown>>();
+  const React = await import('react');
+  function MockImageCropper(props: { maxBytes?: number; accept?: string }) {
+    return React.createElement('div', {
+      'data-testid': 'mock-image-cropper',
+      'data-max-bytes': String(props.maxBytes ?? ''),
+      'data-accept': String(props.accept ?? ''),
+    });
+  }
+  return { ...original, ImageCropper: MockImageCropper };
+});
+
 beforeAll(() => {
   // Radix dan react-easy-crop memakai ResizeObserver yang tidak tersedia di jsdom.
   if (!globalThis.ResizeObserver) {
@@ -30,41 +43,40 @@ beforeAll(() => {
 });
 
 describe('ImageCropperPage', () => {
-  it('merender judul, 6 langkah, dan testid ic-* pada skenario utama', () => {
+  it('merender h1, section Try it dengan 5 langkah, dan testid ic-result', () => {
     render(<ImageCropperPage />);
     expect(screen.getByRole('heading', { level: 1, name: 'Image Cropper' })).toBeTruthy();
-    expect(screen.getByText(/Choose an avatar photo/)).toBeTruthy();
-    expect(screen.getByText(/1280×720 result/)).toBeTruthy();
-    expect(screen.getByTestId('ic-theme-scope')).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 2, name: 'Try it' })).toBeTruthy();
+    expect(screen.getByText(/^Upload —/)).toBeTruthy();
+    expect(screen.getByText(/^States —/)).toBeTruthy();
     expect(screen.getByTestId('ic-result')).toBeTruthy();
-    expect(screen.getByText('Avatar 1:1 · circle · 512×512')).toBeTruthy();
+    expect(screen.getByText('No crop saved yet.')).toBeTruthy();
   });
 
-  it('beralih skenario ke cover mengubah label konfigurasi', () => {
+  it('beralih skenario ke Cover memilih opsi Cover', () => {
     render(<ImageCropperPage />);
     fireEvent.click(screen.getByRole('radio', { name: 'Cover' }));
-    expect(screen.getByText('Cover 16:9 · rectangle · 1280×720')).toBeTruthy();
+    expect(screen.getByRole('radio', { name: 'Cover' }).getAttribute('aria-checked')).toBe('true');
   });
 
-  it('toggle tema gelap menambahkan kelas dark pada scope', () => {
+  it('State size-limit menetapkan maxBytes 1024 pada ImageCropper', () => {
     render(<ImageCropperPage />);
-    const scope = screen.getByTestId('ic-theme-scope');
-    expect(scope.classList.contains('dark')).toBe(false);
-    fireEvent.click(screen.getByRole('button', { name: 'Theme: light' }));
-    expect(screen.getByTestId('ic-theme-scope').classList.contains('dark')).toBe(true);
+    expect(screen.getByTestId('mock-image-cropper').getAttribute('data-max-bytes')).toBe('');
+    fireEvent.click(screen.getByRole('radio', { name: 'Size limit' }));
+    expect(screen.getByTestId('mock-image-cropper').getAttribute('data-max-bytes')).toBe('1024');
   });
 
-  it('panel demo menampilkan tiga dataset dengan petunjuk state', () => {
+  it('State unsupported format menetapkan accept image/png pada ImageCropper', () => {
     render(<ImageCropperPage />);
-    expect(screen.getByText('Valid — PNG/JPG/WebP ≤ 10 MB')).toBeTruthy();
-    expect(screen.getByText('Unsupported format')).toBeTruthy();
-    expect(screen.getByText('File size limit')).toBeTruthy();
-    expect(screen.getByText(/1 KB limit/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('radio', { name: 'Unsupported format' }));
+    expect(screen.getByTestId('mock-image-cropper').getAttribute('data-accept')).toBe('image/png');
   });
 
-  it('resep onComplete tepat 15 baris', () => {
+  it('resep Implementation tetap sinkron dengan RECIPE', () => {
     const lines = IMAGE_CROPPER_RECIPE.split('\n');
     expect(lines).toHaveLength(15);
     expect(lines[0]).toContain('onComplete');
+    render(<ImageCropperPage />);
+    expect(screen.getByText('ImageCropperDemo.tsx')).toBeTruthy();
   });
 });

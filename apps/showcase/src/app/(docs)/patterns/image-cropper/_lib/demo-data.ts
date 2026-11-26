@@ -4,6 +4,8 @@ export type CropScenario = 'avatar' | 'cover';
 
 export type AspectPreset = 'square' | 'wide' | 'standard' | 'free';
 
+export type DemoState = 'valid' | 'unsupported' | 'size-limit';
+
 export interface ScenarioConfig {
   aspect: number | 'free';
   cropShape: 'rect' | 'round';
@@ -34,12 +36,11 @@ export const ASPECT_OPTIONS: { id: AspectPreset; label: string; aspect: number |
 ];
 
 export const STEPS = [
-  'Choose an avatar photo to open a square crop area with a circular preview.',
-  'Drag the crop area or use arrow keys, then adjust zoom with the slider.',
-  'Rotate 90°, then reset to the original position without uploading again.',
-  'Check that the circular preview updates as you adjust the crop.',
-  'Save the result: onComplete receives a 512×512 blob.',
-  'Try a cover: choose Cover 16:9 for a 1280×720 result.',
+  'Upload — choose a photo to open the crop area (circle for avatar, rectangle for cover).',
+  'Adjust — drag the area or use arrow keys; zoom with the slider, rotate with R.',
+  'Switch — set Scenario to Cover for a 1280×720 result without uploading again.',
+  'Limit — set Aspect to Free and crop without a locked ratio.',
+  'States — set State to Unsupported format or Size limit and upload a file to see the error.',
 ];
 
 export const KEYBOARD = [
@@ -49,45 +50,13 @@ export const KEYBOARD = [
   'Tab: move through photo selection, aspect ratio, crop area, slider, controls, preview, and Save.',
 ];
 
-export interface DemoDataset {
-  id: 'valid' | 'rusak' | 'raksasa';
-  title: string;
-  hint: string;
+export interface StateConfig {
   accept?: string;
   maxBytes?: number;
 }
 
-export const DEMO_DATASETS: DemoDataset[] = [
-  {
-    id: 'valid',
-    title: 'Valid — PNG/JPG/WebP ≤ 10 MB',
-    hint: 'Upload a supported photo. A loading state appears while the image decodes.',
-  },
-  {
-    id: 'rusak',
-    title: 'Unsupported format',
-    hint: 'This demo accepts PNG only. Upload a JPG to see the format error.',
-    accept: 'image/png',
-  },
-  {
-    id: 'raksasa',
-    title: 'File size limit',
-    hint: 'This demo uses a 1 KB limit. Upload any file larger than 1 KB to see the size error.',
-    maxBytes: 1024,
-  },
-];
-
-export interface AuditPair {
-  pair: string;
-  kind: 'text' | 'graphics';
-  threshold: string;
-}
-
-export const AUDIT_PAIRS: AuditPair[] = [
-  { pair: 'foreground on background', kind: 'text', threshold: '≥ 4.5:1' },
-  { pair: 'muted-foreground on background', kind: 'text', threshold: '≥ 4.5:1' },
-  { pair: 'primary (viewport border, handles, focus ring)', kind: 'graphics', threshold: '≥ 3:1' },
-  { pair: 'primary-foreground on primary (button labels)', kind: 'text', threshold: '≥ 4.5:1' },
-  { pair: 'destructive on background (error messages)', kind: 'text', threshold: '≥ 4.5:1' },
-  { pair: 'background/80 overlay on the photo', kind: 'graphics', threshold: '≥ 3:1' },
-];
+export const STATE_CONFIG: Record<DemoState, StateConfig> = {
+  valid: {},
+  unsupported: { accept: 'image/png' },
+  'size-limit': { maxBytes: 1024 },
+};
