@@ -56,10 +56,10 @@ type Corner = 'nw' | 'ne' | 'sw' | 'se';
 const CORNERS: Corner[] = ['nw', 'ne', 'sw', 'se'];
 
 const CORNER_LABEL: Record<Corner, string> = {
-  nw: 'Ubah ukuran dari sudut kiri atas',
-  ne: 'Ubah ukuran dari sudut kanan atas',
-  sw: 'Ubah ukuran dari sudut kiri bawah',
-  se: 'Ubah ukuran dari sudut kanan bawah',
+  nw: 'Resize from top-left corner',
+  ne: 'Resize from top-right corner',
+  sw: 'Resize from bottom-left corner',
+  se: 'Resize from bottom-right corner',
 };
 
 const CORNER_CURSOR: Record<Corner, string> = {

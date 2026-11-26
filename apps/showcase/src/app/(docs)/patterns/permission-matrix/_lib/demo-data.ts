@@ -4,20 +4,20 @@ import type { PermissionRole, PermissionResource, PermissionValue } from '@ds/ui
 export const DEMO_ROLES: PermissionRole[] = [
   { id: 'admin', label: 'Admin' },
   { id: 'editor', label: 'Editor' },
-  { id: 'penulis', label: 'Penulis' },
-  { id: 'komentator', label: 'Komentator' },
+  { id: 'penulis', label: 'Writer' },
+  { id: 'komentator', label: 'Commenter' },
   { id: 'viewer', label: 'Viewer' },
 ];
 
 export const DEMO_RESOURCES: PermissionResource[] = [
-  { id: 'publikasi', label: 'Publikasi' },
-  { id: 'artikel', label: 'Artikel' },
-  { id: 'komentar', label: 'Komentar' },
-  { id: 'pengguna', label: 'Pengguna' },
-  { id: 'pengaturan', label: 'Pengaturan' },
-  { id: 'ekspor', label: 'Ekspor' },
-  { id: 'arsip', label: 'Arsip' },
-  { id: 'hapus', label: 'Hapus' },
+  { id: 'publikasi', label: 'Publish' },
+  { id: 'artikel', label: 'Articles' },
+  { id: 'komentar', label: 'Comments' },
+  { id: 'pengguna', label: 'Users' },
+  { id: 'pengaturan', label: 'Settings' },
+  { id: 'ekspor', label: 'Export' },
+  { id: 'arsip', label: 'Archive' },
+  { id: 'hapus', label: 'Delete' },
 ];
 
 /** Dataset uji K3: 20 role (kolom) × 8 resource. */
@@ -35,7 +35,7 @@ const GRANTS: Record<string, string[]> = {
 };
 
 /** Kunci kebijakan demo: sel Viewer × Hapus tidak bisa diubah. */
-export const DEMO_LOCK_REASON = 'Dikunci kebijakan: Viewer tidak boleh Hapus';
+export const DEMO_LOCK_REASON = 'Locked by policy: Viewers cannot delete';
 
 export function demoLocked(role: string, resource: string): string | null {
   return role === 'viewer' && resource === 'hapus' ? DEMO_LOCK_REASON : null;

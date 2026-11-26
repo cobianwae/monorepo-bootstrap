@@ -17,26 +17,26 @@ import { PERMISSION_MATRIX_RECIPE } from './_lib/recipe';
 type Scenario = 'demo' | 'dirty' | 'empty' | 'invalid' | 'loading' | 'error';
 
 const SCENARIOS: { id: Scenario; label: string }[] = [
-  { id: 'demo', label: 'Dataset 5×8 (kunci aktif)' },
-  { id: 'dirty', label: 'Dirty 3 sel' },
-  { id: 'empty', label: 'Kosong' },
-  { id: 'invalid', label: 'Invalid (role ganda)' },
+  { id: 'demo', label: '5×8 dataset (locked cells)' },
+  { id: 'dirty', label: '3 unsaved changes' },
+  { id: 'empty', label: 'Empty' },
+  { id: 'invalid', label: 'Invalid (duplicate role)' },
   { id: 'loading', label: 'Loading' },
   { id: 'error', label: 'Error' },
 ];
 
 const STEPS = [
-  'Buka halaman: matriks 5×8 tampil dengan sel awal dan kunci "Viewer × Hapus".',
-  'Klik header kolom "Editor": semua sel Editor yang tidak terkunci menyala.',
-  'Coba ubah sel "Viewer × Hapus": ditolak, dan alasan kunci diumumkan.',
-  'Ubah tiga sel lain: banner perubahan muncul dengan jumlah perubahan.',
-  'Tinjau banner: buka "Lihat daftar", lalu Reset atau Simpan.',
+  'Start with the 5×8 matrix. The "Viewer × Delete" cell is locked.',
+  'Select the "Editor" column header to enable all unlocked Editor permissions.',
+  'Try changing "Viewer × Delete". The change is blocked and the lock reason is announced.',
+  'Change three other cells to show the unsaved-change count.',
+  'Open "View changes" in the banner, then reset or save.',
 ];
 
 const KEYBOARD = [
-  'Panah: pindah antar sel dan header.',
-  'Space pada sel: ubah nilai; Enter atau Space pada header: toggle massal baris, kolom, atau semua.',
-  'Home / End: awal atau akhir baris; Ctrl+Home / Ctrl+End: sudut grid.',
+  'Arrow keys: move between cells and headers.',
+  'Space: toggle a cell. Enter or Space on a header: toggle a row, column, or the entire matrix.',
+  'Home / End: move to the start or end of a row. Ctrl+Home / Ctrl+End: move to a grid corner.',
 ];
 
 export default function PermissionMatrixPage() {
@@ -74,9 +74,9 @@ export default function PermissionMatrixPage() {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(PERMISSION_MATRIX_RECIPE);
-      setCopyStatus('Resep tersalin.');
+      setCopyStatus('Recipe copied.');
     } catch {
-      setCopyStatus('Gagal menyalin; salin manual dari blok di atas.');
+      setCopyStatus('Could not copy. Select and copy the recipe above.');
     }
   };
 
@@ -85,12 +85,12 @@ export default function PermissionMatrixPage() {
       <PageHeader
         eyebrow="Pattern"
         title="Permission Matrix"
-        description="Grid otorisasi role × resource: toggle massal dengan indeterminate, sel terkunci beralasan, banner perubahan, dan state loading, empty, serta error."
+        description="Manage permissions across roles and resources. Review unsaved changes and understand why some permissions are locked."
       />
 
       <Card className="mx-auto max-w-5xl">
         <CardHeader>
-          <CardTitle>Skenario 5 langkah</CardTitle>
+          <CardTitle>Try it</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <ol className="list-decimal space-y-2 pl-5 text-sm text-foreground">
@@ -106,7 +106,7 @@ export default function PermissionMatrixPage() {
               aria-pressed={dark}
               onClick={() => setDark((current) => !current)}
             >
-              {dark ? 'Tema: gelap' : 'Tema: terang'}
+              {dark ? 'Theme: dark' : 'Theme: light'}
             </Button>
             <Button
               variant="outline"
@@ -114,7 +114,7 @@ export default function PermissionMatrixPage() {
               aria-pressed={wide}
               onClick={() => loadDataset('demo', !wide)}
             >
-              Uji 20 kolom
+              Try 20 columns
             </Button>
           </div>
 
@@ -134,16 +134,16 @@ export default function PermissionMatrixPage() {
               onValueChange={setValue}
               onSave={() => {
                 setSaved(value);
-                setNotice('Perubahan disimpan (demo).');
+                setNotice('Changes saved for this demo.');
               }}
               onCancel={() => {
                 setValue(saved);
-                setNotice('Perubahan dibatalkan.');
+                setNotice('Changes discarded.');
               }}
               onLoadExample={() => loadDataset('demo', false)}
               onEmptyAction={() => loadDataset('demo', false)}
               loading={scenario === 'loading'}
-              error={scenario === 'error' ? 'Sumber data tidak tersedia' : null}
+              error={scenario === 'error' ? 'The data source is unavailable' : null}
               locked={demoLocked}
             />
           </div>
@@ -156,7 +156,7 @@ export default function PermissionMatrixPage() {
 
       <Card className="mx-auto max-w-5xl">
         <CardHeader>
-          <CardTitle>Navigasi keyboard</CardTitle>
+          <CardTitle>Accessibility notes</CardTitle>
         </CardHeader>
         <CardContent>
           <ul className="list-disc space-y-1 pl-5 text-sm text-foreground">
@@ -169,7 +169,7 @@ export default function PermissionMatrixPage() {
 
       <Card className="mx-auto max-w-5xl">
         <CardHeader>
-          <CardTitle>Panel demo state</CardTitle>
+          <CardTitle>Demo states</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-wrap gap-2">
@@ -186,14 +186,14 @@ export default function PermissionMatrixPage() {
             ))}
           </div>
           <p className="text-xs text-muted-foreground">
-            Kunci &quot;Viewer × Hapus&quot; selalu aktif pada dataset 5×8. Dirty 3 sel mengubah tiga sel dari baseline.
+            &quot;Viewer × Delete&quot; is always locked in the 5×8 dataset. The unsaved-changes example modifies three cells from the baseline.
           </p>
         </CardContent>
       </Card>
 
       <Card className="mx-auto max-w-5xl">
         <CardHeader>
-          <CardTitle>Resep controlled</CardTitle>
+          <CardTitle>Implementation</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <pre className="overflow-x-auto rounded-md bg-muted p-3 text-xs text-foreground">
@@ -201,7 +201,7 @@ export default function PermissionMatrixPage() {
           </pre>
           <div className="flex flex-wrap items-center gap-3">
             <Button variant="outline" size="sm" onClick={handleCopy}>
-              Salin resep
+            Copy recipe
             </Button>
             <p role="status" className="text-sm text-muted-foreground">
               {copyStatus}

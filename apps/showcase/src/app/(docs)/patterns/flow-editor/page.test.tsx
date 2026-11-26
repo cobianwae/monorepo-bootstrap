@@ -108,7 +108,7 @@ describe('FlowEditorPage inspector on-demand (CR-019)', () => {
     expect(label).not.toBeNull();
     fireEvent.change(label, { target: { value: 'baru' } });
     expect(screen.getByTestId('flow-stub-edges').textContent).toContain('"label":"baru"');
-    fireEvent.click(screen.getByRole('button', { name: 'Hapus edge' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Delete edge' }));
     expect(screen.getByTestId('flow-stub-edges').textContent).not.toContain('"id":"e1"');
     expect(screen.queryByTestId('flow-inspector')).toBeNull();
   });
@@ -116,13 +116,13 @@ describe('FlowEditorPage inspector on-demand (CR-019)', () => {
   it('node: deskripsi dan status live ke canvas, Duplikat menambah salinan', () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: 'Seleksi n1' }));
-    fireEvent.change(screen.getByLabelText('Deskripsi'), { target: { value: 'Catatan' } });
-    fireEvent.click(screen.getByRole('radio', { name: 'Peringatan' }));
+    fireEvent.change(screen.getByLabelText('Description'), { target: { value: 'Catatan' } });
+    fireEvent.click(screen.getByRole('radio', { name: 'Warning' }));
     const nodesJson = screen.getByTestId('flow-stub-nodes').textContent ?? '';
     expect(nodesJson).toContain('"description":"Catatan"');
     expect(nodesJson).toContain('"status":"warning"');
-    fireEvent.click(screen.getByRole('button', { name: 'Duplikat' }));
-    expect(screen.getByTestId('flow-stub-nodes').textContent).toContain('(salinan)');
+    fireEvent.click(screen.getByRole('button', { name: 'Duplicate' }));
+    expect(screen.getByTestId('flow-stub-nodes').textContent).toContain('(copy)');
     expect(screen.queryByTestId('flow-inspector')).toBeNull();
   });
 });

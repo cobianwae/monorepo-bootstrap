@@ -49,9 +49,9 @@ export default function ImageCropperPage() {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(IMAGE_CROPPER_RECIPE);
-      setCopyStatus('Resep tersalin.');
+      setCopyStatus('Recipe copied.');
     } catch {
-      setCopyStatus('Gagal menyalin; salin manual dari blok di atas.');
+      setCopyStatus('Could not copy. Select and copy the recipe above.');
     }
   };
 
@@ -60,18 +60,18 @@ export default function ImageCropperPage() {
       <PageHeader
         eyebrow="Pattern"
         title="Image Cropper"
-        description="Crop avatar dan cover dengan aspek terkunci, zoom, putar, dan pratinjau live — output blob dan dataURL lewat onComplete."
+        description="Crop an avatar or cover image. Adjust the aspect ratio, zoom, and rotation before saving."
       />
 
       <section id="skenario" className="space-y-4 scroll-mt-20">
         <SectionHeading
           id="skenario-heading"
-          title="Skenario avatar dan cover"
-          description="Ganti skenario atau aspek tanpa mengunggah ulang; hasil mengikuti konfigurasi aktif."
+          title="Interactive demo"
+          description="Switch between avatar and cover crops or change the aspect ratio without uploading again."
         />
         <Card className="mx-auto max-w-5xl">
           <CardHeader>
-            <CardTitle>Skenario 6 langkah</CardTitle>
+            <CardTitle>Try it</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <ol className="list-decimal space-y-2 pl-5 text-sm text-foreground">
@@ -87,7 +87,7 @@ export default function ImageCropperPage() {
                 onValueChange={(value) => {
                   if (value) selectScenario(value as CropScenario);
                 }}
-                aria-label="Skenario crop"
+                aria-label="Crop scenario"
               >
                 <SegmentedControlItem value="avatar">Avatar</SegmentedControlItem>
                 <SegmentedControlItem value="cover">Cover</SegmentedControlItem>
@@ -98,7 +98,7 @@ export default function ImageCropperPage() {
                 onValueChange={(value) => {
                   if (value) setAspectPreset(value as AspectPreset);
                 }}
-                aria-label="Aspek crop"
+                aria-label="Crop aspect ratio"
               >
                 {ASPECT_OPTIONS.map((option) => (
                   <SegmentedControlItem key={option.id} value={option.id}>
@@ -112,7 +112,7 @@ export default function ImageCropperPage() {
                 aria-pressed={dark}
                 onClick={() => setDark((current) => !current)}
               >
-                {dark ? 'Tema: gelap' : 'Tema: terang'}
+                {dark ? 'Theme: dark' : 'Theme: light'}
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">{config.label}</p>
@@ -136,8 +136,8 @@ export default function ImageCropperPage() {
 
             <p role="status" className="text-sm text-muted-foreground" data-testid="ic-result">
               {result
-                ? `${result.width}×${result.height} tersimpan · blob ${Math.round(result.blob.size / 1024)} KB`
-                : 'Belum ada hasil tersimpan.'}
+                ? `${result.width}×${result.height} saved · blob ${Math.round(result.blob.size / 1024)} KB`
+                : 'No crop saved yet.'}
             </p>
           </CardContent>
         </Card>
@@ -146,12 +146,12 @@ export default function ImageCropperPage() {
       <section id="keyboard" className="space-y-4 scroll-mt-20">
         <SectionHeading
           id="keyboard-heading"
-          title="Navigasi keyboard"
-          description="Semua operasi tersedia tanpa mouse; perubahan diumumkan lewat live region."
+          title="Accessibility notes"
+          description="Use the keyboard to adjust the crop; a live region announces changes."
         />
         <Card className="mx-auto max-w-5xl">
           <CardHeader>
-            <CardTitle>Keyboard dan screen reader</CardTitle>
+            <CardTitle>Keyboard and screen readers</CardTitle>
           </CardHeader>
           <CardContent>
             <ul className="list-disc space-y-1 pl-5 text-sm text-foreground">
@@ -166,8 +166,8 @@ export default function ImageCropperPage() {
       <section id="panel-demo" className="space-y-4 scroll-mt-20">
         <SectionHeading
           id="panel-demo-heading"
-          title="Panel demo state"
-          description="Tiap dataset memicu state berbeda; empty dan loading tampil sebelum gambar terdecode."
+          title="Demo states"
+          description="Each dataset demonstrates a different state. Empty and loading states appear before the image is decoded."
         />
         <div className="grid gap-4 md:grid-cols-3">
           {DEMO_DATASETS.map((dataset) => (
@@ -187,25 +187,25 @@ export default function ImageCropperPage() {
       <section id="audit" className="space-y-4 scroll-mt-20">
         <SectionHeading
           id="audit-heading"
-          title="Audit kontras light dan dark"
-          description="Pasangan token yang dipakai komponen; ambang dihitung dari validator @ds/tokens (pnpm test:tokens)."
+          title="Light and dark contrast"
+          description="Token pairs used by the cropper, with thresholds from the @ds/tokens validator (pnpm test:tokens)."
         />
         <Card className="mx-auto max-w-5xl">
           <CardHeader>
-            <CardTitle>Pasangan token dan ambang</CardTitle>
+            <CardTitle>Token pairs and thresholds</CardTitle>
           </CardHeader>
           <CardContent>
             <table className="w-full text-left text-sm">
               <thead>
                 <tr className="border-b border-border">
                   <th scope="col" className="py-2 pr-4 font-medium text-foreground">
-                    Pasangan
+                    Pair
                   </th>
                   <th scope="col" className="py-2 pr-4 font-medium text-foreground">
-                    Jenis
+                    Type
                   </th>
                   <th scope="col" className="py-2 font-medium text-foreground">
-                    Ambang
+                    Threshold
                   </th>
                 </tr>
               </thead>
@@ -224,10 +224,10 @@ export default function ImageCropperPage() {
       </section>
 
       <section id="resep" className="space-y-4 scroll-mt-20">
-        <SectionHeading id="resep-heading" title="Resep onComplete" />
+        <SectionHeading id="resep-heading" title="Implementation" />
         <Card className="mx-auto max-w-5xl">
           <CardHeader>
-            <CardTitle>Resep controlled</CardTitle>
+            <CardTitle>Controlled crop result</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <pre className="overflow-x-auto rounded-md bg-muted p-3 text-xs text-foreground">
@@ -235,7 +235,7 @@ export default function ImageCropperPage() {
             </pre>
             <div className="flex flex-wrap items-center gap-3">
               <Button variant="outline" size="sm" onClick={handleCopy}>
-                Salin resep
+                Copy recipe
               </Button>
               <p role="status" className="text-sm text-muted-foreground">
                 {copyStatus}

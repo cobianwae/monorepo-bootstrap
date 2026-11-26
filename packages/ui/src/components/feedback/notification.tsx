@@ -123,7 +123,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
                 onClick={onRead}
                 className="text-[11px] font-medium text-primary hover:underline"
               >
-                Tandai dibaca
+                Mark as read
               </button>
             )}
           </div>
@@ -136,7 +136,7 @@ export const NotificationItem = React.forwardRef<HTMLDivElement, NotificationIte
           <button
             type="button"
             onClick={onDismiss}
-            aria-label="Hapus notifikasi"
+            aria-label="Dismiss notification"
             className="absolute bottom-3 right-3 rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <X className="h-3.5 w-3.5" />
@@ -206,7 +206,7 @@ export const NotificationHeader = React.forwardRef<HTMLDivElement, NotificationH
               className="h-7 text-xs text-muted-foreground gap-1"
             >
               <Check className="h-3.5 w-3.5" />
-              <span>Tandai semua dibaca</span>
+              <span>Mark all as read</span>
             </Button>
           )}
         </div>
@@ -226,7 +226,7 @@ export const NotificationEmpty = React.forwardRef<HTMLDivElement, NotificationEm
     {
       className,
       title = 'Belum ada notifikasi',
-      description = 'Semua pemberitahuan aktivitas Anda akan muncul di sini.',
+      description = 'All your activity notifications will appear here.',
       ...props
     },
     ref

@@ -27,7 +27,7 @@ export default function MindMapPatternPage() {
   const [data, setData] = React.useState<MindNodeFlat[]>(EXAMPLE);
   const [expanded, setExpanded] = React.useState<string[]>(['q1', 'riset', 'produk', 'marketing']);
   const [query, setQuery] = React.useState('');
-  const [demoState, setDemoState] = React.useState<DemoState>('Contoh Q1');
+  const [demoState, setDemoState] = React.useState<DemoState>('Q1 example');
   const [dark, setDark] = React.useState(false);
   const [minimap, setMinimap] = React.useState(true);
   const matches = query.trim()
@@ -53,8 +53,8 @@ export default function MindMapPatternPage() {
   const selectState = (state: DemoState) => {
     if (state === 'Empty') load([], state);
     else if (state === 'Invalid') load([...EXAMPLE, { ...EXAMPLE[0] }], state);
-    else if (state === 'Contoh Q1') load(EXAMPLE, state);
-    else if (state === 'Berisi') load(EXAMPLE.slice(0, 4), state);
+    else if (state === 'Q1 example') load(EXAMPLE, state);
+    else if (state === 'Populated') load(EXAMPLE.slice(0, 4), state);
     else {
       if (demoState === 'Invalid' || demoState === 'Empty') load(EXAMPLE, state);
       else setDemoState(state);
@@ -64,7 +64,7 @@ export default function MindMapPatternPage() {
   const searchSlot = (
     <div className="flex flex-wrap items-end gap-x-4 gap-y-2">
       <div className="min-w-0 basis-64 flex-1 space-y-1 sm:max-w-sm">
-        <Label htmlFor="mind-search">Cari ide</Label>
+        <Label htmlFor="mind-search">Search ideas</Label>
         <div className="relative">
           <Search
             aria-hidden="true"
@@ -76,7 +76,7 @@ export default function MindMapPatternPage() {
             className="pl-9"
             value={query}
             onChange={(event) => search(event.target.value)}
-            placeholder="Cth: Riset pasar"
+            placeholder="E.g. Market research"
             aria-describedby="mind-search-status"
             disabled={demoState === 'Loading' || demoState === 'Invalid'}
           />
@@ -91,9 +91,9 @@ export default function MindMapPatternPage() {
       >
         {query.trim()
           ? matches.length
-            ? `${matches.length} hasil cocok`
-            : 'Tidak ada hasil'
-          : `${data.length} ide · cari berdasarkan nama ide`}
+            ? `${matches.length} matching results`
+            : 'No results'
+          : `${data.length} ideas · search by idea name`}
       </p>
     </div>
   );
@@ -104,11 +104,11 @@ export default function MindMapPatternPage() {
         eyebrow="UX Recipe Scenario"
         eyebrowIcon={Network}
         title="Mind Map"
-        description="Ubah curah pendapat menjadi peta ide yang bisa dicari, dilipat, dan dikelola langsung di kanvas."
+        description="Turn a brainstorm into a map of ideas you can search, collapse, and edit on the canvas."
         actions={
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="highlight" className="font-mono text-xs">6 state demo</Badge>
-            <Badge variant="outline" className="font-mono text-xs">Pohon pembaca layar</Badge>
+            <Badge variant="highlight" className="font-mono text-xs">6 demo states</Badge>
+            <Badge variant="outline" className="font-mono text-xs">Screen reader tree</Badge>
           </div>
         }
       />
@@ -116,16 +116,16 @@ export default function MindMapPatternPage() {
       <section aria-labelledby="mind-demo">
         <Card>
           <CardHeader className="space-y-1 pb-4">
-            <SectionHeading id="mind-demo" title="Demo interaktif" />
+            <SectionHeading id="mind-demo" title="Interactive demo" />
             <CardDescription>
-              Pilih status data atau tampilan di panel, lalu coba langsung di kanvas.
+              Choose a data state or display option, then try it on the canvas.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <MindDemoPanel
               demoState={demoState}
               onSelectState={selectState}
-              onLoadLarge={() => load(LARGE, 'Berisi')}
+              onLoadLarge={() => load(LARGE, 'Populated')}
               dark={dark}
               onDarkChange={setDark}
               minimap={minimap}
@@ -144,8 +144,8 @@ export default function MindMapPatternPage() {
                 highlightedIds={matches.map((node) => node.id)}
                 loading={demoState === 'Loading'}
                 error={
-                  demoState === 'Error eksternal'
-                    ? 'Perubahan belum tersimpan. Peta tetap tersedia; coba simpan lagi melalui aplikasi konsumen.'
+                  demoState === 'External error'
+                    ? 'Changes have not been saved. The map is still available; try saving again in the consuming app.'
                     : null
                 }
                 minimap={minimap}
@@ -160,9 +160,9 @@ export default function MindMapPatternPage() {
 
       <section aria-labelledby="mind-steps" className="space-y-3">
         <div className="space-y-1">
-          <SectionHeading id="mind-steps" title="Alur brainstorming" />
+          <SectionHeading id="mind-steps" title="Try it" />
           <p className="text-sm text-muted-foreground">
-            Ikuti enam langkah ini untuk mengembangkan ide pusat menjadi rencana yang terstruktur.
+            Follow these six steps to develop a central idea into a structured plan.
           </p>
         </div>
         <Timeline

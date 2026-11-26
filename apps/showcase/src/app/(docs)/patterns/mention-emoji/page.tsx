@@ -30,10 +30,10 @@ const PEOPLE: ChatMentionCandidate[] = [
 type ScenarioState = 'ready' | 'loading' | 'error' | 'empty';
 
 const SCENARIOS: Array<{ id: ScenarioState; label: string; description: string }> = [
-  { id: 'ready', label: 'Berisi', description: 'Kandidat tersedia dan bisa difilter.' },
-  { id: 'loading', label: 'Memuat', description: 'Kandidat sedang diambil dari konsumen.' },
-  { id: 'error', label: 'Error', description: 'Pengambilan kandidat gagal.' },
-  { id: 'empty', label: 'Kosong', description: 'Tidak ada kandidat sama sekali.' },
+  { id: 'ready', label: 'Ready', description: 'Search and select from the available people.' },
+  { id: 'loading', label: 'Loading', description: 'Waiting for the app to provide suggestions.' },
+  { id: 'error', label: 'Error', description: 'Suggestions could not be loaded.' },
+  { id: 'empty', label: 'Empty', description: 'No people are available to mention.' },
 ];
 
 function renderWithMentions(text: string, tokens: ChatMentionToken[]): React.ReactNode {
@@ -65,10 +65,10 @@ interface SentMessage {
 const SEED: SentMessage[] = [
   {
     id: 1,
-    text: 'Halo @Budi, bisa cek draft desain ini?',
+    text: 'Hi @Budi, could you review this design draft?',
     mentions: [{ id: 'u1', label: 'Budi' }],
   },
-  { id: 2, text: 'Siap, nanti sore saya review.', mentions: [] },
+  { id: 2, text: 'Sure, I will review it this afternoon.', mentions: [] },
 ];
 
 export default function MentionEmojiPage() {
@@ -92,10 +92,10 @@ export default function MentionEmojiPage() {
     <div className="space-y-6">
       <PageHeader
         title="Mention & Emoji"
-        description="Composer chat dengan mention @user (popover kandidat) dan emoji picker yang menyisip di posisi kursor."
+        description="Mention people and add emoji while composing a chat message."
       />
 
-      <div role="group" aria-label="Pilih state kandidat" className="flex flex-wrap gap-2">
+      <div role="group" aria-label="Suggestion state" className="flex flex-wrap gap-2">
         {SCENARIOS.map((s) => (
           <button
             key={s.id}
@@ -119,10 +119,10 @@ export default function MentionEmojiPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Chat dengan mention dan emoji</CardTitle>
+          <CardTitle>Interactive demo</CardTitle>
           <CardDescription>
-            Ketik <kbd className="font-mono">@bu</kbd> untuk mencari kandidat. Navigasi dengan panah,
-            pilih dengan Enter, tutup dengan Escape.
+            Type <kbd className="font-mono">@bu</kbd> to find people. Use arrow keys to navigate,
+            Enter to select, and Escape to close suggestions.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
@@ -132,9 +132,9 @@ export default function MentionEmojiPage() {
                 <ChatMessage
                   key={m.id}
                   sender={m.id % 2 === 1 ? 'user' : 'assistant'}
-                  senderName={m.id % 2 === 1 ? undefined : 'Rekan'}
+                  senderName={m.id % 2 === 1 ? undefined : 'Teammate'}
                   content={renderWithMentions(m.text, m.mentions)}
-                  timestamp="Baru saja"
+                  timestamp="Just now"
                 />
               ))}
             </ChatThread>
@@ -146,14 +146,14 @@ export default function MentionEmojiPage() {
               candidatesStatus={status}
               onMention={(token) => setLastMention(token.label)}
               emojiPicker
-              placeholder="Tulis pesan… (@ untuk mention)"
+              placeholder="Write a message… (@ to mention)"
             />
           </ChatContainer>
         </CardContent>
       </Card>
 
       <p className="text-xs text-muted-foreground" aria-live="polite">
-        {lastMention ? `Terakhir di-mention: @${lastMention}` : 'Belum ada mention dipilih.'}
+        {lastMention ? `Last mention: @${lastMention}` : 'No mention selected yet.'}
       </p>
 
       <Button
@@ -165,7 +165,7 @@ export default function MentionEmojiPage() {
           setLastMention(null);
         }}
       >
-        Reset percakapan
+        Reset conversation
       </Button>
     </div>
   );

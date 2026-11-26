@@ -102,7 +102,7 @@ export function PermissionMatrix({
   onLoadExample,
   loading = false,
   error = null,
-  emptyActionLabel = 'Muat contoh 5×8',
+  emptyActionLabel = 'Load 5×8 example',
   onEmptyAction,
 }: PermissionMatrixComponentProps) {
   const roleIds = roles.map(({ id }) => id);
@@ -154,20 +154,20 @@ export function PermissionMatrix({
     if (!diff.length) return;
     onValueChange?.(next, diff);
     const dirty = diffValues(baseline, next, roleIds, resourceIds).length;
-    const dirtySuffix = dirty > 0 ? `; ${dirty} perubahan belum disimpan` : '; tidak ada perubahan';
+    const dirtySuffix = dirty > 0 ? `; ${dirty} unsaved changes` : '; no changes';
     if (diff.length === 1) {
-      setAnnouncement(`${labelOf(diff[0].role, diff[0].resource)} ${diff[0].to ? 'menyala' : 'mati'}${dirtySuffix}`);
+      setAnnouncement(`${labelOf(diff[0].role, diff[0].resource)} ${diff[0].to ? 'on' : 'off'}${dirtySuffix}`);
       return;
     }
     const on = diff.filter((item) => item.to).length;
     const off = diff.length - on;
-    const action = on > 0 && off === 0 ? `${on} dipilih` : off > 0 && on === 0 ? `${off} dimatikan` : `${on} dipilih, ${off} dimatikan`;
+    const action = on > 0 && off === 0 ? `${on} selected` : off > 0 && on === 0 ? `${off} turned off` : `${on} selected, ${off} turned off`;
     setAnnouncement(`${action}${dirtySuffix}`);
   };
   const toggleCell = (role: RoleId, resource: ResourceId): void => {
     const reason = getLocked(locked, role, resource);
     if (reason) {
-      setAnnouncement(`Tidak diubah. Terkunci: ${reason}`);
+      setAnnouncement(`Unchanged. Locked: ${reason}`);
       return;
     }
     const from = isOn(role, resource);
@@ -177,7 +177,7 @@ export function PermissionMatrix({
   const togglePairs = (pairs: Array<{ role: RoleId; resource: ResourceId }>): void => {
     const unlocked = pairs.filter(({ role, resource }) => !getLocked(locked, role, resource));
     if (!unlocked.length) {
-      setAnnouncement('Tidak diubah. Semua sel dikunci kebijakan.');
+      setAnnouncement('Unchanged. All cells are locked by policy.');
       return;
     }
     const to = !unlocked.every(({ role, resource }) => isOn(role, resource));
@@ -222,7 +222,7 @@ export function PermissionMatrix({
     ? stateOf(unlockedPairs.map(({ role, resource }) => isOn(role, resource)))
     : 'unchecked';
   const headerLabel = (base: string, state: HeaderState, lockedCount: number): string =>
-    `${base}${state === 'mixed' ? ', sebagian dipilih' : ''}${lockedCount ? `, ${lockedCount} terkunci` : ''}`;
+    `${base}${state === 'mixed' ? ', partially selected' : ''}${lockedCount ? `, ${lockedCount} locked` : ''}`;
   const isTarget = (target: FocusTarget): boolean => {
     if (focusTarget.kind !== target.kind) return false;
     if (target.kind === 'all') return true;
@@ -285,14 +285,14 @@ export function PermissionMatrix({
     if (!diff.length) return;
     emit(next, diff);
     setListOpen(false);
-    setAnnouncement('Perubahan dibatalkan');
+    setAnnouncement('Change reverted');
     setFocusTarget({ kind: 'all' });
   };
 
   if (loading) {
     return (
-      <div role="grid" aria-label="Memuat izin" aria-busy="true" className={cn('space-y-2 rounded-md border border-border p-3', className)}>
-        <span className="sr-only">Memuat izin…</span>
+      <div role="grid" aria-label="Loading permissions" aria-busy="true" className={cn('space-y-2 rounded-md border border-border p-3', className)}>
+        <span className="sr-only">Loading permissions…</span>
         {Array.from({ length: 5 }, (_, row) => (
           <div key={row} className="flex gap-2">
             {Array.from({ length: 8 }, (_, col) => <Skeleton key={col} className="h-9 flex-1 motion-reduce:animate-none" />)}
@@ -304,18 +304,18 @@ export function PermissionMatrix({
   if (error) {
     return (
       <Alert ref={alertRef} tabIndex={-1} role="alert" variant="destructive" className={className}>
-        <AlertTitle>Data izin tidak valid</AlertTitle>
+        <AlertTitle>Invalid permission data</AlertTitle>
         <AlertDescription>{error}</AlertDescription>
-        <Button className="mt-3" size="sm" onClick={onLoadExample}>Muat contoh</Button>
+        <Button className="mt-3" size="sm" onClick={onLoadExample}>Load example</Button>
       </Alert>
     );
   }
   if (invalidId) {
     return (
       <Alert ref={alertRef} tabIndex={-1} role="alert" variant="destructive" className={className}>
-        <AlertTitle>Data izin tidak valid</AlertTitle>
-        <AlertDescription>ID role atau resource duplikat: {invalidId}</AlertDescription>
-        <Button className="mt-3" size="sm" onClick={onLoadExample}>Muat contoh</Button>
+        <AlertTitle>Invalid permission data</AlertTitle>
+        <AlertDescription>Duplicate role or resource ID: {invalidId}</AlertDescription>
+        <Button className="mt-3" size="sm" onClick={onLoadExample}>Load example</Button>
       </Alert>
     );
   }
@@ -324,8 +324,8 @@ export function PermissionMatrix({
       <EmptyState
         role="status"
         className={className}
-        title="Belum ada role atau resource"
-        description="Tambahkan data atau muat contoh matriks untuk memulai."
+        title="No roles or resources yet"
+        description="Add data or load an example matrix to get started."
         actionLabel={emptyActionLabel}
         onAction={onEmptyAction ?? onLoadExample}
       />
@@ -333,31 +333,31 @@ export function PermissionMatrix({
   }
 
   const dirtyBanner = changes.length > 0 && (
-    <section role="status" aria-label="Perubahan belum disimpan" className="order-first rounded-md border border-warning bg-warning/10 p-3 text-foreground motion-reduce:transition-none">
+    <section role="status" aria-label="Unsaved changes" className="order-first rounded-md border border-warning bg-warning/10 p-3 text-foreground motion-reduce:transition-none">
       <div className="flex flex-col gap-3 md:flex-row md:items-center">
         <Badge variant="warning">{changes.length}</Badge>
-        <span>{changes.length} perubahan belum disimpan</span>
+        <span>{changes.length} unsaved changes</span>
         <Button variant="ghost" size="sm" aria-expanded={listOpen} onClick={() => setListOpen((open) => !open)}>
-          {listOpen ? 'Tutup daftar' : 'Lihat daftar'}
+          {listOpen ? 'Hide list' : 'Show list'}
         </Button>
         <div className="flex flex-wrap gap-2 md:ml-auto">
           <Button variant="ghost" onClick={handleReset}>Reset</Button>
-          {onCancel && <Button variant="ghost" onClick={() => { onCancel(); setFocusTarget({ kind: 'all' }); }}>Batal</Button>}
-          <Button variant="highlight" disabled={!onSave} onClick={() => { onSave?.(); setFocusTarget({ kind: 'all' }); }}>Simpan</Button>
+          {onCancel && <Button variant="ghost" onClick={() => { onCancel(); setFocusTarget({ kind: 'all' }); }}>Cancel</Button>}
+          <Button variant="highlight" disabled={!onSave} onClick={() => { onSave?.(); setFocusTarget({ kind: 'all' }); }}>Save</Button>
         </div>
       </div>
       {listOpen && (
         <ul className="mt-3 space-y-2 border-t border-warning/40 pt-3">
           {changes.map((change) => (
             <li key={JSON.stringify([change.role, change.resource])} className="flex flex-wrap items-center gap-2">
-              <span>{labelOf(change.role, change.resource)}: {change.from ? 'menyala' : 'mati'} → {change.to ? 'menyala' : 'mati'}</span>
+              <span>{labelOf(change.role, change.resource)}: {change.from ? 'on' : 'off'} → {change.to ? 'on' : 'off'}</span>
               <Button size="sm" variant="outline" onClick={() => {
                 const next = cloneValue(value, roleIds, resourceIds);
                 next[change.role][change.resource] = baseline[change.role]?.[change.resource] ?? false;
                 emit(next, diffValues(value, next, roleIds, resourceIds));
-                setAnnouncement(`${labelOf(change.role, change.resource)} dibatalkan`);
+                setAnnouncement(`${labelOf(change.role, change.resource)} reverted`);
                 setFocusTarget({ kind: 'all' });
-              }}>Reset baris ini</Button>
+              }}>Reset this row</Button>
             </li>
           ))}
         </ul>
@@ -371,16 +371,16 @@ export function PermissionMatrix({
         <div ref={gridRef} className={cn('max-h-96 w-full overflow-auto rounded-md border border-border bg-card', className)}>
           {unlockedPairs.length === 0 && (
             <p className="border-b border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-              Semua sel dikunci kebijakan.
+              All cells are locked by policy.
             </p>
           )}
-          <table role="grid" aria-label="Matriks izin role dan resource" className={cn(permissionMatrixVariants({ density }))}>
+          <table role="grid" aria-label="Role and resource permission matrix" className={cn(permissionMatrixVariants({ density }))}>
             <thead>
               <tr role="row">
                 <th role="columnheader" scope="col" className="sticky left-0 top-0 z-20 bg-muted/40 p-2 text-left">
                   <span className="inline-flex min-h-11 items-center gap-2">
-                    <Checkbox {...itemProps({ kind: 'all' })} checked={allState === 'checked' ? true : allState === 'mixed' ? 'indeterminate' : false} onCheckedChange={toggleAll} aria-disabled={!unlockedPairs.length} aria-label={headerLabel('Pilih semua izin', allState, allPairs.length - unlockedPairs.length)} />
-                    <span className="text-xs font-medium text-muted-foreground">semua</span>
+                    <Checkbox {...itemProps({ kind: 'all' })} checked={allState === 'checked' ? true : allState === 'mixed' ? 'indeterminate' : false} onCheckedChange={toggleAll} aria-disabled={!unlockedPairs.length} aria-label={headerLabel('Select all permissions', allState, allPairs.length - unlockedPairs.length)} />
+                    <span className="text-xs font-medium text-muted-foreground">all</span>
                     {allState === 'mixed' && <span aria-hidden="true" className="text-xs text-primary">◐</span>}
                   </span>
                 </th>
@@ -390,7 +390,7 @@ export function PermissionMatrix({
                   return (
                     <th key={role.id} role="columnheader" scope="col" className="sticky top-0 z-10 bg-muted/40 p-2 text-center">
                       <span className="inline-flex min-h-11 items-center justify-center gap-2">
-                        <Checkbox {...itemProps(target)} checked={state === 'checked' ? true : state === 'mixed' ? 'indeterminate' : false} onCheckedChange={() => toggleColumn(role.id)} aria-disabled={!unlocked} aria-label={headerLabel(`Toggle kolom ${role.label}`, state, lockedCount)} />
+                        <Checkbox {...itemProps(target)} checked={state === 'checked' ? true : state === 'mixed' ? 'indeterminate' : false} onCheckedChange={() => toggleColumn(role.id)} aria-disabled={!unlocked} aria-label={headerLabel(`Toggle ${role.label} column`, state, lockedCount)} />
                         <span className={cn(permissionHeaderVariants({ headerState: state }))}>{role.label}</span>
                         {state === 'mixed' && <span aria-hidden="true" className="text-xs text-primary">◐</span>}
                         {state === 'mixed' && <span className="sr-only">sebagian</span>}
@@ -408,7 +408,7 @@ export function PermissionMatrix({
                   <tr key={resource.id} role="row">
                     <th role="rowheader" scope="row" className="sticky left-0 z-10 bg-muted/40 p-2 text-left">
                       <span className="inline-flex min-h-11 items-center gap-2">
-                        <Checkbox {...itemProps(rowTarget)} checked={state === 'checked' ? true : state === 'mixed' ? 'indeterminate' : false} onCheckedChange={() => toggleRow(resource.id)} aria-disabled={!unlocked} aria-label={headerLabel(`Toggle semua izin ${resource.label}`, state, lockedCount)} />
+                        <Checkbox {...itemProps(rowTarget)} checked={state === 'checked' ? true : state === 'mixed' ? 'indeterminate' : false} onCheckedChange={() => toggleRow(resource.id)} aria-disabled={!unlocked} aria-label={headerLabel(`Toggle all ${resource.label} permissions`, state, lockedCount)} />
                         <span className={cn(permissionHeaderVariants({ headerState: state }))}>{resource.label}</span>
                         {state === 'mixed' && <span aria-hidden="true" className="text-xs text-primary">◐</span>}
                         {state === 'mixed' && <span className="sr-only">sebagian</span>}
@@ -418,7 +418,7 @@ export function PermissionMatrix({
                       const checked = isOn(role.id, resource.id);
                       const reason = getLocked(locked, role.id, resource.id);
                       const target: FocusTarget = { kind: 'cell', role: role.id, resource: resource.id };
-                      const label = `${role.label} × ${resource.label}, ${reason ? `terkunci: ${reason}` : checked ? 'menyala' : 'mati'}`;
+                      const label = `${role.label} × ${resource.label}, ${reason ? `locked: ${reason}` : checked ? 'on' : 'off'}`;
                        const cellProps = itemProps(target);
                       const checkbox = renderCell
                         ? <button type="button" {...cellProps} onClick={() => toggleCell(role.id, resource.id)} role="checkbox" aria-checked={checked} aria-label={label} aria-disabled={reason !== null}>{renderCell({ role: role.id, resource: resource.id, checked, lockedReason: reason })}</button>
@@ -440,9 +440,9 @@ export function PermissionMatrix({
             </tbody>
           </table>
           <div className="flex flex-wrap items-center gap-2 border-t border-border px-3 py-2 text-xs text-muted-foreground">
-            <span>{allPairs.length} sel · {allPairs.length - unlockedPairs.length} terkunci</span>
+            <span>{allPairs.length} sel · {allPairs.length - unlockedPairs.length} locked</span>
             <Badge variant="muted" size="sm">◐ = sebagian</Badge>
-            <Badge variant="muted" size="sm"><Lock aria-hidden="true" className="size-3" /> = terkunci kebijakan</Badge>
+            <Badge variant="muted" size="sm"><Lock aria-hidden="true" className="size-3" /> = locked by policy</Badge>
           </div>
         </div>
         {dirtyBanner}

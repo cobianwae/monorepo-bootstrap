@@ -82,13 +82,13 @@ describe('ChatMentionList states (FR-006)', () => {
 
   it('menampilkan state error sebagai alert', () => {
     render(<ChatMentionList {...base} status="error" />);
-    expect(screen.getByRole('alert').textContent).toContain('Gagal memuat kandidat');
+    expect(screen.getByRole('alert').textContent).toContain('Could not load candidates');
   });
 
   it('menampilkan state kosong dengan query', () => {
     render(<ChatMentionList {...base} status="ready" />);
-    expect(screen.getByText('Tidak ada kandidat')).toBeTruthy();
-    expect(screen.getByText('Tidak ada yang cocok dengan "xy".')).toBeTruthy();
+    expect(screen.getByText('No candidates')).toBeTruthy();
+    expect(screen.getByText('Nothing matches "xy".')).toBeTruthy();
   });
 });
 
@@ -99,7 +99,7 @@ describe('ChatComposer mention (FR-001, FR-002, FR-003)', () => {
     fireEvent.change(ta, { target: { value: '@bu' } });
 
     expect(ta.getAttribute('aria-expanded')).toBe('true');
-    const listbox = screen.getByRole('listbox', { name: 'Kandidat mention' });
+    const listbox = screen.getByRole('listbox', { name: 'Mention candidates' });
     const options = within(listbox).getAllByRole('option');
     expect(options.map((o) => o.getAttribute('aria-label'))).toEqual(['Budi', 'Bunga']);
   });
@@ -202,7 +202,7 @@ describe('ChatComposer emoji picker (FR-004)', () => {
     ta.setSelectionRange(5, 5);
 
     fireEvent.click(screen.getByRole('button', { name: 'Sisipkan emoji' }));
-    fireEvent.change(screen.getByRole('searchbox', { name: 'Cari emoji' }), {
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Search emoji' }), {
       target: { value: 'tertawa' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'tertawa sampai menangis' }));
@@ -222,9 +222,9 @@ describe('ChatComposer emoji picker (FR-004)', () => {
   it('pencarian tanpa hasil menampilkan pesan kosong', () => {
     render(<ChatComposer value="" onChange={() => {}} onSend={() => {}} emojiPicker />);
     fireEvent.click(screen.getByRole('button', { name: 'Sisipkan emoji' }));
-    fireEvent.change(screen.getByRole('searchbox', { name: 'Cari emoji' }), {
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Search emoji' }), {
       target: { value: 'zzzz' },
     });
-    expect(screen.getByText('Tidak ada emoji yang cocok.')).toBeTruthy();
+    expect(screen.getByText('No matching emoji.')).toBeTruthy();
   });
 });

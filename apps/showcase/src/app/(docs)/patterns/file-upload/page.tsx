@@ -16,14 +16,14 @@ import { PageHeader } from '@ds/ui';
 const MAX_SIZE_MB = 2;
 
 function abortError(signal: AbortSignal): Error {
-  const error = new Error('Upload dibatalkan.');
+  const error = new Error('Upload cancelled.');
   error.name = 'AbortError';
   void signal;
   return error;
 }
 
 export default function FileUploadPage() {
-  const [failNames, setFailNames] = React.useState<string[]>(['gagal.pdf']);
+  const [failNames, setFailNames] = React.useState<string[]>(['failed.pdf']);
   const [latencyMs, setLatencyMs] = React.useState(1200);
   const [maxConcurrent, setMaxConcurrent] = React.useState(2);
   const [maxRetries, setMaxRetries] = React.useState(0);
@@ -58,7 +58,7 @@ export default function FileUploadPage() {
         eyebrow="UX Recipe Scenario"
         eyebrowIcon={Sparkles}
         title="File Upload / Drag & Drop"
-        description="Dropzone dengan fallback keyboard, validasi per file, antrean upload dengan progres per item, batal/ulang per item, dan ringkasan agregat — semuanya dari komponen FileUpload."
+        description="Upload files in a queue, track their progress, and retry or cancel individual uploads."
       />
 
       <div className="mx-auto max-w-2xl space-y-6">
@@ -72,10 +72,10 @@ export default function FileUploadPage() {
               variant={compact ? 'compact' : 'dropzone'}
               maxSize={MAX_SIZE_MB * 1024 * 1024}
               accept="image/png,image/jpeg,image/webp,application/pdf"
-              helperText={`PNG, JPG, WEBP, PDF · maks ${MAX_SIZE_MB} MB per file`}
-              onAllDone={(items) => setLastResult(`${items.length} file selesai diunggah.`)}
+              helperText={`PNG, JPG, WEBP, PDF · max ${MAX_SIZE_MB} MB per file`}
+              onAllDone={(items) => setLastResult(`${items.length} files uploaded.`)}
               onItemError={(item) =>
-                setLastResult(`Gagal: ${item.file.name} — ${item.error ?? 'kesalahan tidak dikenal'}`)
+                setLastResult(`Upload failed: ${item.file.name} — ${item.error ?? 'unknown error'}`)
               }
             />
             {lastResult && (
@@ -88,10 +88,10 @@ export default function FileUploadPage() {
 
         <Card className="border-border">
           <CardContent className="space-y-5 p-6">
-            <h2 className="text-sm font-semibold text-foreground">Kontrol demo</h2>
+            <h2 className="text-sm font-semibold text-foreground">Demo controls</h2>
 
             <div className="space-y-2">
-              <Label htmlFor="demo-fail">File yang digagalkan (pisahkan koma)</Label>
+              <Label htmlFor="demo-fail">Files to reject (comma-separated)</Label>
               <input
                 id="demo-fail"
                 type="text"
@@ -105,17 +105,17 @@ export default function FileUploadPage() {
                   )
                 }
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="gagal.pdf"
+                placeholder="failed.pdf"
               />
               <p className="text-xs text-muted-foreground">
-                File dengan nama ini akan ditolak server pada akhir upload, sehingga state
-                error dan tombol Ulang bisa didemokan.
+                The simulated server rejects these filenames at the end of an upload.
+                Use them to try the error state and retry action.
               </p>
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="demo-latency">Latensi upload</Label>
+                <Label htmlFor="demo-latency">Upload latency</Label>
                 <span className="text-xs text-muted-foreground">{latencyMs} ms</span>
               </div>
               <Slider
@@ -130,7 +130,7 @@ export default function FileUploadPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="demo-concurrent">Upload bersamaan (maxConcurrent)</Label>
+                <Label htmlFor="demo-concurrent">Concurrent uploads (maxConcurrent)</Label>
                 <span className="text-xs text-muted-foreground">{maxConcurrent}</span>
               </div>
               <Slider
@@ -157,15 +157,15 @@ export default function FileUploadPage() {
                 onValueChange={(values) => setMaxRetries(values[0] ?? 0)}
               />
               <p className="text-xs text-muted-foreground">
-                Item gagal otomatis mencoba ulang hingga batas ini sebelum berstatus error final.
+                Failed uploads retry up to this limit before showing a final error.
               </p>
             </div>
 
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-0.5">
-                <Label htmlFor="demo-sortable">Urutkan antrean (sortable)</Label>
+                <Label htmlFor="demo-sortable">Reorder the queue (sortable)</Label>
                 <p className="text-xs text-muted-foreground">
-                  Drag handle + sensor keyboard, serta tombol pindah atas/bawah.
+                  Use drag handles, keyboard controls, or move-up and move-down buttons.
                 </p>
               </div>
               <Switch id="demo-sortable" checked={sortable} onCheckedChange={setSortable} />
@@ -173,9 +173,9 @@ export default function FileUploadPage() {
 
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-0.5">
-                <Label htmlFor="demo-compact">Varian compact</Label>
+                <Label htmlFor="demo-compact">Compact variant</Label>
                 <p className="text-xs text-muted-foreground">
-                  Baris ringkas tanpa thumbnail secara default; status dan aksi tetap tersedia.
+                  Compact rows hide thumbnails by default and keep status and actions visible.
                 </p>
               </div>
               <Switch id="demo-compact" checked={compact} onCheckedChange={setCompact} />
@@ -183,9 +183,9 @@ export default function FileUploadPage() {
 
             <div className="flex items-center justify-between gap-4">
               <div className="space-y-0.5">
-                <Label htmlFor="demo-abort">Hormati AbortSignal</Label>
+                <Label htmlFor="demo-abort">Respect AbortSignal</Label>
                 <p className="text-xs text-muted-foreground">
-                  Mock handler demo mendengarkan signal, jadi Batal berhenti di tengah jalan.
+                  The demo handler listens for the signal so cancellation stops an upload in progress.
                 </p>
               </div>
               <Switch id="demo-abort" checked disabled />
@@ -194,17 +194,16 @@ export default function FileUploadPage() {
         </Card>
 
         <p className="text-center text-xs text-muted-foreground">
-          Komponen tidak pernah upload sendiri: konsumen menyediakan{' '}
-          <code>uploadHandler(file, {'{ onProgress, signal }'})</code> dan wajib menghormati{' '}
+          The app supplies{' '}
+          <code>uploadHandler(file, {'{ onProgress, signal }'})</code> and must respect{' '}
           <code>AbortSignal</code>.
         </p>
         <p className="text-center text-xs text-muted-foreground">
-          Aksi kolektif: summary bar menampilkan <strong>Ulang semua yang gagal</strong> dan{' '}
-          <strong>Batal semua</strong> secara kondisional. <code>sortable</code> (default{' '}
-          <code>false</code>) mengaktifkan drag handle + sensor keyboard dan tombol pindah
-          atas/bawah. <code>maxRetries</code> (default <code>0</code>) mengaktifkan auto-retry
-          hingga batas sebelum error final. <code>variant=&quot;compact&quot;</code> menampilkan baris
-          ringkas tanpa thumbnail secara default.
+          The summary bar shows <strong>Retry all failed</strong> and{' '}
+          <strong>Cancel all</strong> when available. <code>sortable</code> (default{' '}
+          <code>false</code>) enables drag handles, keyboard controls, and move buttons.
+          <code>maxRetries</code> (default <code>0</code>) limits automatic retries.
+          <code>variant=&quot;compact&quot;</code> hides thumbnails by default.
         </p>
       </div>
     </div>

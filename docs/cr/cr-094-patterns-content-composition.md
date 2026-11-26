@@ -1,6 +1,6 @@
 # CR-094 — Patterns: susunan konten dan hierarki demo
 
-**Status:** draft
+**Status:** approved (ditetapkan user 2026-11-26)
 **Sumber:** audit uplift + diskusi user 2026-11-26
 **Ref:** `docs/design/visual-language.md`, CR-093 (cakupan 37 route dan copy English), CR-095
 
@@ -77,7 +77,8 @@ Implementation / Accessibility notes (sesuai konten)
 Branch: `cr-094-patterns-content-composition`
 Commit: `fix: align patterns content composition [CR-094]`
 
-- [ ] CR disetujui user; CR-093 diintegrasikan.
+- [x] CR disetujui user.
+- [ ] CR-093 diintegrasikan.
 - [ ] Branch dibuat; perubahan diimplementasikan.
 - [ ] Preview `pnpm -C apps/showcase dev`, screenshot dibaca sebagai image, iterasi bersama user.
 - [ ] Verifikasi targeted lalu typecheck → lint → test; build dari salinan sementara bila server user aktif.

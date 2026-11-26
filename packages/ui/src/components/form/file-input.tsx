@@ -39,19 +39,19 @@ export interface FileInputMessages {
 
 const defaultFileInputMessages: FileInputMessages = {
   dropzoneLabel: 'File upload dropzone',
-  clickToUpload: 'Klik untuk upload',
-  dragAndDrop: 'atau drag & drop',
-  selectFile: 'Pilih file',
-  allFileTypes: 'Semua jenis file',
+  clickToUpload: 'Click to upload',
+  dragAndDrop: 'or drag & drop',
+  selectFile: 'Select file',
+  allFileTypes: 'All file types',
   formatLabel: (accept) => `Format: ${accept}`,
-  maxSizeLabel: (formattedMaxSize) => `Maks: ${formattedMaxSize}`,
+  maxSizeLabel: (formattedMaxSize) => `Max: ${formattedMaxSize}`,
   uploadFile: 'Upload file',
   browse: 'Browse',
   uploadedFilesLabel: 'Uploaded files',
-  removeFile: (fileName) => `Hapus ${fileName}`,
+  removeFile: (fileName) => `Remove ${fileName}`,
   fileTooLarge: (fileName, formattedMaxSize) =>
-    `File "${fileName}" melebihi ukuran maksimum (${formattedMaxSize}).`,
-  tooManyFiles: (maxFiles) => `Maksimal ${maxFiles} file yang diizinkan.`,
+    `File "${fileName}" exceeds the maximum size (${formattedMaxSize}).`,
+  tooManyFiles: (maxFiles) => `Maximum ${maxFiles} files allowed.`,
 };
 
 export interface FileInputProps

@@ -220,7 +220,7 @@ export function FileUpload({
   const doneCount = items.filter((item) => item.status === 'done').length;
   const failedCount = items.filter((item) => item.status === 'error').length;
   const summaryText =
-    items.length > 0 ? `${doneCount}/${items.length} selesai · ${failedCount} gagal` : '';
+    items.length > 0 ? `${doneCount}/${items.length} done · ${failedCount} failed` : '';
 
   // Debounced aria-live: umumkan ringkasan, bukan tiap tick progres.
   React.useEffect(() => {
@@ -267,7 +267,7 @@ export function FileUpload({
         const message =
           reason instanceof Error && reason.message
             ? reason.message
-            : `Upload gagal untuk "${item.file.name}".`;
+            : `Upload failed for "${item.file.name}".`;
         const latest = itemsRef.current.find((entry) => entry.id === item.id) ?? item;
         // Auto-retry (FR-013): coba ulang otomatis sampai batas maxRetries.
         if (latest.attempts < maxRetries) {
@@ -331,11 +331,11 @@ export function FileUpload({
 
       let error: string | undefined;
       if (maxFiles && runningTotal >= maxFiles) {
-        error = `"${file.name}" ditolak: maksimal ${maxFiles} file diizinkan.`;
+        error = `"${file.name}" rejected: max ${maxFiles} files allowed.`;
       } else if (!matchesAccept(file, accept)) {
-        error = `"${file.name}" ditolak: tipe file tidak didukung (${file.type || 'tipe tidak dikenal'}).`;
+        error = `"${file.name}" rejected: unsupported file type (${file.type || 'unknown type'}).`;
       } else if (maxSize && file.size > maxSize) {
-        error = `"${file.name}" ditolak: melebihi ukuran maksimum (${formatBytes(maxSize)}).`;
+        error = `"${file.name}" rejected: exceeds max size (${formatBytes(maxSize)}).`;
       }
 
       if (error) {
@@ -486,10 +486,10 @@ export function FileUpload({
                     variant="outline"
                     size="sm"
                     onClick={retryAllFailed}
-                    aria-label="Ulang semua file yang gagal"
+                    aria-label="Retry all failed files"
                   >
                     <RotateCcw className="h-3.5 w-3.5" />
-                    Ulang semua yang gagal
+                    Retry all failed
                   </Button>
                 )}
                 {hasActive && (
@@ -567,7 +567,7 @@ export function FileUpload({
                       <Progress
                         value={item.progress}
                         className="h-1.5"
-                        aria-label={`Progres upload ${item.file.name}`}
+                        aria-label={`Upload progress ${item.file.name}`}
                         aria-valuemin={0}
                         aria-valuemax={100}
                         aria-valuenow={Math.round(item.progress)}
@@ -589,7 +589,7 @@ export function FileUpload({
                           variant="ghost"
                           size="sm"
                           onClick={() => moveItem(item.id, -1)}
-                          aria-label={`Pindahkan ${item.file.name} ke atas`}
+                          aria-label={`Move ${item.file.name} up`}
                         >
                           <ArrowUp className="h-3.5 w-3.5" />
                         </Button>
@@ -598,7 +598,7 @@ export function FileUpload({
                           variant="ghost"
                           size="sm"
                           onClick={() => moveItem(item.id, 1)}
-                          aria-label={`Pindahkan ${item.file.name} ke bawah`}
+                          aria-label={`Move ${item.file.name} down`}
                         >
                           <ArrowDown className="h-3.5 w-3.5" />
                         </Button>
@@ -633,7 +633,7 @@ export function FileUpload({
                           variant="ghost"
                           size="sm"
                           onClick={() => cancelItem(item.id)}
-                          aria-label={`Batalkan upload ${item.file.name}`}
+                          aria-label={`Cancel upload ${item.file.name}`}
                         >
                           Batal
                         </Button>
@@ -644,7 +644,7 @@ export function FileUpload({
                           variant="outline"
                           size="sm"
                           onClick={() => retryItem(item.id)}
-                          aria-label={`Ulangi upload ${item.file.name}`}
+                          aria-label={`Retry upload ${item.file.name}`}
                         >
                           <RotateCcw className="h-3.5 w-3.5" />
                           Ulang
@@ -656,7 +656,7 @@ export function FileUpload({
                           variant="ghost"
                           size="sm"
                           onClick={() => removeItem(item.id)}
-                          aria-label={`Hapus ${item.file.name}`}
+                          aria-label={`Remove ${item.file.name}`}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           Hapus
@@ -706,7 +706,7 @@ export function FileUpload({
                       {item.attempts > 0 ? ` · percobaan ${item.attempts + 1}` : ''}
                     </p>
                     {(item.status === 'uploading' || item.status === 'done') && (
-                      <Progress value={item.progress} className="h-1.5" aria-label={`Progres upload ${item.file.name}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(item.progress)} />
+                      <Progress value={item.progress} className="h-1.5" aria-label={`Upload progress ${item.file.name}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(item.progress)} />
                     )}
                     {item.status === 'error' && item.error && (
                       <p role="status" className="flex items-start gap-1.5 text-xs text-destructive">
@@ -719,13 +719,13 @@ export function FileUpload({
                       {item.status === 'error' && (<span className="mr-1 text-destructive" aria-hidden="true"><XCircle className="h-4 w-4" /></span>)}
                       {item.status === 'canceled' && (<span className="mr-1 text-muted-foreground" aria-hidden="true"><Ban className="h-4 w-4" /></span>)}
                       {!disabled && item.status === 'uploading' && (
-                        <Button type="button" variant="ghost" size="sm" onClick={() => cancelItem(item.id)} aria-label={`Batalkan upload ${item.file.name}`}>Batal</Button>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => cancelItem(item.id)} aria-label={`Cancel upload ${item.file.name}`}>Cancel</Button>
                       )}
                       {!disabled && (item.status === 'error' || item.status === 'canceled') && (
-                        <Button type="button" variant="outline" size="sm" onClick={() => retryItem(item.id)} aria-label={`Ulangi upload ${item.file.name}`}><RotateCcw className="h-3.5 w-3.5" />Ulang</Button>
+                        <Button type="button" variant="outline" size="sm" onClick={() => retryItem(item.id)} aria-label={`Retry upload ${item.file.name}`}><RotateCcw className="h-3.5 w-3.5" />Retry</Button>
                       )}
                       {!disabled && (
-                        <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(item.id)} aria-label={`Hapus ${item.file.name}`}><Trash2 className="h-3.5 w-3.5" />Hapus</Button>
+                        <Button type="button" variant="ghost" size="sm" onClick={() => removeItem(item.id)} aria-label={`Remove ${item.file.name}`}><Trash2 className="h-3.5 w-3.5" />Remove</Button>
                       )}
                     </div>
                   </div>
@@ -738,9 +738,9 @@ export function FileUpload({
           {allDone && (
             <Alert variant="success">
               <CheckCircle2 className="h-4 w-4" />
-              <AlertTitle>Semua file selesai diunggah</AlertTitle>
+              <AlertTitle>All files uploaded</AlertTitle>
               <AlertDescription>
-                {items.length} file berhasil diunggah.
+                {items.length} files uploaded successfully.
               </AlertDescription>
             </Alert>
           )}

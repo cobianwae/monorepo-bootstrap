@@ -16,8 +16,8 @@ export interface ErrorPageProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function ErrorPage({
   className,
-  title = 'Terjadi kesalahan',
-  description = 'Sesuatu gagal dimuat. Coba reset atau muat ulang halaman.',
+  title = 'Something went wrong',
+  description = 'Something failed to load. Try resetting or reloading the page.',
   error,
   onReset,
   onReload,
@@ -43,13 +43,13 @@ export function ErrorPage({
           {onReset && (
             <Button size="sm" variant="outline" onClick={onReset} className="gap-1.5">
               <RotateCcw className="h-3.5 w-3.5" />
-              Coba Lagi
+              Try Again
             </Button>
           )}
           {onReload && (
             <Button size="sm" variant="ghost" onClick={onReload} className="gap-1.5">
               <RefreshCw className="h-3.5 w-3.5" />
-              Muat Ulang
+              Reload
             </Button>
           )}
         </div>

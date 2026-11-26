@@ -49,19 +49,19 @@ describe('OrgChart', () => {
     expect(nestedPositions).toHaveLength(5);
   });
 
-  it('AC-02: id duplikat ditolak dengan pesan jelas tanpa throw', () => {
+  it('AC-02: id Duplicate ID ditolak dengan pesan jelas tanpa throw', () => {
     const data: OrgChartInput = [
       { id: 'a', parentId: null, title: 'A' },
       { id: 'a', parentId: 'a', title: 'A lagi' },
     ];
     const { container } = render(<OrgChart data={data} />);
     const alert = screen.getByRole('alert');
-    expect(alert.textContent).toContain('duplikat');
+    expect(alert.textContent).toContain('Duplicate ID');
     expect(alert.textContent).toContain('"a"');
     expect(container.querySelector('[data-testid="org-chart-node"]')).toBeNull();
   });
 
-  it('AC-02: parent tidak ditemukan ditolak', () => {
+  it('AC-02: parent was not found ditolak', () => {
     const data: OrgChartInput = [
       { id: 'a', parentId: null, title: 'A' },
       { id: 'b', parentId: 'hilang', title: 'B' },
@@ -77,7 +77,7 @@ describe('OrgChart', () => {
       { id: 'root', parentId: null, title: 'Root' },
     ];
     render(<OrgChart data={data} />);
-    expect(screen.getByRole('alert').textContent).toContain('Siklus');
+    expect(screen.getByRole('alert').textContent).toContain('Cycle detected');
   });
 
   it('AC-02: root lebih dari satu ditolak', () => {
@@ -238,7 +238,7 @@ describe('OrgChart', () => {
     }
   });
 
-  it('003-03 AC-01: kanvas role tree + treeitem membawa level/expanded/selected tanpa duplikat', () => {
+  it('003-03 AC-01: kanvas role tree + treeitem membawa level/expanded/selected tanpa Duplicate ID', () => {
     const { container } = render(<OrgChart data={flatData} selectedId="eng" />);
     const tree = screen.getByRole('tree', { name: 'Org chart' });
     expect(tree).toBeTruthy();
@@ -510,7 +510,7 @@ describe('OrgChart', () => {
       ];
       render(<OrgChart data={data} />);
       const alert = screen.getByRole('alert');
-      expect(alert.textContent).toContain('tidak ditemukan');
+      expect(alert.textContent).toContain('was not found');
       expect(alert.textContent).toContain('"b"');
     });
 

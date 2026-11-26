@@ -189,7 +189,7 @@ describe('Lightbox', () => {
     render(<Harness items={makeItems(12)} initialIndex={2} />);
 
     expect(screen.getByText('3 / 12')).toBeTruthy();
-    expect(screen.getByText(/Gambar 3 dari 12/)).toBeTruthy();
+    expect(screen.getByText(/Image 3 of 12/)).toBeTruthy();
 
     fireEvent.click(screen.getByLabelText('Gambar berikut'));
     expect(screen.getByText('4 / 12')).toBeTruthy();
@@ -200,7 +200,7 @@ describe('Lightbox', () => {
     fireEvent.click(screen.getByLabelText('Gambar sebelumnya'));
     expect(screen.getByText('1 / 12')).toBeTruthy();
     expect(screen.getByLabelText('Gambar sebelumnya')).toHaveProperty('disabled', true);
-    expect(screen.getByText(/Gambar pertama/)).toBeTruthy();
+    expect(screen.getByText(/first image/)).toBeTruthy();
 
     // Maju ke ujung terakhir.
     for (let i = 0; i < 11; i += 1) {
@@ -208,7 +208,7 @@ describe('Lightbox', () => {
     }
     expect(screen.getByText('12 / 12')).toBeTruthy();
     expect(screen.getByLabelText('Gambar berikut')).toHaveProperty('disabled', true);
-    expect(screen.getByText(/Gambar terakhir/)).toBeTruthy();
+    expect(screen.getByText(/last image/)).toBeTruthy();
   });
 
   it('AC-01: tidak melingkar — tombol ujung disabled, bukan kembali ke awal', () => {
@@ -332,7 +332,7 @@ describe('Lightbox', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     const items = [{ id: 'x', src: 'https://example.com/x.jpg', alt: '' }];
     render(<Lightbox items={items} openIndex={0} onOpenChange={() => undefined} />);
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('tanpa alt'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('missing alt'));
   });
 
   it('AC-01: live region mengumumkan posisi + alt, fokus kembali ke pemicu saat tutup', () => {
@@ -351,9 +351,9 @@ describe('Lightbox', () => {
     const trigger = screen.getByText('buka galeri');
     trigger.focus();
     fireEvent.click(trigger);
-    expect(screen.getByText(/Gambar 2 dari 3: Foto 2/)).toBeTruthy();
+    expect(screen.getByText(/Image 2 of 3: Foto 2/)).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Gambar berikut'));
-    expect(screen.getByText(/Gambar 3 dari 3: Foto 3/)).toBeTruthy();
+    expect(screen.getByText(/Image 3 of 3: Foto 3/)).toBeTruthy();
     fireEvent.click(screen.getByLabelText('Tutup galeri'));
     expect(document.activeElement).toBe(trigger);
   });
@@ -400,7 +400,7 @@ describe('Lightbox', () => {
       // Perkecil kembali ke 200 lalu pindah: reset diumumkan.
       fireEvent.click(screen.getByLabelText('Perkecil'));
       fireEvent.click(screen.getByLabelText('Gambar berikut'));
-      expect(screen.getByText('Zoom diatur ulang')).toBeTruthy();
+      expect(screen.getByText('Zoom reset')).toBeTruthy();
     } finally {
       vi.useRealTimers();
     }
@@ -423,7 +423,7 @@ describe('Lightbox', () => {
     }
   });
 
-  it('AC-05: empty role=status tanpa overlay, loading aria-busy, error alert + fokus Coba lagi', () => {
+  it('AC-05: empty role=status tanpa overlay, loading aria-busy, error alert + fokus Try again', () => {
     const { unmount } = render(
       <Lightbox items={[]} openIndex={0} onOpenChange={() => undefined} />,
     );
@@ -436,7 +436,7 @@ describe('Lightbox', () => {
     );
     const loadingRegion = screen.getByRole('status');
     expect(loadingRegion.getAttribute('aria-busy')).toBe('true');
-    expect(screen.getByText('Memuat gambar…')).toBeTruthy();
+    expect(screen.getByText('Loading image…')).toBeTruthy();
     unmountLoading();
 
     const onRetry = vi.fn();
@@ -452,11 +452,11 @@ describe('Lightbox', () => {
     );
     expect(screen.getByRole('alert')).toBeTruthy();
     expect(screen.getByText(/Gagal memuat/)).toBeTruthy();
-    const retry = screen.getByText('Coba lagi');
+    const retry = screen.getByText('Try again');
     expect(document.activeElement).toBe(retry);
     fireEvent.click(retry);
     expect(onRetry).toHaveBeenCalledWith(0);
-    fireEvent.click(screen.getByText('Lewati ke berikut'));
+    fireEvent.click(screen.getByText('Skip to next'));
     expect(onOpenChange).toHaveBeenCalledWith(1);
   });
 });

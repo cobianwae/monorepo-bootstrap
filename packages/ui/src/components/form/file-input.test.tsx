@@ -25,8 +25,8 @@ describe('FileInput component', () => {
     const { container } = render(<FileInput value={[existing]} onChange={onChange} />);
 
     expect(screen.getByRole('region', { name: 'File upload dropzone' })).toBeDefined();
-    expect(screen.getByText('Klik untuk upload')).toBeDefined();
-    expect(screen.getByRole('button', { name: 'Hapus a.csv' })).toBeDefined();
+    expect(screen.getByText('Click to upload')).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Remove a.csv' })).toBeDefined();
 
     selectFile(container, next);
     expect(onChange).toHaveBeenCalledWith([existing, next]);
@@ -91,7 +91,7 @@ describe('FileInput component', () => {
 
     const input = container.querySelector('input[type="file"]');
     expect(input?.getAttribute('aria-describedby')).toContain('-helper');
-    fireEvent.click(screen.getByRole('button', { name: 'Hapus a.csv' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Remove a.csv' }));
     expect(onChange).toHaveBeenCalledWith([]);
   });
 

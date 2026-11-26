@@ -1,6 +1,6 @@
 # CR-095 — Patterns: satu keluarga visual lintas art direction
 
-**Status:** draft
+**Status:** approved (ditetapkan user 2026-11-26)
 **Sumber:** audit uplift + diskusi user 2026-11-26
 **Ref:** `docs/design/visual-language.md`, CR-093 (matriks route), CR-094 (komposisi)
 
@@ -54,7 +54,7 @@
 | 1 | Arah visual approved tidak diubah. | Uplift menerapkan bahasa visual bersama, bukan menetapkan art direction baru. |
 | 2 | CR-093 → CR-094 → CR-095; satu CR/branch saat eksekusi. | Memisahkan keputusan editorial, komposisi, dan polish sehingga perubahan dapat direview. |
 | 3 | CR-080/081 tidak diduplikasi; hasil uplift lama menjadi baseline. | Evaluasi delta terhadap kode aktual, bukan mengulang audit lama. |
-| 4 | Draft ini belum mendapat approval eksekusi. | User baru menyetujui arah dan pembuatan CR. |
+| 4 | CR disetujui user 2026-11-26 bersama CR-093/094. | Eksekusi berurutan di worktree arah-prd, dari branch integrasi pattern-polish. |
 
 ## Design System Checks
 
@@ -69,7 +69,8 @@
 Branch: `cr-095-patterns-visual-family`
 Commit: `fix: unify patterns visual presentation [CR-095]`
 
-- [ ] CR disetujui user termasuk perubahan kontrol; CR-094 diintegrasikan.
+- [x] CR disetujui user termasuk perubahan kontrol.
+- [ ] CR-094 diintegrasikan.
 - [ ] Branch dibuat; perubahan diimplementasikan.
 - [ ] Preview via `pnpm -C apps/showcase dev`; screenshot before/after dibaca sebagai image dan iterasi bersama user.
 - [ ] Verifikasi targeted lalu typecheck → lint → test; smoke build dari salinan sementara bila dev server aktif. Jangan menghentikan server user.

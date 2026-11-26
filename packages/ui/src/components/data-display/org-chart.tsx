@@ -117,7 +117,7 @@ function normalizeInput(data: OrgChartInput): NormalizedResult {
         rootId: null,
         error: {
           code: 'duplicate-id',
-          message: `ID duplikat: "${node.id}" muncul lebih dari sekali.`,
+          message: `Duplicate ID: "${node.id}" appears more than once.`,
           nodeId: node.id,
         },
         isEmpty: false,
@@ -151,7 +151,7 @@ function normalizeInput(data: OrgChartInput): NormalizedResult {
         rootId: null,
         error: {
           code: 'missing-parent',
-          message: `Parent "${node.parentId}" dari node "${node.id}" tidak ditemukan.`,
+          message: `Parent "${node.parentId}" of node "${node.id}" was not found.`,
           nodeId: node.id,
         },
         isEmpty: false,
@@ -204,7 +204,7 @@ function normalizeInput(data: OrgChartInput): NormalizedResult {
       rootId: null,
       error: {
         code: 'cycle',
-        message: `Siklus terdeteksi pada node "${cycleId}".`,
+        message: `Cycle detected at node "${cycleId}".`,
         nodeId: cycleId,
       },
       isEmpty: false,

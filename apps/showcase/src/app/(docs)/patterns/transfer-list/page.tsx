@@ -37,8 +37,8 @@ export default function TransferListPatternPage() {
   return (
     <div className="flex flex-col gap-6 p-6">
       <PageHeader
-        title="Transfer List — Assign Role (S-005.30)"
-        description="Dual-listbox controlled untuk assign role/anggota: pindah tiga cara, filter per panel, keyboard penuh. Coba light & dark via theme toggle."
+        title="Transfer List"
+        description="Assign members to a role by moving them between two searchable lists."
       />
       <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Demo state">
         {(['success', 'loading', 'empty', 'error'] as const).map((s) => (
@@ -67,12 +67,12 @@ export default function TransferListPatternPage() {
         selectedLabel="Role members"
       />
       <ol className="flex flex-col gap-1 text-sm text-muted-foreground">
-        <li>1. Pilih item di panel kiri (klik, Ctrl+klik multi, Shift+klik rentang).</li>
-        <li>2. Pindah via tombol (→), double-click, atau pindah-semua yang tampil.</li>
-        <li>3. Filter tiap panel tanpa mengubah nilai terkontrol.</li>
-        <li>4. Keyboard: Tab ke listbox, panah navigasi, Space/Enter seleksi, Tab ke tombol pindah.</li>
-        <li>5. Fokus berpindah logis ke panel tujuan setelah aksi pindah.</li>
-        <li>6. State loading (skeleton), empty per panel, dan error tersedia di toggle di atas.</li>
+        <li>1. Select a member on the left. Ctrl+click selects multiple items; Shift+click selects a range.</li>
+        <li>2. Move members with the arrow button, a double-click, or the move-all-visible action.</li>
+        <li>3. Filter either list without changing the assigned members.</li>
+        <li>4. Use Tab to reach a list, arrow keys to navigate, and Space or Enter to select. Tab to the move buttons.</li>
+        <li>5. After a move, focus follows the items to the destination list.</li>
+        <li>6. Use the demo controls to try loading, empty, and error states (S-005.30).</li>
       </ol>
     </div>
   );

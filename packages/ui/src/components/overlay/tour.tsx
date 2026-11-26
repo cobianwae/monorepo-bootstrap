@@ -343,7 +343,7 @@ export function Tour({
         skippedAtStart.includes(entry.index) ? { ...entry, result: 'skipped-missing' as const } : entry
       );
       const label = skippedAtStart.map((i) => i + 1).join(', ');
-      setNotice(`Langkah ${label} dilewati: target tidak ditemukan.`);
+      setNotice(`Step ${label} skipped: target not found.`);
     }
     activeIndexRef.current = start;
     seenRef.current.add(start);
@@ -384,11 +384,11 @@ export function Tour({
           side: step.placement === 'auto' || step.placement === undefined ? undefined : step.placement,
           align: 'start',
           showProgress: !isSingle,
-          progressText: `${index + 1} dari ${stepCount}`,
-          nextBtnText: last ? 'Selesai' : 'Lanjut',
-          prevBtnText: 'Kembali',
-          doneBtnText: 'Selesai',
-          closeBtnLabel: 'Lewati',
+          progressText: `${index + 1} of ${stepCount}`,
+          nextBtnText: last ? 'Done' : 'Next',
+          prevBtnText: 'Back',
+          doneBtnText: 'Done',
+          closeBtnLabel: 'Skip',
           popoverClass,
           showButtons: ['next', 'previous', 'close'],
           disableButtons: index === 0 ? ['previous'] : [],
@@ -413,7 +413,7 @@ export function Tour({
                 skipped.includes(entry.index) ? { ...entry, result: 'skipped-missing' as const } : entry
               );
               const label = skipped.map((i) => i + 1).join(', ');
-              setNotice(`Langkah ${label} dilewati: target tidak ditemukan.`);
+              setNotice(`Step ${label} skipped: target not found.`);
             }
             if (next >= stepCount) {
               // Sisa langkah hilang semua → error (flow 2: M–Q–ERR).
@@ -454,15 +454,15 @@ export function Tour({
       stageRadius: 8,
       popoverClass,
       showProgress: !isSingle,
-      progressText: `${start + 1} dari ${stepCount}`,
+      progressText: `${start + 1} of ${stepCount}`,
       nextBtnText: 'Lanjut',
-      prevBtnText: 'Kembali',
-      doneBtnText: 'Selesai',
+      prevBtnText: 'Back',
+      doneBtnText: 'Done',
       allowClose: false, // Esc + tutup via alur K2 milik DS, bukan driver.
       smoothScroll: !reduced,
       onDestroyStarted: () => {
         // Pengaman: destroy eksternal = alur lewati (K2 penuh via requestSkip).
-        // Abaikan saat error semua-hilang (penutupan via [Tutup tur] milik DS).
+        // Abaikan saat error semua-hilang (penutupan via [Close tour] milik DS).
         if (!errorRef.current) requestSkipRef.current(activeIndexRef.current);
       },
     });
@@ -507,19 +507,19 @@ export function Tour({
           role="alert"
           tabIndex={-1}
           data-testid="tour-error"
-          aria-label="Semua target tidak ditemukan"
+          aria-label="All targets not found"
         >
-          <p>Semua target tidak ditemukan.</p>
+          <p>All targets not found.</p>
           <p>
-            {errorAllMissing.total} dari {errorAllMissing.total} target hilang — tur tidak dapat
-            dimulai atau dilanjutkan.
+            {errorAllMissing.total} of {errorAllMissing.total} targets missing — the tour cannot
+            start or continue.
           </p>
           <button type="button" onClick={closeError}>
-            Tutup tur
+            Close tour
           </button>
         </div>
         <div aria-live="polite" data-testid="tour-announcer" className="sr-only">
-          Semua target tidak ditemukan.
+          All targets not found.
         </div>
       </div>
     );
@@ -530,10 +530,10 @@ export function Tour({
     return (
       <div ref={layerRef} data-tour-layer>
         <div role="status" data-testid="tour-success">
-          {ended === 'finished' ? 'Tur selesai.' : 'Tur dilewati.'}
+          {ended === 'finished' ? 'Tour finished.' : 'Tour skipped.'}
         </div>
         <div aria-live="polite" data-testid="tour-announcer" className="sr-only">
-          {ended === 'finished' ? 'Tur selesai.' : 'Tur dilewati.'}
+          {ended === 'finished' ? 'Tour finished.' : 'Tour skipped.'}
         </div>
       </div>
     );
@@ -551,10 +551,10 @@ export function Tour({
         className="sr-only"
       >
         {loading
-          ? 'Memuat langkah…'
+          ? 'Loading step…'
           : isSingle
             ? `${current.title}: ${current.content}`
-            : `Langkah ${safeActive + 1} dari ${stepCount}: ${current.title}${notice ? ` ${notice}` : ''}`}
+            : `Step ${safeActive + 1} of ${stepCount}: ${current.title}${notice ? ` ${notice}` : ''}`}
       </div>
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent
@@ -568,15 +568,15 @@ export function Tour({
           }}
         >
           <AlertDialogHeader>
-            <AlertDialogTitle>Lewati tur?</AlertDialogTitle>
+            <AlertDialogTitle>Skip tour?</AlertDialogTitle>
             <AlertDialogDescription>
-              Kamu sudah melihat {seenCount} dari {stepCount} langkah. Lewati sisa tur?
+              You have seen {seenCount} of {stepCount} steps. Skip the rest of the tour?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Lanjut tur</AlertDialogCancel>
+            <AlertDialogCancel>Continue tour</AlertDialogCancel>
             <AlertDialogAction onClick={() => skipTour(statusRef.current, activeIndexRef.current)}>
-              Ya, lewati
+              Yes, skip
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

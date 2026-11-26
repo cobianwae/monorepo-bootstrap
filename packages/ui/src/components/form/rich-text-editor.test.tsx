@@ -76,7 +76,7 @@ describe('RichTextEditor 006-01', () => {
     expect(await screen.findByTestId('rte-toolbar')).toBeDefined();
     expect(screen.getByTestId('rte-content')).toBeDefined();
     expect(screen.getByTestId('rte-live')).toBeDefined();
-    expect(screen.getByRole('toolbar', { name: 'Format teks' })).toBeDefined();
+    expect(screen.getByRole('toolbar', { name: 'Text formatting' })).toBeDefined();
   });
 
   it('marks inline format buttons active inside formatted text', async () => {
@@ -106,8 +106,8 @@ describe('RichTextEditor 006-01', () => {
     const redo = (await screen.findByTestId('rte-button-redo')) as HTMLButtonElement;
     expect(undo.disabled).toBe(true);
     expect(redo.disabled).toBe(true);
-    expect(undo.getAttribute('aria-label')).toContain('Urungkan');
-    expect(redo.getAttribute('aria-label')).toContain('Ulangi');
+    expect(undo.getAttribute('aria-label')).toContain('Undo');
+    expect(redo.getAttribute('aria-label')).toContain('Redo');
     expect(screen.getByTestId('rte-live').getAttribute('aria-live')).toBe('polite');
   });
 
@@ -150,7 +150,7 @@ describe('RichTextEditor 006-02 link + shortcut + keyboard', () => {
     render(<ControlledHarness />);
     fireEvent.click(await screen.findByTestId('rte-button-link'));
     const popover = await screen.findByTestId('rte-link-popover');
-    expect(popover.getAttribute('aria-label')).toBe('Editor tautan');
+    expect(popover.getAttribute('aria-label')).toBe('Link editor');
     const input = (await screen.findByTestId('rte-link-input')) as HTMLInputElement;
     await waitFor(() => {
       expect(document.activeElement).toBe(input);
@@ -195,7 +195,7 @@ describe('RichTextEditor 006-02 link + shortcut + keyboard', () => {
       const last = onChange.mock.calls.at(-1)?.[0] as string | undefined;
       expect(last).toContain('https://baru.com');
     });
-    expect(screen.getByTestId('rte-live').textContent).toContain('diperbarui');
+    expect(screen.getByTestId('rte-live').textContent).toContain('Link updated');
     // Popover closes and focus returns to the editor
     await waitFor(() => {
       expect(screen.queryByTestId('rte-link-input')).toBeNull();
@@ -224,7 +224,7 @@ describe('RichTextEditor 006-02 link + shortcut + keyboard', () => {
       expect(last as string).toContain('sini');
       expect(last as string).not.toContain('<a');
     });
-    expect(screen.getByTestId('rte-live').textContent).toContain('dihapus');
+    expect(screen.getByTestId('rte-live').textContent).toContain('Link removed');
   });
 
   it('opens the existing link in a new tab via Buka', async () => {
@@ -381,7 +381,7 @@ describe('RichTextEditor 006-03 mode + counter + states', () => {
     const counter = screen.getByTestId('rte-counter');
     // 90% = gaya warning + teks "mendekati batas"
     expect(counter.className).toContain('text-warning');
-    expect(screen.getByText('mendekati batas')).toBeDefined();
+    expect(screen.getByText('Near the character limit')).toBeDefined();
     unmountNear();
 
     const { unmount } = render(
@@ -389,7 +389,7 @@ describe('RichTextEditor 006-03 mode + counter + states', () => {
     );
     const alert = await screen.findByTestId('rte-counter-alert');
     expect(alert.getAttribute('role')).toBe('alert');
-    expect(alert.textContent).toContain('melewati batas 2 karakter');
+    expect(alert.textContent).toContain('2 characters over the limit');
     // Mengetik tetap boleh: editor tetap editable saat over-limit.
     const editable = await waitFor(() => {
       const contents = screen.getAllByTestId('rte-content');
@@ -405,7 +405,7 @@ describe('RichTextEditor 006-03 mode + counter + states', () => {
     render(<RichTextEditor value="<p>Halo</p>" loading />);
     const skeleton = await screen.findByTestId('rte-loading');
     expect(skeleton.getAttribute('aria-busy')).toBe('true');
-    expect(screen.getByText('Memuat editor…')).toBeDefined();
+    expect(screen.getByText('Loading editor…')).toBeDefined();
     // Toolbar + counter disembunyikan saat loading.
     expect(screen.queryByTestId('rte-toolbar')).toBeNull();
     expect(screen.queryByTestId('rte-counter')).toBeNull();
@@ -440,12 +440,12 @@ describe('RichTextEditor 006-04 gambar + markdown + mention', () => {
   it('renders image toolbar button and opens M-010 with required validation', async () => {
     render(<RichTextEditor value="<p>Halo</p>" />);
     const imageButton = await screen.findByTestId('rte-button-image');
-    expect(imageButton.getAttribute('aria-label')).toContain('gambar');
+    expect(imageButton.getAttribute('aria-label')).toContain('image');
     fireEvent.click(imageButton);
     const dialog = await screen.findByTestId('rte-image-dialog');
-    expect(dialog.getAttribute('aria-label')).toBe('Sisip gambar');
+    expect(dialog.getAttribute('aria-label')).toBe('Insert image');
     // Kosong: tolak + pesan + Sisipkan disabled + dialog tetap terbuka.
-    expect(screen.getByTestId('rte-image-error').textContent).toContain('wajib diisi');
+    expect(screen.getByTestId('rte-image-error').textContent).toContain('Enter an image URL');
     expect((screen.getByTestId('rte-image-save') as HTMLButtonElement).disabled).toBe(true);
     expect(screen.getByTestId('rte-image-dialog')).toBeDefined();
   });
@@ -457,7 +457,7 @@ describe('RichTextEditor 006-04 gambar + markdown + mention', () => {
     const url = await screen.findByTestId('rte-image-url');
     fireEvent.change(url, { target: { value: 'notaurl' } });
     fireEvent.change(await screen.findByTestId('rte-image-alt'), { target: { value: 'Alt' } });
-    expect(screen.getByTestId('rte-image-error').textContent).toContain('URL tidak valid');
+    expect(screen.getByTestId('rte-image-error').textContent).toContain('Enter a valid URL');
     expect((screen.getByTestId('rte-image-save') as HTMLButtonElement).disabled).toBe(true);
     expect(onChange).not.toHaveBeenCalled();
     expect(screen.getByTestId('rte-image-dialog')).toBeDefined();
@@ -470,7 +470,7 @@ describe('RichTextEditor 006-04 gambar + markdown + mention', () => {
       target: { value: 'https://contoh.com/gambar.png' },
     });
     // Alt kosong → tolak dengan pesan "alt wajib".
-    expect(screen.getByTestId('rte-image-error').textContent).toContain('alt wajib');
+    expect(screen.getByTestId('rte-image-error').textContent).toContain('Enter alt text');
     expect((screen.getByTestId('rte-image-save') as HTMLButtonElement).disabled).toBe(true);
     fireEvent.change(await screen.findByTestId('rte-image-alt'), { target: { value: 'Kucing' } });
     expect(screen.queryByTestId('rte-image-error')).toBeNull();
@@ -492,7 +492,7 @@ describe('RichTextEditor 006-04 gambar + markdown + mention', () => {
       expect(last ?? '').toContain('alt="Kucing"');
       expect(last ?? '').toContain('https://contoh.com/gambar.png');
     });
-    expect(screen.getByTestId('rte-live').textContent).toContain('Gambar disisipkan');
+    expect(screen.getByTestId('rte-live').textContent).toContain('Image inserted');
     await waitFor(() => {
       expect(screen.queryByTestId('rte-image-dialog')).toBeNull();
     });
@@ -579,7 +579,7 @@ describe('RichTextEditor 006-05 showcase final + audit + smoke', () => {
     // Link: buka M-009, validasi, lalu edit tautan existing via klik anchor.
     fireEvent.click(await screen.findByTestId('rte-button-link'));
     const popover = await screen.findByTestId('rte-link-popover');
-    expect(popover.getAttribute('aria-label')).toBe('Editor tautan');
+    expect(popover.getAttribute('aria-label')).toBe('Link editor');
     fireEvent.change(await screen.findByTestId('rte-link-input'), {
       target: { value: 'https://contoh.com' },
     });
@@ -609,7 +609,7 @@ describe('RichTextEditor 006-05 showcase final + audit + smoke', () => {
     void unmountSmoke;
     const alerts = await screen.findAllByTestId('rte-counter-alert');
     expect(alerts.length).toBeGreaterThan(0);
-    expect(alerts[alerts.length - 1].textContent).toContain('melewati batas');
+    expect(alerts[alerts.length - 1].textContent).toContain('over the limit');
     const counters = await screen.findAllByTestId('rte-counter');
     expect(counters[counters.length - 1].textContent).toContain('60/50');
   });

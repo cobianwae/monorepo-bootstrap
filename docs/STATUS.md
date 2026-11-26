@@ -6,7 +6,7 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 ## Posisi Saat Ini
 
-- **Branch kerja: `visual-polish`** (dari `dev` `e57f7ea`) — branch integrasi pekerjaan visual, diperlakukan seperti `dev`: CR/story visual di-merge ke sini. `dev` tidak diubah; push/PR menunggu keputusan user.
+- **Branch kerja: `cr-093-patterns-english-editorial-coherence`**, worktree `arah-prd`, dari `pattern-polish` (`692941c`). Integrasi seri Patterns ke `pattern-polish`; `visual-polish` tetap integrasi visual sebelumnya.
 - PRD 001–006, 010 (legacy), 011 `shipped` dan diarsipkan. PRD 012–019 dan spec ringkas RM-02/03/10 `approved`. Seluruh story `done` kecuali 013-01, 013-02, 013-03.
 - CR-017–092 `done` (kecuali CR-081); riwayat merge/push per CR ada di `docs/STATUS-LOG.md` (rekonsiliasi CR sebelum 054: `docs/reviews/cr-before-054-status-reconciliation.md`).
 - CR `approved` yang belum selesai: CR-081 (seri Import Wizard).
@@ -14,7 +14,7 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 ## Next
 
-Draft uplift 37 halaman Patterns: CR-093 (English copy), CR-094 (komposisi konten), CR-095 (keluarga visual). Arah disepakati; menunggu approval CR sebelum implementasi.
+CR-093 done user 2026-11-26 (copy runtime Patterns English di 11 route + 15 komponen shared `@ds/ui` tanpa perubahan API; typecheck/lint/build hijau, test 749/750 dengan 1 smoke RTE flaky pre-existing). Berikutnya CR-094 (komposisi) lalu CR-095 (visual), satu CR per branch.
 
 1. CR-081 — hanya atas instruksi user, satu CR per sesi. Supersession bahasa Import Wizard (CR-079) sudah diterapkan.
 2. Story 013-01, 013-02, 013-03 (Diff viewer). 013-01 membuka S-005.36 (`in-design`); S-005.30/S-005.31 `implemented`; S-005.41 tetap `in-design` sampai PRD 018 diimplementasi.

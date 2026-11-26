@@ -315,7 +315,7 @@ describe('EventCalendar multi-day segments', () => {
     expect(middle.getAttribute('data-continuation')).toBe('both');
     expect(last.getAttribute('data-continuation')).toBe('before');
     expect(first.getAttribute('aria-label')).toContain('berlanjut ke hari berikutnya');
-    expect(middle.getAttribute('aria-label')).toContain('berlanjut dari hari sebelumnya');
+    expect(middle.getAttribute('aria-label')).toContain('continues from the previous day');
   });
 
   it('AC-01: klik segmen mana pun mengirim payload event utuh', () => {
@@ -348,7 +348,7 @@ describe('EventCalendar multi-day segments', () => {
     expect(weekSegments[1].getAttribute('data-continuation')).toBe('both');
     expect(weekSegments[2].getAttribute('data-continuation')).toBe('before');
     expect(weekSegments[0].getAttribute('aria-label')).toContain('berlanjut ke hari berikutnya');
-    expect(weekSegments[1].getAttribute('aria-label')).toContain('berlanjut dari hari sebelumnya');
+    expect(weekSegments[1].getAttribute('aria-label')).toContain('continues from the previous day');
     week.unmount();
 
     const day = render(<EventCalendar events={EVENTS} defaultDate={CONTEXT_DATE} defaultView="day" />);
@@ -739,8 +739,8 @@ describe('EventCalendar agenda', () => {
       />
     );
     expect(screen.getByRole('status')).toBeDefined();
-    expect(screen.getByText('Tidak ada event di periode ini')).toBeDefined();
-    expect(screen.getByRole('button', { name: 'Buat event' })).toBeDefined();
+    expect(screen.getByText('No events in this period')).toBeDefined();
+    expect(screen.getByRole('button', { name: 'Create event' })).toBeDefined();
   });
 });
 
@@ -752,7 +752,7 @@ describe('EventCalendar state matrix', () => {
     const grid = screen.getByRole('grid');
     expect(grid.getAttribute('aria-busy')).toBe('true');
     expect(grid.getAttribute('data-skeleton-view')).toBe('month');
-    expect(screen.getByText('Memuat event…')).toBeDefined();
+    expect(screen.getByText('Loading events…')).toBeDefined();
     expect(screen.getByLabelText('Previous period').getAttribute('disabled')).toBeDefined();
   });
 
@@ -761,13 +761,13 @@ describe('EventCalendar state matrix', () => {
       <EventCalendar events={[]} defaultDate={CONTEXT_DATE} defaultView="week" loading />
     );
     expect(screen.getByRole('grid').getAttribute('data-skeleton-view')).toBe('week');
-    expect(screen.getByText('Memuat event…')).toBeDefined();
+    expect(screen.getByText('Loading events…')).toBeDefined();
     unmount();
     render(
       <EventCalendar events={[]} defaultDate={CONTEXT_DATE} defaultView="day" loading />
     );
     expect(screen.getByRole('grid').getAttribute('data-skeleton-view')).toBe('day');
-    expect(screen.getByText('Memuat event…')).toBeDefined();
+    expect(screen.getByText('Loading events…')).toBeDefined();
   });
 
   it('AC-01: error menampilkan alert role alert + pesan + tombol Coba lagi', () => {
@@ -781,9 +781,9 @@ describe('EventCalendar state matrix', () => {
       />
     );
     expect(screen.getByRole('alert')).toBeDefined();
-    expect(screen.getByText('Gagal memuat event')).toBeDefined();
+    expect(screen.getByText('Could not load events')).toBeDefined();
     expect(screen.getByText('Gagal memuat data')).toBeDefined();
-    fireEvent.click(screen.getByRole('button', { name: 'Coba lagi' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
     expect(onRetry).toHaveBeenCalledTimes(1);
   });
 
@@ -792,18 +792,18 @@ describe('EventCalendar state matrix', () => {
       <EventCalendar events={[]} defaultDate={CONTEXT_DATE} error="Gagal memuat data" />
     );
     expect(screen.getByRole('alert')).toBeDefined();
-    expect(screen.queryByRole('button', { name: 'Coba lagi' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Try again' })).toBeNull();
   });
 
   it('AC-01: empty (periode tanpa event) menampilkan empty-state role status', () => {
     render(<EventCalendar events={[]} defaultDate={CONTEXT_DATE} />);
     expect(screen.getByRole('status')).toBeDefined();
-    expect(screen.getByText('Tidak ada event di periode ini')).toBeDefined();
+    expect(screen.getByText('No events in this period')).toBeDefined();
   });
 
   it('AC-01: success dengan event menampilkan grid aktif, bukan state matrix', () => {
     render(<EventCalendar events={EVENTS} defaultDate={CONTEXT_DATE} defaultView="month" />);
-    expect(screen.queryByText('Tidak ada event di periode ini')).toBeNull();
+    expect(screen.queryByText('No events in this period')).toBeNull();
     expect(screen.queryByRole('alert')).toBeNull();
     expect(screen.getByRole('grid')).toBeDefined();
   });

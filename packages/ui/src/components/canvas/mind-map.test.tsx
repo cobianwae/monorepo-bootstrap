@@ -172,7 +172,7 @@ describe('MindMap keyboard, SR dan states (012-03)', () => {
     const { container } = render(<ControlledMind onChangeSpy={spy} />);
     const node = container.querySelector('[data-node-id="produk"]')!;
     fireEvent.keyDown(node, { key: 'F2' });
-    const input = screen.getByRole('textbox', { name: 'Ubah ide Produk MVP' });
+    const input = screen.getByRole('textbox', { name: 'Edit idea Produk MVP' });
     fireEvent.keyDown(input, { key: '+', ctrlKey: false });
     fireEvent.keyDown(input, { key: 'z', ctrlKey: true });
     fireEvent.keyDown(input, { key: 'Delete' });
@@ -248,17 +248,17 @@ describe('MindMap keyboard, SR dan states (012-03)', () => {
     fireEvent.keyDown(pill('riset'), { key: 'ArrowDown' });
     await waitFor(() => expect(document.activeElement).toBe(pill('kompetitor')));
     fireEvent.keyDown(pill('kompetitor'), { key: 'F2' });
-    const input = screen.getByRole('textbox', { name: 'Ubah ide Analisis kompetitor' });
+    const input = screen.getByRole('textbox', { name: 'Edit idea Analisis kompetitor' });
     expect(document.activeElement).toBe(input);
     fireEvent.keyDown(input, { key: 'Escape' });
     fireEvent.keyDown(pill('kompetitor'), { key: 'Enter' });
-    expect(screen.getByRole('textbox', { name: 'Ubah ide Analisis kompetitor' })).toBeTruthy();
+    expect(screen.getByRole('textbox', { name: 'Edit idea Analisis kompetitor' })).toBeTruthy();
   });
 
   it('pohon SR tree/group/treeitem, roving tabindex dan keyboard standar', () => {
     const { container } = render(<MindMap data={flatData} />);
     container.querySelector('details')!.open = true;
-    const tree = screen.getByRole('tree', { name: 'Pohon ide' });
+    const tree = screen.getByRole('tree', { name: 'Idea tree' });
     const items = () => within(tree).getAllByRole('treeitem');
     expect(items().filter((item) => item.tabIndex === 0)).toHaveLength(1);
     const root = items()[0];
@@ -277,16 +277,16 @@ describe('MindMap keyboard, SR dan states (012-03)', () => {
     expect(document.activeElement?.getAttribute('data-tree-id')).toBe('riset');
     expect(items().filter((item) => item.tabIndex === 0)).toHaveLength(1);
     fireEvent.click(within(tree).getByRole('button', { name: 'Edit Riset pasar' }));
-    expect(document.activeElement).toBe(screen.getByRole('textbox', { name: 'Ubah ide Riset pasar' }));
+    expect(document.activeElement).toBe(screen.getByRole('textbox', { name: 'Edit idea Riset pasar' }));
   });
 
   it('sorotan presentasional non-warna hilang setelah props dibersihkan', () => {
     const { container, rerender } = render(<MindMap data={flatData} highlightedIds={['produk']} />);
     const pill = () => container.querySelector('[data-node-id="produk"]')!;
-    expect(pill().textContent).toContain('Cocok');
+    expect(pill().textContent).toContain('Match');
     expect(pill().className).toContain('border-dashed');
     rerender(<MindMap data={flatData} highlightedIds={[]} />);
-    expect(pill().textContent).not.toContain('Cocok');
+    expect(pill().textContent).not.toContain('Match');
   });
 
   it('loading enam skeleton tanpa kontrol aktif; error eksternal mempertahankan diagram', () => {
@@ -305,9 +305,9 @@ describe('MindMap keyboard, SR dan states (012-03)', () => {
     Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } });
     try {
       render(<MindMap data={[{ id: 'x', parentId: null, label: 'A' }, { id: 'x', parentId: null, label: 'B' }]} />);
-      expect(screen.getByRole('alert').textContent).toContain('ID duplikat');
-      fireEvent.click(screen.getByRole('button', { name: 'Salin detail error' }));
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Detail disalin' })).toBeTruthy());
+      expect(screen.getByRole('alert').textContent).toContain('Duplicate ID');
+      fireEvent.click(screen.getByRole('button', { name: 'Copy error detail' }));
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Detail copied' })).toBeTruthy());
       expect(writeText.mock.calls[0][0]).toContain('node: x');
     } finally {
       if (original) Object.defineProperty(navigator, 'clipboard', original);
@@ -498,7 +498,7 @@ describe('MindMap fondasi (012-01)', () => {
 
     const badge = container.querySelector('[data-testid="mind-map-badge-riset"]');
     expect(badge?.textContent).toBe('+3');
-    expect(badge?.getAttribute('aria-label')).toBe('3 ide tersembunyi');
+    expect(badge?.getAttribute('aria-label')).toBe('3 hidden ideas');
   });
 
   it('AC-04: expand uncontrolled — toggle internal tanpa prop expandedIds', () => {
@@ -553,7 +553,7 @@ describe('MindMap fondasi (012-01)', () => {
   it('AC-01: dataset kosong → empty state tanpa node', () => {
     const { container } = render(<MindMap data={[]} />);
     expect(container.querySelector('[data-testid="mind-map-node"]')).toBeNull();
-    expect(container.textContent).toContain('Belum ada peta ide');
+    expect(container.textContent).toContain('No idea map yet');
   });
 });
 
@@ -587,7 +587,7 @@ describe('MindMap tambah/hapus/undo (012-02)', () => {
     const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
     const handle = container.querySelector('[data-testid="mind-map-add-child-riset"]') as HTMLElement;
     expect(handle).not.toBeNull();
-    expect(handle.getAttribute('aria-label')).toBe('Tambah anak Riset pasar');
+    expect(handle.getAttribute('aria-label')).toBe('Add child to Riset pasar');
     expect(handle.tagName).toBe('BUTTON'); // keyboard-activatable native
     fireEvent.click(handle);
 
@@ -626,7 +626,7 @@ describe('MindMap tambah/hapus/undo (012-02)', () => {
     const onChangeSpy = vi.fn();
     const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
     const handle = container.querySelector('[data-testid="mind-map-add-sibling-mvp"]') as HTMLElement;
-    expect(handle.getAttribute('aria-label')).toBe('Tambah saudara Fitur inti');
+    expect(handle.getAttribute('aria-label')).toBe('Add sibling to Fitur inti');
     fireEvent.click(handle);
     const input = container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'Fitur pendukung' } });
@@ -654,7 +654,7 @@ describe('MindMap tambah/hapus/undo (012-02)', () => {
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(input.getAttribute('aria-invalid')).toBe('true');
     expect(container.querySelector('[data-testid="mind-map-inline-err-ide-baru-1"]')?.textContent).toContain(
-      'tidak boleh kosong',
+      'cannot be empty',
     );
     expect(container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]')).not.toBeNull();
     expect(onChangeSpy).not.toHaveBeenCalled();
@@ -691,7 +691,7 @@ describe('MindMap tambah/hapus/undo (012-02)', () => {
     expect(onChangeSpy).toHaveBeenCalledTimes(1);
     const next = onChangeSpy.mock.calls[0][0] as MindNodeFlat[];
     expect(next.find((node) => node.id === 'mvp')?.label).toBe('Fitur inti v2');
-    expect(container.querySelector('[data-testid="mind-map-announcement"]')?.textContent).toContain('Diperbarui');
+    expect(container.querySelector('[data-testid="mind-map-announcement"]')?.textContent).toContain('Updated');
   });
 
   it('AC-03: Delete pada daun hapus langsung + satu onChange + live region, tanpa dialog', () => {
@@ -714,7 +714,7 @@ describe('MindMap tambah/hapus/undo (012-02)', () => {
     const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
     fireEvent.keyDown(container.querySelector('[data-node-id="riset"]') as HTMLElement, { key: 'Delete' });
     expect(onChangeSpy).not.toHaveBeenCalled();
-    expect(document.body.textContent).toContain('Hapus "Riset pasar" + 3 turunan?');
+    expect(document.body.textContent).toContain('Delete "Riset pasar" + 3 descendants?');
     fireEvent.click(document.body.querySelector('[data-testid="mind-map-delete-confirm"]')!);
     expect(onChangeSpy).toHaveBeenCalledTimes(1);
     const next = onChangeSpy.mock.calls[0][0] as MindNodeFlat[];
@@ -731,11 +731,11 @@ describe('MindMap tambah/hapus/undo (012-02)', () => {
     expect(onChangeSpy).not.toHaveBeenCalled();
     expect(document.body.querySelector('[data-testid="mind-map-delete-confirm"]')).toBeNull();
     expect(container.querySelector('[data-testid="mind-map-announcement"]')?.textContent).toContain(
-      'Ide pusat tidak bisa dihapus',
+      'cannot be deleted',
     );
 
     fireEvent.contextMenu(container.querySelector('[data-node-id="q1"]')!);
-    const hapus = screen.getByRole('menuitem', { name: 'Hapus' });
+    const hapus = screen.getByRole('menuitem', { name: 'Delete' });
     expect(hapus.getAttribute('data-disabled')).not.toBeNull();
   });
 
@@ -779,7 +779,7 @@ describe('MindMap tambah/hapus/undo (012-02)', () => {
     const onChangeSpy = vi.fn();
     const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
     fireEvent.contextMenu(container.querySelector('[data-node-id="produk"]')!);
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Tambah anak' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Add child' }));
     const input = await screen.findByTestId('mind-map-inline-input-ide-baru-1');
     expect(document.activeElement).toBe(input);
     expect(onChangeSpy).not.toHaveBeenCalled();
@@ -823,7 +823,7 @@ describe('MindMap tambah/hapus/undo (012-02)', () => {
   it('AC-01: empty state CTA "Buat peta" → root langsung inline-edit', () => {
     const onChangeSpy = vi.fn();
     const { container } = render(<MindMap data={[]} onChange={onChangeSpy} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Buat peta' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Create map' }));
     const input = container.querySelector('[data-testid="mind-map-inline-input-ide-baru-1"]') as HTMLInputElement;
     expect(input).not.toBeNull();
     expect(document.activeElement).toBe(input);
@@ -842,10 +842,10 @@ describe('MindMap tambah/hapus/undo (012-02)', () => {
       </>,
     );
     fireEvent.keyDown(container.querySelector('[data-node-id="kompetitor"]')!, { key: 'Delete' });
-    const title = await screen.findByText('Dihapus', { exact: true });
+    const title = await screen.findByText('Deleted', { exact: true });
     const toastItem = title.closest('li');
     expect(toastItem).not.toBeNull();
-    fireEvent.click(within(toastItem!).getByRole('button', { name: 'Urungkan' }));
+    fireEvent.click(within(toastItem!).getByRole('button', { name: 'Undo' }));
     expect(onChangeSpy).toHaveBeenCalledTimes(2);
     expect(nodeIds(container)).toContain('kompetitor');
   });
@@ -854,7 +854,7 @@ describe('MindMap tambah/hapus/undo (012-02)', () => {
     const onChangeSpy = vi.fn();
     const { container } = render(<ControlledMind onChangeSpy={onChangeSpy} />);
     fireEvent.contextMenu(container.querySelector('[data-node-id="kompetitor"]')!);
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Hapus' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Delete' }));
     await waitFor(() => {
       expect(onChangeSpy).toHaveBeenCalledTimes(1);
       expect(document.activeElement?.getAttribute('data-node-id')).toBe('riset');

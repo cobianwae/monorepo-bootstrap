@@ -107,8 +107,8 @@ function isValidLinkUrl(raw: string): boolean {
 }
 
 function linkErrorFor(raw: string): string | null {
-  if (!raw.trim()) return 'URL tautan wajib diisi';
-  if (!isValidLinkUrl(raw)) return 'Gunakan format https://… atau /path';
+  if (!raw.trim()) return 'Enter a link URL';
+  if (!isValidLinkUrl(raw)) return 'Use https://… or /path';
   return null;
 }
 
@@ -117,10 +117,10 @@ function isValidImageUrl(raw: string): boolean {
 }
 
 function imageErrorFor(url: string, alt: string, previewFailed: boolean): string | null {
-  if (!url.trim()) return 'URL gambar wajib diisi';
-  if (!isValidImageUrl(url)) return 'URL tidak valid';
-  if (previewFailed) return 'Gambar gagal dimuat — periksa URL';
-  if (!alt.trim()) return 'alt wajib';
+  if (!url.trim()) return 'Enter an image URL';
+  if (!isValidImageUrl(url)) return 'Enter a valid URL';
+  if (previewFailed) return 'Could not load the image. Check the URL.';
+  if (!alt.trim()) return 'Enter alt text';
   return null;
 }
 
@@ -154,7 +154,7 @@ function LinkForm({ url, error, isEditing, inputRef, onUrlChange, onSave, onOpen
   return (
     <div className="space-y-3">
       <div className="space-y-1.5">
-        <Label htmlFor="rte-link-input">URL tautan</Label>
+        <Label htmlFor="rte-link-input">Link URL</Label>
         <Input
           id="rte-link-input"
           ref={inputRef}
@@ -169,7 +169,7 @@ function LinkForm({ url, error, isEditing, inputRef, onUrlChange, onSave, onOpen
               onCancel();
             }
           }}
-          placeholder="https://contoh.com atau /path"
+          placeholder="https://example.com or /path"
           autoComplete="off"
           inputMode="url"
           aria-invalid={error ? true : undefined}
@@ -181,13 +181,13 @@ function LinkForm({ url, error, isEditing, inputRef, onUrlChange, onSave, onOpen
             {error}
           </p>
         ) : (
-          <p className="text-xs text-muted-foreground">Gunakan https://… atau /path.</p>
+          <p className="text-xs text-muted-foreground">Use https://… or /path.</p>
         )}
       </div>
       <div className="flex flex-wrap items-center justify-end gap-2">
         {isEditing ? (
           <Button type="button" variant="outline" size="sm" data-testid="rte-link-open" onClick={onOpen}>
-            Buka
+            Open link
           </Button>
         ) : null}
         {isEditing ? (
@@ -199,14 +199,14 @@ function LinkForm({ url, error, isEditing, inputRef, onUrlChange, onSave, onOpen
             data-testid="rte-link-remove"
             onClick={onRemove}
           >
-            Hapus
+            Remove link
           </Button>
         ) : null}
         <Button type="button" variant="ghost" size="sm" data-testid="rte-link-cancel" onClick={onCancel}>
-          Batal
+          Cancel
         </Button>
         <Button type="button" variant="highlight" size="sm" data-testid="rte-link-save" disabled={saveDisabled} onClick={onSave}>
-          Simpan
+          Save
         </Button>
       </div>
     </div>
@@ -217,7 +217,7 @@ export function RichTextEditor({
   value,
   onChange,
   onTextChange,
-  placeholder = 'Tulis sesuatu…',
+  placeholder = 'Write something…',
   mode = 'editable',
   loading = false,
   error = null,
@@ -342,7 +342,7 @@ export function RichTextEditor({
   React.useEffect(() => {
     if (counterStatus === 'over' && !overAnnouncedRef.current) {
       overAnnouncedRef.current = true;
-      setAnnounce(`Melewati batas ${overBy} karakter`);
+      setAnnounce(`${overBy} characters over the limit`);
     }
     if (counterStatus !== 'over') {
       overAnnouncedRef.current = false;
@@ -429,7 +429,7 @@ export function RichTextEditor({
     if (!editor) return;
     if (isEditingLink) selectOpenedLink();
     editor.chain().focus().extendMarkRange('link').setLink({ href }).run();
-    setAnnounce(isEditingLink ? 'Tautan diperbarui' : 'Tautan disisipkan');
+    setAnnounce(isEditingLink ? 'Link updated' : 'Link inserted');
     setLinkOpen(false);
     setLinkError(null);
   }, [editor, isEditingLink, linkUrl, selectOpenedLink]);
@@ -438,7 +438,7 @@ export function RichTextEditor({
     if (!editor) return;
     if (isEditingLink) selectOpenedLink();
     editor.chain().focus().unsetLink().run();
-    setAnnounce('Tautan dihapus');
+    setAnnounce('Link removed');
     setLinkOpen(false);
     setLinkError(null);
   }, [editor, isEditingLink, selectOpenedLink]);
@@ -479,7 +479,7 @@ export function RichTextEditor({
     const err = imageErrorFor(imageUrl, imageAlt, imagePreviewFailed);
     if (err || !editor) return;
     editor.chain().focus().setImage({ src, alt }).run();
-    setAnnounce('Gambar disisipkan');
+    setAnnounce('Image inserted');
     setImageOpen(false);
   }, [editor, imageAlt, imagePreviewFailed, imageUrl]);
 
@@ -544,7 +544,7 @@ export function RichTextEditor({
       <TooltipTrigger asChild>
         <button
           type="button"
-          aria-label="Tautan (Ctrl+K)"
+          aria-label="Link (Ctrl+K)"
           aria-pressed={isLinkActive}
           disabled={nonEditable}
           onClick={() => openLinkPopover()}
@@ -554,7 +554,7 @@ export function RichTextEditor({
           <Link2 className="h-4 w-4" aria-hidden="true" />
         </button>
       </TooltipTrigger>
-      <TooltipContent side="bottom">Tautan (Ctrl+K)</TooltipContent>
+      <TooltipContent side="bottom">Link (Ctrl+K)</TooltipContent>
     </Tooltip>
   ) : null;
 
@@ -576,28 +576,28 @@ export function RichTextEditor({
     ? [
         {
           name: 'bold',
-          label: 'Tebal (Ctrl+B)',
+          label: 'Bold (Ctrl+B)',
           icon: Bold,
           isActive: editor.isActive('bold'),
           action: () => editor.chain().focus().toggleBold().run(),
         },
         {
           name: 'italic',
-          label: 'Miring (Ctrl+I)',
+          label: 'Italic (Ctrl+I)',
           icon: Italic,
           isActive: editor.isActive('italic'),
           action: () => editor.chain().focus().toggleItalic().run(),
         },
         {
           name: 'underline',
-          label: 'Garis bawah (Ctrl+U)',
+          label: 'Underline (Ctrl+U)',
           icon: UnderlineIcon,
           isActive: editor.isActive('underline'),
           action: () => editor.chain().focus().toggleUnderline().run(),
         },
         {
           name: 'strike',
-          label: 'Coret',
+          label: 'Strikethrough',
           icon: Strikethrough,
           isActive: editor.isActive('strike'),
           action: () => editor.chain().focus().toggleStrike().run(),
@@ -609,42 +609,42 @@ export function RichTextEditor({
     ? [
         {
           name: 'h1',
-          label: 'Judul 1',
+          label: 'Heading 1',
           icon: Heading1,
           isActive: editor.isActive('heading', { level: 1 }),
           action: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
         },
         {
           name: 'h2',
-          label: 'Judul 2',
+          label: 'Heading 2',
           icon: Heading2,
           isActive: editor.isActive('heading', { level: 2 }),
           action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
         },
         {
           name: 'h3',
-          label: 'Judul 3',
+          label: 'Heading 3',
           icon: Heading3,
           isActive: editor.isActive('heading', { level: 3 }),
           action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
         },
         {
           name: 'bullet',
-          label: 'Daftar bullet',
+          label: 'Bullet list',
           icon: List,
           isActive: editor.isActive('bulletList'),
           action: () => editor.chain().focus().toggleBulletList().run(),
         },
         {
           name: 'ordered',
-          label: 'Daftar bernomor',
+          label: 'Numbered list',
           icon: ListOrdered,
           isActive: editor.isActive('orderedList'),
           action: () => editor.chain().focus().toggleOrderedList().run(),
         },
         {
           name: 'quote',
-          label: 'Kutipan',
+          label: 'Quote',
           icon: Quote,
           isActive: editor.isActive('blockquote'),
           action: () => editor.chain().focus().toggleBlockquote().run(),
@@ -674,7 +674,7 @@ export function RichTextEditor({
         <Skeleton className="h-4 w-5/6" />
         <Skeleton className="h-24 w-full" />
       </div>
-      <span className="sr-only">Memuat editor…</span>
+      <span className="sr-only">Loading editor…</span>
     </div>
   );
 
@@ -691,7 +691,7 @@ export function RichTextEditor({
       {isReadOnly ? null : (
       <div
         role="toolbar"
-        aria-label="Format teks"
+        aria-label="Text formatting"
         aria-disabled={isDisabled || undefined}
         data-testid="rte-toolbar"
         className="flex flex-wrap items-center gap-1 border-b border-border/60 bg-card p-2"
@@ -714,11 +714,11 @@ export function RichTextEditor({
             <SheetContent
               side="bottom"
               data-testid="rte-link-popover"
-              aria-label="Editor tautan"
+              aria-label="Link editor"
               onOpenAutoFocus={focusLinkInput}
               onCloseAutoFocus={returnFocusToEditor}
             >
-              <SheetTitle>Editor tautan</SheetTitle>
+              <SheetTitle>Link editor</SheetTitle>
               <div className="mt-4">{linkForm}</div>
             </SheetContent>
           </Sheet>
@@ -729,7 +729,7 @@ export function RichTextEditor({
             </PopoverAnchor>
             <PopoverContent
               data-testid="rte-link-popover"
-              aria-label="Editor tautan"
+              aria-label="Link editor"
               side="bottom"
               align="center"
               className="w-80"
@@ -744,7 +744,7 @@ export function RichTextEditor({
           <TooltipTrigger asChild>
             <button
               type="button"
-              aria-label="Sisip gambar"
+              aria-label="Insert image"
               disabled={nonEditable}
               onClick={openImageDialog}
               data-testid="rte-button-image"
@@ -753,23 +753,23 @@ export function RichTextEditor({
               <ImagePlus className="h-4 w-4" aria-hidden="true" />
             </button>
           </TooltipTrigger>
-          <TooltipContent side="bottom">Sisip gambar</TooltipContent>
+          <TooltipContent side="bottom">Insert image</TooltipContent>
         </Tooltip>
         <Dialog open={imageOpen} onOpenChange={handleImageOpenChange}>
-          <DialogContent data-testid="rte-image-dialog" aria-label="Sisip gambar">
+          <DialogContent data-testid="rte-image-dialog" aria-label="Insert image">
             <DialogHeader>
-              <DialogTitle>Sisip gambar</DialogTitle>
-              <DialogDescription>Tempel URL gambar dan isi alt agar terbaca pembaca layar.</DialogDescription>
+              <DialogTitle>Insert image</DialogTitle>
+              <DialogDescription>Paste an image URL and add alt text for screen readers.</DialogDescription>
             </DialogHeader>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label htmlFor="rte-image-url">URL gambar</Label>
+                <Label htmlFor="rte-image-url">Image URL</Label>
                 <Input
                   id="rte-image-url"
                   data-testid="rte-image-url"
                   value={imageUrl}
                   onChange={(event) => handleImageUrlChange(event.target.value)}
-                  placeholder="https://contoh.com/gambar.png"
+                  placeholder="https://example.com/image.png"
                   autoComplete="off"
                   inputMode="url"
                   aria-invalid={imageError ? true : undefined}
@@ -777,13 +777,13 @@ export function RichTextEditor({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="rte-image-alt">Teks alt</Label>
+                <Label htmlFor="rte-image-alt">Alt text</Label>
                 <Input
                   id="rte-image-alt"
                   data-testid="rte-image-alt"
                   value={imageAlt}
                   onChange={(event) => handleImageAltChange(event.target.value)}
-                  placeholder="Deskripsi singkat gambar"
+                  placeholder="Briefly describe the image"
                   autoComplete="off"
                   aria-invalid={imageError ? true : undefined}
                   aria-describedby={imageError ? 'rte-image-error' : undefined}
@@ -807,12 +807,12 @@ export function RichTextEditor({
                   {imageError}
                 </p>
               ) : (
-                <p className="text-xs text-muted-foreground">Pratinjau tampil setelah URL valid. Alt wajib diisi.</p>
+                <p className="text-xs text-muted-foreground">Enter a valid URL to preview the image. Alt text is required.</p>
               )}
             </div>
             <DialogFooter>
               <Button type="button" variant="ghost" size="sm" data-testid="rte-image-cancel" onClick={() => setImageOpen(false)}>
-                Batal
+                Cancel
               </Button>
               <Button
                 type="button"
@@ -822,7 +822,7 @@ export function RichTextEditor({
                 disabled={imageSaveDisabled}
                 onClick={handleImageSave}
               >
-                Sisipkan
+                Insert
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -832,7 +832,7 @@ export function RichTextEditor({
             <TooltipTrigger asChild>
               <button
                 type="button"
-                aria-label="Urungkan (Ctrl+Z)"
+                aria-label="Undo (Ctrl+Z)"
                 disabled={!canUndo || nonEditable}
                 onClick={handleUndo}
                 data-testid="rte-button-undo"
@@ -841,13 +841,13 @@ export function RichTextEditor({
                 <Undo2 className="h-4 w-4" aria-hidden="true" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="bottom">Urungkan (Ctrl+Z)</TooltipContent>
+            <TooltipContent side="bottom">Undo (Ctrl+Z)</TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
               <button
                 type="button"
-                aria-label="Ulangi (Ctrl+Shift+Z)"
+                aria-label="Redo (Ctrl+Shift+Z)"
                 disabled={!canRedo || nonEditable}
                 onClick={handleRedo}
                 data-testid="rte-button-redo"
@@ -856,7 +856,7 @@ export function RichTextEditor({
                 <Redo2 className="h-4 w-4" aria-hidden="true" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="bottom">Ulangi (Ctrl+Shift+Z)</TooltipContent>
+            <TooltipContent side="bottom">Redo (Ctrl+Shift+Z)</TooltipContent>
           </Tooltip>
         </div>
       </div>
@@ -864,7 +864,7 @@ export function RichTextEditor({
       {hasError ? (
         <div className="p-3">
           <Alert variant="destructive" data-testid="rte-error">
-            <AlertTitle>Gagal memuat konten</AlertTitle>
+            <AlertTitle>Could not load content</AlertTitle>
             <AlertDescription className="flex flex-wrap items-center gap-2">
               <span>{error}</span>
               {onRetry ? (
@@ -875,7 +875,7 @@ export function RichTextEditor({
                   data-testid="rte-error-retry"
                   onClick={onRetry}
                 >
-                  Coba lagi
+                  Try again
                 </Button>
               ) : null}
             </AlertDescription>
@@ -890,17 +890,17 @@ export function RichTextEditor({
       </div>
       {isEmpty ? (
         <p data-testid="rte-empty" className="px-3 pb-1 text-xs text-muted-foreground">
-          Editor kosong — mulai mengetik atau pilih format.
+          The editor is empty. Start typing or choose a format.
         </p>
       ) : null}
       {showCounter ? (
         <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border/60 bg-card px-3 py-1.5">
           {counterStatus === 'near' ? (
-            <span className="text-xs text-warning">mendekati batas</span>
+            <span className="text-xs text-warning">Near the character limit</span>
           ) : null}
           {counterStatus === 'over' ? (
             <p role="alert" data-testid="rte-counter-alert" className="text-xs text-destructive">
-              melewati batas {overBy} karakter
+              {overBy} characters over the limit
             </p>
           ) : null}
           <p

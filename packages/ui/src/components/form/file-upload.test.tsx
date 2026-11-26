@@ -36,8 +36,8 @@ describe('FileUpload component', () => {
     await waitFor(() => {
       expect(screen.getByText('Selesai')).toBeDefined();
     });
-    expect(screen.getByText('1/1 selesai · 0 gagal')).toBeDefined();
-    expect(screen.getByText('Semua file selesai diunggah')).toBeDefined();
+    expect(screen.getByText('1/1 done · 0 failed')).toBeDefined();
+    expect(screen.getByText('All files uploaded')).toBeDefined();
   });
 
   it('rejects only invalid files in a mixed batch with per-file reasons', async () => {
@@ -49,8 +49,8 @@ describe('FileUpload component', () => {
     await waitFor(() => {
       expect(screen.getByText('Selesai')).toBeDefined();
     });
-    expect(screen.getByText(/"big\.txt" ditolak: melebihi ukuran maksimum/)).toBeDefined();
-    expect(screen.getByText('1/2 selesai · 1 gagal')).toBeDefined();
+    expect(screen.getByText(/"big\.txt" rejected: exceeds max size/)).toBeDefined();
+    expect(screen.getByText('1/2 done · 1 failed')).toBeDefined();
   });
 
   it('rejects files whose type does not match accept', async () => {
@@ -59,7 +59,7 @@ describe('FileUpload component', () => {
     );
     selectFiles(container, [makeFile('notes.txt', 10, 'text/plain')]);
 
-    expect(screen.getByText(/"notes\.txt" ditolak: tipe file tidak didukung/)).toBeDefined();
+    expect(screen.getByText(/"notes\.txt" rejected: unsupported file type/)).toBeDefined();
   });
 
   it('rejects files exceeding maxFiles immediately', async () => {
@@ -68,7 +68,7 @@ describe('FileUpload component', () => {
     );
     selectFiles(container, [makeFile('a.txt'), makeFile('b.txt')]);
 
-    expect(screen.getByText(/"b\.txt" ditolak: maksimal 1 file/)).toBeDefined();
+    expect(screen.getByText(/"b\.txt" rejected: max 1 files/)).toBeDefined();
     await waitFor(() => expect(screen.getByText('Selesai')).toBeDefined());
   });
 
@@ -118,17 +118,17 @@ describe('FileUpload component', () => {
     selectFiles(container, [makeFile('a.txt'), makeFile('b.txt')]);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Batalkan upload a.txt')).toBeDefined();
+      expect(screen.getByLabelText('Cancel upload a.txt')).toBeDefined();
     });
 
-    fireEvent.click(screen.getByLabelText('Batalkan upload a.txt'));
+    fireEvent.click(screen.getByLabelText('Cancel upload a.txt'));
 
     await waitFor(() => {
       expect(screen.getByText('Dibatalkan')).toBeDefined();
     });
     expect(signals[0].aborted).toBe(true);
     expect(screen.getByText('Mengunggah 0%')).toBeDefined();
-    expect(screen.getByLabelText('Batalkan upload b.txt')).toBeDefined();
+    expect(screen.getByLabelText('Cancel upload b.txt')).toBeDefined();
   });
 
   it('isolates per-file errors and supports retry per item', async () => {
@@ -147,7 +147,7 @@ describe('FileUpload component', () => {
     });
 
     shouldFail = false;
-    fireEvent.click(screen.getByLabelText('Ulangi upload a.txt'));
+    fireEvent.click(screen.getByLabelText('Retry upload a.txt'));
 
     await waitFor(() => {
       expect(screen.getAllByText('Selesai')).toHaveLength(2);
@@ -164,11 +164,11 @@ describe('FileUpload component', () => {
     selectFiles(container, [makeFile('photo.png', 10, 'image/png')]);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Hapus photo.png')).toBeDefined();
+      expect(screen.getByLabelText('Remove photo.png')).toBeDefined();
     });
     expect(URL.createObjectURL).toHaveBeenCalled();
 
-    fireEvent.click(screen.getByLabelText('Hapus photo.png'));
+    fireEvent.click(screen.getByLabelText('Remove photo.png'));
 
     await waitFor(() => {
       expect(screen.queryByText('photo.png')).toBeNull();
@@ -186,7 +186,7 @@ describe('FileUpload component', () => {
     selectFiles(container, [makeFile('a.txt')]);
 
     await waitFor(() => {
-      const bar = screen.getByRole('progressbar', { name: 'Progres upload a.txt' });
+      const bar = screen.getByRole('progressbar', { name: 'Upload progress a.txt' });
       expect(bar.getAttribute('aria-valuenow')).toBe('42');
     });
   });
@@ -214,15 +214,15 @@ describe('FileUpload component', () => {
     selectFiles(container, [makeFile('gagal1.txt'), makeFile('gagal2.txt'), makeFile('ok.txt')]);
 
     await waitFor(() => {
-      expect(screen.getByText('1/3 selesai · 2 gagal')).toBeDefined();
+      expect(screen.getByText('1/3 done · 2 failed')).toBeDefined();
     });
 
     shouldFail = false;
-    fireEvent.click(screen.getByLabelText('Ulang semua file yang gagal'));
+    fireEvent.click(screen.getByLabelText('Retry all failed files'));
 
     await waitFor(() => {
       expect(screen.getAllByText('Selesai')).toHaveLength(3);
-      expect(screen.queryByText('1/3 selesai · 2 gagal')).toBeNull();
+      expect(screen.queryByText('1/3 done · 2 failed')).toBeNull();
     });
   });
 
@@ -250,13 +250,13 @@ describe('FileUpload component', () => {
     let calls = 0;
     const handler: UploadHandler = async () => {
       calls += 1;
-      throw new Error('Selalu gagal');
+      throw new Error('Always fails');
     };
     const { container } = render(<FileUpload uploadHandler={handler} maxRetries={2} />);
     selectFiles(container, [makeFile('a.txt')]);
 
     await waitFor(() => {
-      expect(screen.getByText('Selalu gagal')).toBeDefined();
+      expect(screen.getByText('Always fails')).toBeDefined();
     });
     // 1 percobaan awal + 2 auto-retry = 3 panggilan
     expect(calls).toBe(3);
@@ -290,8 +290,8 @@ describe('FileUpload component', () => {
     );
 
     expect(screen.getAllByLabelText(/Seret untuk mengurutkan/).length).toBeGreaterThan(0);
-    expect(screen.getByLabelText('Pindahkan a.txt ke bawah')).toBeDefined();
-    expect(screen.getByLabelText('Pindahkan b.txt ke atas')).toBeDefined();
+    expect(screen.getByLabelText('Move a.txt down')).toBeDefined();
+    expect(screen.getByLabelText('Move b.txt up')).toBeDefined();
   });
 
   it('does not render sortable controls by default', async () => {
@@ -311,10 +311,10 @@ describe('FileUpload component', () => {
     selectFiles(container, [makeFile('a.txt'), makeFile('b.txt')]);
 
     await waitFor(() => {
-      expect(screen.getByLabelText('Pindahkan a.txt ke bawah')).toBeDefined();
+      expect(screen.getByLabelText('Move a.txt down')).toBeDefined();
     });
 
-    fireEvent.click(screen.getByLabelText('Pindahkan a.txt ke bawah'));
+    fireEvent.click(screen.getByLabelText('Move a.txt down'));
 
     const names = screen.getAllByText(/\.txt$/).map((el) => el.textContent);
     expect(names).toEqual(['b.txt', 'a.txt']);
@@ -331,6 +331,6 @@ describe('FileUpload component', () => {
     });
     // Compact: tanpa thumbnail secara default, status+aksi tetap ada
     expect(container.querySelector('img')).toBeNull();
-    expect(screen.getByLabelText('Hapus pic.png')).toBeDefined();
+    expect(screen.getByLabelText('Remove pic.png')).toBeDefined();
   });
 });

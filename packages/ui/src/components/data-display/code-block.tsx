@@ -16,11 +16,11 @@ export interface CodeBlockCopyLabels {
 }
 
 const DEFAULT_COPY_LABELS: Required<CodeBlockCopyLabels> = {
-  copy: 'Salin',
-  copyAriaLabel: 'Salin kode',
-  copied: 'Tersalin',
-  failed: 'Gagal disalin',
-  failedAriaLabel: 'Gagal menyalin',
+  copy: 'Copy',
+  copyAriaLabel: 'Copy code',
+  copied: 'Copied',
+  failed: 'Copy failed',
+  failedAriaLabel: 'Copy failed',
 };
 
 export interface CodeBlockProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -205,12 +205,12 @@ export const CodeBlock = React.forwardRef<HTMLDivElement, CodeBlockProps>(
               {isExpanded ? (
                 <>
                   <ChevronUp className="h-3.5 w-3.5" />
-                  <span>Sembunyikan</span>
+                  <span>Hide</span>
                 </>
               ) : (
                 <>
                   <ChevronDown className="h-3.5 w-3.5" />
-                  <span>Lihat semua ({lines.length} baris)</span>
+                  <span>View all ({lines.length} lines)</span>
                 </>
               )}
             </Button>

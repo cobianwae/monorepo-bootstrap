@@ -1,40 +1,40 @@
 import type { MindNodeFlat } from '@ds/ui';
 
 export const EXAMPLE: MindNodeFlat[] = [
-  { id: 'q1', parentId: null, label: 'Peluncuran Q1' },
-  { id: 'riset', parentId: 'q1', label: 'Riset pasar', accent: 'success' },
-  { id: 'produk', parentId: 'q1', label: 'Produk MVP', accent: 'info' },
+  { id: 'q1', parentId: null, label: 'Q1 Launch' },
+  { id: 'riset', parentId: 'q1', label: 'Market research', accent: 'success' },
+  { id: 'produk', parentId: 'q1', label: 'MVP product', accent: 'info' },
   { id: 'marketing', parentId: 'q1', label: 'Marketing', accent: 'warning' },
-  { id: 'wawancara', parentId: 'riset', label: 'Wawancara pengguna' },
-  { id: 'kompetitor', parentId: 'riset', label: 'Analisis kompetitor' },
-  { id: 'fitur', parentId: 'produk', label: 'Fitur inti' },
-  { id: 'uji', parentId: 'produk', label: 'Uji kegunaan' },
-  { id: 'materi', parentId: 'marketing', label: 'Materi kampanye' },
-  { id: 'kanal', parentId: 'marketing', label: 'Kanal distribusi' },
-  { id: 'harga', parentId: 'produk', label: 'Harga' },
-  { id: 'persona', parentId: 'riset', label: 'Persona' },
+  { id: 'wawancara', parentId: 'riset', label: 'User interviews' },
+  { id: 'kompetitor', parentId: 'riset', label: 'Competitor analysis' },
+  { id: 'fitur', parentId: 'produk', label: 'Core features' },
+  { id: 'uji', parentId: 'produk', label: 'Usability tests' },
+  { id: 'materi', parentId: 'marketing', label: 'Campaign materials' },
+  { id: 'kanal', parentId: 'marketing', label: 'Distribution channels' },
+  { id: 'harga', parentId: 'produk', label: 'Pricing' },
+  { id: 'persona', parentId: 'riset', label: 'Personas' },
 ];
 
 export const LARGE: MindNodeFlat[] = [
   EXAMPLE[0],
   ...Array.from({ length: 49 }, (_, index): MindNodeFlat => ({
-    id: `ide-${index + 1}`,
-    parentId: index < 3 ? 'q1' : `ide-${(index % 3) + 1}`,
-    label: `Ide ${index + 1}`,
+    id: `idea-${index + 1}`,
+    parentId: index < 3 ? 'q1' : `idea-${(index % 3) + 1}`,
+    label: `Idea ${index + 1}`,
     ...(index < 3 ? { accent: 'primary' as const } : {}),
   })),
 ];
 
-export const STATES = ['Berisi', 'Contoh Q1', 'Loading', 'Empty', 'Invalid', 'Error eksternal'] as const;
+export const STATES = ['Populated', 'Q1 example', 'Loading', 'Empty', 'Invalid', 'External error'] as const;
 export type DemoState = typeof STATES[number];
 
 export const STEPS: Array<{ title: string; detail: string }> = [
-  { title: 'Mulai', detail: 'Buka peta Peluncuran Q1.' },
-  { title: 'Tambah ide', detail: 'Tambah cabang atau saudara, ketik nama ide, lalu Enter untuk menyimpan.' },
-  { title: 'Lipat', detail: 'Lipat dan buka cabang lewat Space atau expander.' },
-  { title: 'Hapus', detail: 'Hapus cabang, konfirmasi, lalu urungkan lewat Ctrl+Z.' },
-  { title: 'Cari', detail: 'Cari nama ide untuk membuka jalur menuju hasil.' },
-  { title: 'Navigasi', detail: 'Pan, zoom, fit-view, lalu reset ke 100%.' },
+  { title: 'Start', detail: 'Open the Q1 Launch map.' },
+  { title: 'Add an idea', detail: 'Add a branch or sibling, type the idea name, then press Enter to save it.' },
+  { title: 'Collapse', detail: 'Collapse and expand branches with Space or the expander.' },
+  { title: 'Delete', detail: 'Delete a branch, confirm, then undo with Ctrl+Z.' },
+  { title: 'Search', detail: 'Search idea names to open the path to a result.' },
+  { title: 'Navigate', detail: 'Pan, zoom, fit view, then reset to 100%.' },
 ];
 
 export const RECIPE = `const [data, setData] = useState(ideas);
@@ -51,4 +51,4 @@ function search(text) {
 }
 <MindMap data={data} onChange={setData} highlightedIds={matches.map(n => n.id)}
   expandedIds={expanded} onExpandedChange={setExpanded}
-  searchSlot={<label>Cari ide<input value={query} onChange={e => search(e.target.value)} /></label>} />`;
+  searchSlot={<label>Search ideas<input value={query} onChange={e => search(e.target.value)} /></label>} />`;

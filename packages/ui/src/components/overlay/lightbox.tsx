@@ -78,7 +78,7 @@ export function Lightbox({
     const missing = items.filter((item) => !item.alt?.trim());
     if (missing.length > 0) {
       console.warn(
-        `[Lightbox] ${missing.length} item tanpa alt (id: ${missing.map((i) => i.id).join(', ')}); alt wajib diisi.`,
+        `[Lightbox] ${missing.length} items missing alt (id: ${missing.map((i) => i.id).join(', ')}); alt is required.`,
       );
     }
   }, [items]);
@@ -205,7 +205,7 @@ export function Lightbox({
       const zoom = zoomRef.current;
       if (zoom && typeof zoom.changeZoom === 'function' && (zoom.zoom ?? 1) > 1) {
         zoom.changeZoom(1, true);
-        setZoomAnnouncement('Zoom diatur ulang');
+        setZoomAnnouncement('Zoom reset');
       }
       viewRef.current = index;
       onOpenChange(index);
@@ -240,15 +240,15 @@ export function Lightbox({
   const isLast = total > 0 && currentIndex === total - 1;
   const announcement =
     total > 0 && currentItem
-      ? `Gambar ${currentIndex + 1} dari ${total}: ${currentItem.alt}` +
-        (isFirst ? ' — Gambar pertama' : isLast ? ' — Gambar terakhir' : '')
+      ? `Image ${currentIndex + 1} of ${total}: ${currentItem.alt}` +
+        (isFirst ? ' — first image' : isLast ? ' — last image' : '')
       : '';
 
   // Empty: lightbox tidak dibuka, status untuk SR (FR-008).
   if (total === 0) {
     return (
       <span role="status" className="sr-only">
-        Tidak ada media untuk ditampilkan.
+        No media to display.
       </span>
     );
   }
@@ -378,12 +378,12 @@ export function Lightbox({
           className="ds-lightbox-state ds-lightbox-state--loading"
         >
           <div className="ds-lightbox-skeleton" aria-hidden />
-          <span className="sr-only">Memuat gambar…</span>
+          <span className="sr-only">Loading image…</span>
         </div>
       ) : null}
       {error ? (
         <div role="alert" className="ds-lightbox-state ds-lightbox-state--error">
-          <p className="text-sm font-medium text-foreground">Gambar gagal dimuat</p>
+          <p className="text-sm font-medium text-foreground">Image failed to load</p>
           <p className="text-xs text-muted-foreground">{error}</p>
           <div className="ds-lightbox-state-actions">
             <button
@@ -392,7 +392,7 @@ export function Lightbox({
               onClick={handleRetry}
               className="min-h-11 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              Coba lagi
+              Try again
             </button>
             <button
               type="button"
@@ -400,7 +400,7 @@ export function Lightbox({
               disabled={isLast}
               className="min-h-11 rounded-md border border-border px-4 text-sm font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50"
             >
-              Lewati ke berikut
+              Skip to next
             </button>
           </div>
         </div>

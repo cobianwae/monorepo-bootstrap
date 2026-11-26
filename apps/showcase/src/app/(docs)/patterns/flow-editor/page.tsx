@@ -41,23 +41,23 @@ type EdgeChangeParam = NonNullable<FlowEditorProps['onEdgesChange']> extends (ch
 type ConnectParam = NonNullable<FlowEditorProps['onConnect']> extends (connection: infer C) => void ? C : never;
 
 const paletteItems: FlowPaletteItem[] = [
-  { type: 'action', title: 'Kirim email', description: 'Tugas otomatisasi email' },
-  { type: 'pending', title: 'Tunda', description: 'Jeda eksekusi sejumlah waktu' },
+  { type: 'action', title: 'Send email', description: 'Automated email task' },
+  { type: 'pending', title: 'Wait', description: 'Pause execution for a while' },
 ];
 
 const initialNodes: FlowNode[] = [
-  { id: 'n1', type: 'action', position: { x: 100, y: 50 }, data: { label: 'Mulai', kind: 'action' } },
-  { id: 'n2', type: 'action', position: { x: 400, y: 50 }, data: { label: 'Kirim email', kind: 'action' } },
-  { id: 'n3', type: 'pending', position: { x: 700, y: 50 }, data: { label: 'Tunggu 1 hari', kind: 'pending', status: 'warning' } },
-  { id: 'n4', type: 'action', position: { x: 400, y: 220 }, data: { label: 'Cabang verifikasi', kind: 'action' } },
-  { id: 'n5', type: 'action', position: { x: 700, y: 220 }, data: { label: 'Selesai', kind: 'success' } },
+  { id: 'n1', type: 'action', position: { x: 100, y: 50 }, data: { label: 'Start', kind: 'action' } },
+  { id: 'n2', type: 'action', position: { x: 400, y: 50 }, data: { label: 'Send email', kind: 'action' } },
+  { id: 'n3', type: 'pending', position: { x: 700, y: 50 }, data: { label: 'Wait 1 day', kind: 'pending', status: 'warning' } },
+  { id: 'n4', type: 'action', position: { x: 400, y: 220 }, data: { label: 'Verification branch', kind: 'action' } },
+  { id: 'n5', type: 'action', position: { x: 700, y: 220 }, data: { label: 'Done', kind: 'success' } },
 ];
 
 const initialEdges: FlowEdge[] = [
   { id: 'e1', source: 'n1', target: 'n2', label: 'trigger', animated: false },
-  { id: 'e2', source: 'n2', target: 'n3', label: 'tunda', animated: false },
-  { id: 'e3', source: 'n3', target: 'n4', label: 'lanjut', animated: false },
-  { id: 'e4', source: 'n4', target: 'n5', label: 'selesai', animated: false },
+  { id: 'e2', source: 'n2', target: 'n3', label: 'wait', animated: false },
+  { id: 'e3', source: 'n3', target: 'n4', label: 'continue', animated: false },
+  { id: 'e4', source: 'n4', target: 'n5', label: 'done', animated: false },
 ];
 
 export default function FlowEditorPage() {
@@ -101,7 +101,7 @@ export default function FlowEditorPage() {
     setSelected(null);
     setDraftTitle('');
     setTitleError(false);
-    void toast({ title: 'Dihapus', description: `${selection.nodes.length} node, ${selection.edges.length} edge dihapus — Urungkan`, duration: 4000 });
+    void toast({ title: 'Deleted', description: `${selection.nodes.length} nodes, ${selection.edges.length} edges deleted — Undo`, duration: 4000 });
   }, []);
 
   const handleSaveTitle = React.useCallback(() => {
@@ -212,13 +212,13 @@ export default function FlowEditorPage() {
       id: `${node.id}-copy-${Date.now()}`,
       position: { x: node.position.x + 40, y: node.position.y + 40 },
       selected: false,
-      data: { ...node.data, label: `${node.data.label} (salinan)` },
+      data: { ...node.data, label: `${node.data.label} (copy)` },
     };
     setNodes((prev) => [...prev, copy]);
     setSelected(null);
     setDraftTitle('');
     setTitleError(false);
-    void toast({ title: 'Diduplikasi', description: `${copy.data.label} ditambahkan ke kanvas.`, duration: 4000 });
+    void toast({ title: 'Duplicated', description: `${copy.data.label} added to the canvas.`, duration: 4000 });
   }, []);
 
   // Seleksi dibaca ulang dari state terbaru agar isi inspector tidak stale setelah diedit.
@@ -251,8 +251,8 @@ export default function FlowEditorPage() {
   const handleInvalidEdgeDemo = React.useCallback(() => {
     // Simulasi penolakan koneksi tak valid (self-loop) → toast role="alert" (AC-02 panel invalid-edge).
     void toast({
-      title: 'Koneksi ditolak',
-      description: 'Tidak dapat menyambung node ke dirinya sendiri (self-loop).',
+      title: 'Connection rejected',
+      description: 'Cannot connect a node to itself (self-loop).',
       duration: 4000,
     });
   }, []);
@@ -264,7 +264,7 @@ export default function FlowEditorPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Flow Editor" description="Canvas node berbasis token dengan pan/zoom, handle ≥44px, dan state matrix." />
+      <PageHeader title="Flow Editor" description="Token-based node canvas with pan/zoom, ≥44px handles, and a state matrix." />
 
       {/* Kontrol demo + tema + minimap (AC-02/AC-05 panel demo). */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -273,40 +273,40 @@ export default function FlowEditorPage() {
           <Switch
             checked={minimapEnabled}
             onCheckedChange={setMinimapEnabled}
-            aria-label={minimapEnabled ? 'Sembunyikan minimap' : 'Tampilkan minimap'}
+            aria-label={minimapEnabled ? 'Hide minimap' : 'Show minimap'}
             data-testid="flow-minimap-switch"
           />
-          <span className="text-xs text-muted-foreground">{resolvedTheme === 'dark' ? 'Gelap' : 'Terang'}</span>
+          <span className="text-xs text-muted-foreground">{resolvedTheme === 'dark' ? 'Dark' : 'Light'}</span>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant={demo === 'data' ? 'default' : 'outline'} size="sm" onClick={() => setDemo('data')}>
-            Muat contoh
+            Load example
           </Button>
           <Button variant="outline" size="sm" onClick={() => setDemo('loading')}>
-            Simulasi memuat
+            Simulate loading
           </Button>
-          <Button variant="outline" size="sm" onClick={() => setDemo('empty')}>Kosongkan</Button>
-          <Button variant="outline" size="sm" onClick={() => setDemo('error')}>Paksa error</Button>
+          <Button variant="outline" size="sm" onClick={() => setDemo('empty')}>Empty</Button>
+          <Button variant="outline" size="sm" onClick={() => setDemo('error')}>Force error</Button>
           <Button variant="destructive" size="sm" onClick={handleInvalidEdgeDemo}>
-            Edge tak valid
+            Invalid edge
           </Button>
-          <Button onClick={handleResetDemo}>Atur ulang demo</Button>
+          <Button onClick={handleResetDemo}>Reset demo</Button>
         </div>
       </div>
 
       {/* Panduan 6 langkah (AC-02, Bahasa Indonesia). */}
       <Card className="border border-info/30 bg-info/5">
         <CardHeader>
-          <CardTitle className="text-sm">Cara menggunakan demo</CardTitle>
+          <CardTitle className="text-sm">How to use the demo</CardTitle>
         </CardHeader>
         <CardContent>
           <ol className="list-decimal pl-5 space-y-1 text-sm text-foreground/90">
-            <li>Mulai dari node <strong>Mulai</strong> yang sudah ada di kanvas.</li>
-            <li>Tambah node dari palet di kanvas (seret jenis node atau klik [+] pada item).</li>
-            <li>Sambungkan handle sumber ke handle target untuk membentuk alur.</li>
-            <li>Aktifkan <strong>snap ke grid</strong> dari toolbar kanvas untuk penempatan rapi.</li>
-            <li>Buka <strong>minimap</strong> untuk menavigasi kanvas besar, lalu seret viewport.</li>
-            <li>Pilih node untuk mengubah judul melalui Inspector (sheet kanan; bottom-sheet di layar kecil).</li>
+            <li>Start from the <strong>Start</strong> node already on the canvas.</li>
+            <li>Add a node from the palette on the canvas (drag a node type or click [+] on an item).</li>
+            <li>Connect a source handle to a target handle to build the flow.</li>
+            <li>Enable <strong>snap to grid</strong> from the canvas toolbar for tidy placement.</li>
+            <li>Open the <strong>minimap</strong> to navigate a large canvas, then drag the viewport.</li>
+            <li>Select a node to rename it through the Inspector (right sheet; bottom sheet on small screens).</li>
           </ol>
         </CardContent>
       </Card>
@@ -316,7 +316,7 @@ export default function FlowEditorPage() {
           <Card>
             <CardHeader className="flex flex-col md:flex-row md:items-center justify-between gap-2">
               <div>
-                <CardTitle className="text-sm">Kanvas alur</CardTitle>
+                <CardTitle className="text-sm">Flow canvas</CardTitle>
                 <CardDescription className="text-xs">
                   {demo === 'data' ? `${nodes.length} node · ${edges.length} edge` : demo} state
                 </CardDescription>
@@ -346,20 +346,20 @@ export default function FlowEditorPage() {
                 onAddFromPalette={handleAddFromPalette}
                 paletteItems={paletteItems}
                 loading={isLoading}
-                error={isError ? 'Gagal memuat flow dari server.' : null}
+                error={isError ? 'Could not load the flow from the server.' : null}
                 onRetry={() => {
                   setDemo('data');
-                  void toast({ title: 'Diretry', description: 'Flow dimuat ulang.' });
+                  void toast({ title: 'Retried', description: 'Flow reloaded.' });
                 }}
                 minimap={minimapEnabled}
                 snapToGrid={snapToGrid}
                 gridSize={gridSize}
-                ariaLabel="Editor alur demonstrasi"
+                ariaLabel="Demo flow editor"
               />
             </CardContent>
             {/* Satu sumber visual: panel inspector ada di sheet; di kartu hanya live region hitungan (CR-019 #5). */}
             <div role="status" aria-live="polite" className="sr-only" data-testid="flow-selection-count">
-              {selectedCount > 0 ? `${selectedCount} terpilih` : ''}
+              {selectedCount > 0 ? `${selectedCount} selected` : ''}
             </div>
           </Card>
         </section>
@@ -371,7 +371,7 @@ export default function FlowEditorPage() {
         <SheetTrigger asChild>
           {selected && (
             <Button variant="outline" size="sm" data-testid="flow-inspector-trigger">
-              Buka inspector
+              Open inspector
             </Button>
           )}
         </SheetTrigger>
@@ -421,10 +421,10 @@ type InspectorPanelProps = {
 
 const STATUS_OPTIONS: Array<{ value: FlowStatus; label: string }> = [
   { value: 'default', label: 'Default' },
-  { value: 'running', label: 'Berjalan' },
-  { value: 'success', label: 'Sukses' },
-  { value: 'warning', label: 'Peringatan' },
-  { value: 'error', label: 'Gagal' },
+  { value: 'running', label: 'Running' },
+  { value: 'success', label: 'Success' },
+  { value: 'warning', label: 'Warning' },
+  { value: 'error', label: 'Failed' },
 ];
 
 function InspectorPanel({
@@ -449,7 +449,7 @@ function InspectorPanel({
     : 0;
 
   const sheetTitle = isMulti
-    ? `${selection.nodes.length + selection.edges.length} terpilih (${selection.nodes.length} node, ${selection.edges.length} edge)`
+    ? `${selection.nodes.length + selection.edges.length} selected (${selection.nodes.length} nodes, ${selection.edges.length} edges)`
     : isSingleNode
       ? (node?.data.label ?? 'Node')
       : edge
@@ -462,10 +462,10 @@ function InspectorPanel({
         <SheetTitle className="text-sm">{sheetTitle}</SheetTitle>
         <SheetDescription>
           {isMulti
-            ? 'Gunakan Hapus semua untuk menghapus sekaligus, atau Batalkan seleksi.'
+            ? 'Use Delete all to remove them at once, or clear the selection.'
             : isSingleNode
-              ? 'Ubah judul node. Judul tidak boleh kosong.'
-              : 'Ubah label edge, atau hapus edge dari kanvas.'}
+              ? 'Rename the node. The title cannot be empty.'
+              : 'Edit the edge label, or delete the edge from the canvas.'}
         </SheetDescription>
       </SheetHeader>
       <Separator />
@@ -480,10 +480,10 @@ function InspectorPanel({
                 onCancel();
               }}
             >
-              Hapus semua
+              Delete all
             </Button>
             <Button variant="outline" size="sm" onClick={onCancel}>
-              Batalkan seleksi
+              Clear selection
             </Button>
           </>
         ) : isSingleNode ? (
@@ -493,7 +493,7 @@ function InspectorPanel({
               <Input readOnly value={node?.id ?? ''} className="text-xs" />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="flow-node-title" className="text-xs font-medium">Judul</Label>
+              <Label htmlFor="flow-node-title" className="text-xs font-medium">Title</Label>
               <Input
                 id="flow-node-title"
                 value={draftTitle}
@@ -503,10 +503,10 @@ function InspectorPanel({
                 aria-describedby={titleError ? 'err-flow-node-title' : undefined}
                 aria-invalid={titleError}
               />
-              {titleError && <p id="err-flow-node-title" className="text-xs text-destructive">Judul tidak boleh kosong.</p>}
+              {titleError && <p id="err-flow-node-title" className="text-xs text-destructive">Title cannot be empty.</p>}
             </div>
             <div className="space-y-1">
-              <Label htmlFor="flow-node-description" className="text-xs font-medium">Deskripsi</Label>
+              <Label htmlFor="flow-node-description" className="text-xs font-medium">Description</Label>
               <Input
                 id="flow-node-description"
                 value={node?.data.description ?? ''}
@@ -532,7 +532,7 @@ function InspectorPanel({
               </SegmentedControl>
             </fieldset>
             <div className="space-y-1">
-              <div className="text-xs font-medium">Posisi</div>
+              <div className="text-xs font-medium">Position</div>
               <Input
                 readOnly
                 value={`(${Math.round(node?.position.x ?? 0)}, ${Math.round(node?.position.y ?? 0)})`}
@@ -540,15 +540,15 @@ function InspectorPanel({
               />
             </div>
             <div className="space-y-1">
-              <div className="text-xs font-medium">Koneksi</div>
+              <div className="text-xs font-medium">Connections</div>
               <Input readOnly value={String(edgeCount)} className="text-xs" />
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <Button size="sm" onClick={onSaveTitle} disabled={titleError || draftTitle.trim().length === 0}>
-                Simpan judul
+                Save title
               </Button>
               <Button variant="outline" size="sm" onClick={() => node && onDuplicate(node)}>
-                Duplikat
+                Duplicate
               </Button>
               <Button
                 variant="destructive"
@@ -561,10 +561,10 @@ function InspectorPanel({
                   onCancel();
                 }}
               >
-                Hapus node
+                Delete node
               </Button>
               <Button variant="outline" size="sm" onClick={onCancel}>
-                Batal
+                Cancel
               </Button>
             </div>
           </>
@@ -575,7 +575,7 @@ function InspectorPanel({
               <Input readOnly value={edge?.id ?? ''} className="text-xs" />
             </div>
             <div className="space-y-1">
-              <div className="text-xs font-medium">Sumber → Target</div>
+              <div className="text-xs font-medium">Source → Target</div>
               <Input readOnly value={`${edge?.source ?? '—'} → ${edge?.target ?? '—'}`} className="text-xs" />
             </div>
             <div className="space-y-1">
@@ -596,7 +596,7 @@ function InspectorPanel({
                   onCancel();
                 }}
               >
-                Hapus edge
+                Delete edge
               </Button>
             </div>
           </>

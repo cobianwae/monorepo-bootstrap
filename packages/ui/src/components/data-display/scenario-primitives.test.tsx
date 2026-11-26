@@ -57,7 +57,7 @@ describe('Scenario Primitives', () => {
   describe('ErrorPage', () => {
     it('renders default copy and an error message', () => {
       render(<ErrorPage error={new Error('boom')} />);
-      expect(screen.getByText('Terjadi kesalahan')).toBeDefined();
+      expect(screen.getByText('Something went wrong')).toBeDefined();
       expect(screen.getByText('boom')).toBeDefined();
     });
 
@@ -65,8 +65,8 @@ describe('Scenario Primitives', () => {
       const onReset = vi.fn();
       const onReload = vi.fn();
       render(<ErrorPage onReset={onReset} onReload={onReload} />);
-      fireEvent.click(screen.getByText('Coba Lagi'));
-      fireEvent.click(screen.getByText('Muat Ulang'));
+      fireEvent.click(screen.getByText('Try Again'));
+      fireEvent.click(screen.getByText('Reload'));
       expect(onReset).toHaveBeenCalledTimes(1);
       expect(onReload).toHaveBeenCalledTimes(1);
     });

@@ -65,7 +65,7 @@ const cycleData: OrgNodeFlat[] = orgData.map((node) =>
 );
 
 const missingParentData: OrgNodeFlat[] = orgData.map((node) =>
-  node.id === 'fin-6' ? { ...node, parentId: 'tidak-ada' } : node,
+  node.id === 'fin-6' ? { ...node, parentId: 'missing-parent' } : node,
 );
 
 const demoStates = ['normal', 'loading', 'empty', 'error-cycle', 'error-parent', 'error-external'] as const;
@@ -129,13 +129,13 @@ export default function OrgChartPage() {
       <PageHeader
         eyebrow="UX Recipe Scenario"
         eyebrowIcon={Sparkles}
-        title="Org Chart / Diagram Organisasi"
-        description="Pattern OrgChart (S-005.28): diagram hierarki 40 orang, 4 tingkat, 4 departemen beda aksen — dengan state matrix (loading/empty/error), highlight pencarian yang membuka path, toggle orientasi, dan pan/zoom keyboard. Handler demo mock; logika pencarian milik konsumen."
+        title="Org Chart"
+        description="Explore reporting relationships, find people, and follow their place in the organization. Switch layouts or navigate with the keyboard."
       />
 
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          State demo
+          Demo state
         </span>
         {demoStates.map((state) => (
           <Button
@@ -152,11 +152,11 @@ export default function OrgChartPage() {
       <div className="flex flex-wrap items-center gap-3">
         <SearchInput
           className="max-w-sm flex-1"
-          placeholder="Cari nama atau jabatan…"
+          placeholder="Search names or job titles…"
           value={query}
           onChange={(event) => handleQueryChange(event.target.value)}
           onClear={() => handleQueryChange('')}
-          aria-label="Cari node organisasi"
+          aria-label="Search the organization"
         />
         <SegmentedControl
           type="single"
@@ -164,13 +164,13 @@ export default function OrgChartPage() {
           onValueChange={(value) => {
             if (value) setOrientation(value as OrgChartOrientation);
           }}
-          aria-label="Orientasi layout"
+          aria-label="Layout orientation"
         >
           <SegmentedControlItem value="top-down">Top-down</SegmentedControlItem>
           <SegmentedControlItem value="left-right">Left-right</SegmentedControlItem>
         </SegmentedControl>
         <p aria-live="polite" className="text-sm text-muted-foreground">
-          {query.trim() ? `${matches.length} hasil` : 'Ketik untuk mencari'}
+          {query.trim() ? `${matches.length} results` : 'Type to search'}
         </p>
       </div>
 
@@ -182,39 +182,39 @@ export default function OrgChartPage() {
         selectedId={selectedId}
         highlightedIds={highlightedIds}
         loading={demoState === 'loading'}
-        error={demoState === 'error-external' ? 'Gagal memuat data organisasi. Diagram terakhir tetap ditampilkan.' : null}
-        emptyActionLabel="Kembalikan data contoh"
+        error={demoState === 'error-external' ? 'Could not load the organization. The last diagram is still shown.' : null}
+        emptyActionLabel="Load example"
         onEmptyAction={() => setDemoState('normal')}
         onSelect={(node) => {
           setSelectedId(node.id);
           setSelectedTitle(node.title);
-          toast({ variant: 'success', title: 'Node dipilih', description: node.title });
+          toast({ variant: 'success', title: 'Node selected', description: node.title });
         }}
       />
 
       <p aria-live="polite" className="text-sm text-muted-foreground">
-        {selectedTitle ? `Node terpilih: ${selectedTitle}` : 'Belum ada node terpilih.'}
+        {selectedTitle ? `Selected node: ${selectedTitle}` : 'No node selected.'}
       </p>
 
-      <section aria-label="Papan zoom dan pan keyboard" className="space-y-2">
+      <section aria-label="Keyboard navigation" className="space-y-2">
         <h2 className="flex items-center gap-2 text-sm font-semibold">
-          <Network className="h-4 w-4" aria-hidden="true" /> Papan zoom/pan keyboard
+          <Network className="h-4 w-4" aria-hidden="true" /> Keyboard navigation
         </h2>
         <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-          <li>Fokus kanvas (role region): panah = pan 40px, <kbd>+</kbd>/<kbd>-</kbd> = zoom, <kbd>0</kbd> = reset.</li>
-          <li>Zoom via tombol [−] [%] [+] [reset] di kanan atas kanvas, atau Ctrl/Cmd+wheel; wheel polos tidak dicegat.</li>
-          <li>Node (roving tabindex): ↑↓ antar node visible, → expand/masuk anak, ← collapse/ke parent, Home/End, Enter/Spasi = pilih.</li>
+          <li>Focus the canvas: arrow keys pan by 40px, <kbd>+</kbd>/<kbd>-</kbd> zoom, and <kbd>0</kbd> resets the view.</li>
+          <li>Use the zoom controls at the top right or Ctrl/Cmd+wheel. Scrolling without a modifier keeps its normal behavior.</li>
+          <li>On a node: ↑↓ move between visible nodes, → expands or enters a child, ← collapses or moves to the parent, Home/End jump to the first/last node, and Enter/Space select.</li>
         </ul>
       </section>
 
-      <section aria-label="Catatan aksesibilitas" className="space-y-2">
-        <h2 className="text-sm font-semibold">Catatan aksesibilitas</h2>
+      <section aria-label="Accessibility notes" className="space-y-2">
+        <h2 className="text-sm font-semibold">Accessibility notes</h2>
         <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-          <li>Diagram memakai role tree/treeitem dengan aria-level/aria-expanded/aria-selected; navigasi keyboard mengikuti pola tree-view.</li>
-          <li>Loading memakai skeleton 8 kotak dengan aria-busy; empty memakai role status; error invalid dan error eksternal memakai role alert dengan pesan teks.</li>
-          <li>Highlight pencarian memakai ring primary + data-highlighted (bukan hanya warna); hasil diumumkan via live region di luar kanvas.</li>
-          <li>Resep pencarian: konsumen mencocokkan nama/jabatan, lalu memakai getAncestors untuk expand path ke target.</li>
-          <li>Semua warna lewat token semantik; light/dark parity terjaga. Transisi dihormati via prefers-reduced-motion.</li>
+          <li>The diagram uses tree/treeitem roles with aria-level, aria-expanded, and aria-selected. Keyboard navigation follows the tree-view pattern.</li>
+          <li>Loading shows eight skeleton cards with aria-busy. Empty content uses a status region; validation and external errors use text alerts.</li>
+          <li>Search results use a primary ring and data-highlighted. A live region outside the canvas announces the result count.</li>
+          <li>Search implementation: match names or titles, then use getAncestors to expand the path to each result. This demo uses mock handlers (S-005.28).</li>
+          <li>Colors use semantic tokens in light and dark modes. Transitions respect prefers-reduced-motion.</li>
         </ul>
       </section>
     </div>

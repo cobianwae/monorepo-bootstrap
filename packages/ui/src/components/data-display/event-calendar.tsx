@@ -145,9 +145,9 @@ function CalendarEmpty() {
   return (
     <EmptyState
       role="status"
-      title="Tidak ada event di periode ini"
-      description="Belum ada jadwal pada periode yang dipilih. Coba ganti view atau periode."
-      actionLabel="Buat event"
+      title="No events in this period"
+      description="No events scheduled in the selected period. Try changing the view or period."
+      actionLabel="Create event"
     />
   );
 }
@@ -387,7 +387,7 @@ function buildSegmentsBySlot(
 
 function continuationLabel(segment: EventSegment): string {
   const parts: string[] = [];
-  if (segment.continuesBefore) parts.push('berlanjut dari hari sebelumnya');
+  if (segment.continuesBefore) parts.push('continues from the previous day');
   if (segment.continuesAfter) parts.push('berlanjut ke hari berikutnya');
   return parts.length > 0 ? `, ${parts.join(', ')}` : '';
 }
@@ -1378,15 +1378,15 @@ export function EventCalendar({
               ))}
             </div>
           )}
-          <p className="mt-4 text-center text-sm text-muted-foreground">Memuat event…</p>
+          <p className="mt-4 text-center text-sm text-muted-foreground">Loading events…</p>
         </div>
       ) : error ? (
         <Alert variant="destructive" role="alert" className="rounded-lg border border-border">
-          <AlertTitle>Gagal memuat event</AlertTitle>
+          <AlertTitle>Could not load events</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
           {onRetry && (
             <Button type="button" size="sm" onClick={onRetry} className="mt-3">
-              Coba lagi
+              Try again
             </Button>
           )}
         </Alert>

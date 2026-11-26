@@ -351,11 +351,11 @@ function FlowNode({
     error: 'text-destructive-foreground',
   }[status];
   const statusLabel = {
-    default: 'Siap',
-    running: 'Berjalan',
-    success: 'Sukses',
-    warning: 'Peringatan',
-    error: 'Gagal',
+    default: 'Ready',
+    running: 'Running',
+    success: 'Success',
+    warning: 'Warning',
+    error: 'Failed',
   }[status];
 
   return (
@@ -535,7 +535,7 @@ function FlowPaletteItemRow({ item, onAdd }: FlowPaletteItemRowProps) {
         type="button"
         data-testid={`flow-palette-add-${item.type}`}
         className="flex shrink-0 items-center justify-center w-8 h-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        aria-label={`Tambah ${item.title}`}
+        aria-label={`Add ${item.title}`}
         onClick={() => void onAdd(item)}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
@@ -597,7 +597,7 @@ function FlowControls({
         <button type="button" aria-label="Atur 100%" onClick={resetZoom} title="Atur 100% (1:1)" className={buttonClass} data-testid="flow-reset-zoom">
           <span className="text-[10px] font-mono">1:1</span>
         </button>
-        <button type="button" aria-label="Selaras tampilan" onClick={fitView} title="Selaras tampilan (fit view)" className={buttonClass} data-testid="flow-fit-view">
+        <button type="button" aria-label="Fit view" onClick={fitView} title="Fit view (fit view)" className={buttonClass} data-testid="flow-fit-view">
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0-2.21-3.582-4-8-4S0 4.79 0 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7" />
           </svg>
@@ -661,29 +661,29 @@ function FlowToolbar({
     >
       <button
         type="button"
-        aria-label="Urungkan"
+        aria-label="Undo"
         disabled={!canUndo}
         onClick={onUndo}
         className={buttonClass}
         data-testid="flow-toolbar-undo"
       >
-        Urungkan
+        Undo
       </button>
       <button
         type="button"
-        aria-label="Ulangi"
+        aria-label="Redo"
         disabled={!canRedo}
         onClick={onRedo}
         className={buttonClass}
         data-testid="flow-toolbar-redo"
       >
-        Ulangi
+        Redo
       </button>
       <div aria-hidden="true" className="h-5 w-px bg-border mx-1" />
       <button
         type="button"
         aria-pressed={snapToGrid}
-        aria-label={snapToGrid ? 'Matikan snap ke grid' : 'Nyalakan snap ke grid'}
+        aria-label={snapToGrid ? 'Turn off snap to grid' : 'Turn on snap to grid'}
         onClick={onToggleSnap}
         className={cn(buttonClass, snapToGrid ? 'bg-primary text-primary-foreground' : '')}
         data-testid="flow-toolbar-snap"
@@ -693,7 +693,7 @@ function FlowToolbar({
       <button
         type="button"
         aria-pressed={showGrid}
-        aria-label={showGrid ? 'Sembunyikan grid' : 'Tampilkan grid'}
+        aria-label={showGrid ? 'Hide grid' : 'Show grid'}
         onClick={onToggleGrid}
         className={cn(buttonClass, showGrid ? '' : 'opacity-50')}
         data-testid="flow-toolbar-grid"
@@ -704,7 +704,7 @@ function FlowToolbar({
       <button
         type="button"
         aria-pressed={minimapOpen}
-        aria-label={minimapOpen ? 'Sembunyikan minimap' : 'Tampilkan minimap'}
+        aria-label={minimapOpen ? 'Hide minimap' : 'Show minimap'}
         onClick={onToggleMinimap}
         className={cn(buttonClass, minimapOpen ? '' : 'opacity-50')}
         data-testid="flow-toggle-minimap"
@@ -995,7 +995,7 @@ export function FlowEditor(props: FlowEditorProps) {
     loading,
     error,
     onRetry,
-    emptyActionLabel = 'Tambah node pertama',
+    emptyActionLabel = 'Add first node',
     onEmptyAction,
     historyLimit = 50,
     ariaLabel = 'Editor alur',
@@ -1076,8 +1076,8 @@ export function FlowEditor(props: FlowEditorProps) {
         setInternalNodes(snap.nodes);
         setInternalEdges(snap.edges);
       }
-      setHistoryAnnounce('Perubahan dibatalkan');
-      void toast({ title: 'Dibatalkan', description: 'Langkah sebelumnya dikembalikan.', duration: 3000 });
+      setHistoryAnnounce('Change undone');
+      void toast({ title: 'Undone', description: 'Previous step restored.', duration: 3000 });
     } finally {
       historyApplying.current = false;
     }
@@ -1095,8 +1095,8 @@ export function FlowEditor(props: FlowEditorProps) {
         setInternalNodes(snap.nodes);
         setInternalEdges(snap.edges);
       }
-      setHistoryAnnounce('Perubahan diulang');
-      void toast({ title: 'Dilakukan Ulang', description: 'Langkah sebelumnya diterapkan kembali.', duration: 3000 });
+      setHistoryAnnounce('Change redone');
+      void toast({ title: 'Redone', description: 'Previous step reapplied.', duration: 3000 });
     } finally {
       historyApplying.current = false;
     }
@@ -1160,10 +1160,10 @@ export function FlowEditor(props: FlowEditorProps) {
 type ConnectionRejectReason = 'self-loop' | 'duplikat' | 'handle-penuh' | 'custom';
 
 const connectionRejectMessage: Record<ConnectionRejectReason, string> = {
-  'self-loop': 'Sambungan ditolak: self-loop tidak diizinkan.',
-  'duplikat': 'Sambungan ditolak: edge duplikat sudah ada.',
-  'handle-penuh': 'Sambungan ditolak: handle tujuan sudah penuh.',
-  custom: 'Sambungan ditolak: aturan kustom menolak koneksi.',
+  'self-loop': 'Connection rejected: self-loops are not allowed.',
+  'duplikat': 'Connection rejected: duplicate edge already exists.',
+  'handle-penuh': 'Connection rejected: target handle is full.',
+  custom: 'Connection rejected: custom rule rejected the connection.',
 };
 
 /**
@@ -1187,7 +1187,7 @@ function validateConnection(
   // hanya menyambung source handle ke target handle; arah terbalik tidak dapat
   // diinisiasi lewat handle, dan self-loop sudah ditolak di atas.
 
-  // Duplikat pasangan (source, sourceHandle, target, targetHandle) sudah ada.
+  // Duplicate pasangan (source, sourceHandle, target, targetHandle) sudah ada.
   const duplicate = edges.some(
     (e) =>
       e.source === source &&
@@ -1257,7 +1257,7 @@ const handleConnect = React.useCallback(
     const validation = validateConnection(connection, edges, isValidConnection);
     if (!validation.ok) {
       const message = connectionRejectMessage[validation.reason];
-      void toast({ title: 'Koneksi ditolak', description: message, duration: 4000 });
+      void toast({ title: 'Connection rejected', description: message, duration: 4000 });
       setConnectionAlert(message);
       setConnectionSuccess(null);
       return false;
@@ -1338,7 +1338,7 @@ React.useEffect(() => {
     }
     setSelection({ nodes: [], edges: [] });
     setSelectedEdgeId(null);
-    void toast({ title: 'Dihapus', description: `${selNodes.length} node, ${edgeList.length} edge dihapus — Urungkan`, duration: 4000 });
+    void toast({ title: 'Deleted', description: `${selNodes.length} nodes, ${edgeList.length} edges deleted — Undo`, duration: 4000 });
   }, [selection, edges, isControlled, onDelete, nodes, _history]);
 
   // Fokus pada node/edge dari daftar SR (AC-03): seleksi elemen + fokus DOM bila tersedia.
@@ -1378,7 +1378,7 @@ React.useEffect(() => {
     (node: FlowNode) => {
       const related = edges.filter((e) => e.source === node.id || e.target === node.id);
       handleDeleteSelected({ nodes: [node], edges: related });
-      setHistoryAnnounce(`Node ${node.data.label} dihapus`);
+      setHistoryAnnounce(`Node ${node.data.label} deleted`);
     },
     [edges, handleDeleteSelected],
   );
@@ -1386,7 +1386,7 @@ React.useEffect(() => {
   const removeSingleEdge = React.useCallback(
     (edge: FlowEdge) => {
       handleDeleteSelected({ nodes: [], edges: [edge] });
-      setHistoryAnnounce(`Edge ${edge.source} → ${edge.target} dihapus`);
+      setHistoryAnnounce(`Edge ${edge.source} → ${edge.target} deleted`);
     },
     [handleDeleteSelected],
   );
@@ -1451,7 +1451,7 @@ React.useEffect(() => {
     }
     setSelectedEdgeId(null);
     closeContextMenu();
-    void toast({ title: 'Dihapus', description: 'Edge dihapus — Urungkan', duration: 3000 });
+    void toast({ title: 'Deleted', description: 'Edge deleted — Undo', duration: 3000 });
   }, [contextMenu, isControlled, onEdgesChange, nodes, edges, _history, closeContextMenu]);
 
   const handleRefs = React.useRef<Map<string, { source: HTMLElement; target: HTMLElement }>>(new Map());
@@ -1518,7 +1518,7 @@ React.useEffect(() => {
         if (selectedEdgeId) {
           event.preventDefault();
           removeSelectedEdge();
-          void toast({ title: 'Dihapus', description: 'Edge dihapus — Urungkan', duration: 3000 });
+          void toast({ title: 'Deleted', description: 'Edge deleted — Undo', duration: 3000 });
           return;
         }
         if (selection.nodes.length > 0) {
@@ -1587,7 +1587,7 @@ React.useEffect(() => {
           aria-busy="true"
         >
           <Skeleton className="w-48 h-12 mb-3" />
-          <p className="sr-only">Memuat flow…</p>
+          <p className="sr-only">Loading flow…</p>
         </div>
       )}
 
@@ -1595,8 +1595,8 @@ React.useEffect(() => {
       {!loading && !error && empty && (
         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center p-6" role="status" aria-live="polite">
           <EmptyState
-            title="Canvas kosong"
-            description="Mulai dengan menambahkan node pertama."
+            title="Empty canvas"
+            description="Start by adding the first node."
             actionLabel={emptyActionLabel}
             onAction={onEmptyAction}
           />
@@ -1612,9 +1612,9 @@ React.useEffect(() => {
         >
           <EmptyState
             variant="error"
-            title="Gagal memuat flow"
+            title="Could not load flow"
             description={error}
-            actionLabel="Coba lagi"
+            actionLabel="Try again"
             onAction={onRetry}
           />
         </div>
@@ -1707,12 +1707,12 @@ React.useEffect(() => {
           data-testid="flow-sr-toggle"
           className="rounded-md border border-border bg-card px-2 py-1 text-xs text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
-          {showNodeList ? 'Sembunyikan daftar node & edge' : 'Tampilkan daftar node & edge'}
+          {showNodeList ? 'Hide node & edge list' : 'Show node & edge list'}
         </button>
         <div
           id="flow-node-edge-list"
           role="region"
-          aria-label="Daftar node dan edge"
+          aria-label="Node and edge list"
           className={cn(
             'rounded-md border border-border bg-card p-3 text-sm text-foreground',
             showNodeList ? '' : 'sr-only',
@@ -1747,7 +1747,7 @@ React.useEffect(() => {
                       data-testid={`flow-sr-hapus-node-${node.id}`}
                       className="rounded-sm border border-destructive/40 px-2 py-0.5 text-xs text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
-                      Hapus
+                      Delete
                     </button>
                   </span>
                 </li>
@@ -1777,7 +1777,7 @@ React.useEffect(() => {
                     data-testid={`flow-sr-hapus-edge-${edge.id}`}
                     className="rounded-sm border border-destructive/40 px-2 py-0.5 text-xs text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    Hapus
+                    Delete
                   </button>
                 </span>
               </li>
@@ -1789,7 +1789,7 @@ React.useEffect(() => {
       {/* Live region hitungan seleksi (AC-02) */}
       {(selection.nodes.length > 0 || selection.edges.length > 0) && (
         <div aria-live="polite" aria-atomic="true" className="sr-only">
-          {selection.nodes.length} node, {selection.edges.length} edge terpilih
+          {selection.nodes.length} nodes, {selection.edges.length} edges selected
         </div>
       )}
 
@@ -1818,10 +1818,10 @@ React.useEffect(() => {
               {contextMenu.kind === 'node' ? (
                 <>
                   <ContextMenuItem onClick={closeContextMenu} data-testid="flow-menu-node-rincian">
-                    Rincian
+                    Details
                   </ContextMenuItem>
                   <ContextMenuItem onClick={closeContextMenu} data-testid="flow-menu-node-duplik">
-                    Duplikat
+                    Duplicate
                   </ContextMenuItem>
                   <ContextMenuSeparator />
                   <ContextMenuItem
@@ -1829,7 +1829,7 @@ React.useEffect(() => {
                     variant="destructive"
                     data-testid="flow-menu-node-hapus"
                   >
-                    Hapus
+                    Delete
                   </ContextMenuItem>
                 </>
               ) : contextMenu.kind === 'edge' ? (
@@ -1843,26 +1843,26 @@ React.useEffect(() => {
                     variant="destructive"
                     data-testid="flow-menu-edge-hapus"
                   >
-                    Hapus edge
+                    Delete edge
                   </ContextMenuItem>
                 </>
               ) : (
                 <>
                   <ContextMenuItem onClick={closeContextMenu} data-testid="flow-menu-canvas-tambah">
-                    Tambah di sini
+                    Add here
                   </ContextMenuItem>
                   <ContextMenuItem
                     onClick={closeContextMenu}
                     data-testid="flow-menu-canvas-selaraskan"
                   >
-                    Selaras tampilan
+                    Fit view
                   </ContextMenuItem>
                   <ContextMenuSeparator />
                   <ContextMenuItem
                     onClick={closeContextMenu}
                     data-testid="flow-menu-canvas-grid"
                   >
-                    Alih grid
+                    Toggle grid
                   </ContextMenuItem>
                 </>
               )}

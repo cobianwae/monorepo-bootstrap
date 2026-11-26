@@ -16,13 +16,13 @@ export const SCENARIOS: Record<CropScenario, ScenarioConfig> = {
     aspect: 1,
     cropShape: 'round',
     outputSize: { width: 512, height: 512 },
-    label: 'Avatar 1:1 · lingkaran · 512×512',
+    label: 'Avatar 1:1 · circle · 512×512',
   },
   cover: {
     aspect: 16 / 9,
     cropShape: 'rect',
     outputSize: { width: 1280, height: 720 },
-    label: 'Cover 16:9 · persegi · 1280×720',
+    label: 'Cover 16:9 · rectangle · 1280×720',
   },
 };
 
@@ -30,23 +30,23 @@ export const ASPECT_OPTIONS: { id: AspectPreset; label: string; aspect: number |
   { id: 'square', label: '1:1', aspect: 1 },
   { id: 'wide', label: '16:9', aspect: 16 / 9 },
   { id: 'standard', label: '4:3', aspect: 4 / 3 },
-  { id: 'free', label: 'Bebas', aspect: 'free' },
+  { id: 'free', label: 'Free', aspect: 'free' },
 ];
 
 export const STEPS = [
-  'Pilih foto avatar: area crop 1:1 muncul dengan pratinjau lingkaran.',
-  'Geser area dengan drag atau panah keyboard, lalu ubah zoom dengan slider.',
-  'Putar 90° dengan tombol, lalu atur ulang untuk kembali ke awal tanpa upload ulang.',
-  'Cek pratinjau lingkaran berubah mengikuti area crop secara live.',
-  'Simpan hasil: blob 512×512 diteruskan lewat onComplete.',
-  'Ulangi untuk cover: pilih skenario Cover 16:9, hasil 1280×720.',
+  'Choose an avatar photo to open a square crop area with a circular preview.',
+  'Drag the crop area or use arrow keys, then adjust zoom with the slider.',
+  'Rotate 90°, then reset to the original position without uploading again.',
+  'Check that the circular preview updates as you adjust the crop.',
+  'Save the result: onComplete receives a 512×512 blob.',
+  'Try a cover: choose Cover 16:9 for a 1280×720 result.',
 ];
 
 export const KEYBOARD = [
-  'Panah: geser area crop 10px (Shift + panah = 1px presisi).',
-  '+ / −: zoom dalam batas 100%–500%; slider ikut tersinkron.',
-  'R: putar 90° (Shift + R putar balik); 0: atur ulang ke awal file.',
-  'Tab: urutan Pilih foto → aspek → area → slider → tombol → pratinjau → Simpan.',
+  'Arrow keys: move the crop area by 10px (Shift + arrow for 1px adjustments).',
+  '+ / −: zoom between 100% and 500%; the slider stays in sync.',
+  'R: rotate 90° (Shift + R reverses rotation); 0: reset the image.',
+  'Tab: move through photo selection, aspect ratio, crop area, slider, controls, preview, and Save.',
 ];
 
 export interface DemoDataset {
@@ -61,33 +61,33 @@ export const DEMO_DATASETS: DemoDataset[] = [
   {
     id: 'valid',
     title: 'Valid — PNG/JPG/WebP ≤ 10 MB',
-    hint: 'Unggah foto valid: area crop muncul, loading tampil sesaat saat decode.',
+    hint: 'Upload a supported photo. A loading state appears while the image decodes.',
   },
   {
     id: 'rusak',
-    title: 'Rusak — format tidak diterima',
-    hint: 'Hanya PNG yang diterima: unggah JPG untuk memicu error format dengan penyebab.',
+    title: 'Unsupported format',
+    hint: 'This demo accepts PNG only. Upload a JPG to see the format error.',
     accept: 'image/png',
   },
   {
     id: 'raksasa',
-    title: 'Raksasa — melebihi batas ukuran',
-    hint: 'Batas demo 1 KB (mock ukuran tercatat, bukan file besar): unggah file apa pun > 1 KB untuk memicu error ukuran.',
+    title: 'File size limit',
+    hint: 'This demo uses a 1 KB limit. Upload any file larger than 1 KB to see the size error.',
     maxBytes: 1024,
   },
 ];
 
 export interface AuditPair {
   pair: string;
-  kind: 'teks' | 'grafis';
+  kind: 'text' | 'graphics';
   threshold: string;
 }
 
 export const AUDIT_PAIRS: AuditPair[] = [
-  { pair: 'foreground di atas background', kind: 'teks', threshold: '≥ 4,5:1' },
-  { pair: 'muted-foreground di atas background', kind: 'teks', threshold: '≥ 4,5:1' },
-  { pair: 'primary (garis viewport, gagang, ring fokus)', kind: 'grafis', threshold: '≥ 3:1' },
-  { pair: 'primary-foreground di atas primary (label tombol)', kind: 'teks', threshold: '≥ 4,5:1' },
-  { pair: 'destructive di atas background (pesan error)', kind: 'teks', threshold: '≥ 4,5:1' },
-  { pair: 'overlay background/80 di atas foto', kind: 'grafis', threshold: '≥ 3:1' },
+  { pair: 'foreground on background', kind: 'text', threshold: '≥ 4.5:1' },
+  { pair: 'muted-foreground on background', kind: 'text', threshold: '≥ 4.5:1' },
+  { pair: 'primary (viewport border, handles, focus ring)', kind: 'graphics', threshold: '≥ 3:1' },
+  { pair: 'primary-foreground on primary (button labels)', kind: 'text', threshold: '≥ 4.5:1' },
+  { pair: 'destructive on background (error messages)', kind: 'text', threshold: '≥ 4.5:1' },
+  { pair: 'background/80 overlay on the photo', kind: 'graphics', threshold: '≥ 3:1' },
 ];

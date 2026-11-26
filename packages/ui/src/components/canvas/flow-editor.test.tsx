@@ -198,22 +198,22 @@ describe('FlowEditor fondasi (005-01)', () => {
     renderEditor({ defaultNodes: [], defaultEdges: [] });
     const empty = screen.getByRole('status');
     expect(empty).not.toBeNull();
-    expect(empty.textContent).toContain('Canvas kosong');
+    expect(empty.textContent).toContain('Empty canvas');
   });
 
   it('AC-04: state matrix — loading (aria-busy + SR)', () => {
     renderEditor({ loading: true, defaultNodes: [], defaultEdges: [] });
     const busy = document.querySelector('[aria-busy="true"]');
     expect(busy).not.toBeNull();
-    expect(busy?.textContent).toContain('Memuat flow…');
+    expect(busy?.textContent).toContain('Loading flow…');
   });
 
   it('AC-04: state matrix — error (role=alert + retry)', () => {
     renderEditor({ error: 'Gagal jaringan', onRetry: vi.fn(), defaultNodes: [], defaultEdges: [] });
     const alert = screen.getByRole('alert');
     expect(alert).not.toBeNull();
-    expect(alert.textContent).toContain('Gagal memuat flow');
-    expect(screen.getByRole('button', { name: /Coba lagi/i })).not.toBeNull();
+    expect(alert.textContent).toContain('Could not load flow');
+    expect(screen.getByRole('button', { name: /Try again/i })).not.toBeNull();
   });
 
   it('AC-05: controlled nodes/edges diteruskan (tidak mutate internal)', () => {
@@ -416,7 +416,7 @@ describe('FlowEditor edge + validasi + label (005-03)', () => {
     const tgt = screen.getByTestId('flow-handle-n2-target');
     fireEvent.keyDown(tgt, { key: 'Enter' });
     expect(onConnect).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert').textContent).toContain('edge duplikat sudah ada');
+    expect(screen.getByRole('alert').textContent).toContain('duplicate edge already exists');
     expect(document.activeElement).toBe(src);
   });
 
@@ -424,14 +424,14 @@ describe('FlowEditor edge + validasi + label (005-03)', () => {
     renderControlled();
     triggerConnect({ source: 'n1', target: 'n1', sourceHandle: 'c', targetHandle: 'd' });
     expect(onConnect).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert').textContent).toContain('self-loop tidak diizinkan');
+    expect(screen.getByRole('alert').textContent).toContain('self-loops are not allowed');
   });
 
   it('AC-03: duplikat ditolak + teks alasan', () => {
     renderControlled();
     triggerConnect({ source: 'n1', target: 'n2', sourceHandle: 'a', targetHandle: 'b' }); // duplikat e1
     expect(onConnect).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert').textContent).toContain('edge duplikat sudah ada');
+    expect(screen.getByRole('alert').textContent).toContain('duplicate edge already exists');
   });
 
   it('AC-03: handle tujuan penuh ditolak + teks alasan', () => {
@@ -439,7 +439,7 @@ describe('FlowEditor edge + validasi + label (005-03)', () => {
     // e1: n1→n2 targetHandle 'b'; target n2 dengan targetHandle 'b' sudah penuh.
     triggerConnect({ source: 'n1', target: 'n2', sourceHandle: 'x', targetHandle: 'b' });
     expect(onConnect).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert').textContent).toContain('handle tujuan sudah penuh');
+    expect(screen.getByRole('alert').textContent).toContain('target handle is full');
   });
 
   it('AC-04: isValidConnection hanya mengencangkan (AND), tidak boleh melonggarkan arah', () => {
@@ -546,12 +546,12 @@ describe('FlowEditor seleksi + inspector on-demand + hapus (005-04)', () => {
   it('live region hitungan seleksi multi node + edge', () => {
     renderControlled();
     triggerSelect({ nodes: [baseNodes[0], baseNodes[1]], edges: baseEdges });
-    expect(screen.getByText(/2 node, 1 edge terpilih/)).not.toBeNull();
+    expect(screen.getByText(/2 nodes, 1 edges selected/)).not.toBeNull();
   });
 
   it('live region kosong saat tidak ada seleksi', () => {
     renderControlled();
-    expect(screen.queryByText(/node, .* edge terpilih/)).toBeNull();
+    expect(screen.queryByText(/nodes, .* edges selected/)).toBeNull();
   });
 
   it('Delete pada node terpilih → onDelete atomic node + edge terkait (controlled)', () => {
@@ -566,23 +566,23 @@ describe('FlowEditor seleksi + inspector on-demand + hapus (005-04)', () => {
       }),
     );
     // toast 'Dihapus' dapat menumpuk di antaranya test (memoryState global); hitung semua.
-    expect(screen.getAllByText('Dihapus').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Deleted').length).toBeGreaterThan(0);
   });
 
   it('menu konteks node: Rincian / Duplikat / Hapus; Hapus hapus node + edge terkait (uncontrolled)', () => {
     renderEditor(); // defaultNodes/defaultEdges → uncontrolled
     triggerNodeMenu('n1');
     const menu = openMenu();
-    expect(within(menu).getByText('Rincian')).not.toBeNull();
-    expect(within(menu).getByText('Duplikat')).not.toBeNull();
-    expect(within(menu).getByText('Hapus')).not.toBeNull();
+    expect(within(menu).getByText('Details')).not.toBeNull();
+    expect(within(menu).getByText('Duplicate')).not.toBeNull();
+    expect(within(menu).getByText('Delete')).not.toBeNull();
 
     act(() => {
-      within(menu).getByText('Hapus').click();
+      within(menu).getByText('Delete').click();
     });
     expect(screen.queryByTestId('flow-node-n1')).toBeNull();
     expect(screen.queryByTestId('flow-edge-e1')).toBeNull(); // e1 menyentuh n1
-    expect(screen.getAllByText('Dihapus').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Deleted').length).toBeGreaterThan(0);
   });
 
   it('menu konteks edge: Edit label / Hapus edge; Hapus edge hapus edge (uncontrolled)', () => {
@@ -590,23 +590,23 @@ describe('FlowEditor seleksi + inspector on-demand + hapus (005-04)', () => {
     triggerEdgeMenu('e1');
     const menu = openMenu();
     expect(within(menu).getByText('Edit label')).not.toBeNull();
-    expect(within(menu).getByText('Hapus edge')).not.toBeNull();
+    expect(within(menu).getByText('Delete edge')).not.toBeNull();
 
     act(() => {
-      within(menu).getByText('Hapus edge').click();
+      within(menu).getByText('Delete edge').click();
     });
     expect(screen.queryByTestId('flow-edge-e1')).toBeNull();
     expect(screen.queryByTestId('flow-node-n1')).not.toBeNull(); // node tidak ikut dihapus
-    expect(screen.getAllByText('Dihapus').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Deleted').length).toBeGreaterThan(0);
   });
 
   it('menu konteks canvas: Tambah di sini / Selaras tampilan / Alih grid', () => {
     renderEditor();
     triggerPaneMenu();
     const menu = openMenu();
-    expect(within(menu).getByText('Tambah di sini')).not.toBeNull();
-    expect(within(menu).getByText('Selaras tampilan')).not.toBeNull();
-    expect(within(menu).getByText('Alih grid')).not.toBeNull();
+    expect(within(menu).getByText('Add here')).not.toBeNull();
+    expect(within(menu).getByText('Fit view')).not.toBeNull();
+    expect(within(menu).getByText('Toggle grid')).not.toBeNull();
   });
 
   it('tambah via [+] tidak membuka inspector penuh / seleksi tetap kosong (regresi 005-01)', () => {
@@ -741,14 +741,14 @@ describe('FlowEditor undo/redo + toolbar (005-05)', () => {
     // jalur keyboard Ctrl+Z
     fireEvent.keyDown(screen.getByTestId('flow-editor'), { key: 'z', ctrlKey: true });
     expect(countNodes()).toBe(2);
-    expect(screen.getByText('Perubahan dibatalkan')).not.toBeNull();
+    expect(screen.getByText('Change undone')).not.toBeNull();
     expect(undo.disabled).toBe(true);
     expect(redo.disabled).toBe(false);
 
     // jalur keyboard Ctrl+Y (alias redo)
     fireEvent.keyDown(screen.getByTestId('flow-editor'), { key: 'y', ctrlKey: true });
     expect(countNodes()).toBe(3);
-    expect(screen.getByText('Perubahan diulang')).not.toBeNull();
+    expect(screen.getByText('Change redone')).not.toBeNull();
     expect(undo.disabled).toBe(false);
     expect(redo.disabled).toBe(true);
   });
@@ -838,7 +838,7 @@ describe('FlowEditor minimap + daftar SR (005-06)', () => {
 
   it('AC-03: status node memakai dot + teks label (bukan warna-saja)', () => {
     renderEditor();
-    expect(screen.getByTestId('flow-node-status-n2').textContent).toContain('Peringatan');
+    expect(screen.getByTestId('flow-node-status-n2').textContent).toContain('Warning');
   });
 
   it('AC-03: daftar SR menampilkan jumlah koneksi + label edge', () => {
@@ -853,7 +853,7 @@ describe('FlowEditor minimap + daftar SR (005-06)', () => {
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     fireEvent.click(toggle);
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
-    expect(screen.getByRole('region', { name: 'Daftar node dan edge' }).className).not.toContain('sr-only');
+    expect(screen.getByRole('region', { name: 'Node and edge list' }).className).not.toContain('sr-only');
   });
 
   it('AC-03: tombol [Fokus] pada baris node memanggil onSelectionChange', () => {

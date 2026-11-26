@@ -382,7 +382,7 @@ export default function CalendarPage() {
                 <tr>
                   <td className="py-1 pr-4">Agenda (empty)</td>
                   <td className="py-1 pr-4">No events in period</td>
-                  <td className="py-1">Empty state with role=&quot;status&quot; and a &quot;Buat event&quot; consumer CTA.</td>
+                  <td className="py-1">Empty state with role=&quot;status&quot; and a &quot;Create event&quot; consumer CTA.</td>
                 </tr>
               </tbody>
             </table>

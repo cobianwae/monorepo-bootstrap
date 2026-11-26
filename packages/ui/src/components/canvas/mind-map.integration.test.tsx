@@ -17,10 +17,10 @@ describe('MindMap integrasi ReactFlow (CR-020)', () => {
     for (const wrapper of wrappers) {
       expect(wrapper.style.pointerEvents).toBe('all');
     }
-    fireEvent.click(screen.getByRole('button', { name: 'Tambah anak Riset' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add child to Riset' }));
     expect(screen.getByRole('textbox')).toBe(document.activeElement);
     fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
-    fireEvent.click(screen.getByRole('button', { name: 'Lipat Peluncuran Q1' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse Peluncuran Q1' }));
     expect(container.querySelector('[data-node-id="child"]')).toBeNull();
     fireEvent.click(screen.getByTestId('mind-map-expander-root'));
     expect(container.querySelector('[data-node-id="child"]')).not.toBeNull();

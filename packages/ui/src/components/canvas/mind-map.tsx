@@ -145,7 +145,7 @@ export function normalizeMindInput(data: MindInput): MindNormalizedResult {
         rootId: null,
         error: {
           code: 'duplicate-id',
-          message: `ID duplikat: "${node.id}" muncul lebih dari sekali.`,
+          message: `Duplicate ID: "${node.id}" appears more than once.`,
           nodeId: node.id,
         },
         isEmpty: false,
@@ -163,7 +163,7 @@ export function normalizeMindInput(data: MindInput): MindNormalizedResult {
       rootId: null,
       error: {
         code: 'root-count',
-        message: `Harus tepat satu root, ditemukan ${roots.length}.`,
+        message: `Exactly one root is required, found ${roots.length}.`,
         nodeId: extra ? extra.id : null,
       },
       isEmpty: false,
@@ -179,7 +179,7 @@ export function normalizeMindInput(data: MindInput): MindNormalizedResult {
         rootId: null,
         error: {
           code: 'missing-parent',
-          message: `Parent "${node.parentId}" dari node "${node.id}" tidak ditemukan.`,
+          message: `Parent "${node.parentId}" of node "${node.id}" was not found.`,
           nodeId: node.id,
         },
         isEmpty: false,
@@ -230,7 +230,7 @@ export function normalizeMindInput(data: MindInput): MindNormalizedResult {
       rootId: null,
       error: {
         code: 'cycle',
-        message: `Siklus terdeteksi pada node "${cycleId}".`,
+        message: `Cycle detected at node "${cycleId}".`,
         nodeId: cycleId,
       },
       isEmpty: false,
@@ -790,7 +790,7 @@ function MindNode({ data }: { data: MindNodeData }) {
           {node.hasChildren ? (
             <button
               type="button"
-              aria-label={isExpanded ? `Lipat ${node.label}` : `Buka ${node.label}`}
+              aria-label={isExpanded ? `Collapse ${node.label}` : `Expand ${node.label}`}
               aria-expanded={isExpanded}
               data-testid={`mind-map-expander-${node.id}`}
               disabled={node.disabled}
@@ -811,7 +811,7 @@ function MindNode({ data }: { data: MindNodeData }) {
           {isEditing ? (
             <div className="relative min-w-0 flex-1">
               <label htmlFor={`mind-map-inline-${node.id}`} className="sr-only">
-                {isNew ? 'Label ide baru' : `Ubah ide ${node.label}`}
+                {isNew ? 'New idea label' : `Edit idea ${node.label}`}
               </label>
               <Input
                 ref={inputRef}
@@ -820,7 +820,7 @@ function MindNode({ data }: { data: MindNodeData }) {
                 value={draft}
                 aria-invalid={draftInvalid || undefined}
                 aria-describedby={draftInvalid ? `mind-map-inline-err-${node.id}` : undefined}
-                placeholder={isNew ? 'Ide baru' : 'Ubah ide'}
+                placeholder={isNew ? 'New idea' : 'Edit idea'}
                 onChange={(event) => {
                   setDraft(event.target.value);
                   if (event.target.value.trim()) setDraftInvalid(false);
@@ -869,11 +869,11 @@ function MindNode({ data }: { data: MindNodeData }) {
                 data-testid={`mind-map-inline-err-${node.id}`}
                 className="absolute left-1/2 top-full z-20 mt-1 -translate-x-1/2 whitespace-nowrap rounded-sm bg-card px-1 text-xs text-destructive shadow-sm"
               >
-                Label tidak boleh kosong.
+                Label cannot be empty.
               </span>
             ) : (
               <span className="absolute left-1/2 top-full z-20 mt-1 -translate-x-1/2 whitespace-nowrap rounded-sm bg-card px-1 text-xs text-muted-foreground shadow-sm">
-                Enter simpan · Esc batal
+                Enter saves · Esc cancels
               </span>
             )
           ) : null}
@@ -881,7 +881,7 @@ function MindNode({ data }: { data: MindNodeData }) {
             <Badge
               variant="secondary"
               size="sm"
-              aria-label={`${hiddenCount} ide tersembunyi`}
+              aria-label={`${hiddenCount} hidden ideas`}
               data-testid={`mind-map-badge-${node.id}`}
               className="shrink-0"
             >
@@ -889,13 +889,13 @@ function MindNode({ data }: { data: MindNodeData }) {
             </Badge>
           ) : null}
           {data.highlighted ? (
-            <Badge variant="default" size="sm" className="absolute -top-2 right-1">Cocok</Badge>
+            <Badge variant="default" size="sm" className="absolute -top-2 right-1">Match</Badge>
           ) : null}
           {!isEditing && !node.disabled ? (
             <>
               <MindAddHandle
                 testId={`mind-map-add-child-${node.id}`}
-                label={`Tambah anak ${node.label}`}
+                label={`Add child to ${node.label}`}
                 className={cn(atOuter, handleAlign)}
                 onAdd={() => onAddChild(node.id)}
                 tabIndex={data.active === false ? -1 : 0}
@@ -903,7 +903,7 @@ function MindNode({ data }: { data: MindNodeData }) {
               {canAddSibling ? (
                 <MindAddHandle
                   testId={`mind-map-add-sibling-${node.id}`}
-                  label={`Tambah saudara ${node.label}`}
+                  label={`Add sibling to ${node.label}`}
                   className={cn(atRootFacing, handleAlign)}
                   onAdd={() => onAddSibling(node.id)}
                   tabIndex={data.active === false ? -1 : 0}
@@ -925,13 +925,13 @@ function MindNode({ data }: { data: MindNodeData }) {
         <ContextMenuItem disabled={node.disabled} data-testid={`mind-map-menu-add-child-${node.id}`} onSelect={() => {
           afterMenuCloseRef.current = () => onAddChild(node.id);
         }}>
-          Tambah anak
+          Add child
         </ContextMenuItem>
         {canAddSibling ? (
           <ContextMenuItem disabled={node.disabled} data-testid={`mind-map-menu-add-sibling-${node.id}`} onSelect={() => {
             afterMenuCloseRef.current = () => onAddSibling(node.id);
           }}>
-            Tambah saudara
+            Add sibling
           </ContextMenuItem>
         ) : null}
         <ContextMenuItem disabled={node.disabled} data-testid={`mind-map-menu-edit-${node.id}`} onSelect={() => {
@@ -941,7 +941,7 @@ function MindNode({ data }: { data: MindNodeData }) {
         </ContextMenuItem>
         {node.hasChildren ? (
           <ContextMenuItem disabled={node.disabled} data-testid={`mind-map-menu-toggle-${node.id}`} onSelect={() => onToggle(node.id)}>
-            {isExpanded ? 'Lipat' : 'Buka'}
+            {isExpanded ? 'Collapse' : 'Expand'}
           </ContextMenuItem>
         ) : null}
         <ContextMenuSeparator />
@@ -953,11 +953,11 @@ function MindNode({ data }: { data: MindNodeData }) {
             afterMenuCloseRef.current = () => onRequestDelete(node.id);
           }}
         >
-          Hapus
+          Delete
         </ContextMenuItem>
         {isRoot ? (
           <p className="max-w-56 px-2 py-1 text-xs text-muted-foreground">
-            Ide pusat tidak bisa dihapus — hapus cabangnya dulu.
+            The central idea cannot be deleted — delete its branches first.
           </p>
         ) : null}
       </ContextMenuContent>
@@ -1030,11 +1030,11 @@ function MindAccessibleTree({
           <span className="px-2 text-sm">{node.label}</span>
           {active && !node.disabled ? (
             <>
-              <Button size="sm" variant="ghost" className="min-h-11" onClick={() => handlers.onAddChild(id)}>Tambah anak {node.label}</Button>
-              {node.parentId ? <Button size="sm" variant="ghost" className="min-h-11" onClick={() => handlers.onAddSibling(id)}>Tambah saudara {node.label}</Button> : null}
+              <Button size="sm" variant="ghost" className="min-h-11" onClick={() => handlers.onAddChild(id)}>Add child to {node.label}</Button>
+              {node.parentId ? <Button size="sm" variant="ghost" className="min-h-11" onClick={() => handlers.onAddSibling(id)}>Add sibling to {node.label}</Button> : null}
               <Button size="sm" variant="ghost" className="min-h-11" onClick={() => handlers.onStartEdit(id)}>Edit {node.label}</Button>
-              {node.hasChildren ? <Button size="sm" variant="ghost" className="min-h-11" onClick={() => handlers.onToggle(id)}>{open ? 'Lipat' : 'Buka'} {node.label}</Button> : null}
-              <Button size="sm" variant="ghost" className="min-h-11" disabled={!node.parentId} onClick={() => handlers.onRequestDelete(id)}>Hapus {node.label}</Button>
+              {node.hasChildren ? <Button size="sm" variant="ghost" className="min-h-11" onClick={() => handlers.onToggle(id)}>{open ? 'Collapse' : 'Expand'} {node.label}</Button> : null}
+              <Button size="sm" variant="ghost" className="min-h-11" disabled={!node.parentId} onClick={() => handlers.onRequestDelete(id)}>Delete {node.label}</Button>
             </>
           ) : null}
         </div>
@@ -1044,9 +1044,9 @@ function MindAccessibleTree({
   };
   return (
     <details className="mt-3 rounded-md border border-border p-2">
-      <summary className="min-h-11 cursor-pointer rounded-sm p-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">Pohon aksesibel — navigasi tanpa kanvas</summary>
-      <p className="p-2 text-xs text-muted-foreground">Panah menelusuri pohon; Home/End ke awal/akhir. Enter/F2 edit, Space lipat, Delete hapus. Ide pusat tidak bisa dihapus.</p>
-      <div ref={treeRef} role="tree" aria-label="Pohon ide">
+      <summary className="min-h-11 cursor-pointer rounded-sm p-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">Accessible tree — navigate without the canvas</summary>
+      <p className="p-2 text-xs text-muted-foreground">Arrow keys move through the tree; Home/End jump to the first/last item. Enter/F2 edits, Space collapses, Delete removes. The central idea cannot be deleted.</p>
+      <div ref={treeRef} role="tree" aria-label="Idea tree">
         {normalized.rootId ? renderNode(normalized.rootId) : null}
       </div>
     </details>
@@ -1444,7 +1444,7 @@ export function MindMap({
     emitChange(snapshot);
     setEditingId(null);
     setNewNodeId(null);
-    setAnnouncement('Perubahan dibatalkan.');
+    setAnnouncement('Change undone.');
     syncHistoryLen();
   }, [emitChange, syncHistoryLen]);
 
@@ -1458,7 +1458,7 @@ export function MindMap({
     emitChange(snapshot);
     setEditingId(null);
     setNewNodeId(null);
-    setAnnouncement('Perubahan diulang.');
+    setAnnouncement('Change redone.');
     syncHistoryLen();
   }, [emitChange, syncHistoryLen]);
 
@@ -1474,11 +1474,11 @@ export function MindMap({
       setAnnouncement(`${toastTitle}.`);
       toast({
         title: toastTitle,
-        description: 'Urungkan bila salah.',
+        description: 'Undo if this was a mistake.',
         duration: 5000,
         action: (
-          <ToastAction altText="Urungkan" onClick={undo}>
-            Urungkan
+          <ToastAction altText="Undo" onClick={undo}>
+            Undo
           </ToastAction>
         ),
       });
@@ -1528,7 +1528,7 @@ export function MindMap({
       pendingIdsRef.current.delete(nodeId);
       setEditingId(null);
       setNewNodeId(nodeId);
-      commitWithUndo(snapshot, next, isPending ? 'Ditambah' : 'Diperbarui');
+      commitWithUndo(snapshot, next, isPending ? 'Added' : 'Updated');
       setFocusNodeId(nodeId);
     },
     [commitWithUndo, internalFlat],
@@ -1564,12 +1564,12 @@ export function MindMap({
       const target = flat.find((node) => node.id === nodeId);
       if (!target || target.parentId === null) return; // root diproteksi
       const next = applyMindDelete(flat, nodeId);
-      commitWithUndo(flat, next, 'Dihapus');
+      commitWithUndo(flat, next, 'Deleted');
       const descendantCount = normalized.byId.get(nodeId)?.descendantCount ?? 0;
       setAnnouncement(
         descendantCount > 0
-          ? `Ide ${target.label} dihapus beserta ${descendantCount} turunan.`
-          : `Ide ${target.label} dihapus.`,
+          ? `Idea ${target.label} deleted with ${descendantCount} descendants.`
+          : `Idea ${target.label} deleted.`,
       );
       setDeleteNodeId(null);
       if (target.parentId) setFocusNodeId(target.parentId);
@@ -1582,7 +1582,7 @@ export function MindMap({
       const node = normalized.byId.get(nodeId);
       if (!node) return;
       if (node.depth === 0) {
-        setAnnouncement('Ide pusat tidak bisa dihapus — hapus cabangnya dulu.');
+        setAnnouncement('The central idea cannot be deleted — delete its branches first.');
         return;
       }
       if (node.descendantCount === 0) {
@@ -1728,8 +1728,8 @@ export function MindMap({
 
   if (loading) {
     return (
-      <div aria-busy="true" aria-label="Memuat peta ide" className={cn('rounded-md border border-border p-6', className)}>
-        <p role="status" className="sr-only">Memuat peta ide…</p>
+      <div aria-busy="true" aria-label="Loading idea map" className={cn('rounded-md border border-border p-6', className)}>
+        <p role="status" className="sr-only">Loading idea map…</p>
         <div aria-hidden="true" className="flex min-h-80 flex-col items-center justify-center gap-6">
           <div className="flex items-center">
             <Skeleton data-testid="mind-map-skeleton" className="h-16 w-[200px] rounded-full motion-reduce:animate-none" />
@@ -1763,7 +1763,7 @@ export function MindMap({
     return (
       <div role="alert" className={cn('rounded-md border border-destructive bg-card p-4 text-sm text-foreground', className)}>
         <p>{message}</p>
-        {nodeId ? <p className="mt-1 text-muted-foreground">Node terkait: {nodeId}</p> : null}
+        {nodeId ? <p className="mt-1 text-muted-foreground">Related node: {nodeId}</p> : null}
         <Button
           type="button"
           variant="outline"
@@ -1776,11 +1776,11 @@ export function MindMap({
               setErrorCopied(true);
             } catch {
               setErrorCopied(false);
-              setAnnouncement('Detail tidak dapat disalin. Pilih teks pesan untuk menyalin secara manual.');
+              setAnnouncement('Could not copy the detail. Select the message text to copy it manually.');
             }
           }}
         >
-          {errorCopied ? 'Detail disalin' : 'Salin detail error'}
+          {errorCopied ? 'Detail copied' : 'Copy error detail'}
         </Button>
         <p role="status">{announcement}</p>
       </div>
@@ -1794,9 +1794,9 @@ export function MindMap({
       <div className={cn('w-full', className)}>
         <EmptyState
           role="status"
-          title="Belum ada peta ide"
-          description="Mulai dari satu ide pusat, lalu tambah cabang lewat gagang +."
-          actionLabel="Buat peta"
+          title="No idea map yet"
+          description="Start with one central idea, then add branches with the + handle."
+          actionLabel="Create map"
           onAction={() => spawnPending(null)}
         />
       </div>
@@ -1828,7 +1828,7 @@ export function MindMap({
               type="button"
               variant="outline"
               size="sm"
-              aria-label="Tambah cabang ide pusat"
+              aria-label="Add branch to the central idea"
               data-testid="mind-map-add-root"
               className="min-h-11"
               onClick={() => {
@@ -1836,7 +1836,7 @@ export function MindMap({
               }}
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
-              Tambah cabang ide pusat
+              Add branch to central idea
             </Button>
             <Button
               type="button"
@@ -1848,7 +1848,7 @@ export function MindMap({
               onClick={undo}
             >
               <Undo2 className="h-4 w-4" aria-hidden="true" />
-              Urungkan
+              Undo
             </Button>
             <Button
               type="button"
@@ -1860,7 +1860,7 @@ export function MindMap({
               onClick={redo}
             >
               <Redo2 className="h-4 w-4" aria-hidden="true" />
-              Ulangi
+              Redo
             </Button>
           </div>
         </div>
@@ -1894,7 +1894,7 @@ export function MindMap({
           className="mt-1 flex items-center justify-between gap-2 text-xs text-muted-foreground"
         >
           <span>
-            {positions.length} ide tampil · zoom {Math.round(zoomLevel * 100)}%
+            {positions.length} ideas shown · zoom {Math.round(zoomLevel * 100)}%
           </span>
           <span data-testid="mind-map-announcement">{announcement}</span>
         </div>
@@ -1914,19 +1914,19 @@ export function MindMap({
               <AlertDialogHeader>
                 <AlertDialogTitle>
                   {deleteDescendantCount > 0
-                    ? `Hapus "${deleteNode.label}" + ${deleteDescendantCount} turunan?`
-                    : `Hapus "${deleteNode.label}"?`}
+                    ? `Delete "${deleteNode.label}" + ${deleteDescendantCount} descendants?`
+                    : `Delete "${deleteNode.label}"?`}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   {deleteDescendantCount > 0
-                    ? `Ide "${deleteNode.label}" beserta ${deleteDescendantCount} turunannya akan dihapus dari peta.`
-                    : `Ide "${deleteNode.label}" akan dihapus dari peta.`}
+                    ? `Idea "${deleteNode.label}" and its ${deleteDescendantCount} descendants will be removed from the map.`
+                    : `Idea "${deleteNode.label}" will be removed from the map.`}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel data-testid="mind-map-delete-cancel">Batal</AlertDialogCancel>
+                <AlertDialogCancel data-testid="mind-map-delete-cancel">Cancel</AlertDialogCancel>
                 <AlertDialogAction data-testid="mind-map-delete-confirm" onClick={() => confirmDelete(deleteNode.id)}>
-                  Ya, hapus
+                  Yes, delete
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

@@ -102,7 +102,7 @@ export function ChatMentionList({
   if (status === 'loading') {
     return (
       <div role="status" aria-live="polite" aria-busy="true" className="flex flex-col gap-2 p-2">
-        <span className="sr-only">Memuat kandidat…</span>
+        <span className="sr-only">Loading candidates…</span>
         {[0, 1, 2].map((i) => (
           <div key={i} className="flex items-center gap-2">
             <Skeleton className="h-6 w-6 rounded-full" />
@@ -116,7 +116,7 @@ export function ChatMentionList({
   if (status === 'error') {
     return (
       <p role="alert" className="p-2 text-xs text-destructive">
-        Gagal memuat kandidat. Ketik ulang untuk mencoba lagi.
+        Could not load candidates. Type again to try.
       </p>
     );
   }
@@ -125,8 +125,8 @@ export function ChatMentionList({
     return (
       <EmptyState
         icon={MessageCircleOff}
-        title="Tidak ada kandidat"
-        description={`Tidak ada yang cocok dengan "${query}".`}
+        title="No candidates"
+        description={`Nothing matches "${query}".`}
       />
     );
   }
@@ -135,7 +135,7 @@ export function ChatMentionList({
     <div
       id={listId}
       role="listbox"
-      aria-label="Kandidat mention"
+      aria-label="Mention candidates"
       className="flex max-h-60 flex-col overflow-y-auto"
     >
       {candidates.map((candidate, index) => {
@@ -297,8 +297,8 @@ export function ChatEmojiPicker({ onPick, onRequestFocus, disabled = false }: Ch
       >
         <Input
           type="search"
-          aria-label="Cari emoji"
-          placeholder="Cari emoji…"
+          aria-label="Search emoji"
+          placeholder="Search emoji…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -327,7 +327,7 @@ export function ChatEmojiPicker({ onPick, onRequestFocus, disabled = false }: Ch
         >
           {results.length === 0 ? (
             <p className="col-span-8 py-4 text-center text-xs text-muted-foreground">
-              Tidak ada emoji yang cocok.
+              No matching emoji.
             </p>
           ) : (
             results.map((item) => (

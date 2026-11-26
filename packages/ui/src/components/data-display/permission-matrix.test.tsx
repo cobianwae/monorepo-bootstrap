@@ -35,7 +35,7 @@ function makeValue(fill: boolean): PermissionValue {
 describe('PermissionMatrix', () => {
   it('renders 5x8 grid with associated scope headers and labeled cells', () => {
     render(<PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} />);
-    expect(screen.getByRole('grid', { name: /matriks izin/i })).toBeDefined();
+    expect(screen.getByRole('grid', { name: /permission matrix/i })).toBeDefined();
 
     const colHeaders = screen.getAllByRole('columnheader');
     expect(colHeaders.length).toBeGreaterThanOrEqual(6);
@@ -46,7 +46,7 @@ describe('PermissionMatrix', () => {
     for (const h of rowHeaders) expect(h.getAttribute('scope')).toBe('row');
 
     expect(screen.getAllByRole('gridcell')).toHaveLength(40);
-    expect(screen.getByLabelText('Editor × Hapus, mati')).toBeDefined();
+    expect(screen.getByLabelText('Editor × Hapus, off')).toBeDefined();
   });
 
   it('shows full / partial / empty header states via aria-checked', () => {
@@ -55,9 +55,9 @@ describe('PermissionMatrix', () => {
     value.editor[resources[0].id] = true; // sebagian 1/8
     render(<PermissionMatrix roles={roles} resources={resources} value={value} />);
 
-    expect(screen.getByLabelText(/toggle kolom admin/i).getAttribute('aria-checked')).toBe('true');
-    expect(screen.getByLabelText(/toggle kolom editor/i).getAttribute('aria-checked')).toBe('mixed');
-    expect(screen.getByLabelText(/toggle kolom owner/i).getAttribute('aria-checked')).toBe('false');
+    expect(screen.getByLabelText(/toggle admin column/i).getAttribute('aria-checked')).toBe('true');
+    expect(screen.getByLabelText(/toggle editor column/i).getAttribute('aria-checked')).toBe('mixed');
+    expect(screen.getByLabelText(/toggle owner column/i).getAttribute('aria-checked')).toBe('false');
     expect(screen.getAllByText('sebagian').length).toBeGreaterThan(0);
   });
 
@@ -66,7 +66,7 @@ describe('PermissionMatrix', () => {
     render(
       <PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} onValueChange={onValueChange} />
     );
-    fireEvent.click(screen.getByLabelText('Editor × Hapus, mati'));
+    fireEvent.click(screen.getByLabelText('Editor × Hapus, off'));
     expect(onValueChange).toHaveBeenCalledTimes(1);
     const [next, diff] = onValueChange.mock.calls[0] as [PermissionValue, Array<{ role: string; resource: string; from: boolean; to: boolean }>];
     expect(diff).toHaveLength(1);
@@ -79,7 +79,7 @@ describe('PermissionMatrix', () => {
     render(
       <PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} onValueChange={onValueChange} />
     );
-    fireEvent.click(screen.getByLabelText(/toggle kolom editor/i));
+    fireEvent.click(screen.getByLabelText(/toggle editor column/i));
     expect(onValueChange).toHaveBeenCalledTimes(1);
     const [, diff] = onValueChange.mock.calls[0] as [PermissionValue, unknown[]];
     expect(diff).toHaveLength(8);
@@ -90,7 +90,7 @@ describe('PermissionMatrix', () => {
     render(
       <PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} onValueChange={onValueChange} />
     );
-    fireEvent.click(screen.getByLabelText(/pilih semua izin/i));
+    fireEvent.click(screen.getByLabelText(/select all permissions/i));
     expect(onValueChange).toHaveBeenCalledTimes(1);
     const [, diff] = onValueChange.mock.calls[0] as [PermissionValue, unknown[]];
     expect(diff).toHaveLength(40);
@@ -103,12 +103,12 @@ describe('PermissionMatrix', () => {
     render(
       <PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} onValueChange={onValueChange} locked={locked} />
     );
-    const cell = screen.getByLabelText(/viewer × hapus, terkunci/i);
+    const cell = screen.getByLabelText(/viewer × hapus, locked/i);
     expect(cell.getAttribute('aria-label')).toContain('Dikunci kebijakan');
     fireEvent.click(cell);
     fireEvent.keyDown(cell, { key: ' ' });
     expect(onValueChange).not.toHaveBeenCalled();
-    expect(screen.getByText(/Tidak diubah. Terkunci:/).textContent).toContain('Viewer tidak boleh Hapus');
+    expect(screen.getByText(/Unchanged. Locked:/).textContent).toContain('Viewer tidak boleh Hapus');
   });
 
   it('excludes locked cells from denominator and skips them in bulk toggle', () => {
@@ -123,9 +123,9 @@ describe('PermissionMatrix', () => {
       <PermissionMatrix roles={roles} resources={resources} value={value} onValueChange={onValueChange} locked={locked} />
     );
     // 7/7 unlocked on → header penuh, bukan mixed
-    expect(screen.getByLabelText(/toggle kolom editor/i).getAttribute('aria-checked')).toBe('true');
+    expect(screen.getByLabelText(/toggle editor column/i).getAttribute('aria-checked')).toBe('true');
 
-    fireEvent.click(screen.getByLabelText(/toggle kolom editor/i));
+    fireEvent.click(screen.getByLabelText(/toggle editor column/i));
     expect(onValueChange).toHaveBeenCalledTimes(1);
     const [next, diff] = onValueChange.mock.calls[0] as [PermissionValue, Array<{ resource: string; to: boolean }> ];
     expect(diff).toHaveLength(7);
@@ -136,13 +136,13 @@ describe('PermissionMatrix', () => {
   it('supports roving keyboard navigation and toggles focused cells with Space', () => {
     const onValueChange = vi.fn();
     render(<PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} onValueChange={onValueChange} />);
-    const first = screen.getByLabelText('Pilih semua izin');
+    const first = screen.getByLabelText('Select all permissions');
     expect(first.getAttribute('tabindex')).toBe('0');
     fireEvent.keyDown(first, { key: 'ArrowRight' });
-    const admin = screen.getByLabelText(/toggle kolom admin/i);
+    const admin = screen.getByLabelText(/toggle admin column/i);
     expect(document.activeElement).toBe(admin);
     fireEvent.keyDown(admin, { key: 'ArrowDown' });
-    const cell = screen.getByLabelText('Admin × Publikasi, mati');
+    const cell = screen.getByLabelText('Admin × Publikasi, off');
     expect(document.activeElement).toBe(cell);
     fireEvent.keyDown(cell, { key: ' ' });
     expect(onValueChange).toHaveBeenCalledTimes(1);
@@ -157,46 +157,46 @@ describe('PermissionMatrix', () => {
     const current = makeValue(false);
     current.admin.publikasi = true;
     render(<PermissionMatrix roles={roles} resources={resources} value={current} initialValue={initialValue} onValueChange={onValueChange} onSave={onSave} />);
-    expect(screen.getByText('1 perubahan belum disimpan')).toBeDefined();
-    fireEvent.click(screen.getByRole('button', { name: 'Lihat daftar' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Reset baris ini' }));
+    expect(screen.getByText('1 unsaved changes')).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: 'Show list' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reset this row' }));
     expect(onValueChange).toHaveBeenCalledWith(initialValue, [{ role: 'admin', resource: 'publikasi', from: true, to: false }]);
-    fireEvent.click(screen.getByRole('button', { name: 'Simpan' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
     expect(onSave).toHaveBeenCalledTimes(1);
   });
 
   it('renders loading, empty, duplicate-id error, and all-locked states', () => {
     const { rerender } = render(<PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} loading />);
-    expect(screen.getByText('Memuat izin…')).toBeDefined();
-    expect(screen.getByText('Memuat izin…').parentElement?.getAttribute('aria-busy')).toBe('true');
+    expect(screen.getByText('Loading permissions…')).toBeDefined();
+    expect(screen.getByText('Loading permissions…').parentElement?.getAttribute('aria-busy')).toBe('true');
 
     rerender(<PermissionMatrix roles={[]} resources={resources} value={{}} />);
     expect(screen.getByRole('status')).toBeDefined();
 
     rerender(<PermissionMatrix roles={[roles[0], roles[0]]} resources={resources} value={makeValue(false)} />);
-    expect(screen.getByRole('alert').textContent).toContain('ID role atau resource duplikat');
+    expect(screen.getByRole('alert').textContent).toContain('Duplicate role or resource ID');
     expect(document.activeElement).toBe(screen.getByRole('alert'));
 
     rerender(<PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} locked={() => 'Terkunci kebijakan'} />);
-    expect(screen.getByText('Semua sel dikunci kebijakan.')).toBeDefined();
+    expect(screen.getByText('All cells are locked by policy.')).toBeDefined();
   });
 
   it('keeps locked cells reachable, announces refusal, and preserves row/column boundaries', () => {
     const onValueChange = vi.fn();
     render(<PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} onValueChange={onValueChange} locked={() => 'Kebijakan organisasi'} />);
-    const first = screen.getByLabelText(/pilih semua izin/i);
+    const first = screen.getByLabelText(/select all permissions/i);
     act(() => first.focus());
     fireEvent.keyDown(first, { key: 'ArrowDown' });
-    const row = screen.getByLabelText(/toggle semua izin publikasi/i);
+    const row = screen.getByLabelText(/toggle all publikasi permissions/i);
     expect(document.activeElement).toBe(row);
     fireEvent.keyDown(row, { key: 'ArrowRight' });
-    const cell = screen.getByLabelText(/Admin × Publikasi, terkunci/);
+    const cell = screen.getByLabelText(/Admin × Publikasi, locked/);
     expect(document.activeElement).toBe(cell);
     fireEvent.keyDown(cell, { key: ' ' });
     expect(onValueChange).not.toHaveBeenCalled();
-    expect(screen.getByText('Tidak diubah. Terkunci: Kebijakan organisasi')).toBeDefined();
+    expect(screen.getByText('Unchanged. Locked: Kebijakan organisasi')).toBeDefined();
     fireEvent.keyDown(cell, { key: 'End' });
-    const lastInRow = screen.getByLabelText(/Owner × Publikasi, terkunci/);
+    const lastInRow = screen.getByLabelText(/Owner × Publikasi, locked/);
     expect(document.activeElement).toBe(lastInRow);
     fireEvent.keyDown(lastInRow, { key: 'ArrowRight' });
     expect(document.activeElement).toBe(lastInRow);
@@ -205,7 +205,7 @@ describe('PermissionMatrix', () => {
     fireEvent.keyDown(row, { key: 'Home', ctrlKey: true });
     expect(document.activeElement).toBe(first);
     fireEvent.keyDown(first, { key: 'End', ctrlKey: true });
-    const last = screen.getByLabelText(/Owner × Laporan, terkunci/);
+    const last = screen.getByLabelText(/Owner × Laporan, locked/);
     expect(document.activeElement).toBe(last);
     fireEvent.keyDown(last, { key: 'ArrowDown' });
     expect(document.activeElement).toBe(last);
@@ -222,39 +222,39 @@ describe('PermissionMatrix', () => {
     }
     render(<Consumer />);
     for (const label of ['Admin × Publikasi', 'Editor × Artikel', 'Viewer × Media']) {
-      fireEvent.click(screen.getByLabelText(`${label}, mati`));
+      fireEvent.click(screen.getByLabelText(`${label}, off`));
     }
     const banner = screen.getByRole('status');
     expect(within(banner).getByText('3')).toBeDefined();
     expect(screen.getByRole('grid').compareDocumentPosition(banner) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Lihat daftar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Show list' }));
     expect(screen.getAllByRole('listitem')).toHaveLength(3);
-    fireEvent.click(screen.getAllByRole('button', { name: 'Reset baris ini' })[0]);
+    fireEvent.click(screen.getAllByRole('button', { name: 'Reset this row' })[0]);
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
-    expect(document.activeElement).toBe(screen.getByLabelText(/pilih semua izin/i));
+    expect(document.activeElement).toBe(screen.getByLabelText(/select all permissions/i));
     fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
     expect(screen.queryByRole('status')).toBeNull();
-    expect(screen.getByText('Perubahan dibatalkan')).toBeDefined();
-    expect(document.activeElement).toBe(screen.getByLabelText(/pilih semua izin/i));
-    fireEvent.click(screen.getByLabelText('Editor × Artikel, mati'));
-    fireEvent.click(screen.getByRole('button', { name: 'Simpan' }));
+    expect(screen.getByText('Change reverted')).toBeDefined();
+    expect(document.activeElement).toBe(screen.getByLabelText(/select all permissions/i));
+    fireEvent.click(screen.getByLabelText('Editor × Artikel, off'));
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
     expect(onSave).toHaveBeenCalledTimes(1);
     expect(onSave.mock.calls[0][0].editor.artikel).toBe(true);
     expect(screen.queryByRole('status')).toBeNull();
-    expect(document.activeElement).toBe(screen.getByLabelText(/pilih semua izin/i));
+    expect(document.activeElement).toBe(screen.getByLabelText(/select all permissions/i));
   });
 
   it('captures the ready baseline by default and emits exactly one batch per keyboard header action', () => {
     const onValueChange = vi.fn();
     const { rerender } = render(<PermissionMatrix roles={roles} resources={resources} value={makeValue(false)} onValueChange={onValueChange} />);
-    const header = screen.getByLabelText(/toggle kolom admin/i);
+    const header = screen.getByLabelText(/toggle admin column/i);
     fireEvent.keyDown(header, { key: 'Enter' });
     expect(onValueChange).toHaveBeenCalledTimes(1);
     const [next, diff] = onValueChange.mock.calls[0];
     expect(diff).toHaveLength(8);
-    expect(screen.getByText(/8 dipilih/)).toBeDefined();
+    expect(screen.getByText(/8 selected/)).toBeDefined();
     rerender(<PermissionMatrix roles={roles} resources={resources} value={next} onValueChange={onValueChange} />);
-    expect(screen.getByText('8 perubahan belum disimpan')).toBeDefined();
+    expect(screen.getByText('8 unsaved changes')).toBeDefined();
   });
 
   it('exposes loading placeholders and functional empty/error recovery actions', () => {
@@ -265,12 +265,12 @@ describe('PermissionMatrix', () => {
     expect(grid.querySelectorAll('.motion-reduce\\:animate-none')).toHaveLength(40);
     expect(within(grid).queryAllByRole('checkbox')).toHaveLength(0);
     rerender(<PermissionMatrix roles={[]} resources={[]} value={{}} onLoadExample={onLoadExample} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Muat contoh 5×8' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Load 5×8 example' }));
     expect(onLoadExample).toHaveBeenCalledTimes(1);
     rerender(<PermissionMatrix roles={roles} resources={resources} value={{}} error="Sumber data tidak tersedia" onLoadExample={onLoadExample} />);
     expect(document.activeElement).toBe(screen.getByRole('alert'));
     expect(screen.getByRole('alert').textContent).toContain('Sumber data tidak tersedia');
-    fireEvent.click(screen.getByRole('button', { name: 'Muat contoh' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Load example' }));
     expect(onLoadExample).toHaveBeenCalledTimes(2);
   });
 
@@ -281,9 +281,9 @@ describe('PermissionMatrix', () => {
     expect(screen.getAllByRole('columnheader').every((header) => header.classList.contains('sticky') && header.classList.contains('top-0'))).toBe(true);
     expect(screen.getAllByRole('rowheader').every((header) => header.classList.contains('sticky') && header.classList.contains('left-0'))).toBe(true);
     expect(container.querySelector('.overflow-auto')).not.toBeNull();
-    const last = screen.getByLabelText('Role 19 × Laporan, mati');
+    const last = screen.getByLabelText('Role 19 × Laporan, off');
     const scrollIntoView = vi.spyOn(last, 'scrollIntoView');
-    fireEvent.keyDown(screen.getByLabelText(/pilih semua izin/i), { key: 'End', ctrlKey: true });
+    fireEvent.keyDown(screen.getByLabelText(/select all permissions/i), { key: 'End', ctrlKey: true });
     expect(document.activeElement).toBe(last);
     expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' });
   });

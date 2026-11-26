@@ -164,8 +164,8 @@ describe('CodeBlock Component', () => {
       value: { writeText: vi.fn().mockRejectedValue(new Error('denied')) },
     });
     render(<CodeBlock code="x" />);
-    fireEvent.click(screen.getByRole('button', { name: 'Salin kode' }));
-    expect(await screen.findByText('Gagal disalin')).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: 'Copy code' }));
+    expect(await screen.findByText('Copy failed')).toBeDefined();
   });
 
   it('uses custom copy labels and keeps defaults for the ones not provided', async () => {
@@ -174,7 +174,7 @@ describe('CodeBlock Component', () => {
       value: { writeText: vi.fn().mockResolvedValue(undefined) },
     });
     render(<CodeBlock code="x" copyLabels={{ copyAriaLabel: 'Copy code', copied: 'Copied' }} />);
-    expect(screen.getByText('Salin')).toBeDefined();
+    expect(screen.getByText('Copy')).toBeDefined();
     fireEvent.click(screen.getByRole('button', { name: 'Copy code' }));
     expect(await screen.findByRole('button', { name: 'Copied' })).toBeDefined();
   });
@@ -202,7 +202,7 @@ describe('Notification Components', () => {
     );
     expect(screen.getByText('Pembayaran Berhasil')).toBeDefined();
     expect(screen.getByText('Invoice #INV-2026 telah lunas')).toBeDefined();
-    fireEvent.click(screen.getByText('Tandai dibaca'));
+    fireEvent.click(screen.getByText('Mark as read'));
     expect(onRead).toHaveBeenCalled();
   });
 
