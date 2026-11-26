@@ -14,6 +14,8 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 ## Next
 
+Draft uplift 37 halaman Patterns: CR-093 (English copy), CR-094 (komposisi konten), CR-095 (keluarga visual). Arah disepakati; menunggu approval CR sebelum implementasi.
+
 1. CR-081 — hanya atas instruksi user, satu CR per sesi. Supersession bahasa Import Wizard (CR-079) sudah diterapkan.
 2. Story 013-01, 013-02, 013-03 (Diff viewer). 013-01 membuka S-005.36 (`in-design`); S-005.30/S-005.31 `implemented`; S-005.41 tetap `in-design` sampai PRD 018 diimplementasi.
 3. Verifikasi yang tertunda: cek browser (keyboard, light/dark, positioning, kontras numerik) untuk CR-013, CR-070, CR-077, CR-083–088.
