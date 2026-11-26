@@ -6,15 +6,15 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 ## Posisi Saat Ini
 
-- **Branch kerja: `pattern-polish`** — CR-093 sudah di-merge (`42436a4`); amendemen CR-094 dan CR-096 ter-commit di branch ini. Edit pilot Dashboard (disetujui user 2026-11-26) belum di-commit di working tree dan menunggu CR halaman Dashboard. `visual-polish` tetap integrasi visual sebelumnya; worktree `arah-*` prunable.
+- **Branch kerja: `pattern-polish`** — CR-093 sudah di-merge (`42436a4`); CR-096 sudah di-merge. Edit pilot Dashboard (disetujui user 2026-11-26) belum di-commit di working tree dan menunggu CR halaman Dashboard. `visual-polish` tetap integrasi visual sebelumnya; worktree `arah-*` prunable.
 - PRD 001–006, 010 (legacy), 011 `shipped` dan diarsipkan. PRD 012–019 dan spec ringkas RM-02/03/10 `approved`. Seluruh story `done` kecuali 013-01, 013-02, 013-03.
-- CR-017–093 `done` (kecuali CR-081); riwayat merge/push per CR ada di `docs/STATUS-LOG.md` (rekonsiliasi CR sebelum 054: `docs/reviews/cr-before-054-status-reconciliation.md`).
-- CR `approved` yang belum selesai: CR-081 (seri Import Wizard); CR-094 dan CR-095 menjadi payung seri Patterns (eksekusi lewat CR per halaman). CR-096 (halaman Rich Text Editor) `approved`, belum dieksekusi.
+- CR-017–093 dan CR-096 `done` (kecuali CR-081); riwayat merge/push per CR ada di `docs/STATUS-LOG.md` (rekonsiliasi CR sebelum 054: `docs/reviews/cr-before-054-status-reconciliation.md`).
+- CR `approved` yang belum selesai: CR-081 (seri Import Wizard); CR-094 dan CR-095 menjadi payung seri Patterns (eksekusi lewat CR per halaman).
 - Config OpenCode (CR-089–CR-092, `done` 2026-11-26): `nim-coder` dipakai hanya untuk `explore` (pin `general` dilepas karena uji 2–3× lebih lambat dari model sesi), proteksi DCP `docs/stories/**` dan `docs/cr/**` terverifikasi 2026-11-26, `max_bytes` 24576, `compaction.buffer` 25%, `snapshots` aktif; `visual-language.md` auto-loaded.
 
 ## Next
 
-CR-093 done user 2026-11-26 (copy runtime Patterns English di 11 route + 15 komponen shared `@ds/ui` tanpa perubahan API; typecheck/lint/build hijau, test 749/750 dengan 1 smoke RTE flaky pre-existing). Seri Patterns (setelah audit visual 37 route, 2026-11-26): satu CR per halaman, dimulai dari halaman pilot. CR-094 (komposisi) dan CR-095 (visual) adalah payung. Berikutnya: eksekusi CR-096 (Rich Text Editor), lalu Image Cropper, Settings, Dashboard. Titik masuk tiap sesi CR halaman: `docs/discussions/2026-11-26-patterns-ui-per-page.md` (kesepakatan, antrean halaman, rubrik). Aset audit (141 screenshot, rubrik, temuan 8 halaman) tersimpan di luar repo: `~/Projects/monorepo-bootstrap-audit/`.
+CR-093 done user 2026-11-26 (copy runtime Patterns English di 11 route + 15 komponen shared `@ds/ui` tanpa perubahan API; typecheck/lint/build hijau, test 749/750 dengan 1 smoke RTE flaky pre-existing). Seri Patterns (setelah audit visual 37 route, 2026-11-26): satu CR per halaman, dimulai dari halaman pilot. CR-094 (komposisi) dan CR-095 (visual) adalah payung. CR-096 (Rich Text Editor) `done` 2026-11-27. Berikutnya: Image Cropper, Settings, Dashboard. Titik masuk tiap sesi CR halaman: `docs/discussions/2026-11-26-patterns-ui-per-page.md` (kesepakatan, antrean halaman, rubrik). Aset audit (141 screenshot, rubrik, temuan 8 halaman) tersimpan di luar repo: `~/Projects/monorepo-bootstrap-audit/`.
 
 1. CR-081 — hanya atas instruksi user, satu CR per sesi. Supersession bahasa Import Wizard (CR-079) sudah diterapkan.
 2. Story 013-01, 013-02, 013-03 (Diff viewer). 013-01 membuka S-005.36 (`in-design`); S-005.30/S-005.31 `implemented`; S-005.41 tetap `in-design` sampai PRD 018 diimplementasi.

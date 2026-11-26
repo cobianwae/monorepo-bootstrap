@@ -1,6 +1,6 @@
 # CR-096 — Patterns: halaman Rich Text Editor
 
-**Status:** approved (ditetapkan user 2026-11-26)
+**Status:** done (ditetapkan user 2026-11-27; approved 2026-11-26)
 **Sumber:** audit visual Patterns 2026-11-26 (screenshot 37 route) + umpan balik user atas pilot CR-094
 **Ref:** `docs/design/visual-language.md`, CR-094 (payung komposisi), CR-095 (payung visual), CR-093 (istilah English), `packages/ui/src/components/form/rich-text-editor.tsx`
 
@@ -176,14 +176,41 @@ Isi paragraf helper di bawah editor (`page.tsx:184–187`: counter memakai teks 
 - `SegmentedControl` memotong item saat lebih lebar dari kontainer; halaman ini hanya membungkusnya dengan `overflow-x-auto`.
 - Judul `<h2>` di dalam dokumen contoh tetap level h2 (isi pengguna, bukan struktur halaman).
 
+## Amendemen hasil preview (2026-11-27)
+
+Iterasi preview bersama user. Struktur **demo** di atas dipertahankan apa adanya; bagian di bawah demo diganti karena dinilai tanpa karakter. Amendemen ini menggantikan struktur tujuan di bawah demo, snippet Try it dan Implementation, dan Keputusan 1.
+
+| Lokasi final (`rich-text-editor/page.tsx`) | Isi |
+|---|---|
+| `:202` (helper `:144`, state `:172`) | Demo sesuai rencana awal. |
+| `:247` (data `:32`) | “Type it, don’t click it” — lembar spesimen 3×2 (2 kolom di mobile): sintaks yang diketik dan hasilnya. |
+| `:268` | “Try to break it” — tiga kolom: `notaurl`, `50`, `Load error`. |
+| `:281` | “Keyboard & screen readers” — tabel shortcut `Kbd` dan daftar atribut ARIA. |
+| `:308` | “Drop it in” — tiga kontrak prop, link demo Forms, `CodeBlock`. |
+
+Keputusan tambahan dari user:
+
+- Heading tetap dua level (h1, h2); section di bawah demo menjadi empat.
+- Copy lugas; kalimat pembuka section hanya di lembar spesimen. Versi yang diperkaya ditolak karena ramai.
+- Referensi dokumen requirement (`S-004.03`, `S-005.22`, `M-009`, `M-010`) tidak ditampilkan di halaman.
+- Langkah “Image” dihapus.
+
+Dibuktikan di browser: enam input rule spesimen, Mod+B/I/U, undo, redo, dan Ctrl/⌘K; saat load error konten tetap terlihat dan tidak bisa diedit. Kontras teks area yang diubah (tema default) minimal 7,36 light dan 6,96 dark. Tanpa scroll horizontal di 390px.
+
+Temuan di luar scope, belum ditangani:
+
+- URL gambar rusak di dialog Image ikut memunculkan pesan fallback gambar contoh di halaman (perilaku lama `onErrorCapture`).
+- `components/forms/page.tsx:560` masih menampilkan link berlabel `S-005.22`.
+- Komponen: fokus jatuh ke body setelah Try again; ring over-limit terpotong `overflow-hidden`; pengumuman undo/redo masih bahasa Indonesia.
+
 ## Tasks (jalur small-fix)
 
-- [ ] Susun ulang `page.tsx` sesuai struktur tujuan; hapus Card/CardHeader/CardTitle/Badge/FlaskConical/FolderOpen/Copy/Check yang tak terpakai.
-- [ ] Ganti state `loading`/`error` dengan `demoState`; tulis `resetDemo`, `retry`, dan pembersihan timer loading.
-- [ ] Tulis ulang Try it, Implementation (`RECIPE` lewat `CodeBlock`), dan Accessibility notes; verifikasi setiap klaim a11y ke `rich-text-editor.tsx` (toolbar :692–698, loading :665, error :870–883, limit :885–916).
-- [ ] Tulis ulang `page.test.tsx`: 47 words di awal; fallback gambar; Read only menyembunyikan toolbar; reset mengembalikan mode dan isi; Load error → pesan error → Try again → loading selesai; batas 50 → alert over-limit.
-- [ ] Preview before/after light, dark, mobile (alat capture di `~/Projects/monorepo-bootstrap-audit/tools/shot2.mjs`), screenshot dibaca sebagai image, iterasi bersama user.
-- [ ] Verifikasi targeted (`vitest run patterns/rich-text-editor`, eslint, `build:types`) lalu typecheck → lint → test; build dari salinan sementara.
+- [x] Susun ulang `page.tsx` sesuai struktur tujuan; hapus Card/CardHeader/CardTitle/Badge/FlaskConical/FolderOpen/Copy/Check yang tak terpakai.
+- [x] Ganti state `loading`/`error` dengan `demoState`; tulis `resetDemo`, `retry`, dan pembersihan timer loading.
+- [x] Tulis ulang Try it, Implementation (`RECIPE` lewat `CodeBlock`), dan Accessibility notes; verifikasi setiap klaim a11y ke `rich-text-editor.tsx` (toolbar :692–698, loading :665, error :870–883, limit :885–916).
+- [x] Tulis ulang `page.test.tsx`: 47 words di awal; fallback gambar; Read only menyembunyikan toolbar; reset mengembalikan mode dan isi; Load error → pesan error → Try again → loading selesai; batas 50 → alert over-limit.
+- [x] Preview before/after light, dark, mobile (alat capture di `~/Projects/monorepo-bootstrap-audit/tools/shot2.mjs`), screenshot dibaca sebagai image, iterasi bersama user.
+- [x] Verifikasi targeted (`vitest run patterns/rich-text-editor`, eslint, `build:types`) lalu typecheck → lint → test; build dari salinan sementara.
 
 ### Test terdampak
 
@@ -204,13 +231,13 @@ Isi paragraf helper di bawah editor (`page.tsx:184–187`: counter memakai teks 
 
 ## Design System Checks
 
-- [ ] Tidak ada hex/RGB hardcode; memakai token semantik.
-- [ ] Kontras light dan dark lolos WCAG AA pada pasangan yang disentuh (`text-muted-foreground` untuk label dan status).
-- [ ] Perilaku Radix/a11y tidak rusak: label grup kontrol, `aria-busy`, alert error, `role="status"` counter tetap ada.
-- [ ] API `cva` dan export `@ds/ui` tetap konsisten (tidak ada perubahan).
-- [ ] State loading, empty, dan error relevan tersedia (loading, error dengan Try again, editor kosong, fallback gambar).
-- [ ] Mobile: grup kontrol menumpuk tanpa terpotong; tanpa scroll horizontal.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass; smoke build dari salinan sementara.
+- [x] Tidak ada hex/RGB hardcode; memakai token semantik.
+- [x] Kontras light dan dark lolos WCAG AA pada pasangan yang disentuh (`text-muted-foreground` untuk label dan status).
+- [x] Perilaku Radix/a11y tidak rusak: label grup kontrol, `aria-busy`, alert error, `role="status"` counter tetap ada.
+- [x] API `cva` dan export `@ds/ui` tetap konsisten (tidak ada perubahan).
+- [x] State loading, empty, dan error relevan tersedia (loading, error dengan Try again, editor kosong, fallback gambar).
+- [x] Mobile: grup kontrol menumpuk tanpa terpotong; tanpa scroll horizontal.
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass; smoke build dari salinan sementara.
 
 ## Eksekusi
 
@@ -218,10 +245,10 @@ Branch: `cr-096-patterns-rich-text-editor-page`
 Commit: `fix: redesign patterns rich text editor page [CR-096]`
 
 - [x] CR disetujui user (termasuk 5 perubahan perilaku demo) — 2026-11-26.
-- [ ] Branch dibuat dari `pattern-polish`.
-- [ ] Perubahan diimplementasikan.
-- [ ] Preview before/after bersama user; CR dimutakhirkan ke `file:line` final.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat dari `pattern-polish`.
+- [x] Perubahan diimplementasikan.
+- [x] Preview before/after bersama user; CR dimutakhirkan ke `file:line` final.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
