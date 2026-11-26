@@ -7,17 +7,17 @@ import { buildImportResult, planSubmit, submitLabel, summaryBuckets } from './su
 import type { Mapping } from './wizard-state';
 
 const MAPPING: Mapping = {
-  'Nama Lengkap': 'name',
+  'Full name': 'name',
   Email: 'email',
-  'Tgl Lahir': 'dob',
-  Telepon: 'phone',
+  'Date of birth': 'dob',
+  Phone: 'phone',
 };
 
 describe('planSubmit', () => {
   it('policy skip: baris gagal dilewati dan submit tetap bisa', () => {
     const plan = planSubmit(200, 3, 'skip');
     expect(plan).toMatchObject({ valid: 200, failedRows: 3, skipped: 3, canSubmit: true });
-    expect(submitLabel(plan)).toBe('Impor 200 baris');
+    expect(submitLabel(plan)).toBe('Prepare import (200 rows)');
   });
 
   it('policy fail: submit ditolak selama masih ada error', () => {
@@ -25,13 +25,13 @@ describe('planSubmit', () => {
     expect(plan.canSubmit).toBe(false);
     expect(plan.skipped).toBe(0);
     expect(plan.reason).toBe(
-      'Masih ada 3 baris error. Perbaiki di langkah validasi atau pilih "Dilewati".'
+      '3 rows with errors. Fix them in the validation step or choose "Skip failed rows".'
     );
   });
 
   it('submit diblokir: label tidak menjanjikan impor', () => {
-    expect(submitLabel(planSubmit(200, 3, 'fail'))).toBe('Perbaiki error untuk impor');
-    expect(submitLabel(planSubmit(0, 2, 'skip'))).toBe('Tidak ada baris untuk diimpor');
+    expect(submitLabel(planSubmit(200, 3, 'fail'))).toBe('Fix errors to import');
+    expect(submitLabel(planSubmit(0, 2, 'skip'))).toBe('No rows to import');
   });
 
   it('policy fail tanpa error: submit boleh', () => {
@@ -70,7 +70,7 @@ describe('buildImportResult', () => {
     expect(built.result.rows).toHaveLength(200);
     expect(built.result.skipped).toBe(3);
     expect(built.result.failed).toBe(3);
-    expect(built.result.rows.some((r) => r.email === 'dup@contoh.id')).toBe(false);
+    expect(built.result.rows.some((r) => r.email === 'dup@example.com')).toBe(false);
     expect(Object.keys(built.result.rows[0] ?? {}).sort()).toEqual(['dob', 'email', 'name', 'phone']);
   });
 

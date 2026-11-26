@@ -11,6 +11,7 @@ import {
   RadioGroupItem,
   StatCard,
 } from '@ds/ui';
+import { plural } from '../_lib/plural';
 import type { ImportResult } from '../_lib/types';
 import { submitLabel, summaryBuckets, type FailPolicy, type SubmitPlan } from '../_lib/submit';
 
@@ -40,15 +41,15 @@ export function ConfirmStep({
     return (
       <div data-testid="iw-success" className="space-y-4 rounded-lg border border-border p-6">
         <p className="text-base font-medium text-foreground">
-          {result.rows.length} baris siap diimpor.
+          {plural(result.rows.length, 'row')} ready to import.
         </p>
         <p className="text-sm text-muted-foreground">
-          {result.skipped > 0 ? `${result.skipped} baris dilewati. ` : ''}
-          {result.failed > 0 ? `${result.failed} baris gagal. ` : ''}
-          Hasil dikirim ke onComplete sebagai ImportResult.
+          {result.skipped > 0 ? `${plural(result.skipped, 'row')} skipped. ` : ''}
+          {result.failed > 0 ? `${plural(result.failed, 'row')} failed. ` : ''}
+          Local simulation: an ImportResult was prepared on this page. Nothing was sent or saved.
         </p>
         <Button type="button" variant="outline" onClick={onRestart}>
-          Mulai ulang
+          Start over
         </Button>
       </div>
     );
@@ -69,19 +70,19 @@ export function ConfirmStep({
             title="Valid"
             value={buckets.valid}
             icon={CheckCircle2}
-            description={plan.canSubmit ? 'Akan diimpor' : 'Belum bisa diimpor'}
+            description={plan.canSubmit ? 'Will be included' : 'Cannot be imported yet'}
           />
           <StatCard
-            title="Lewati"
+            title="Skipped"
             value={buckets.skipped}
             icon={MinusCircle}
-            description="Error; tidak ikut impor"
+            description="Errors; left out of the import"
           />
           <StatCard
-            title="Gagal"
+            title="Failed"
             value={buckets.failed}
             icon={AlertCircle}
-            description="Error; memblokir impor"
+            description="Errors; blocking the import"
           />
         </div>
 
@@ -98,19 +99,19 @@ export function ConfirmStep({
       </div>
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-medium text-foreground">Jika ada baris gagal</legend>
+        <legend className="text-sm font-medium text-foreground">If any row fails</legend>
         <RadioGroup
           value={policy}
           onValueChange={(value) => onPolicyChange(value === 'fail' ? 'fail' : 'skip')}
-          aria-label="Kebijakan baris gagal"
+          aria-label="Failed row policy"
         >
           <div className="flex items-center gap-2">
             <RadioGroupItem value="skip" id="iw-policy-skip" data-testid="iw-policy-skip" />
-            <Label htmlFor="iw-policy-skip">Lewati baris gagal (default)</Label>
+            <Label htmlFor="iw-policy-skip">Skip failed rows (default)</Label>
           </div>
           <div className="flex items-center gap-2">
             <RadioGroupItem value="fail" id="iw-policy-fail" data-testid="iw-policy-fail" />
-            <Label htmlFor="iw-policy-fail">Gagalkan impor bila masih ada error</Label>
+            <Label htmlFor="iw-policy-fail">Block the import while errors remain</Label>
           </div>
         </RadioGroup>
       </fieldset>

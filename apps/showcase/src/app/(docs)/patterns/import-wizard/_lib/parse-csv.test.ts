@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseCsv } from './parse-csv';
+import { UNSUPPORTED_FORMAT_ERROR, parseCsv } from './parse-csv';
 
 const HEADER = 'Nama Lengkap,Email';
 const FIVE_ROWS = [
@@ -21,11 +21,11 @@ describe('parseCsv', () => {
     expect(result.rows[0]).toEqual({ 'Nama Lengkap': 'Budi', Email: 'budi@contoh.id' });
   });
 
-  it('AC-01 menolak berkas non-CSV (XLSX) dengan pesan "v1 CSV saja"', async () => {
+  it('AC-01 menolak berkas non-CSV (XLSX) dengan pesan recovery English', async () => {
     const xlsx = { name: 'data.xlsx', type: '', size: 0 } as File;
     const result = await parseCsv(xlsx);
 
-    expect(result.error).toBe('v1 CSV saja');
+    expect(result.error).toBe(UNSUPPORTED_FORMAT_ERROR);
     expect(result.rows).toHaveLength(0);
   });
 
@@ -50,15 +50,16 @@ describe('parseCsv', () => {
 
     expect(result.error).toBeUndefined();
     expect(result.rowCount).toBe(10_001);
-    expect(result.warnings.join(' ')).toContain('10.000');
+    expect(result.warnings.join(' ')).toContain('Recommended up to 10,000 rows. Larger files are still processed.');
+    expect(result.rowCount).toBe(10_001);
   });
 
   it('AC-02 memberi warning + tetap lanjut saat ukuran melebihi batas', async () => {
     const file = { name: 'besar.csv', type: 'text/csv', size: 6_000_000 } as File;
     const result = await parseCsv(file, { maxBytes: 5_000_000 });
 
-    expect(result.warnings.join(' ')).toContain('5.0 MB');
-    expect(result.error).toBe('Berkas tidak dapat dibaca di lingkungan uji');
+    expect(result.warnings.join(' ')).toContain('Recommended up to 5.0 MB. Larger files are still processed.');
+    expect(result.error).toBe('The file cannot be read in this test environment');
   });
 
   it('AC-02 menghasilkan hasil kosong bertanda empty untuk file header-saja', async () => {

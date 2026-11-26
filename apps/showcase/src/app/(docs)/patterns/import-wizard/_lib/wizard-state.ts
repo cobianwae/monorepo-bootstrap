@@ -110,7 +110,7 @@ export interface SetTargetResult {
 
 /**
  * Ubah target satu kolom. Target non-Abaikan yang sudah dipakai kolom lain ditolak
- * (state tidak berubah) dengan pesan Bahasa Indonesia.
+ * (state tidak berubah) dengan pesan English (CR-079).
  */
 export function setTarget(
   state: WizardState,
@@ -126,7 +126,7 @@ export function setTarget(
       const label = fields.find((f) => f.key === key)?.label ?? key;
       return {
         state,
-        error: `Target "${label}" sudah dipakai kolom "${other}". Pilih target lain atau Abaikan.`,
+        error: `Target "${label}" is already used by column "${other}". Choose another target or Ignore.`,
       };
     }
   }
@@ -142,9 +142,9 @@ export function setTarget(
 /** Apakah langkah saat ini boleh dilewati ke langkah berikutnya. */
 export function canContinue(state: WizardState, fields: TargetField[]): GateResult {
   if (state.step === 1) {
-    if (!state.parsed) return { ok: false, reason: 'Pilih berkas atau tempel isi CSV dulu.' };
+    if (!state.parsed) return { ok: false, reason: 'Choose a file or paste CSV content first.' };
     if (state.parsed.error) return { ok: false, reason: state.parsed.error };
-    if (state.parsed.rowCount === 0) return { ok: false, reason: 'File tidak memiliki baris data.' };
+    if (state.parsed.rowCount === 0) return { ok: false, reason: 'The file has no data rows.' };
     return { ok: true };
   }
   if (state.step === 2) {
@@ -152,7 +152,7 @@ export function canContinue(state: WizardState, fields: TargetField[]): GateResu
     if (missing.length > 0) {
       return {
         ok: false,
-        reason: `Wajib belum terpetakan: ${missing.map((f) => f.label).join(', ')}.`,
+        reason: `Required fields not mapped: ${missing.map((f) => f.label).join(', ')}.`,
       };
     }
     return { ok: true };
@@ -161,11 +161,11 @@ export function canContinue(state: WizardState, fields: TargetField[]): GateResu
     // Validasi tidak memblokir maju: baris gagal ditangani di konfirmasi (policy).
     const missing = missingRequired(state.mapping, fields);
     if (missing.length > 0) {
-      return { ok: false, reason: 'Kembali ke mapping: target wajib belum terpetakan.' };
+      return { ok: false, reason: 'Go back to mapping: required targets are not mapped.' };
     }
     return { ok: true };
   }
-  return { ok: false, reason: 'Ini langkah terakhir.' };
+  return { ok: false, reason: 'This is the last step.' };
 }
 
 /**

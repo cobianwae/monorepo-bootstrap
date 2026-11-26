@@ -21,8 +21,8 @@ beforeAll(() => {
 describe('ImportWizardPage', () => {
   it('memulai di langkah 1 dengan judul dan live region', () => {
     render(<ImportWizardPage />);
-    expect(screen.getByRole('heading', { level: 2, name: 'Unggah file CSV' })).toBeTruthy();
-    expect(screen.getByTestId('iw-live').textContent).toBe('Langkah 1 dari 4: Unggah file CSV');
+    expect(screen.getByRole('heading', { level: 2, name: 'Upload CSV file' })).toBeTruthy();
+    expect(screen.getByTestId('iw-live').textContent).toBe('Step 1 of 4: Upload CSV file');
     expect(screen.getByTestId('iw-next').getAttribute('aria-disabled')).toBe('true');
   });
 
@@ -46,10 +46,10 @@ describe('ImportWizardPage', () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 2, name: 'Petakan kolom' })).toBeTruthy()
+      expect(screen.getByRole('heading', { level: 2, name: 'Map columns' })).toBeTruthy()
     );
-    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 2, name: 'Petakan kolom' }));
-    expect(screen.getByTestId('iw-live').textContent).toBe('Langkah 2 dari 4: Petakan kolom');
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 2, name: 'Map columns' }));
+    expect(screen.getByTestId('iw-live').textContent).toBe('Step 2 of 4: Map columns');
     expect(screen.getByTestId('iw-mapping-row-Nama Lengkap')).toBeTruthy();
     expect(screen.queryByTestId('iw-missing')).toBeNull();
   });
@@ -64,14 +64,14 @@ describe('ImportWizardPage', () => {
     await act(async () => {
       fireEvent.click(screen.getByTestId('iw-next'));
     });
-    await waitFor(() => expect(screen.getByTestId('iw-live').textContent).toContain('Langkah 2'));
+    await waitFor(() => expect(screen.getByTestId('iw-live').textContent).toContain('Step 2'));
 
     await act(async () => {
       fireEvent.click(screen.getByTestId('iw-back'));
     });
 
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 2, name: 'Unggah file CSV' })).toBeTruthy()
+      expect(screen.getByRole('heading', { level: 2, name: 'Upload CSV file' })).toBeTruthy()
     );
     expect((screen.getByTestId('iw-paste') as HTMLTextAreaElement).value).toBe(CSV_VALID);
   });

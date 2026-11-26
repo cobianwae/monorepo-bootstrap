@@ -3,7 +3,7 @@
  * serta pemicu error format dan error parse. Dibangkitkan di memori, tanpa berkas statis.
  */
 
-export const DEMO_HEADER = 'Nama Lengkap,Email,Tgl Lahir,Telepon';
+export const DEMO_HEADER = 'Full name,Email,Date of birth,Phone';
 
 export type DemoDatasetId = 'valid' | 'invalid' | 'empty' | 'large' | 'format' | 'parse';
 
@@ -17,9 +17,9 @@ export interface DemoDataset {
 
 const pad = (n: number, width = 2) => String(n).padStart(width, '0');
 
-function validRow(i: number, email = `anggota${i}@contoh.id`, dob?: string): string {
+function validRow(i: number, email = `member${i}@example.com`, dob?: string): string {
   const birth = dob ?? `${1960 + (i % 50)}-${pad((i % 12) + 1)}-${pad((i % 28) + 1)}`;
-  return `Anggota ${i},${email},${birth},0812${pad(100000000 + i, 9)}`;
+  return `Member ${i},${email},${birth},0812${pad(100000000 + i, 9)}`;
 }
 
 function buildRows(count: number, overrides: Record<number, string> = {}): string {
@@ -35,12 +35,12 @@ export const VALID_TEXT = buildRows(200);
 
 /**
  * 203 baris: 200 valid + 3 gagal.
- * - baris 3 & 7: email ganda (`dup@contoh.id`)
+ * - baris 3 & 7: email ganda (`dup@example.com`)
  * - baris 9: tanggal tidak valid (`32/13/1990`)
  */
 export const INVALID_TEXT = buildRows(203, {
-  3: validRow(3, 'dup@contoh.id'),
-  7: validRow(7, 'dup@contoh.id'),
+  3: validRow(3, 'dup@example.com'),
+  7: validRow(7, 'dup@example.com'),
   9: validRow(9, undefined, '32/13/1990'),
 });
 
@@ -53,46 +53,46 @@ export const LARGE_ROW_COUNT = 10_000;
 export const DEMO_DATASETS: Record<DemoDatasetId, DemoDataset> = {
   valid: {
     id: 'valid',
-    label: 'Valid (200 baris)',
-    fileName: 'anggota-valid.csv',
+    label: 'Valid (200 rows)',
+    fileName: 'members-valid.csv',
     mime: 'text/csv',
     text: VALID_TEXT,
   },
   invalid: {
     id: 'invalid',
-    label: 'Invalid (3 baris gagal)',
-    fileName: 'anggota-invalid.csv',
+    label: 'Invalid (3 failing rows)',
+    fileName: 'members-invalid.csv',
     mime: 'text/csv',
     text: INVALID_TEXT,
   },
   empty: {
     id: 'empty',
-    label: 'Kosong (header saja)',
-    fileName: 'kosong.csv',
+    label: 'Empty (headers only)',
+    fileName: 'members-empty.csv',
     mime: 'text/csv',
     text: EMPTY_TEXT,
   },
   large: {
     id: 'large',
-    label: 'Besar (10.000 baris)',
-    fileName: 'anggota-besar.csv',
+    label: 'Large (10,000 rows)',
+    fileName: 'members-large.csv',
     mime: 'text/csv',
     text: buildRows(LARGE_ROW_COUNT),
   },
   format: {
     id: 'format',
-    label: 'Error format (XLSX)',
-    fileName: 'anggota.xlsx',
+    label: 'Format error (XLSX)',
+    fileName: 'members.xlsx',
     mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    text: 'PK\u0003\u0004 bukan CSV',
+    text: 'PK\u0003\u0004 not CSV',
   },
   parse: {
     id: 'parse',
-    label: 'Error parse (kutip rusak)',
-    fileName: 'rusak.csv',
+    label: 'Parse error (broken quote)',
+    fileName: 'members-broken.csv',
     mime: 'text/csv',
-    // Kutip tidak ditutup → papaparse melaporkan error → "Gagal membaca berkas CSV".
-    text: `Nama Lengkap,Email\n"Budi,budi@contoh.id\n`,
+    // Kutip tidak ditutup → papaparse melaporkan error → "Failed to read the CSV file".
+    text: `Full name,Email\n"Budi,budi@example.com\n`,
   },
 };
 

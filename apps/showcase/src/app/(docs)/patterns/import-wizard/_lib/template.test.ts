@@ -14,7 +14,7 @@ describe('toTemplateCsv', () => {
     const lines = csv.split('\n');
 
     expect(lines[0]).toBe('name,email,dob');
-    expect(lines[1]).toBe('Budi,nama@contoh.id,1990-01-01');
+    expect(lines[1]).toBe('Budi,name@example.com,1990-01-01');
     expect(lines.length).toBe(3); // header + contoh + trailing newline → ['header','contoh','']
   });
 
@@ -27,7 +27,7 @@ describe('toTemplateCsv', () => {
     const csv = toTemplateCsv(fields);
 
     expect(csv).toContain('name,count,email');
-    expect(csv).toContain('contoh,0,nama@contoh.id');
+    expect(csv).toContain('example,0,name@example.com');
   });
 
   it('nilai contoh dengan koma di-escape dengan benar', () => {

@@ -17,11 +17,11 @@ beforeAll(() => {
   }
 });
 
-async function pasteAndGoTo(step: 'Petakan kolom' | 'Validasi data' | 'Konfirmasi impor') {
+async function pasteAndGoTo(step: 'Map columns' | 'Validate data' | 'Confirm import') {
   fireEvent.change(screen.getByTestId('iw-paste'), { target: { value: CSV_VALID } });
   fireEvent.click(screen.getByTestId('iw-paste-submit'));
   await waitFor(() => expect(screen.getByTestId('iw-next').getAttribute('aria-disabled')).toBe('false'));
-  const order = ['Petakan kolom', 'Validasi data', 'Konfirmasi impor'];
+  const order = ['Map columns', 'Validate data', 'Confirm import'];
   for (let i = 0; i <= order.indexOf(step); i++) {
     await act(async () => {
       fireEvent.click(screen.getByTestId('iw-next'));
@@ -33,32 +33,32 @@ async function pasteAndGoTo(step: 'Petakan kolom' | 'Validasi data' | 'Konfirmas
 describe('ImportWizardPage — alur 4 langkah', () => {
   it('langkah 3 menampilkan ringkasan validasi dan fokus ke judul', async () => {
     render(<ImportWizardPage />);
-    await pasteAndGoTo('Validasi data');
-    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 2, name: 'Validasi data' }));
+    await pasteAndGoTo('Validate data');
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 2, name: 'Validate data' }));
     expect(screen.getByTestId('iw-validation-summary').textContent).toContain('1 valid');
     expect(screen.getByTestId('iw-validation-table')).toBeTruthy();
   });
 
   it('langkah 4 impor 1 baris valid menampilkan layar sukses', async () => {
     render(<ImportWizardPage />);
-    await pasteAndGoTo('Konfirmasi impor');
+    await pasteAndGoTo('Confirm import');
     fireEvent.click(screen.getByTestId('iw-submit'));
     await waitFor(() => expect(screen.getByTestId('iw-success')).toBeTruthy());
-    expect(screen.getByTestId('iw-success').textContent).toContain('1 baris siap diimpor');
-    expect(screen.getByRole('heading', { level: 2, name: 'Impor siap diproses' })).toBeTruthy();
+    expect(screen.getByTestId('iw-success').textContent).toContain('1 row ready to import');
+    expect(screen.getByRole('heading', { level: 2, name: 'Import ready' })).toBeTruthy();
   });
 
   it('panel demo dataset invalid: policy fail menolak submit dan fokus ke ringkasan', async () => {
     render(<ImportWizardPage />);
     fireEvent.click(screen.getByTestId('iw-demo-invalid'));
     await waitFor(() => expect(screen.getByTestId('iw-next').getAttribute('aria-disabled')).toBe('false'));
-    for (const heading of ['Petakan kolom', 'Validasi data', 'Konfirmasi impor']) {
+    for (const heading of ['Map columns', 'Validate data', 'Confirm import']) {
       await act(async () => {
         fireEvent.click(screen.getByTestId('iw-next'));
       });
       await waitFor(() => expect(screen.getByRole('heading', { level: 2, name: heading })).toBeTruthy());
     }
-    expect(screen.getByTestId('iw-summary').textContent).toContain('Lewati');
+    expect(screen.getByTestId('iw-summary').textContent).toContain('Skipped');
     fireEvent.click(screen.getByTestId('iw-policy-fail'));
     fireEvent.click(screen.getByTestId('iw-submit'));
     await waitFor(() => expect(screen.getByTestId('iw-reject')).toBeTruthy());
@@ -68,7 +68,7 @@ describe('ImportWizardPage — alur 4 langkah', () => {
 
   it('setelah sukses, klik stepper tidak membuka form lama dan judul tetap selesai', async () => {
     render(<ImportWizardPage />);
-    await pasteAndGoTo('Konfirmasi impor');
+    await pasteAndGoTo('Confirm import');
     fireEvent.click(screen.getByTestId('iw-submit'));
     await waitFor(() => expect(screen.getByTestId('iw-success')).toBeTruthy());
 
@@ -79,29 +79,29 @@ describe('ImportWizardPage — alur 4 langkah', () => {
     expect(screen.getByTestId('iw-success')).toBeTruthy();
     expect(screen.queryByTestId('iw-paste')).toBeNull();
     expect(screen.queryByTestId('iw-mapping-row-Nama Lengkap')).toBeNull();
-    expect(screen.getByRole('heading', { level: 2, name: 'Impor siap diproses' })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 2, name: 'Import ready' })).toBeTruthy();
   });
 
   it('setelah sukses, Mulai ulang kembali ke Upload tanpa hasil lama dan fokus ke judul', async () => {
     render(<ImportWizardPage />);
-    await pasteAndGoTo('Konfirmasi impor');
+    await pasteAndGoTo('Confirm import');
     fireEvent.click(screen.getByTestId('iw-submit'));
     await waitFor(() => expect(screen.getByTestId('iw-success')).toBeTruthy());
 
-    fireEvent.click(screen.getByRole('button', { name: 'Mulai ulang' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Start over' }));
 
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 2, name: 'Unggah file CSV' })).toBeTruthy()
+      expect(screen.getByRole('heading', { level: 2, name: 'Upload CSV file' })).toBeTruthy()
     );
     expect(screen.queryByTestId('iw-success')).toBeNull();
-    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 2, name: 'Unggah file CSV' }));
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 2, name: 'Upload CSV file' }));
   });
 
   it('fail → skip: penolakan lama hilang dan ringkasan mengikuti policy baru', async () => {
     render(<ImportWizardPage />);
     fireEvent.click(screen.getByTestId('iw-demo-invalid'));
     await waitFor(() => expect(screen.getByTestId('iw-next').getAttribute('aria-disabled')).toBe('false'));
-    for (const heading of ['Petakan kolom', 'Validasi data', 'Konfirmasi impor']) {
+    for (const heading of ['Map columns', 'Validate data', 'Confirm import']) {
       await act(async () => {
         fireEvent.click(screen.getByTestId('iw-next'));
       });
@@ -114,7 +114,7 @@ describe('ImportWizardPage — alur 4 langkah', () => {
     fireEvent.click(screen.getByTestId('iw-policy-skip'));
 
     expect(screen.queryByTestId('iw-reject')).toBeNull();
-    expect(screen.getByTestId('iw-summary').textContent).toContain('Lewati');
+    expect(screen.getByTestId('iw-summary').textContent).toContain('Skipped');
     expect(screen.getByTestId('iw-submit').getAttribute('aria-disabled')).toBe('false');
   });
 });

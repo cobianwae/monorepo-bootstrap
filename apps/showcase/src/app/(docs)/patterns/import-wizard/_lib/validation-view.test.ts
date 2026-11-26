@@ -6,10 +6,10 @@ import { buildValidation, paginate, visibleRowNumbers } from './validation-view'
 import type { Mapping } from './wizard-state';
 
 const MAPPING: Mapping = {
-  'Nama Lengkap': 'name',
+  'Full name': 'name',
   Email: 'email',
-  'Tgl Lahir': 'dob',
-  Telepon: 'phone',
+  'Date of birth': 'dob',
+  Phone: 'phone',
 };
 
 describe('buildValidation', () => {
@@ -28,7 +28,7 @@ describe('buildValidation', () => {
     expect(view.invalidRowNumbers).toEqual([3, 7, 9]);
     expect(view.errorsByColumn.email).toBe(2);
     expect(view.errorsByColumn.dob).toBe(1);
-    expect(view.cellErrors.get('9\u0000dob')?.message).toBe('Tanggal tidak valid (YYYY-MM-DD)');
+    expect(view.cellErrors.get('9\u0000dob')?.message).toBe('Invalid date (YYYY-MM-DD)');
   });
 });
 

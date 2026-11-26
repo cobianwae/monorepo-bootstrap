@@ -5,6 +5,7 @@
  * hanya menerima baris valid. `fail` → submit ditolak selama masih ada baris error.
  */
 
+import { plural } from './plural';
 import type { ImportResult, RowError } from './types';
 import type { Mapping } from './wizard-state';
 
@@ -27,7 +28,7 @@ export function planSubmit(validCount: number, invalidCount: number, policy: Fai
       failedRows: invalidCount,
       skipped: 0,
       canSubmit: false,
-      reason: `Masih ada ${invalidCount} baris error. Perbaiki di langkah validasi atau pilih "Dilewati".`,
+      reason: `${plural(invalidCount, 'row')} with errors. Fix them in the validation step or choose "Skip failed rows".`,
     };
   }
   if (validCount === 0) {
@@ -36,7 +37,7 @@ export function planSubmit(validCount: number, invalidCount: number, policy: Fai
       failedRows: invalidCount,
       skipped: policy === 'skip' ? invalidCount : 0,
       canSubmit: false,
-      reason: 'Tidak ada baris valid untuk diimpor.',
+      reason: 'There are no valid rows to import.',
     };
   }
   return {
@@ -82,7 +83,7 @@ export function buildImportResult(
 ): BuildResult {
   const invalidRows = new Set(rowErrors.map((e) => e.row));
   const plan = planSubmit(rows.length - invalidRows.size, invalidRows.size, policy);
-  if (!plan.canSubmit) return { ok: false, reason: plan.reason ?? 'Submit ditolak.' };
+  if (!plan.canSubmit) return { ok: false, reason: plan.reason ?? 'Submit rejected.' };
 
   const out: Record<string, string>[] = [];
   rows.forEach((row, index) => {
@@ -107,7 +108,7 @@ export function buildImportResult(
  */
 export function submitLabel(plan: SubmitPlan): string {
   if (!plan.canSubmit) {
-    return plan.valid === 0 ? 'Tidak ada baris untuk diimpor' : 'Perbaiki error untuk impor';
+    return plan.valid === 0 ? 'No rows to import' : 'Fix errors to import';
   }
-  return `Impor ${plan.valid} baris`;
+  return `Prepare import (${plural(plan.valid, 'row')})`;
 }

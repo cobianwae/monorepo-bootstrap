@@ -1,6 +1,6 @@
 /**
  * Parse CSV murni (wrapper papaparse) + deteksi batas ukuran/baris +
- * penolakan berkas non-CSV (XLSX → "v1 CSV saja", FR-010).
+ * penolakan berkas non-CSV (XLSX → UNSUPPORTED_FORMAT_ERROR, FR-010).
  *
  * Worker papaparse hanya di browser; di tes (node) diparses string sinkron
  * agar deterministik (lihat catatan risiko story 014-01).
@@ -8,6 +8,8 @@
 
 import Papa from 'papaparse';
 import type { CsvParseResult, ParseCsvOptions } from './types';
+
+export const UNSUPPORTED_FORMAT_ERROR = 'Only CSV files are supported';
 
 const CSV_EXTENSIONS = ['.csv'];
 const CSV_MIME = 'text/csv';
@@ -28,7 +30,7 @@ function isCsvFile(input: File | { name?: string; type?: string; size?: number }
 
 /**
  * Parse input (File | teks CSV) ke header + baris.
- * - File non-CSV (xlsx, dll.) → error 'v1 CSV saja' (FR-010), tidak melempar.
+ * - File non-CSV (xlsx, dll.) → error UNSUPPORTED_FORMAT_ERROR (FR-010), tidak melempar.
  * - >maxBytes / >maxRows → warning + tetap lanjut (warning, bukan blokir, OQ#1).
  * - Parsing gagal → error, tidak melempar.
  */
@@ -49,13 +51,13 @@ export function parseCsv(
         rows: [],
         rowCount: 0,
         warnings,
-        error: 'v1 CSV saja',
+        error: UNSUPPORTED_FORMAT_ERROR,
       });
     }
     const file = input as File;
     if (file.size > maxBytes) {
       warnings.push(
-        `File melebihi batas ${formatBytes(maxBytes)} — tetap diparses (warning, bukan blokir).`
+        `Recommended up to ${formatBytes(maxBytes)}. Larger files are still processed.`
       );
     }
   }
@@ -75,13 +77,13 @@ export function parseCsv(
             rows: [],
             rowCount: 0,
             warnings,
-            error: 'Gagal membaca berkas CSV',
+            error: 'Failed to read the CSV file',
           });
           return;
         }
         if (maxRows && rows.length > maxRows) {
           warnings.push(
-            `File melebihi batas ${maxRows.toLocaleString('id-ID')} baris — diparses penuh (warning).`
+            `Recommended up to ${maxRows.toLocaleString('en-US')} rows. Larger files are still processed.`
           );
         }
         resolve({ headers, rows, rowCount: rows.length, warnings });
@@ -94,11 +96,11 @@ export function parseCsv(
       const reader = new FileReader();
       reader.onload = () => Papa.parse(String(reader.result), config);
       reader.onerror = () => {
-        resolve({ headers: [], rows: [], rowCount: 0, warnings, error: 'Gagal membaca berkas' });
+        resolve({ headers: [], rows: [], rowCount: 0, warnings, error: 'Failed to read the file' });
       };
       reader.readAsText(input);
     } else {
-      resolve({ headers: [], rows: [], rowCount: 0, warnings, error: 'Berkas tidak dapat dibaca di lingkungan uji' });
+      resolve({ headers: [], rows: [], rowCount: 0, warnings, error: 'The file cannot be read in this test environment' });
     }
   });
 }

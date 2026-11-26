@@ -21,7 +21,7 @@ function normalize(text: string): string {
 const SYNONYM: Record<string, string> = {
   nama: 'name',
   namalengkap: 'name',
-  sulam: 'email',
+  surel: 'email',
   emailaddress: 'email',
   tgllahir: 'dob',
   tgallahir: 'dob',
@@ -37,6 +37,14 @@ const SYNONYM: Record<string, string> = {
   memberid: 'memberId',
   idanggota: 'memberId',
   idmember: 'memberId',
+};
+
+// Alias Indonesia untuk pencocokan substring (skor 70), mis. "Telepon Rumah".
+// Terpisah dari label agar tetap bekerja walau label field memakai bahasa lain.
+const ALIASES: Record<string, string[]> = {
+  name: ['namalengkap'],
+  dob: ['tanggallahir'],
+  phone: ['telepon'],
 };
 
 export function suggestMapping(
@@ -63,7 +71,9 @@ export function suggestMapping(
         score = 90;
       } else if (
         nk.length >= 3 &&
-        (nh.includes(nk) || nk.includes(nh) || nh.includes(nl) || nl.includes(nh))
+        (nh.includes(nk) ||
+          nk.includes(nh) ||
+          [nl, ...(ALIASES[field.key] ?? [])].some((name) => nh.includes(name) || name.includes(nh)))
       ) {
         // Substring bermakna = 70.
         score = 70;
