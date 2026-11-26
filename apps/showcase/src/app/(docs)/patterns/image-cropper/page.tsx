@@ -1,9 +1,11 @@
 'use client';
 
 import * as React from 'react';
+import { Crop } from 'lucide-react';
 import {
   CodeBlock,
   ImageCropper,
+  Kbd,
   PageHeader,
   SegmentedControl,
   SegmentedControlItem,
@@ -11,11 +13,13 @@ import {
 } from '@ds/ui';
 import { SectionHeading } from '../../../../components/section-heading';
 import {
+  ARIA_NOTES,
   ASPECT_OPTIONS,
-  KEYBOARD,
+  BREAK_CASES,
+  CONTRACT,
   SCENARIOS,
+  SHORTCUTS,
   STATE_CONFIG,
-  STEPS,
   type AspectPreset,
   type CropScenario,
   type DemoState,
@@ -52,40 +56,22 @@ function DemoControl({ label, value, options, onValueChange }: DemoControlProps)
   );
 }
 
-function StepLead({ step, index }: { step: string; index: number }) {
-  const separator = step.indexOf(' — ');
-  const lead = separator > 0 ? step.slice(0, separator) : null;
-  const rest = separator > 0 ? step.slice(separator + 3) : step;
-  return (
-    <li className="flex items-start gap-3">
-      <span
-        aria-hidden="true"
-        className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-highlight/40 bg-highlight/10 text-xs font-semibold text-foreground"
-      >
-        {index + 1}
-      </span>
-      <span className="text-base text-muted-foreground">
-        {lead ? <strong className="font-semibold text-foreground">{lead}</strong> : null}
-        {lead ? ' — ' : null}
-        {rest}
-      </span>
-    </li>
-  );
-}
+/** Spesimen bingkai: bentuk area crop dan ukuran keluarannya. */
+const FRAME_SPECIMENS = [
+  { prop: 'cropShape="round"', name: 'Avatar', shape: 'h-32 w-32 rounded-full', result: '512 × 512' },
+  { prop: 'aspect={16 / 9}', name: 'Cover', shape: 'h-28 w-48 rounded-md', result: '1280 × 720' },
+  { prop: 'aspect="free"', name: 'Free', shape: 'h-32 w-24 rounded-md', result: 'Photo’s own ratio' },
+] as const;
 
-function KeyboardShortcut({ item }: { item: string }) {
-  const separator = item.indexOf(': ');
-  const lead = separator > 0 ? item.slice(0, separator) : null;
-  const rest = separator > 0 ? item.slice(separator + 2) : item;
+/** Area crop mini: grid sepertiga di dalam bingkai highlight. */
+function CropFrame({ className }: { className: string }) {
   return (
-    <li className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-      {lead ? (
-        <kbd className="shrink-0 rounded-md border border-border bg-muted px-1.5 py-0.5 font-mono text-xs font-medium text-foreground">
-          {lead}
-        </kbd>
-      ) : null}
-      <span className="text-base text-muted-foreground">{rest}</span>
-    </li>
+    <span className={`relative block overflow-hidden border-2 border-highlight bg-highlight/10 ${className}`}>
+      <span className="absolute inset-y-0 left-1/3 w-px bg-highlight/40" />
+      <span className="absolute inset-y-0 left-2/3 w-px bg-highlight/40" />
+      <span className="absolute inset-x-0 top-1/3 h-px bg-highlight/40" />
+      <span className="absolute inset-x-0 top-2/3 h-px bg-highlight/40" />
+    </span>
   );
 }
 
@@ -113,6 +99,7 @@ export default function ImageCropperPage() {
     <div className="space-y-10 animate-in fade-in-50 duration-200">
       <PageHeader
         eyebrow="UX Recipe Scenario"
+        eyebrowIcon={Crop}
         title="Image Cropper"
         description="Crop an avatar or cover image. Adjust the aspect ratio, zoom, and rotation before saving."
       />
@@ -163,35 +150,95 @@ export default function ImageCropperPage() {
         </p>
       </section>
 
-      <section id="try-it" aria-labelledby="try-it-heading" className="space-y-4 scroll-mt-20">
-        <SectionHeading id="try-it-heading" title="Try it" description="Five moves from upload to error states." />
-        <ol className="max-w-xl space-y-3">
-          {STEPS.map((step, index) => (
-            <StepLead key={step} step={step} index={index} />
+      <section id="frames" aria-labelledby="frames-heading" className="space-y-4 scroll-mt-20">
+        <SectionHeading
+          id="frames-heading"
+          title="The frame decides the file"
+          description="Shape and ratio are set by props. outputSize fixes the pixels you get back, always as PNG."
+        />
+        <ul className="grid gap-px overflow-hidden rounded-xl border border-border bg-border md:grid-cols-3">
+          {FRAME_SPECIMENS.map((specimen) => (
+            <li key={specimen.name} className="flex flex-col bg-card">
+              <div className="flex items-center justify-between gap-3 border-b border-dashed border-border px-4 py-3">
+                <code className="font-mono text-sm">{specimen.prop}</code>
+                <span className="text-xs text-muted-foreground">{specimen.name}</span>
+              </div>
+              <div aria-hidden="true" className="flex min-h-44 items-center justify-center bg-muted/40 p-4">
+                <CropFrame className={specimen.shape} />
+              </div>
+              <p className="border-t border-border px-4 py-3 text-center font-display text-xl font-bold tabular-nums">
+                {specimen.result}
+              </p>
+            </li>
           ))}
-        </ol>
+        </ul>
       </section>
 
-      <section id="implementation" aria-labelledby="implementation-heading" className="space-y-4 scroll-mt-20">
-        <SectionHeading id="implementation-heading" title="Implementation" description="Copy the recipe and wire onComplete to your upload." />
-        <CodeBlock filename="ImageCropperDemo.tsx" language="tsx" code={IMAGE_CROPPER_RECIPE} className="max-w-3xl" />
-        <p className="max-w-3xl text-xs text-muted-foreground">
-          This page (S-005.38) shows the avatar (S-005.38.01) and cover (S-005.38.02) scenarios with state simulation.{' '}
-          Token pairs used here are covered by the{' '}
-          <a href="/foundations/colors" className="underline underline-offset-2">
-            foundations contrast matrix
-          </a>
-          .
-        </p>
+      <section id="edge-cases" aria-labelledby="edge-cases-heading" className="space-y-4 scroll-mt-20">
+        <SectionHeading id="edge-cases-heading" title="Try to break it" />
+        <ul className="grid gap-6 md:grid-cols-3">
+          {BREAK_CASES.map((item) => (
+            <li key={item.input} className="space-y-2 border-t-2 border-highlight pt-4">
+              <p className="font-mono text-2xl font-bold">{item.input}</p>
+              <p className="text-sm">{item.action}</p>
+              <p className="text-sm text-muted-foreground">{item.outcome}</p>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section id="accessibility" aria-labelledby="accessibility-heading" className="space-y-4 scroll-mt-20">
-        <SectionHeading id="accessibility-heading" title="Accessibility notes" description="Every crop action works with the keyboard alone." />
-        <ul className="max-w-xl space-y-2.5">
-          {KEYBOARD.map((item) => (
-            <KeyboardShortcut key={item} item={item} />
-          ))}
-        </ul>
+        <SectionHeading
+          id="accessibility-heading"
+          title="Keyboard & screen readers"
+          description="Focus the crop area, then use these keys."
+        />
+        <div className="grid gap-6 lg:grid-cols-5">
+          <dl className="self-start rounded-xl border border-border bg-card px-4 lg:col-span-2">
+            {SHORTCUTS.map((shortcut) => (
+              <div key={shortcut.label} className="flex items-center justify-between gap-4 border-b border-border py-3 last:border-b-0">
+                <dt className="text-sm">{shortcut.label}</dt>
+                <dd className="flex items-center gap-1">
+                  {shortcut.keys.map((key) => (
+                    <Kbd key={key}>{key}</Kbd>
+                  ))}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <dl className="lg:col-span-3">
+            {ARIA_NOTES.map((note) => (
+              <div key={note.term} className="grid gap-1 border-b border-border py-3 first:pt-0 last:border-b-0 sm:grid-cols-[9rem_1fr] sm:gap-4">
+                <dt className="font-mono text-sm font-medium">{note.term}</dt>
+                <dd className="text-sm text-muted-foreground">{note.meaning}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <section id="implementation" aria-labelledby="implementation-heading" className="space-y-4 scroll-mt-20">
+        <SectionHeading id="implementation-heading" title="Drop it in" />
+        <div className="grid gap-6 lg:grid-cols-5">
+          <div className="space-y-4 lg:col-span-2">
+            <dl className="space-y-4">
+              {CONTRACT.map((item) => (
+                <div key={item.term} className="space-y-1 border-l-2 border-highlight pl-4">
+                  <dt className="font-mono text-sm font-medium">{item.term}</dt>
+                  <dd className="text-sm text-muted-foreground">{item.meaning}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="text-xs text-muted-foreground">
+              S-005.38 covers the avatar (S-005.38.01) and cover (S-005.38.02) scenarios. Token pairs are covered by the{' '}
+              <a href="/foundations/colors" className="underline underline-offset-2">
+                foundations contrast matrix
+              </a>
+              .
+            </p>
+          </div>
+          <CodeBlock filename="ImageCropperDemo.tsx" language="tsx" code={IMAGE_CROPPER_RECIPE} className="min-w-0 self-start lg:col-span-3" />
+        </div>
       </section>
     </div>
   );

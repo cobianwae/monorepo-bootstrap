@@ -146,6 +146,31 @@ Level heading turun menjadi dua: h1 36px → h2 24px (`SectionHeading`). Judul 1
 - `formatMegabytes(1024)` → "0.0 MB"; butuh format KB (`image-cropper-utils.ts:50–53`).
 - `SegmentedControl` terpotong bila lebih lebar dari kontainer (catatan umum seri Patterns).
 
+## Revisi 2026-11-27 (umpan balik user)
+
+User: demo dipertahankan; bagian di bawahnya dinilai "no personality", dengan acuan halaman Rich Text Editor (CR-096) di `:4001`. Bagian ini **menggantikan** "Struktur tujuan", snippet Try it/Implementation, dan Keputusan #1 untuk area di bawah demo.
+
+| Section | Isi | Lokasi |
+|---|---|---|
+| The frame decides the file | 3 spesimen bingkai (avatar, cover, free) | `page.tsx:153` |
+| Try to break it | format ditolak, batas ukuran, batas zoom | `page.tsx:177` |
+| Keyboard & screen readers | tabel shortcut (`Kbd`) + catatan ARIA | `page.tsx:190` |
+| Drop it in | kontrak prop + `CodeBlock`; ID screen dan tautan matrix | `page.tsx:220` |
+
+`PageHeader` mendapat `eyebrowIcon={Crop}`. Demo (`page.tsx:107`) tidak berubah.
+
+Klaim lama yang salah dan sudah dihapus dari halaman:
+
+- Ganti Scenario **tidak** mempertahankan gambar (`key` me-remount komponen).
+- Aspect `Free` mengikuti rasio asli foto, bukan crop tanpa rasio.
+- Komponen tidak punya tombol "Try again"; saat error, dropzone tampil lagi.
+
+Temuan di luar scope (input CR komponen):
+
+- Demo mengirim `outputSize` dari Scenario, sehingga Aspect yang berbeda rasio menghasilkan gambar gepeng/melar (perilaku sudah ada sebelum CR ini).
+- Gagang sudut hanya bisa dipakai dengan pointer; tidak ada resize lewat keyboard.
+- Pengumuman reset salah ketik: "Diaturn ulang".
+
 ## Tasks (jalur small-fix)
 
 - [x] Susun ulang `page.tsx` sesuai struktur tujuan; hapus Card/CardHeader/CardTitle/Table/`aria-pressed` Theme yang tak terpakai; eyebrow → `UX Recipe Scenario`.
@@ -191,7 +216,7 @@ Commit: `fix: redesign patterns image cropper page [CR-097]`
 - [x] CR disetujui user (termasuk 5 perubahan perilaku demo) — 2026-11-26.
 - [x] Branch dibuat dari `pattern-polish`.
 - [x] Perubahan diimplementasikan.
-- [x] Preview before/after light/dark/mobile diambil dan dibaca; CR dimutakhirkan ke `file:line` final (halaman: demo `page.tsx:83–128`, Try it `page.tsx:130–136`, Implementation `page.tsx:139–150`, Accessibility `page.tsx:152–161`, `STATE_CONFIG` `demo-data.ts:58`, `STEPS` `demo-data.ts:38`). Iterasi lanjutan menunggu masukan user saat review.
+- [x] Preview before/after light/dark/mobile diambil dan dibaca; CR dimutakhirkan ke `file:line` final (lokasi final: lihat Revisi 2026-11-27; `STATE_CONFIG` `demo-data.ts:84`). Iterasi lanjutan menunggu masukan user saat review.
 - [x] Verifikasi dijalankan (targeted 5/5, typecheck, lint, test 749/750 dengan 1 flaky pre-existing, build dari salinan sementara).
 - [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
 - [x] `docs/STATUS.md` diperbarui bila relevan.

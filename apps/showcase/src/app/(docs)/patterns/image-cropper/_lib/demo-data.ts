@@ -35,19 +35,45 @@ export const ASPECT_OPTIONS: { id: AspectPreset; label: string; aspect: number |
   { id: 'free', label: 'Free', aspect: 'free' },
 ];
 
-export const STEPS = [
-  'Upload — choose a photo to open the crop area (circle for avatar, rectangle for cover).',
-  'Adjust — drag the area or use arrow keys; zoom with the slider, rotate with R.',
-  'Switch — set Scenario to Cover for a 1280×720 result without uploading again.',
-  'Limit — set Aspect to Free and crop without a locked ratio.',
-  'States — set State to Unsupported format or Size limit and upload a file to see the error.',
+export const BREAK_CASES = [
+  {
+    input: '.jpg',
+    action: 'Set State to Unsupported format, then drag a JPG onto the dropzone.',
+    outcome: 'An alert says why. The dropzone stays, ready for another file.',
+  },
+  {
+    input: '> 1 KB',
+    action: 'Set State to Size limit, then pick any photo.',
+    outcome: 'The file is rejected before it is decoded.',
+  },
+  {
+    input: '500%',
+    action: 'Load a photo, focus the crop area, and keep pressing +.',
+    outcome: 'Zoom stops at 500%. The slider stays in sync.',
+  },
 ];
 
-export const KEYBOARD = [
-  'Arrow keys: move the crop area by 10px (Shift + arrow for 1px adjustments).',
-  '+ / −: zoom between 100% and 500%; the slider stays in sync.',
-  'R: rotate 90° (Shift + R reverses rotation); 0: reset the image.',
-  'Tab: move through photo selection, aspect ratio, crop area, slider, controls, preview, and Save.',
+export const SHORTCUTS = [
+  { label: 'Move 10px', keys: ['← ↑ ↓ →'] },
+  { label: 'Move 1px', keys: ['Shift', '← ↑ ↓ →'] },
+  { label: 'Zoom', keys: ['+', '−'] },
+  { label: 'Rotate 90°', keys: ['R'] },
+  { label: 'Rotate back', keys: ['Shift', 'R'] },
+  { label: 'Reset', keys: ['0'] },
+];
+
+export const ARIA_NOTES = [
+  { term: 'aria-live', meaning: 'Position, zoom, and rotation changes are announced.' },
+  { term: 'role="alert"', meaning: 'Rejected files are explained in text, and focus moves to the message.' },
+  { term: 'aria-busy', meaning: 'Set on the crop area while the photo loads.' },
+  { term: 'Focus', meaning: 'After Save, focus moves to the confirmation.' },
+  { term: 'Pointer only', meaning: 'Corner handles resize by dragging; there is no keyboard resize yet.' },
+];
+
+export const CONTRACT = [
+  { term: 'onComplete', meaning: 'Hands you a blob, a data URL, and the final width and height.' },
+  { term: 'outputSize', meaning: 'Pixel size of the result. Keep its ratio equal to aspect, or the image stretches.' },
+  { term: 'accept / maxBytes', meaning: 'Type is checked first, then size, before the file is decoded.' },
 ];
 
 export interface StateConfig {

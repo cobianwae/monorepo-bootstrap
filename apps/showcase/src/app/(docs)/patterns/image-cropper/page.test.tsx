@@ -43,14 +43,13 @@ beforeAll(() => {
 });
 
 describe('ImageCropperPage', () => {
-  it('merender h1, section Try it dengan 5 langkah, dan testid ic-result', () => {
+  it('merender h1, section di bawah demo, dan testid ic-result', () => {
     render(<ImageCropperPage />);
     expect(screen.getByRole('heading', { level: 1, name: 'Image Cropper' })).toBeTruthy();
-    expect(screen.getByRole('heading', { level: 2, name: 'Try it' })).toBeTruthy();
-    expect(screen.getByText('Upload')).toBeTruthy();
-    expect(screen.getByText('States')).toBeTruthy();
-    expect(screen.getByText(/choose a photo to open the crop area/)).toBeTruthy();
-    expect(screen.getByText(/see the error/)).toBeTruthy();
+    for (const name of ['The frame decides the file', 'Try to break it', 'Keyboard & screen readers', 'Drop it in']) {
+      expect(screen.getByRole('heading', { level: 2, name })).toBeTruthy();
+    }
+    expect(screen.getByText('1280 × 720')).toBeTruthy();
     expect(screen.getByTestId('ic-result')).toBeTruthy();
     expect(screen.getByText('No crop saved yet.')).toBeTruthy();
   });
