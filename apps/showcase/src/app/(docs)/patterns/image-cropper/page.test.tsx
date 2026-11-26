@@ -47,8 +47,10 @@ describe('ImageCropperPage', () => {
     render(<ImageCropperPage />);
     expect(screen.getByRole('heading', { level: 1, name: 'Image Cropper' })).toBeTruthy();
     expect(screen.getByRole('heading', { level: 2, name: 'Try it' })).toBeTruthy();
-    expect(screen.getByText(/^Upload —/)).toBeTruthy();
-    expect(screen.getByText(/^States —/)).toBeTruthy();
+    expect(screen.getByText('Upload')).toBeTruthy();
+    expect(screen.getByText('States')).toBeTruthy();
+    expect(screen.getByText(/choose a photo to open the crop area/)).toBeTruthy();
+    expect(screen.getByText(/see the error/)).toBeTruthy();
     expect(screen.getByTestId('ic-result')).toBeTruthy();
     expect(screen.getByText('No crop saved yet.')).toBeTruthy();
   });

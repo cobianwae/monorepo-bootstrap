@@ -52,6 +52,43 @@ function DemoControl({ label, value, options, onValueChange }: DemoControlProps)
   );
 }
 
+function StepLead({ step, index }: { step: string; index: number }) {
+  const separator = step.indexOf(' — ');
+  const lead = separator > 0 ? step.slice(0, separator) : null;
+  const rest = separator > 0 ? step.slice(separator + 3) : step;
+  return (
+    <li className="flex items-start gap-3">
+      <span
+        aria-hidden="true"
+        className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-highlight/40 bg-highlight/10 text-xs font-semibold text-foreground"
+      >
+        {index + 1}
+      </span>
+      <span className="text-base text-muted-foreground">
+        {lead ? <strong className="font-semibold text-foreground">{lead}</strong> : null}
+        {lead ? ' — ' : null}
+        {rest}
+      </span>
+    </li>
+  );
+}
+
+function KeyboardShortcut({ item }: { item: string }) {
+  const separator = item.indexOf(': ');
+  const lead = separator > 0 ? item.slice(0, separator) : null;
+  const rest = separator > 0 ? item.slice(separator + 2) : item;
+  return (
+    <li className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+      {lead ? (
+        <kbd className="shrink-0 rounded-md border border-border bg-muted px-1.5 py-0.5 font-mono text-xs font-medium text-foreground">
+          {lead}
+        </kbd>
+      ) : null}
+      <span className="text-base text-muted-foreground">{rest}</span>
+    </li>
+  );
+}
+
 export default function ImageCropperPage() {
   const [scenario, setScenario] = React.useState<CropScenario>('avatar');
   const [aspectPreset, setAspectPreset] = React.useState<AspectPreset>('square');
@@ -127,18 +164,18 @@ export default function ImageCropperPage() {
       </section>
 
       <section id="try-it" aria-labelledby="try-it-heading" className="space-y-4 scroll-mt-20">
-        <SectionHeading id="try-it-heading" title="Try it" />
-        <ol className="max-w-xl list-decimal space-y-2 pl-5 text-base">
-          {STEPS.map((step) => (
-            <li key={step}>{step}</li>
+        <SectionHeading id="try-it-heading" title="Try it" description="Five moves from upload to error states." />
+        <ol className="max-w-xl space-y-3">
+          {STEPS.map((step, index) => (
+            <StepLead key={step} step={step} index={index} />
           ))}
         </ol>
       </section>
 
       <section id="implementation" aria-labelledby="implementation-heading" className="space-y-4 scroll-mt-20">
-        <SectionHeading id="implementation-heading" title="Implementation" />
+        <SectionHeading id="implementation-heading" title="Implementation" description="Copy the recipe and wire onComplete to your upload." />
         <CodeBlock filename="ImageCropperDemo.tsx" language="tsx" code={IMAGE_CROPPER_RECIPE} className="max-w-3xl" />
-        <p className="text-xs text-muted-foreground">
+        <p className="max-w-3xl text-xs text-muted-foreground">
           This page (S-005.38) shows the avatar (S-005.38.01) and cover (S-005.38.02) scenarios with state simulation.{' '}
           Token pairs used here are covered by the{' '}
           <a href="/foundations/colors" className="underline underline-offset-2">
@@ -149,10 +186,10 @@ export default function ImageCropperPage() {
       </section>
 
       <section id="accessibility" aria-labelledby="accessibility-heading" className="space-y-4 scroll-mt-20">
-        <SectionHeading id="accessibility-heading" title="Accessibility notes" />
-        <ul className="max-w-xl list-disc space-y-1 pl-5 text-base">
+        <SectionHeading id="accessibility-heading" title="Accessibility notes" description="Every crop action works with the keyboard alone." />
+        <ul className="max-w-xl space-y-2.5">
           {KEYBOARD.map((item) => (
-            <li key={item}>{item}</li>
+            <KeyboardShortcut key={item} item={item} />
           ))}
         </ul>
       </section>
