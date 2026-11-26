@@ -1,6 +1,6 @@
 # CR-096 — Patterns: halaman Rich Text Editor
 
-**Status:** draft
+**Status:** approved (ditetapkan user 2026-11-26)
 **Sumber:** audit visual Patterns 2026-11-26 (screenshot 37 route) + umpan balik user atas pilot CR-094
 **Ref:** `docs/design/visual-language.md`, CR-094 (payung komposisi), CR-095 (payung visual), CR-093 (istilah English), `packages/ui/src/components/form/rich-text-editor.tsx`
 
@@ -217,7 +217,7 @@ Isi paragraf helper di bawah editor (`page.tsx:184–187`: counter memakai teks 
 Branch: `cr-096-patterns-rich-text-editor-page`
 Commit: `fix: redesign patterns rich text editor page [CR-096]`
 
-- [ ] CR disetujui user (termasuk 5 perubahan perilaku demo).
+- [x] CR disetujui user (termasuk 5 perubahan perilaku demo) — 2026-11-26.
 - [ ] Branch dibuat dari `pattern-polish`.
 - [ ] Perubahan diimplementasikan.
 - [ ] Preview before/after bersama user; CR dimutakhirkan ke `file:line` final.

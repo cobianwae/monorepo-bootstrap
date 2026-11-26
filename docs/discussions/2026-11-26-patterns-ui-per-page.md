@@ -76,7 +76,7 @@ Urutan di bawah adalah usulan; user yang menentukan. Nomor CR diambil saat CR di
 
 | Route | Status | Inti masalah | Sumber audit |
 |---|---|---|---|
-| `rich-text-editor` | **CR-096 `draft`** | instruksi sebelum demo; tiga kartu setara; 10 tombol kontrol bercampur | `notes-pilot.md`, CR-096 |
+| `rich-text-editor` | **CR-096 `approved`** | instruksi sebelum demo; tiga kartu setara; 10 tombol kontrol bercampur | `notes-pilot.md`, CR-096 |
 | `image-cropper` | belum ada CR | demo terbuka kosong; tiap h2 dibungkus kartu berjudul lagi; tabel audit token dan 3 state kosong mendominasi; teks Indonesia dari `@ds/ui` | `notes-pilot.md` |
 | `settings` | belum ada CR | tiga heading untuk satu kelompok isi; dua kartu sama berat; state inti (dirty, invalid, danger) tak punya titik masuk; footer tombol menempel tepi kartu (verifikasi kode) | `notes-pilot.md` |
 | `dashboard` | edit disetujui user, **belum di-commit** | aksi aplikasi sudah dipindah dari PageHeader ke toolbar. Sisa minor: toolbar mengambang kanan, label kartu terpotong, ruang kosong kartu feed | `notes-pilot.md` |
@@ -148,7 +148,6 @@ Keterbatasan screenshot: grafik beranimasi bisa kosong; halaman dengan scroll in
 
 ## Belum diputuskan
 
-1. Approval CR-096, termasuk lima perubahan perilaku demo.
-2. Kapan Dashboard diberi CR kecil dan di-commit.
-3. Urutan setelah gelombang 1.
-4. Kapan CR komponen dan CR copy dikerjakan relatif terhadap CR halaman (beberapa halaman bergantung padanya).
+1. Kapan Dashboard diberi CR kecil dan di-commit.
+2. Urutan setelah gelombang 1.
+3. Kapan CR komponen dan CR copy dikerjakan relatif terhadap CR halaman (beberapa halaman bergantung padanya).
