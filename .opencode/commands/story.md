@@ -3,18 +3,16 @@ description: Pecah PRD menjadi story dan minta gate 3
 agent: build
 ---
 
-PRD: `$ARGUMENTS`
+Muat skill `story-writer` lalu baca PRD di: `$ARGUMENTS`
 
-## Langkah
+Pastikan dulu: PRD berstatus `approved` DAN design terkait sudah `approved` (gate 2). Jika belum, hentikan dan ingatkan user.
 
-1. Muat skill `story-writer`.
-2. Baca PRD approved dan design approved. Jika salah satu belum, berhenti.
-3. Pecah menjadi story yang masing-masing selesai dalam satu sesi build.
-4. Setiap story harus vertical slice: token → ui → showcase → docs (sesuai scope).
-5. Tulis acceptance criteria Given/When/Then dengan referensi `FR-NNN` dan screen ID `S-NNN`.
-6. Simpan di `docs/stories/NNN-MM-slug.md` sesuai template `story-writer`.
-7. Tambahkan baris `todo` di `docs/BACKLOG.md`.
-8. Pastikan seluruh FR tercakup; tandai dependencies antar-story.
-9. Minta **gate 3**: user mereview dan menetapkan `approved`.
+Langkah:
+1. Identifikasi seluruh requirement (`NNN.FR-NNN` — qualified, FR hanya unik per PRD) dan screen (`S-NNN`, `S-NNN.MM`, `M-NNN`) dari PRD + design.
+2. Pecah menjadi story berukuran satu sesi build, masing-masing vertical slice: token → ui → showcase → docs (sesuai scope); aturan pemecahan ada di skill `story-writer`. Simpan ke `docs/stories/NNN-MM-slug.md`.
+3. Setiap story wajib punya acceptance criteria Given/When/Then yang merujuk `NNN.FR-NNN` dan `S-NNN`/`M-NNN`.
+4. Daftarkan semua story baru di `docs/BACKLOG.md` dengan status `todo`.
+5. Pastikan setiap FR di PRD ter-cover minimal satu story — tidak boleh ada FR tercecer.
+6. Tampilkan ringkasan stories, urutan pengerjaan, dan dependency-nya untuk direview user (gate 3).
 
-Jangan implementasi kode sebelum story approved.
+Jangan implementasi kode sebelum story `approved`.
