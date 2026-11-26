@@ -4,6 +4,8 @@ export type CropScenario = 'avatar' | 'cover';
 
 export type AspectPreset = 'square' | 'wide' | 'standard' | 'free';
 
+export type DemoState = 'valid' | 'unsupported' | 'size-limit';
+
 export interface ScenarioConfig {
   aspect: number | 'free';
   cropShape: 'rect' | 'round';
@@ -33,61 +35,54 @@ export const ASPECT_OPTIONS: { id: AspectPreset; label: string; aspect: number |
   { id: 'free', label: 'Free', aspect: 'free' },
 ];
 
-export const STEPS = [
-  'Choose an avatar photo to open a square crop area with a circular preview.',
-  'Drag the crop area or use arrow keys, then adjust zoom with the slider.',
-  'Rotate 90°, then reset to the original position without uploading again.',
-  'Check that the circular preview updates as you adjust the crop.',
-  'Save the result: onComplete receives a 512×512 blob.',
-  'Try a cover: choose Cover 16:9 for a 1280×720 result.',
+export const BREAK_CASES = [
+  {
+    input: '.jpg',
+    action: 'Set State to Unsupported format, then drag a JPG onto the dropzone.',
+    outcome: 'An alert says why. The dropzone stays, ready for another file.',
+  },
+  {
+    input: '> 1 KB',
+    action: 'Set State to Size limit, then pick any photo.',
+    outcome: 'The file is rejected before it is decoded.',
+  },
+  {
+    input: '500%',
+    action: 'Load a photo, focus the crop area, and keep pressing +.',
+    outcome: 'Zoom stops at 500%. The slider stays in sync.',
+  },
 ];
 
-export const KEYBOARD = [
-  'Arrow keys: move the crop area by 10px (Shift + arrow for 1px adjustments).',
-  '+ / −: zoom between 100% and 500%; the slider stays in sync.',
-  'R: rotate 90° (Shift + R reverses rotation); 0: reset the image.',
-  'Tab: move through photo selection, aspect ratio, crop area, slider, controls, preview, and Save.',
+export const SHORTCUTS = [
+  { label: 'Move 10px', keys: ['← ↑ ↓ →'] },
+  { label: 'Move 1px', keys: ['Shift', '← ↑ ↓ →'] },
+  { label: 'Zoom', keys: ['+', '−'] },
+  { label: 'Rotate 90°', keys: ['R'] },
+  { label: 'Rotate back', keys: ['Shift', 'R'] },
+  { label: 'Reset', keys: ['0'] },
 ];
 
-export interface DemoDataset {
-  id: 'valid' | 'rusak' | 'raksasa';
-  title: string;
-  hint: string;
+export const ARIA_NOTES = [
+  { term: 'aria-live', meaning: 'Position, zoom, and rotation changes are announced.' },
+  { term: 'role="alert"', meaning: 'Rejected files are explained in text, and focus moves to the message.' },
+  { term: 'aria-busy', meaning: 'Set on the crop area while the photo loads.' },
+  { term: 'Focus', meaning: 'After Save, focus moves to the confirmation.' },
+  { term: 'Pointer only', meaning: 'Corner handles resize by dragging; there is no keyboard resize yet.' },
+];
+
+export const CONTRACT = [
+  { term: 'onComplete', meaning: 'Hands you a blob, a data URL, and the final width and height.' },
+  { term: 'outputSize', meaning: 'Pixel size of the result. Keep its ratio equal to aspect, or the image stretches.' },
+  { term: 'accept / maxBytes', meaning: 'Type is checked first, then size, before the file is decoded.' },
+];
+
+export interface StateConfig {
   accept?: string;
   maxBytes?: number;
 }
 
-export const DEMO_DATASETS: DemoDataset[] = [
-  {
-    id: 'valid',
-    title: 'Valid — PNG/JPG/WebP ≤ 10 MB',
-    hint: 'Upload a supported photo. A loading state appears while the image decodes.',
-  },
-  {
-    id: 'rusak',
-    title: 'Unsupported format',
-    hint: 'This demo accepts PNG only. Upload a JPG to see the format error.',
-    accept: 'image/png',
-  },
-  {
-    id: 'raksasa',
-    title: 'File size limit',
-    hint: 'This demo uses a 1 KB limit. Upload any file larger than 1 KB to see the size error.',
-    maxBytes: 1024,
-  },
-];
-
-export interface AuditPair {
-  pair: string;
-  kind: 'text' | 'graphics';
-  threshold: string;
-}
-
-export const AUDIT_PAIRS: AuditPair[] = [
-  { pair: 'foreground on background', kind: 'text', threshold: '≥ 4.5:1' },
-  { pair: 'muted-foreground on background', kind: 'text', threshold: '≥ 4.5:1' },
-  { pair: 'primary (viewport border, handles, focus ring)', kind: 'graphics', threshold: '≥ 3:1' },
-  { pair: 'primary-foreground on primary (button labels)', kind: 'text', threshold: '≥ 4.5:1' },
-  { pair: 'destructive on background (error messages)', kind: 'text', threshold: '≥ 4.5:1' },
-  { pair: 'background/80 overlay on the photo', kind: 'graphics', threshold: '≥ 3:1' },
-];
+export const STATE_CONFIG: Record<DemoState, StateConfig> = {
+  valid: {},
+  unsupported: { accept: 'image/png' },
+  'size-limit': { maxBytes: 1024 },
+};

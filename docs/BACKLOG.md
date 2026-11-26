@@ -158,6 +158,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-094 | Patterns: komposisi demo-first per bentuk halaman, kontrol menurut peran, deskripsi/bullet/steps/cards/callout sesuai fungsi; di-amend atas persetujuan user 2026-11-26 (satu template untuk 37 route diganti aturan per bentuk halaman); sejak 2026-11-26 menjadi payung — eksekusi lewat CR per halaman (Keputusan 9) | approved | `docs/cr/cr-094-patterns-content-composition.md` |
 | CR-095 | Patterns: keluarga visual lintas art direction, tipografi/surface/density/state dan detail craft; payung visual untuk CR per halaman | approved | `docs/cr/cr-095-patterns-visual-family.md` |
 | CR-096 | Patterns: halaman Rich Text Editor — demo-first, kontrol simulasi lewat SegmentedControl, section di bawah demo berbentuk spesimen/edge case/shortcut/kontrak prop | done | `docs/cr/cr-096-patterns-rich-text-editor-page.md` |
+| CR-097 | Patterns: halaman Image Cropper — satu demo + simulator State; section di bawah demo berbentuk spesimen bingkai/edge case/shortcut/kontrak prop | done | `docs/cr/cr-097-patterns-image-cropper-page.md` |
 
 ## Catatan
 
