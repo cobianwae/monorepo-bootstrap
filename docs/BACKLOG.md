@@ -150,9 +150,10 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-086 | Cascader & Tree Select: kemandirian demo, umpan balik label, dan microcopy halaman (English); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-086-cascader-tree-select-demo-feedback.md` |
 | CR-087 | Cascader & TreeSelect: a11y label/error (useId, aria-invalid) dan kontrol clear/tag bersarang; done dan di-merge ke `visual-polish` | done | `docs/cr/cr-087-cascader-tree-select-component-a11y.md` |
 | CR-088 | Cascader & TreeSelect: konsistensi microcopy/teks default komponen (English, ditetapkan user 2026-11-25); done dan di-merge ke `visual-polish` | done | `docs/cr/cr-088-cascader-tree-select-copy-defaults.md` |
-| CR-089 | Tuning config OpenCode hemat token: provider `nim-coder` kembali, proteksi DCP story/CR, `max_bytes` 24576, `compaction.buffer` 25%, `snapshots` true (acuan CRM); disetujui user 2026-11-26 | approved | `docs/cr/cr-089-tuning-config-opencode.md` |
+| CR-089 | Tuning config OpenCode hemat token: provider `nim-coder` kembali, proteksi DCP story/CR, `max_bytes` 24576, `compaction.buffer` 25%, `snapshots` true (acuan CRM); disetujui user 2026-11-26. Hasil: proteksi DCP terverifikasi, pin `general` dilepas lewat CR-092, `max_bytes` 2× dan `buffer` 25% bukan penghematan (rincian di bagian Hasil CR) | approved | `docs/cr/cr-089-tuning-config-opencode.md` |
 | CR-090 | `AGENTS.md` ringkas tanpa duplikasi + `STATUS.md` snapshot ringkas + port aturan graphify/stack CRM; disetujui user 2026-11-26 | approved | `docs/cr/cr-090-agents-ringkas-status-snapshot.md` |
 | CR-091 | Command dan skill workflow: port gerbang prosedural CRM (6 skill bersama + 7 command), isi design system dipertahankan; disetujui user 2026-11-26 | approved | `docs/cr/cr-091-command-skill-gerbang-prosedural.md` |
+| CR-092 | Subagent murah berbasis bukti + prosedur fallback: pin `general` ke `nim-coder` dilepas (uji 2026-11-26: 2–3× lebih lambat dari model sesi), pin `explore` tetap, fallback grep di `AGENTS.md`, hasil CR-089 dicatat; disetujui user 2026-11-26 | approved | `docs/cr/cr-092-subagent-murah-bukti-fallback.md` |
 
 ## Catatan
 

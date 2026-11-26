@@ -35,7 +35,7 @@
 - [x] Terapkan lima perubahan `opencode.json` (`274c641`).
 - [x] Buat `.opencode/dcp.jsonc` (`274c641`).
 - [x] Smoke test: `nim-coder/nim-coder` terdaftar `active` (provider hot-reload tanpa restart); subagent `explore` merespons (`apps/showcase/src/components/section-heading.tsx:24`). Bentuk V2 terbaca, jadi fallback bentuk lama tidak diperlukan.
-- [ ] Restart OpenCode (dilakukan user setelah sesi ini) agar plugin DCP memuat `.opencode/dcp.jsonc`; lalu cek proteksi file story/CR aktif.
+- [x] Restart OpenCode (dilakukan user setelah sesi ini) agar plugin DCP memuat `.opencode/dcp.jsonc`; lalu cek proteksi file story/CR aktif. Hasil (2026-11-26, dicatat CR-092): klien di-restart 12:48, uji hidup lulus — `read` `docs/cr/cr-090-agents-ringkas-status-snapshot.md` dan `docs/stories/002-04-states-manage-a11y.md` tetap utuh setelah `compress`; `read` `docs/STATUS.md` sebagai kontrol tidak dipertahankan.
 - [x] Verifikasi: tidak ada perubahan kode → `pnpm typecheck`/`lint`/`test` tidak diperlukan; `node scripts/check-status-log.mjs` hijau.
 - [x] Perbarui `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/STATUS-LOG.md`.
 
@@ -66,7 +66,22 @@ Commit: `chore: tuning config opencode hemat token [CR-089]`
 - [x] CR disetujui user (2026-11-26).
 - [x] Branch dibuat.
 - [x] Perubahan diimplementasikan.
-- [x] Verifikasi dijalankan (smoke test live; proteksi DCP menunggu restart OpenCode).
+- [x] Verifikasi dijalankan (smoke test live; proteksi DCP terverifikasi 2026-11-26).
 - [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui (tetap `approved` sampai user menetapkan `done`).
 - [x] `docs/STATUS.md` diperbarui bila relevan.
 - [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+
+## Hasil (2026-11-26)
+
+Dicatat oleh CR-092. Ringkasan review: blocker 0, major 2, minor 3; tidak ada drift antara CR ini dan `opencode.json`.
+
+| Perubahan | Hasil |
+|---|---|
+| `providers.nim-coder` + pin `explore` | Blocker #1 selesai: `explore` merespons. Pada uji delapan pertanyaan dengan model yang sama, 2 dari 3 run menjawab 8/8 dengan bukti `path:line` valid (rincian di CR-092). |
+| `agents.general.model` = `nim-coder/nim-coder` | Tidak ada keuntungan terukur: 226–315 s vs 111 s model sesi, token dibaca 125–178K vs 123K, satu dari tiga run 7,5/8. Biaya tidak terukur dari log (`cost` = 0). **Dilepas lewat CR-092.** |
+| `.opencode/dcp.jsonc` | **Terverifikasi aktif** setelah klien di-restart; service background tidak ikut restart. Bukan penghematan token: hasil `read`/`edit` pada `docs/stories/**` dan `docs/cr/**` menetap di konteks, jadi bacaan di dua folder itu wajib targeted. |
+| `tool_output.max_bytes` 24576 | 39 dari 52 output yang sebelumnya terpotong kini utuh, sehingga baca ulang berkurang. Token per output naik; bukan penghematan langsung. |
+| `compaction.buffer` 25% | Hampir tanpa efek: DCP global memotong lebih dulu di 80K token; compaction native baru lebih dulu bila jendela model < ±107K. Dihitung sebagai pagar cadangan. |
+| `snapshots: true` | 248 objek/6,8 MB saat review. Alat undo/revert, bukan penghematan. |
+
+Kesimpulan: tidak ada perubahan di CR ini yang terbukti menghemat token. Routing `nim-coder` ke `explore` adalah satu-satunya yang berpotensi menurunkan biaya, dan itu pun tidak tercatat di log (`cost` = 0). Judul "hemat token" menggambarkan tujuan, bukan hasil.
