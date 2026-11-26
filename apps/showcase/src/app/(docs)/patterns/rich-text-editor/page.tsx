@@ -1,19 +1,19 @@
 'use client';
 
 import * as React from 'react';
-import { PenLine, RotateCcw, FolderOpen, FlaskConical, Copy, Check } from 'lucide-react';
+import { PenLine, RotateCcw } from 'lucide-react';
 import {
   PageHeader,
   Button,
-  Badge,
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
+  CodeBlock,
+  Kbd,
   RichTextEditor,
+  SegmentedControl,
+  SegmentedControlItem,
 } from '@ds/ui';
+import { SectionHeading } from '../../../../components/section-heading';
 
-const PROSE_EXAMPLE = `<h2>Write with RichTextEditor</h2><p>A sample document with <strong>bold</strong>, <em>italic</em>, <u>underline</u>, and <code>inline code</code>.</p><ul><li>Single-level bullet list</li><li>Toolbar formatting matches keyboard shortcuts</li></ul><ol><li>First step</li><li>Second step</li></ol><blockquote><p>Quote: editing and publishing share the same Prose styles.</p></blockquote><pre><code>pnpm -C apps/showcase build</code></pre><p>Read the <a href="https://tiptap.dev">Tiptap documentation</a> and visit a <a href="/path/lokal">local path</a>.</p><p><img src="/examples/rich-text-document.svg" alt="Document illustration with a heading and lines of text" /></p>`;
+const PROSE_EXAMPLE = `<h2>Formatting in practice</h2><p>A sample document with <strong>bold</strong>, <em>italic</em>, <u>underline</u>, and <code>inline code</code>.</p><ul><li>Single-level bullet list</li><li>Toolbar formatting matches keyboard shortcuts</li></ul><ol><li>First step</li><li>Second step</li></ol><blockquote><p>Quote: editing and publishing share the same Prose styles.</p></blockquote><pre><code>pnpm -C apps/showcase build</code></pre><p>Read the <a href="https://tiptap.dev">Tiptap documentation</a> and visit a <a href="/path/lokal">local path</a>.</p><p><img src="/examples/rich-text-document.svg" alt="Document illustration with a heading and lines of text" /></p>`;
 
 const RECIPE = `const [value, setValue] = useState('<p>Hello</p>');
 <RichTextEditor
@@ -28,47 +28,165 @@ const RECIPE = `const [value, setValue] = useState('<p>Hello</p>');
 <p>{value.length} characters of HTML</p>
 <Button onClick={save}>Save</Button>`;
 
+/** Input rules bawaan editor: yang diketik → hasil yang muncul. */
+const TYPING_SPECIMENS = [
+  {
+    typed: '## Title',
+    name: 'Heading',
+    result: <span className="font-display text-3xl font-bold tracking-tight">Title</span>,
+  },
+  {
+    typed: '- Item',
+    name: 'Bullet list',
+    result: (
+      <span className="flex items-center gap-3 text-xl">
+        <span className="h-2 w-2 rounded-full bg-highlight" />
+        Item
+      </span>
+    ),
+  },
+  {
+    typed: '1. Step',
+    name: 'Numbered list',
+    result: (
+      <span className="flex items-baseline gap-3 text-xl">
+        <span className="font-display font-bold tabular-nums">1.</span>
+        Step
+      </span>
+    ),
+  },
+  {
+    typed: '> Quote',
+    name: 'Quote',
+    result: <span className="border-l-4 border-highlight pl-4 text-xl italic text-muted-foreground">Quote</span>,
+  },
+  {
+    typed: '**bold**',
+    name: 'Bold',
+    result: <span className="text-2xl font-bold">bold</span>,
+  },
+  {
+    typed: '`code`',
+    name: 'Inline code',
+    result: <span className="rounded-md border border-border bg-muted/50 px-2 py-1 font-mono text-lg">code</span>,
+  },
+];
+
+const BREAK_CASES = [
+  {
+    input: 'notaurl',
+    action: 'Select text, press Ctrl+K or ⌘K, and save this.',
+    outcome: 'The field is marked invalid and says why. Nothing is linked.',
+  },
+  {
+    input: '50',
+    action: 'Set Character limit to 50, then keep typing.',
+    outcome: 'The counter raises an alert. Your input is never blocked.',
+  },
+  {
+    input: 'Load error',
+    action: 'Switch State to Load error.',
+    outcome: 'An alert appears and editing pauses. Try again reloads.',
+  },
+];
+
+const SHORTCUTS = [
+  { label: 'Bold', keys: ['B'] },
+  { label: 'Italic', keys: ['I'] },
+  { label: 'Underline', keys: ['U'] },
+  { label: 'Link', keys: ['K'] },
+  { label: 'Undo', keys: ['Z'] },
+  { label: 'Redo', keys: ['Shift', 'Z'] },
+];
+
+const ARIA_NOTES = [
+  { term: 'aria-pressed', meaning: 'Format buttons in the “Text formatting” toolbar report whether they are active.' },
+  { term: 'aria-invalid', meaning: 'Bad link and image fields are flagged, with a text message beside them.' },
+  { term: 'aria-busy', meaning: 'Set while loading, alongside hidden loading text.' },
+  { term: 'role="alert"', meaning: 'Load errors and an exceeded limit are announced as text, not just colour.' },
+  { term: 'Tab order', meaning: 'Read only hides the toolbar. Disabled removes the editor from the Tab order.' },
+];
+
+const CONTRACT = [
+  { term: 'value / onChange', meaning: 'Controlled HTML string in, HTML string out.' },
+  { term: 'onTextChange', meaning: 'Plain text and its counts, so you never parse HTML.' },
+  { term: 'maxLength', meaning: 'Counts plain text. It warns and does not block.' },
+];
+
+type Mode = 'editable' | 'readonly' | 'disabled';
+type DemoState = 'idle' | 'loading' | 'load-error';
+
+const MODE_OPTIONS = [
+  { value: 'editable', label: 'Editable' },
+  { value: 'readonly', label: 'Read only' },
+  { value: 'disabled', label: 'Disabled' },
+] as const;
+
+const STATE_OPTIONS = [
+  { value: 'idle', label: 'Idle' },
+  { value: 'loading', label: 'Loading' },
+  { value: 'load-error', label: 'Load error' },
+] as const;
+
+const LIMIT_OPTIONS = [
+  { value: '10000', label: '10,000' },
+  { value: '50', label: '50' },
+] as const;
+
+interface DemoControlProps<T extends string> {
+  label: string;
+  value: T;
+  options: readonly { value: T; label: string }[];
+  onValueChange: (value: T) => void;
+}
+
+/** Label + segmented single-select; selalu ada satu nilai terpilih. */
+function DemoControl<T extends string>({ label, value, options, onValueChange }: DemoControlProps<T>) {
+  return (
+    <div className="flex min-w-0 flex-wrap items-center gap-2">
+      <span className="text-sm font-medium text-muted-foreground">{label}</span>
+      <SegmentedControl
+        type="single"
+        value={value}
+        onValueChange={(next) => {
+          if (next) onValueChange(next as T);
+        }}
+        aria-label={label}
+        className="max-w-full overflow-x-auto"
+      >
+        {options.map((option) => (
+          <SegmentedControlItem key={option.value} value={option.value}>
+            {option.label}
+          </SegmentedControlItem>
+        ))}
+      </SegmentedControl>
+    </div>
+  );
+}
+
 export default function RichTextEditorPage() {
   const [value, setValue] = React.useState(PROSE_EXAMPLE);
   const [words, setWords] = React.useState<number | null>(null);
   const [imageFailed, setImageFailed] = React.useState(false);
-  const [mode, setMode] = React.useState<'editable' | 'readonly' | 'disabled'>('editable');
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const [mode, setMode] = React.useState<Mode>('editable');
+  const [demoState, setDemoState] = React.useState<DemoState>('idle');
   const [maxLength, setMaxLength] = React.useState(10000);
-  const [copied, setCopied] = React.useState(false);
 
-  const loadExample = React.useCallback(() => {
-    setError(null);
-    setLoading(false);
-    setMode('editable');
-    setMaxLength(10000);
-    setValue(PROSE_EXAMPLE);
-    setImageFailed(false);
-  }, []);
+  // Cleanup membatalkan timer bila State diganti atau halaman ditutup lebih dulu.
+  React.useEffect(() => {
+    if (demoState !== 'loading') return;
+    const timer = window.setTimeout(() => setDemoState('idle'), 1500);
+    return () => window.clearTimeout(timer);
+  }, [demoState]);
+
+  const retry = React.useCallback(() => setDemoState('loading'), []);
 
   const resetDemo = React.useCallback(() => {
-    setError(null);
-    setLoading(false);
+    setValue(PROSE_EXAMPLE);
     setMode('editable');
+    setDemoState('idle');
     setMaxLength(10000);
-    setValue('');
-  }, []);
-
-  const triggerLoading = React.useCallback(() => {
-    setError(null);
-    setLoading(true);
-    window.setTimeout(() => setLoading(false), 1500);
-  }, []);
-
-  const copyRecipe = React.useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(RECIPE);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setCopied(false);
-    }
+    setImageFailed(false);
   }, []);
 
   return (
@@ -78,138 +196,136 @@ export default function RichTextEditorPage() {
         eyebrowIcon={PenLine}
         title="Rich Text Editor"
         description="Compose formatted content with links and images. Try editing, read-only mode, and validation feedback."
-        actions={
-          <div className="flex items-center gap-2">
-            <Badge variant="highlight" className="font-mono text-xs">
-              S-005.22
-            </Badge>
-            <Badge variant="outline" className="font-mono text-xs">
-              {words === null ? 'Counting words…' : `${words} words`}
-            </Badge>
-          </div>
-        }
       />
 
-      <Card className="border-border">
-        <CardHeader className="pb-3 border-b border-border/60 bg-muted/10">
-          <CardTitle className="text-sm">Try it</CardTitle>
-        </CardHeader>
-        <CardContent className="p-6 space-y-4">
-          <ol className="list-decimal space-y-2 pl-5 text-sm text-muted-foreground">
-            <li><strong className="text-foreground">Format:</strong> select text and choose a toolbar format. Active buttons follow the selection.</li>
-            <li><strong className="text-foreground">Shortcuts:</strong> type <code className="font-mono">#␣</code>, <code className="font-mono">-␣</code>, or <code className="font-mono">**text**</code> to apply the same formats.</li>
-            <li><strong className="text-foreground">Link:</strong> select text, press <code className="font-mono">Ctrl+K</code>, enter a valid URL, and save. Click a link to edit, open, or remove it.</li>
-            <li><strong className="text-foreground">Image:</strong> enter a valid image URL and required alt text, preview it, then insert it.</li>
-            <li><strong className="text-foreground">Counter:</strong> choose “Limit: 50” and type past the limit. A warning appears without blocking input.</li>
-            <li><strong className="text-foreground">Reset:</strong> choose “Reset demo” to clear the editor and errors, enable editing, and restore the 10,000-character limit.</li>
-          </ol>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="highlight" size="sm" onClick={loadExample} className="gap-1.5">
-              <FolderOpen className="h-3.5 w-3.5" />
-              Load example
-            </Button>
-            <Button variant="outline" size="sm" onClick={resetDemo} className="gap-1.5">
-              <RotateCcw className="h-3.5 w-3.5" />
-              Reset demo
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="border-border">
-        <CardHeader className="pb-3 border-b border-border/60 bg-muted/10">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <FlaskConical className="h-4 w-4 text-highlight" />
-            Interactive demo
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 p-6" onErrorCapture={(event) => {
+      <section
+        aria-label="Interactive demo"
+        className="space-y-4"
+        onErrorCapture={(event) => {
           if (event.target instanceof HTMLImageElement) setImageFailed(true);
-        }}>
-          {imageFailed ? (
-            <p role="status" className="text-sm text-muted-foreground">
-              The example image is unavailable. It illustrates a document with a heading and lines of text; the editor content is still readable.
-            </p>
-          ) : null}
-          <RichTextEditor
-            value={value}
-            onChange={setValue}
-            onTextChange={(_text, stats) => setWords(stats.words)}
-            mode={mode}
-            loading={loading}
-            error={error}
-            onRetry={() => setError(null)}
-            maxLength={maxLength}
+        }}
+      >
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+          <DemoControl label="Mode" value={mode} options={MODE_OPTIONS} onValueChange={setMode} />
+          <DemoControl label="State" value={demoState} options={STATE_OPTIONS} onValueChange={setDemoState} />
+          <DemoControl
+            label="Character limit"
+            value={String(maxLength)}
+            options={LIMIT_OPTIONS}
+            onValueChange={(next) => setMaxLength(Number(next))}
           />
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-muted-foreground">Mode:</span>
-            {(['editable', 'readonly', 'disabled'] as const).map((m) => (
-              <Button
-                key={m}
-                variant={mode === m ? 'highlight' : 'outline'}
-                size="sm"
-                onClick={() => setMode(m)}
-              >
-                {m}
-              </Button>
-            ))}
-            <span className="text-muted-foreground">State:</span>
-            <Button variant="outline" size="sm" onClick={triggerLoading}>
-              Load for 1.5 seconds
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => { setValue(''); setError(null); }}>
-              Clear content
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setError('Could not load content')}>
-              Simulate error
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setError(null)}>
-              Clear error
-            </Button>
-            <span className="text-muted-foreground">Counter:</span>
-            <Button variant="outline" size="sm" onClick={() => setMaxLength(10000)}>
-              Limit: 10,000
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setMaxLength(50)}>
-              Limit: 50
-            </Button>
-            <span className="text-muted-foreground">Dataset:</span>
-            <Button variant="outline" size="sm" onClick={loadExample}>
-              Valid content
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => { setValue('<p>Check the <a href="notaurl">broken link</a> and image without alt text</p>'); setError('Invalid URL example: fix the link or image, then save again'); }}>
-              Invalid URL
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            The counter uses plain text (<code className="font-mono">getText()</code>). Exceeding the limit shows a warning and an invalid ring without blocking input.
-            Light and dark modes use semantic tokens; invalid states include text and <code className="font-mono">aria-invalid</code>, not color alone.
-          </p>
-        </CardContent>
-      </Card>
+        </div>
 
-      <Card className="border-border">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm">Implementation</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <pre className="overflow-x-auto rounded-xl border border-border bg-muted/20 p-4 font-mono text-xs leading-relaxed text-foreground">
-            {RECIPE}
-          </pre>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" onClick={copyRecipe} className="gap-1.5">
-              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-              {copied ? 'Copied' : 'Copy recipe'}
-            </Button>
-            <Button variant="ghost" size="sm" asChild>
-              <a href="/components/forms#rte-demo">View the compact Forms demo →</a>
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            The Forms demo (S-004.03) shows a compact editor with a placeholder, toolbar, and counter. This page (S-005.22) adds state controls and link (M-009) and image (M-010) workflows.
+        {imageFailed ? (
+          <p role="status" className="text-sm text-muted-foreground">
+            The example image is unavailable. It illustrates a document with a heading and lines of text; the editor content is still readable.
           </p>
-        </CardContent>
-      </Card>
+        ) : null}
+
+        <RichTextEditor
+          value={value}
+          onChange={setValue}
+          onTextChange={(_text, stats) => setWords(stats.words)}
+          mode={mode}
+          loading={demoState === 'loading'}
+          error={demoState === 'load-error' ? 'Check your connection, then try again.' : null}
+          onRetry={retry}
+          maxLength={maxLength}
+        />
+
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs tabular-nums text-muted-foreground">
+            {words === null ? 'Counting words…' : `${words} words`}
+          </p>
+          <Button variant="ghost" size="sm" onClick={resetDemo} className="gap-1.5">
+            <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+            Reset demo
+          </Button>
+        </div>
+      </section>
+
+      <section id="try-it" aria-labelledby="try-it-heading" className="space-y-4 scroll-mt-20">
+        <SectionHeading
+          id="try-it-heading"
+          title="Type it, don’t click it"
+          description="Type these on an empty line in the editor above. Formatting happens as you go."
+        />
+        <ul className="grid gap-px overflow-hidden rounded-xl border border-border bg-border grid-cols-2 lg:grid-cols-3">
+          {TYPING_SPECIMENS.map((specimen) => (
+            <li key={specimen.name} className="flex flex-col bg-card">
+              <div className="flex flex-col gap-1 border-b border-dashed border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                <code className="font-mono text-sm">{specimen.typed}</code>
+                <span className="text-xs text-muted-foreground">{specimen.name}</span>
+              </div>
+              <div aria-hidden="true" className="flex min-h-24 flex-1 sm:min-h-28 items-center justify-center p-4">
+                {specimen.result}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section id="edge-cases" aria-labelledby="edge-cases-heading" className="space-y-4 scroll-mt-20">
+        <SectionHeading id="edge-cases-heading" title="Try to break it" />
+        <ul className="grid gap-6 md:grid-cols-3">
+          {BREAK_CASES.map((item) => (
+            <li key={item.input} className="space-y-2 border-t-2 border-highlight pt-4">
+              <p className="font-mono text-2xl font-bold">{item.input}</p>
+              <p className="text-sm">{item.action}</p>
+              <p className="text-sm text-muted-foreground">{item.outcome}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section id="accessibility" aria-labelledby="accessibility-heading" className="space-y-4 scroll-mt-20">
+        <SectionHeading id="accessibility-heading" title="Keyboard & screen readers" />
+        <div className="grid gap-6 lg:grid-cols-5">
+          <dl className="self-start rounded-xl border border-border bg-card px-4 lg:col-span-2">
+            {SHORTCUTS.map((shortcut) => (
+              <div key={shortcut.label} className="flex items-center justify-between gap-4 border-b border-border py-3 last:border-b-0">
+                <dt className="text-sm">{shortcut.label}</dt>
+                <dd className="flex items-center gap-1">
+                  <Kbd>⌘ / Ctrl</Kbd>
+                  {shortcut.keys.map((key) => (
+                    <Kbd key={key}>{key}</Kbd>
+                  ))}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <dl className="lg:col-span-3">
+            {ARIA_NOTES.map((note) => (
+              <div key={note.term} className="grid gap-1 border-b border-border py-3 first:pt-0 last:border-b-0 sm:grid-cols-[9rem_1fr] sm:gap-4">
+                <dt className="font-mono text-sm font-medium">{note.term}</dt>
+                <dd className="text-sm text-muted-foreground">{note.meaning}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <section id="implementation" aria-labelledby="implementation-heading" className="space-y-4 scroll-mt-20">
+        <SectionHeading id="implementation-heading" title="Drop it in" />
+        <div className="grid gap-6 lg:grid-cols-5">
+          <div className="space-y-4 lg:col-span-2">
+            <dl className="space-y-4">
+              {CONTRACT.map((item) => (
+                <div key={item.term} className="space-y-1 border-l-2 border-highlight pl-4">
+                  <dt className="font-mono text-sm font-medium">{item.term}</dt>
+                  <dd className="text-sm text-muted-foreground">{item.meaning}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="text-xs text-muted-foreground">
+              <a href="/components/forms#rte-demo" className="underline underline-offset-2">
+                View the compact Forms demo →
+              </a>
+            </p>
+          </div>
+          <CodeBlock filename="RichTextEditorDemo.tsx" language="tsx" code={RECIPE} className="min-w-0 self-start lg:col-span-3" />
+        </div>
+      </section>
     </div>
   );
 }
