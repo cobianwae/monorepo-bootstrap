@@ -32,11 +32,12 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Terapkan lima perubahan `opencode.json`.
-- [ ] Buat `.opencode/dcp.jsonc`.
-- [ ] Restart OpenCode (plugin DCP tidak hot-reload), lalu smoke test: `nim-coder/nim-coder` muncul di daftar model; subagent `explore` merespons; log baru bebas `Model unavailable`.
-- [ ] Verifikasi: tidak ada perubahan kode → `pnpm typecheck`/`lint`/`test` tidak diperlukan; `node scripts/check-status-log.mjs` hijau.
-- [ ] Perbarui `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/STATUS-LOG.md`.
+- [x] Terapkan lima perubahan `opencode.json` (`274c641`).
+- [x] Buat `.opencode/dcp.jsonc` (`274c641`).
+- [x] Smoke test: `nim-coder/nim-coder` terdaftar `active` (provider hot-reload tanpa restart); subagent `explore` merespons (`apps/showcase/src/components/section-heading.tsx:24`). Bentuk V2 terbaca, jadi fallback bentuk lama tidak diperlukan.
+- [ ] Restart OpenCode (dilakukan user setelah sesi ini) agar plugin DCP memuat `.opencode/dcp.jsonc`; lalu cek proteksi file story/CR aktif.
+- [x] Verifikasi: tidak ada perubahan kode → `pnpm typecheck`/`lint`/`test` tidak diperlukan; `node scripts/check-status-log.mjs` hijau.
+- [x] Perbarui `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/STATUS-LOG.md`.
 
 ## Keputusan
 
@@ -55,7 +56,7 @@
 - [x] API `cva` dan export tidak berubah.
 - [x] State loading, empty, dan error: tidak relevan.
 - [x] Showcase/docs: tidak ada perubahan halaman.
-- [ ] `pnpm typecheck`, `pnpm lint`, `pnpm test` — tidak dijalankan penuh karena tidak ada perubahan kode (lihat Tasks).
+- [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` — tidak dijalankan penuh karena tidak ada perubahan kode (lihat Tasks).
 
 ## Eksekusi
 
@@ -63,9 +64,9 @@ Branch: `cr-089-tuning-config-opencode`
 Commit: `chore: tuning config opencode hemat token [CR-089]`
 
 - [x] CR disetujui user (2026-11-26).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan (smoke test live; proteksi DCP menunggu restart OpenCode).
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui (tetap `approved` sampai user menetapkan `done`).
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
