@@ -25,12 +25,12 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Susun ulang `AGENTS.md`: satu pernyataan per aturan; cek silang setiap aturan lama punya padanan.
-- [ ] Port sintaks panggilan graphify dan aturan "keputusan final, jangan tawarkan alternatif stack".
-- [ ] Perbarui tabel ID (`NNN.FR-NNN` untuk requirement di luar file PRD; artefak baru saja).
-- [ ] Susun ulang `docs/STATUS.md` jadi snapshot ringkas.
-- [ ] Verifikasi: cek silang aturan lama; tidak ada perubahan kode → `pnpm typecheck`/`lint`/`test` tidak diperlukan; `node scripts/check-status-log.mjs` hijau.
-- [ ] Perbarui `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/STATUS-LOG.md`.
+- [x] Susun ulang `AGENTS.md`: satu pernyataan per aturan; cek silang setiap aturan lama punya padanan. Hasil: 195 baris/10,0 KB → 109 baris/6,5 KB. Padanan aturan yang dikeluarkan: Stack & Structure → `ARCHITECTURE.md`; Conventions (naming, no `any`, destructure, bahasa) dan Rules #4, #5, #8, #10–#14 → `CONVENTIONS.md`/`ARCHITECTURE.md`/`visual-language.md`; 3x rule → `ARCHITECTURE.md` Prinsip 5; aturan graphify dan "hanya user menetapkan approved/done" masing-masing disatukan menjadi satu.
+- [x] Port sintaks panggilan graphify dan aturan "keputusan final, jangan tawarkan alternatif stack".
+- [x] Perbarui tabel ID (`NNN.FR-NNN` untuk requirement di luar file PRD; artefak baru saja).
+- [x] Susun ulang `docs/STATUS.md` jadi snapshot ringkas. Hasil: 68 baris/15,3 KB → 37 baris/3,0 KB.
+- [x] Verifikasi: cek silang aturan lama; tidak ada perubahan kode → `pnpm typecheck`/`lint`/`test` tidak diperlukan; `node scripts/check-status-log.mjs` hijau.
+- [x] Perbarui `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/STATUS-LOG.md`.
 
 ## Keputusan
 
@@ -57,9 +57,9 @@ Branch: `cr-090-agents-ringkas-status-snapshot`
 Commit: `docs: rapikan AGENTS.md dan snapshot STATUS.md [CR-090]`
 
 - [x] CR disetujui user (2026-11-26).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat.
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan.
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
+- [x] `docs/STATUS.md` diperbarui bila relevan.
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
