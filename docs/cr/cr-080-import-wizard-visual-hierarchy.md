@@ -1,6 +1,6 @@
 # CR-080 — Import Wizard: Hierarki, Density Preview, dan Konsistensi Showcase
 
-**Status:** approved (2026-11-25; diimplementasi 2026-11-26, menunggu review user)  
+**Status:** done (2026-11-26, atas izin eksplisit user)  
 **Sumber:** audit UI/UX `/improve-ui` Import Wizard, 2026-11-25 — cluster visual  
 **Ref:** `docs/design/visual-language.md`, `docs/design/import-wizard.md`, S-005.37, halaman referensi `patterns/overlays-menus` dan `patterns/data-display`  
 **Urutan usulan:** setelah CR-076/077; koordinasikan copy dengan CR-079.
