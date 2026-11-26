@@ -7,19 +7,18 @@ compatibility: [next, opencode, claude, cursor]
 
 # Story Writer
 
-## Kapan Pakai
+Filosofi: story adalah unit kerja yang selesai dalam satu sesi build, dan menjadi source of truth implementasi.
 
-Saat `/story`, setelah PRD dan design `approved`.
-Menghasilkan unit kerja yang bisa diselesaikan dalam satu sesi build.
+Dipakai saat `/story`, setelah PRD dan design `approved`.
 
-## Splitting Rules
+## Aturan pemecahan PRD → stories
 
-- **1 story = 1 sesi build** — tidak lebih dari satu fokus utama.
-- **Vertical slice** — mencakup token → ui → showcase → docs sesuai scope, bukan hanya satu layer.
-- **Independen** — tidak menunggu story lain kecuali dependency eksplisit.
-- **Testable** — setiap AC bisa diverifikasi.
-- **FR coverage** — seluruh `FR-NNN` PRD terdistribusi ke story.
-- **Tidak ada story "implement everything"**.
+1. **1 story = 1 sesi build.** Kalau checklist task melebihi itu, pecah lagi. Tidak ada story "implement everything".
+2. **Vertikal, bukan horizontal**: satu story mencakup token → ui → showcase → docs sesuai scope; JANGAN pisah per layer teknis ("story token", "story showcase").
+3. **Setiap AC merujuk ID**: `NNN.FR-NNN` (qualified — FR hanya unik per PRD) untuk requirement, `S-NNN`/`S-NNN.MM`/`M-NNN` untuk screen/modal. Berlaku untuk artefak baru; artefak lama tidak di-retrofit.
+4. **Coverage wajib**: setiap FR di PRD ter-cover minimal satu story. Setelah pecah, buat tabel mapping FR → story — tidak boleh ada FR tercecer.
+5. Story boleh bergantung pada story lain — tulis eksplisit, dan tidak melingkar.
+6. Status `approved` hanya ditetapkan user. Jangan mulai implementasi sebelum gate 3.
 
 ## Template
 
@@ -27,8 +26,9 @@ Menghasilkan unit kerja yang bisa diselesaikan dalam satu sesi build.
 # NNN-MM — Judul
 
 Status: todo
-PRD: `docs/prd/NNN-slug.md`
-FR: `FR-001`, `FR-002`
+PRD: `docs/prd/NNN-slug.md` (approved, gate 1)
+Design: `docs/design/wireframes/<fitur>.md` (approved, gate 2) + `docs/design/flows/<fitur>.mmd`
+FR: `NNN.FR-001`, `NNN.FR-003`
 Screens: `S-NNN`, `S-NNN.MM`
 Goal: —
 
@@ -38,12 +38,11 @@ Goal: —
 
 **Given** kondisi awal
 **When** aksi user
-**Then** hasil yang bisa diverifikasi
+**Then** hasil yang bisa diverifikasi — diverifikasi test (NNN.FR-001, S-NNN)
 
 ## Tasks
 
 - [ ] Task 1
-- [ ] Task 2
 - [ ] Test
 - [ ] Update docs/showcase
 
@@ -60,39 +59,36 @@ Goal: —
 
 ## AC Rules
 
-- Gunakan Given/When/Then.
-- Sertakan `FR-NNN` dan screen ID yang relevan.
-- AC harus menguji perilaku, bukan implementasi.
-- Sertakan state empty/loading/error bila relevan.
-- Sertakan a11y dan light/dark bila relevan.
+- Gunakan Given/When/Then; AC menguji perilaku, bukan implementasi, dan bukan daftar task.
+- Setiap AC diakhiri rujukan `NNN.FR-NNN` + screen ID, dan menyebut cara verifikasinya (test, audit manual).
+- Sertakan state empty/loading/error, a11y, dan light/dark bila relevan.
 - Jangan menulis AC yang tidak bisa diverifikasi.
 
-## Gate 3 Checklist
+## Mapping FR → story (wajib setelah memecah)
 
-- [ ] PRD dan design `approved`.
-- [ ] Setiap story selesai dalam satu sesi.
-- [ ] Semua `FR-NNN` tercakup.
-- [ ] AC memakai Given/When/Then + FR + screen ID.
-- [ ] Tasks jelas dan berurutan.
-- [ ] Dependencies dicatat.
-- [ ] User menetapkan story `approved`.
+| FR | Story |
+|---|---|
+| `NNN.FR-001` | NNN-01 |
+| `NNN.FR-002` | NNN-01, NNN-02 |
+
+## Quality bar review (gate 3)
+
+1. Setiap AC Given/When/Then dan merujuk FR + screen.
+2. Setiap task bisa ditandai selesai secara objektif, dan berurutan.
+3. Ukuran story satu sesi build — jika ragu, pecah.
+4. Dependency jelas dan tidak melingkar.
+5. Mapping FR → story lengkap (tidak ada FR yatim).
 
 ## Naming & Branch
 
-- File: `docs/stories/NNN-MM-slug.md`
-- Branch: `NNN-MM-slug`
-- Commit: `type: deskripsi [NNN-MM]`
+- File: `docs/stories/NNN-MM-slug.md` — NNN = nomor PRD, MM = urutan story di PRD itu (01, 02, ...).
+- Branch implementasi = `NNN-MM-slug` (sama dengan nama file tanpa ekstensi).
+- Commit: `type: deskripsi [NNN-MM]`.
+- Daftarkan di `docs/BACKLOG.md` dengan status `todo`.
 
-## Anti-Patterns
+## Format ringkasan untuk user
 
-- ✗ Story terlalu besar.
-- ✗ AC berupa daftar task.
-- ✗ FR tidak tercakup.
-- ✗ Dependency tersembunyi.
-- ✗ Implementasi dimulai sebelum gate 3.
+- Daftar story (ID + judul + FR + screen), urutan pengerjaan, dependency, dan tabel mapping FR → story.
+- Minta gate 3. JANGAN mulai implementasi sebelum story `approved`.
 
-## Integration
-
-- **Sebelum**: `designer` (gate 2), `prd-writer` (gate 1).
-- **Sesudah**: `/implement`, `ui-component`, `design-tokens`, `ux-patterns`.
-- **Review**: `reviewer` memeriksa AC dan coverage.
+Skill terkait: sebelum `prd-writer` (gate 1), `designer` (gate 2); sesudah `/implement`, `ui-component`, `design-tokens`, `ux-patterns`; review lewat `reviewer`.

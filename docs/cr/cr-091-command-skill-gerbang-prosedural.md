@@ -26,10 +26,10 @@
 
 ## Tasks (jalur small-fix)
 
-- [ ] Tulis ulang `designer`, `prd-writer`, `story-writer`, `reviewer`, `ui-designer`, `visual-designer`.
-- [ ] Port gerbang ke `implement.md`, `start.md`, `design.md`, `story.md`, `improve-ui.md`, `polish-ui.md`, `design-language.md`.
-- [ ] Verifikasi: frontmatter command tidak berubah; rujukan skill/section valid; tidak ada perubahan kode; `node scripts/check-status-log.mjs` hijau.
-- [ ] Perbarui `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/STATUS-LOG.md`.
+- [x] Tulis ulang `designer`, `prd-writer`, `story-writer`, `reviewer`, `ui-designer`, `visual-designer`. — Selesai: 18,3 KB → 34,2 KB (boilerplate taksonomi dibuang, tetapi cek konkret, gerbang, dan definisi selesai CRM ditambahkan; dibanding skill CRM 27,9 KB). Skill dimuat saat dipakai, bukan tiap sesi.
+- [x] Port gerbang ke `implement.md`, `start.md`, `design.md`, `story.md`, `improve-ui.md`, `polish-ui.md`, `design-language.md`. — Selesai: 5,6 KB → 9,4 KB.
+- [x] Verifikasi: frontmatter command tidak berubah; rujukan skill/section valid; tidak ada perubahan kode; `node scripts/check-status-log.mjs` hijau. — Frontmatter 13 file identik terhadap HEAD (cek skrip); path dan skill yang dirujuk ada; audit kondisi nyata memakai `pnpm -C apps/showcase dev` (proyek ini tidak punya Playwright).
+- [x] Perbarui `docs/BACKLOG.md`, `docs/STATUS.md`, `docs/STATUS-LOG.md`.
 
 ## Keputusan
 
@@ -56,9 +56,9 @@ Branch: `cr-091-command-skill-gerbang-prosedural`
 Commit: `docs: port gerbang prosedural CRM ke command dan skill [CR-091]`
 
 - [x] CR disetujui user (2026-11-26).
-- [ ] Branch dibuat.
-- [ ] Perubahan diimplementasikan.
-- [ ] Verifikasi dijalankan.
-- [ ] CR di-tick dan status di `docs/BACKLOG.md` diperbarui.
-- [ ] `docs/STATUS.md` diperbarui bila relevan.
-- [ ] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
+- [x] Branch dibuat (dari tip `cr-090-agents-ringkas-status-snapshot`, menumpuk di atas CR-090).
+- [x] Perubahan diimplementasikan.
+- [x] Verifikasi dijalankan (frontmatter, rujukan, `check-status-log`).
+- [x] CR di-tick dan status di `docs/BACKLOG.md` diperbarui (tetap `approved`; `done` hanya oleh user).
+- [x] `docs/STATUS.md` diperbarui bila relevan (baris CR-089/090/091 sudah ada dari CR-090).
+- [x] `docs/STATUS-LOG.md` di-append (`YYYY-MM-DD — ringkasan — referensi`) dan `node scripts/check-status-log.mjs` hijau.
