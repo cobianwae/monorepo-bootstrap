@@ -1,6 +1,6 @@
 # CR-079 — Import Wizard: Copy English dan Kejelasan Kontrak Demo
 
-**Status:** approved (2026-11-25; supersession bahasa disetujui; diimplementasikan 2026-11-26, menunggu `done` dari user)  
+**Status:** done (ditetapkan user 2026-11-26; supersession bahasa disetujui) — diimplementasikan 2026-11-26 di branch `cr-079-import-wizard-english-copy`, di-merge ke `visual-polish` dan di-push atas izin eksplisit user  
 **Sumber:** audit UI/UX `/improve-ui` Import Wizard, 2026-11-25 — cluster copy/kejujuran demo  
 **Ref:** `docs/prd/014-import-wizard.md` (FR-001/003/004/007/010/011), `docs/design/import-wizard.md` (D1/D2/D5 dan §2), S-005.37  
 **Dependensi:** dukungan messages FileInput CR-078; selaraskan feedback dengan CR-076.
