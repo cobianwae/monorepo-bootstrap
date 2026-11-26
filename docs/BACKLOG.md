@@ -155,7 +155,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-091 | Command dan skill workflow: port gerbang prosedural CRM (6 skill bersama + 7 command), isi design system dipertahankan; disetujui user 2026-11-26; done dan di-merge ke `visual-polish` | done | `docs/cr/cr-091-command-skill-gerbang-prosedural.md` |
 | CR-092 | Subagent murah berbasis bukti + prosedur fallback: pin `general` ke `nim-coder` dilepas (uji 2026-11-26: 2–3× lebih lambat dari model sesi), pin `explore` tetap, fallback grep di `AGENTS.md`, hasil CR-089 dicatat; disetujui user 2026-11-26; done dan di-merge ke `visual-polish` | done | `docs/cr/cr-092-subagent-murah-bukti-fallback.md` |
 | CR-093 | Patterns: English copywriting, istilah, deskripsi dan microcopy koheren pada 37 route | done | `docs/cr/cr-093-patterns-english-editorial-coherence.md` |
-| CR-094 | Patterns: komposisi demo-first, hierarki kontrol, deskripsi/bullet/steps/cards/callout sesuai fungsi | approved | `docs/cr/cr-094-patterns-content-composition.md` |
+| CR-094 | Patterns: komposisi demo-first per bentuk halaman, kontrol menurut peran, deskripsi/bullet/steps/cards/callout sesuai fungsi; di-amend atas persetujuan user 2026-11-26 (satu template untuk 37 route diganti aturan per bentuk halaman) | approved | `docs/cr/cr-094-patterns-content-composition.md` |
 | CR-095 | Patterns: keluarga visual lintas art direction, tipografi/surface/density/state dan detail craft | approved | `docs/cr/cr-095-patterns-visual-family.md` |
 
 ## Catatan
