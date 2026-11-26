@@ -7,7 +7,7 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 ## Posisi Saat Ini
 
 - **Branch kerja: `visual-polish`** (dari `dev` `e57f7ea`) — branch integrasi pekerjaan visual, diperlakukan seperti `dev`: CR/story visual berikutnya di-merge ke sini. `dev` tidak diubah; push/PR menunggu keputusan user.
-- Struktur OpenCode terpasang (config root, docs-as-state, agents, commands, workflow skills, skill fullstack). `visual-language.md` kini auto-loaded lewat `opencode.json`.
+- Struktur OpenCode terpasang (config root, docs-as-state, agents, commands, workflow skills, skill fullstack); `visual-language.md` auto-loaded lewat `opencode.json`. CR-089 (diimplementasikan 2026-11-26, menunggu `done`): provider `nim-coder` kembali, proteksi DCP untuk story/CR, `max_bytes` 24576, `compaction.buffer` 25%, `snapshots` aktif.
 - PRD 001–006, 010 (legacy), 011 `shipped` dan diarsipkan. Aktif: PRD 012–019 (`approved`); antrean story `approved`: 013-01–013-03, 015-03. Seri 012–018 yang sudah `done` (Mind Map, ImageCropper, wizard, product tour, dst.) dan CR-015–033 tercatat di `docs/STATUS-LOG.md` dan `docs/BACKLOG.md`.
 - Mind Map CR-020–033 `done` atas approval user, ter-merge ke `dev` (`eeb7a6b`); status push tidak diverifikasi (terakhir tercatat belum di-push). Pembaca layar bersuara native belum diuji.
 - CR sebelum 054 direkonsiliasi 2026-11-23: user menetapkan **CR-034/035/037/038/042/047/050–053 done**. CR-036 kemudian ditetapkan **done** setelah matriks AA di browser lulus 16/16. CR-018 ditetapkan **done** (varian §2.5 + responsif §5 + PRD 017 shipped), disusul CR-017 setelah verifikasi dialog di Chrome light/dark. Kini seluruh 37 CR pada rentang CR-017–053 **done**. Detail historis: `docs/reviews/cr-before-054-status-reconciliation.md`.

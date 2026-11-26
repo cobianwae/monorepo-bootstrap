@@ -5,11 +5,11 @@
     "docs/CONVENTIONS.md",
     "docs/design/visual-language.md"
   ],
-  "snapshots": false,
+  "snapshots": true,
   "formatter": false,
   "tool_output": {
     "max_lines": 500,
-    "max_bytes": 12288
+    "max_bytes": 24576
   },
   "watcher": {
     "ignore": [
@@ -27,8 +27,29 @@
   },
   "compaction": {
     "auto": true,
+    "buffer": "25%",
     "keep": {
       "tokens": 12000
+    }
+  },
+  "providers": {
+    "nim-coder": {
+      "name": "Nim Coder",
+      "package": "@opencode/ai/providers/openai-compatible",
+      "settings": {
+        "baseURL": "http://localhost:4101/v1",
+        "apiKey": "unused"
+      },
+      "models": {
+        "nim-coder": {
+          "name": "Nim Coder"
+        }
+      }
+    }
+  },
+  "agents": {
+    "general": {
+      "model": "nim-coder/nim-coder"
     }
   },
   "experimental": {
