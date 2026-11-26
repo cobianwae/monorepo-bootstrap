@@ -47,6 +47,11 @@
       }
     }
   },
+  "agents": {
+    "general": {
+      "model": "nim-coder/nim-coder"
+    }
+  },
   "experimental": {
     "location_idle_timeout": "15 minutes"
   },
