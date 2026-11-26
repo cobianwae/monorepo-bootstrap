@@ -1,6 +1,6 @@
 # CR-090 — `AGENTS.md` ringkas tanpa duplikasi + `STATUS.md` snapshot ringkas
 
-**Status:** approved (ditetapkan user 2026-11-26 atas rencana review config; "approve dulu semua, dan kerjakan")
+**Status:** done (ditetapkan user 2026-11-26 atas izin eksplisit; sebelumnya approved atas rencana review config — "approve dulu semua, dan kerjakan"; diimplementasikan di branch `cr-090-agents-ringkas-status-snapshot`, di-merge dan di-push ke `visual-polish`)
 **Sumber:** review config OpenCode — perbandingan dengan project sibling CRM (sesi 2026-11-26); lanjutan CR-089
 **Ref:** `AGENTS.md` (195 baris/10,0 KB), `docs/STATUS.md` (68 baris/15,3 KB), `docs/ARCHITECTURE.md`, `docs/CONVENTIONS.md`, CRM `AGENTS.md` Protokol #3–#4
 

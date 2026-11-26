@@ -1,6 +1,6 @@
 # CR-089 — Tuning config OpenCode hemat token: provider `nim-coder`, proteksi DCP, batas output
 
-**Status:** approved (ditetapkan user 2026-11-26)
+**Status:** done (ditetapkan user 2026-11-26; diimplementasikan di branch `cr-089-tuning-config-opencode`, di-merge dan di-push ke `visual-polish` atas izin eksplisit; proteksi DCP terverifikasi setelah restart klien)
 **Sumber:** review config OpenCode — perbandingan dengan project sibling CRM (sesi 2026-11-26)
 **Ref:** `opencode.json:8,12,28-33`, `.opencode/agents/explore.md:4`, `.opencode/dcp.jsonc` (baru), commit `1f4e55d` (blok provider dihapus), `AGENTS.md` Session Protocol #7
 

@@ -8,9 +8,9 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 
 - **Branch kerja: `visual-polish`** (dari `dev` `e57f7ea`) — branch integrasi pekerjaan visual, diperlakukan seperti `dev`: CR/story visual di-merge ke sini. `dev` tidak diubah; push/PR menunggu keputusan user.
 - PRD 001–006, 010 (legacy), 011 `shipped` dan diarsipkan. PRD 012–019 dan spec ringkas RM-02/03/10 `approved`. Seluruh story `done` kecuali 013-01, 013-02, 013-03.
-- CR-017–088 `done`; riwayat merge/push per CR ada di `docs/STATUS-LOG.md` (rekonsiliasi CR sebelum 054: `docs/reviews/cr-before-054-status-reconciliation.md`).
-- CR `approved` yang belum selesai: CR-079, CR-080, CR-081 (seri Import Wizard) serta CR-089–CR-092 (config OpenCode; diimplementasikan 2026-11-26, menunggu `done`).
-- Config OpenCode (CR-089, CR-092): `nim-coder` dipakai hanya untuk `explore` (pin `general` dilepas karena uji 2–3× lebih lambat dari model sesi), proteksi DCP `docs/stories/**` dan `docs/cr/**` terverifikasi 2026-11-26, `max_bytes` 24576, `compaction.buffer` 25%, `snapshots` aktif; `visual-language.md` auto-loaded.
+- CR-017–092 `done` (kecuali CR-079–081); riwayat merge/push per CR ada di `docs/STATUS-LOG.md` (rekonsiliasi CR sebelum 054: `docs/reviews/cr-before-054-status-reconciliation.md`).
+- CR `approved` yang belum selesai: CR-079, CR-080, CR-081 (seri Import Wizard).
+- Config OpenCode (CR-089–CR-092, `done` 2026-11-26): `nim-coder` dipakai hanya untuk `explore` (pin `general` dilepas karena uji 2–3× lebih lambat dari model sesi), proteksi DCP `docs/stories/**` dan `docs/cr/**` terverifikasi 2026-11-26, `max_bytes` 24576, `compaction.buffer` 25%, `snapshots` aktif; `visual-language.md` auto-loaded.
 
 ## Next
 

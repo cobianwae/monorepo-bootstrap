@@ -1,6 +1,6 @@
 # CR-092 — Subagent murah berbasis bukti: lepas pin `general`, fallback `explore`, catat hasil CR-089
 
-**Status:** approved (ditetapkan user 2026-11-26 atas rencana review config — "approve dulu semua, dan kerjakan"; rencana CR ini dilanjutkan user dengan "lanjutkan")
+**Status:** done (ditetapkan user 2026-11-26 atas izin eksplisit — "approve, set done, push merge ke visual-polish"; sebelumnya approved atas rencana review config — "approve dulu semua, dan kerjakan", dilanjutkan dengan "lanjutkan"; diimplementasikan di branch `cr-092-subagent-murah-bukti-fallback`, di-merge dan di-push ke `visual-polish`)
 **Sumber:** review CR-089 (sesi 2026-11-26) — uji pin `general` dan verifikasi proteksi DCP
 **Ref:** `opencode.json:50-54`, `AGENTS.md:32`, `.opencode/agents/explore.md:4`, `docs/cr/cr-089-tuning-config-opencode.md:38,47-48`
 
