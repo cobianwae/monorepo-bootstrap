@@ -26,7 +26,7 @@ async function pasteAndGoTo(step: 'Map columns' | 'Validate data' | 'Confirm imp
     await act(async () => {
       fireEvent.click(screen.getByTestId('iw-next'));
     });
-    await waitFor(() => expect(screen.getByRole('heading', { level: 2, name: order[i] })).toBeTruthy());
+    await waitFor(() => expect(screen.getByRole('heading', { level: 3, name: order[i] })).toBeTruthy());
   }
 }
 
@@ -34,7 +34,7 @@ describe('ImportWizardPage — alur 4 langkah', () => {
   it('langkah 3 menampilkan ringkasan validasi dan fokus ke judul', async () => {
     render(<ImportWizardPage />);
     await pasteAndGoTo('Validate data');
-    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 2, name: 'Validate data' }));
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 3, name: 'Validate data' }));
     expect(screen.getByTestId('iw-validation-summary').textContent).toContain('1 valid');
     expect(screen.getByTestId('iw-validation-table')).toBeTruthy();
   });
@@ -45,7 +45,7 @@ describe('ImportWizardPage — alur 4 langkah', () => {
     fireEvent.click(screen.getByTestId('iw-submit'));
     await waitFor(() => expect(screen.getByTestId('iw-success')).toBeTruthy());
     expect(screen.getByTestId('iw-success').textContent).toContain('1 row ready to import');
-    expect(screen.getByRole('heading', { level: 2, name: 'Import ready' })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 3, name: 'Import ready' })).toBeTruthy();
   });
 
   it('panel demo dataset invalid: policy fail menolak submit dan fokus ke ringkasan', async () => {
@@ -56,7 +56,7 @@ describe('ImportWizardPage — alur 4 langkah', () => {
       await act(async () => {
         fireEvent.click(screen.getByTestId('iw-next'));
       });
-      await waitFor(() => expect(screen.getByRole('heading', { level: 2, name: heading })).toBeTruthy());
+      await waitFor(() => expect(screen.getByRole('heading', { level: 3, name: heading })).toBeTruthy());
     }
     expect(screen.getByTestId('iw-summary').textContent).toContain('Skipped');
     fireEvent.click(screen.getByTestId('iw-policy-fail'));
@@ -79,7 +79,7 @@ describe('ImportWizardPage — alur 4 langkah', () => {
     expect(screen.getByTestId('iw-success')).toBeTruthy();
     expect(screen.queryByTestId('iw-paste')).toBeNull();
     expect(screen.queryByTestId('iw-mapping-row-Nama Lengkap')).toBeNull();
-    expect(screen.getByRole('heading', { level: 2, name: 'Import ready' })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 3, name: 'Import ready' })).toBeTruthy();
   });
 
   it('setelah sukses, Mulai ulang kembali ke Upload tanpa hasil lama dan fokus ke judul', async () => {
@@ -91,10 +91,10 @@ describe('ImportWizardPage — alur 4 langkah', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Start over' }));
 
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 2, name: 'Upload CSV file' })).toBeTruthy()
+      expect(screen.getByRole('heading', { level: 3, name: 'Upload CSV file' })).toBeTruthy()
     );
     expect(screen.queryByTestId('iw-success')).toBeNull();
-    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 2, name: 'Upload CSV file' }));
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 3, name: 'Upload CSV file' }));
   });
 
   it('fail → skip: penolakan lama hilang dan ringkasan mengikuti policy baru', async () => {
@@ -105,7 +105,7 @@ describe('ImportWizardPage — alur 4 langkah', () => {
       await act(async () => {
         fireEvent.click(screen.getByTestId('iw-next'));
       });
-      await waitFor(() => expect(screen.getByRole('heading', { level: 2, name: heading })).toBeTruthy());
+      await waitFor(() => expect(screen.getByRole('heading', { level: 3, name: heading })).toBeTruthy());
     }
     fireEvent.click(screen.getByTestId('iw-policy-fail'));
     fireEvent.click(screen.getByTestId('iw-submit'));

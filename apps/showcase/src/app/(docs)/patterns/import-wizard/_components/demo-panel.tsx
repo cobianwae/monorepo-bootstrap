@@ -1,7 +1,7 @@
 'use client';
 
-import * as React from 'react';
-import { Button, DemoSection } from '@ds/ui';
+import { Button, Card, CardContent, CodeBlock } from '@ds/ui';
+import { SectionHeading } from '../../../../../components/section-heading';
 import { DEMO_DATASETS, type DemoDatasetId } from '../_lib/demo-datasets';
 
 /** Enam state demo S-005.37: valid, invalid, kosong, besar, loading, error. */
@@ -38,55 +38,60 @@ export interface DemoPanelProps {
   lastResultSummary: string | null;
 }
 
+/** CodeBlock berdefault Indonesia; halaman ini berbahasa Inggris. */
+const COPY_LABELS = {
+  copy: 'Copy',
+  copyAriaLabel: 'Copy code',
+  copied: 'Copied',
+  failed: 'Copy failed',
+  failedAriaLabel: 'Copy failed',
+};
+
 export function DemoPanel({ onLoad, lastResultSummary }: DemoPanelProps) {
-  const [copied, setCopied] = React.useState(false);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(ONCOMPLETE_RECIPE);
-      setCopied(true);
-    } catch {
-      setCopied(false);
-    }
-  };
-
   return (
-    <DemoSection label="Demo panel" description="Load a sample dataset or trigger a specific state.">
-      <div className="space-y-6" data-testid="iw-demo-panel">
-        <div className="flex flex-wrap gap-2">
-          {DEMO_BUTTONS.map((item) => (
-            <Button
-              key={item.testId}
-              type="button"
-              variant="outline"
-              size="sm"
-              className="h-11"
-              data-testid={item.testId}
-              onClick={() => onLoad(item.id, item.delayMs)}
-            >
-              {item.label}
-            </Button>
-          ))}
-        </div>
+    <>
+      <section aria-labelledby="iw-demo-heading" className="max-w-4xl space-y-4 scroll-mt-20">
+        <SectionHeading
+          id="iw-demo-heading"
+          title="Demo panel"
+          description="Load a sample dataset or trigger a specific state."
+        />
+        <Card className="w-full min-w-0">
+          <CardContent className="space-y-4 pt-6" data-testid="iw-demo-panel">
+            <div className="flex flex-wrap gap-2">
+              {DEMO_BUTTONS.map((item) => (
+                <Button
+                  key={item.testId}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-11"
+                  data-testid={item.testId}
+                  onClick={() => onLoad(item.id, item.delayMs)}
+                >
+                  {item.label}
+                </Button>
+              ))}
+            </div>
 
-        {lastResultSummary && (
-          <p className="text-sm text-muted-foreground" data-testid="iw-demo-result">
-            Previous simulated result: {lastResultSummary}
-          </p>
-        )}
+            {lastResultSummary && (
+              <p className="text-sm text-muted-foreground" data-testid="iw-demo-result">
+                Previous simulated result: {lastResultSummary}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </section>
 
-        <div className="space-y-2">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-medium text-foreground">Integration sketch</p>
-            <Button type="button" variant="outline" size="sm" className="h-11" onClick={handleCopy} data-testid="iw-recipe-copy">
-              {copied ? 'Copied' : 'Copy sketch'}
-            </Button>
-          </div>
-          <pre className="overflow-x-auto rounded-md bg-muted p-4 text-xs text-foreground" data-testid="iw-recipe">
-            <code>{ONCOMPLETE_RECIPE}</code>
-          </pre>
-        </div>
-      </div>
-    </DemoSection>
+      <section aria-labelledby="iw-recipe-heading" className="max-w-4xl space-y-4 scroll-mt-20">
+        <SectionHeading id="iw-recipe-heading" title="Integration sketch" />
+        <CodeBlock
+          code={ONCOMPLETE_RECIPE}
+          language="ts"
+          copyLabels={COPY_LABELS}
+          data-testid="iw-recipe"
+        />
+      </section>
+    </>
   );
 }

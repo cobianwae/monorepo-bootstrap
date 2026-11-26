@@ -9,12 +9,12 @@ Design System Foundation v1 — token, komponen inti, showcase, dan workflow kon
 - **Branch kerja: `visual-polish`** (dari `dev` `e57f7ea`) — branch integrasi pekerjaan visual, diperlakukan seperti `dev`: CR/story visual di-merge ke sini. `dev` tidak diubah; push/PR menunggu keputusan user.
 - PRD 001–006, 010 (legacy), 011 `shipped` dan diarsipkan. PRD 012–019 dan spec ringkas RM-02/03/10 `approved`. Seluruh story `done` kecuali 013-01, 013-02, 013-03.
 - CR-017–092 `done` (kecuali CR-080–081); riwayat merge/push per CR ada di `docs/STATUS-LOG.md` (rekonsiliasi CR sebelum 054: `docs/reviews/cr-before-054-status-reconciliation.md`).
-- CR `approved` yang belum selesai: CR-080, CR-081 (seri Import Wizard).
+- CR `approved` yang belum selesai: CR-080 (diimplementasi di branch `cr-080-import-wizard-visual-hierarchy`, menunggu review), CR-081.
 - Config OpenCode (CR-089–CR-092, `done` 2026-11-26): `nim-coder` dipakai hanya untuk `explore` (pin `general` dilepas karena uji 2–3× lebih lambat dari model sesi), proteksi DCP `docs/stories/**` dan `docs/cr/**` terverifikasi 2026-11-26, `max_bytes` 24576, `compaction.buffer` 25%, `snapshots` aktif; `visual-language.md` auto-loaded.
 
 ## Next
 
-1. CR-080, lalu CR-081 — hanya atas instruksi user, satu CR per sesi. Supersession bahasa Import Wizard (CR-079) sudah diterapkan.
+1. Review CR-080, lalu CR-081 — hanya atas instruksi user, satu CR per sesi. Supersession bahasa Import Wizard (CR-079) sudah diterapkan.
 2. Story 013-01, 013-02, 013-03 (Diff viewer). 013-01 membuka S-005.36 (`in-design`); S-005.30/S-005.31 `implemented`; S-005.41 tetap `in-design` sampai PRD 018 diimplementasi.
 3. Verifikasi yang tertunda: cek browser (keyboard, light/dark, positioning, kontras numerik) untuk CR-013, CR-070, CR-077, CR-083–088.
 
@@ -22,7 +22,7 @@ Catatan: jangan membuka ulang temuan yang sudah ditangani — eyebrow `PageHeade
 
 ## Known Issues
 
-- Suite UI: tanpa flag `NODE_OPTIONS=--no-experimental-webstorage`, 4 smoke FlowEditor gagal (`localStorage.getItem is not a function`; lihat STATUS-LOG CR-072/073). `rte-link-save` flaky baseline pada run penuh. Typecheck workspace hijau sejak CR-075.
+- Suite UI: tanpa flag `NODE_OPTIONS=--no-experimental-webstorage`, 4 smoke FlowEditor gagal (`localStorage.getItem is not a function`; lihat STATUS-LOG CR-072/073). `rte-link-save` flaky baseline pada run penuh; smoke RTE 006-05 AC-01 juga intermiten (termasuk terisolasi), `file-upload` retry sekali gagal. Typecheck workspace hijau sejak CR-075.
 - Pembaca layar bersuara native belum diuji.
 - Graphify per-machine; graph tidak di-commit.
 - `apps/web` dan `apps/api` masih tipis; integration test belum aktif.

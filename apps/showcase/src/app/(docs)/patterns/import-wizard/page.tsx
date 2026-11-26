@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { Button, Card, CardContent, CardFooter, CardHeader, CardTitle, PageHeader, Stepper } from '@ds/ui';
+import { Button, Card, CardContent, CardFooter, PageHeader, Stepper } from '@ds/ui';
+import { SectionHeading } from '../../../../components/section-heading';
 import { DEMO_FIELDS, DEMO_TEMPLATE_NAME } from './_lib/demo-fields';
 import { DEMO_DATASETS, toDemoFile, type DemoDatasetId } from './_lib/demo-datasets';
 import { parseCsv } from './_lib/parse-csv';
@@ -205,148 +206,147 @@ export default function ImportWizardPage() {
         description="Four-step CSV import wizard: upload or paste, map columns, validate, then confirm."
       />
 
-      <Card className="mx-auto w-full min-w-0 max-w-4xl overflow-hidden" data-testid="iw-card">
-        <CardHeader>
-          <CardTitle>Import members</CardTitle>
-        </CardHeader>
-
-        <CardContent className="space-y-8 min-w-0">
-          <Stepper
-            aria-label="Import steps"
-            steps={STEP_LABELS.map((title, index) => ({ id: index + 1, title }))}
-            currentStep={stepIndex}
-            onStepClick={(index) => {
-              // Setelah selesai, stepper hanya menunjukkan posisi terakhir (CR-076).
-              if (completed) return;
-              setState((prev) => goToStep(prev, index + 1, DEMO_FIELDS));
-            }}
-            data-testid="iw-stepper"
-          />
-          <p className="text-xs text-muted-foreground">
-            Unlocked steps are clickable; the next step unlocks once its requirements are met.
-          </p>
-
-          <div className="space-y-4">
-            <h2
-              ref={headingRef}
-              tabIndex={-1}
-              className="text-lg font-semibold text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-            >
-              {headingText}
-            </h2>
-            <p role="status" aria-live="polite" className="sr-only" data-testid="iw-live">
-              Step {state.step} of {TOTAL_STEPS}: {headingText}
+      <section aria-labelledby="iw-wizard-heading" className="max-w-4xl space-y-4 scroll-mt-20">
+        <SectionHeading id="iw-wizard-heading" title="Import members" />
+        <Card className="w-full min-w-0 overflow-hidden" data-testid="iw-card">
+          <CardContent className="space-y-8 min-w-0 pt-6">
+            <Stepper
+              aria-label="Import steps"
+              steps={STEP_LABELS.map((title, index) => ({ id: index + 1, title }))}
+              currentStep={stepIndex}
+              onStepClick={(index) => {
+                // Setelah selesai, stepper hanya menunjukkan posisi terakhir (CR-076).
+                if (completed) return;
+                setState((prev) => goToStep(prev, index + 1, DEMO_FIELDS));
+              }}
+              data-testid="iw-stepper"
+            />
+            <p className="text-xs text-muted-foreground">
+              Unlocked steps are clickable; the next step unlocks once its requirements are met.
             </p>
 
-            {state.step === 1 && (
-              <UploadStep
-                files={fileActive && state.source?.kind === 'file' ? [state.source.file] : []}
-                onFiles={handleFiles}
-                pasteText={pasteText}
-                onPasteChange={setPasteText}
-                onProcessPaste={handleProcessPaste}
-                pasteNotice={pasteNotice}
-                delimiter={delimiter}
-                onDelimiterChange={handleDelimiterChange}
-                parsing={parsing}
-                parsed={state.parsed}
-                fileInputRef={fileInputRef}
-                onDownloadTemplate={handleDownloadTemplate}
-              />
-            )}
-
-            {state.step === 2 && (
-              <MappingStep
-                headers={headers}
-                mapping={state.mapping}
-                suggested={state.suggested}
-                fields={DEMO_FIELDS}
-                missing={missing}
-                onChangeTarget={handleTarget}
-              />
-            )}
-
-            {state.step === 3 && view && state.parsed && (
-              <ValidationStep
-                rows={state.parsed.rows}
-                mapping={state.mapping}
-                fields={DEMO_FIELDS}
-                view={view}
-                filter={filter}
-                onFilterChange={(value) => {
-                  setFilter(value);
-                  setValidationPage(1);
-                }}
-                page={validationPage}
-                onPageChange={setValidationPage}
-                onFixMapping={() => setState((prev) => goToStep(prev, 2, DEMO_FIELDS))}
-                onReupload={handleReupload}
-              />
-            )}
-
-            {state.step === 4 && plan && (
-              <ConfirmStep
-                plan={plan}
-                policy={policy}
-                onPolicyChange={(next) => {
-                  // Penolakan lama tidak relevan setelah policy berubah.
-                  setPolicy(next);
-                  setRejection(null);
-                }}
-                onSubmit={handleSubmit}
-                rejection={rejection}
-                summaryRef={summaryRef}
-                result={result}
-                onRestart={handleRestart}
-              />
-            )}
-          </div>
-
-          {state.source && state.parsed && !state.parsed.error && (
-            <p data-testid="iw-status" className="text-xs text-muted-foreground">
-              Source: {state.source.kind === 'file' ? state.source.file.name : 'pasted text'} · Rows:{' '}
-              {state.parsed.rowCount} · Delimiter: {delimiter === '\t' ? 'tab' : delimiter}
-            </p>
-          )}
-        </CardContent>
-
-        <CardFooter className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Button
-            type="button"
-            variant="outline"
-            data-testid="iw-back"
-            disabled={state.step === 1 || completed}
-            onClick={() => setState((prev) => goToStep(prev, prev.step - 1, DEMO_FIELDS))}
-          >
-            Back
-          </Button>
-          {nextAvailable && (
-            <div className="flex flex-col items-stretch gap-2 sm:items-end">
-              {nextReason && (
-                <p
-                  ref={gateReasonRef}
-                  id="iw-gate-reason"
-                  tabIndex={-1}
-                  data-testid="iw-gate-reason"
-                  className="text-xs text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-                >
-                  {nextReason}
-                </p>
-              )}
-              <Button
-                type="button"
-                data-testid="iw-next"
-                aria-disabled={nextBlocked}
-                aria-describedby={nextReason ? 'iw-gate-reason' : undefined}
-                className={nextBlocked ? 'opacity-50' : undefined}
-                onClick={handleNext}
+            <div className="space-y-4">
+              <h3
+                ref={headingRef}
+                tabIndex={-1}
+                className="text-xl font-bold font-display text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
               >
-                {NEXT_LABELS[stepIndex]}
-              </Button>
+                {headingText}
+              </h3>
+              <p role="status" aria-live="polite" className="sr-only" data-testid="iw-live">
+                Step {state.step} of {TOTAL_STEPS}: {headingText}
+              </p>
+
+              {state.step === 1 && (
+                <UploadStep
+                  files={fileActive && state.source?.kind === 'file' ? [state.source.file] : []}
+                  onFiles={handleFiles}
+                  pasteText={pasteText}
+                  onPasteChange={setPasteText}
+                  onProcessPaste={handleProcessPaste}
+                  pasteNotice={pasteNotice}
+                  delimiter={delimiter}
+                  onDelimiterChange={handleDelimiterChange}
+                  parsing={parsing}
+                  parsed={state.parsed}
+                  fileInputRef={fileInputRef}
+                  onDownloadTemplate={handleDownloadTemplate}
+                />
+              )}
+
+              {state.step === 2 && (
+                <MappingStep
+                  headers={headers}
+                  mapping={state.mapping}
+                  suggested={state.suggested}
+                  fields={DEMO_FIELDS}
+                  missing={missing}
+                  onChangeTarget={handleTarget}
+                />
+              )}
+
+              {state.step === 3 && view && state.parsed && (
+                <ValidationStep
+                  rows={state.parsed.rows}
+                  mapping={state.mapping}
+                  fields={DEMO_FIELDS}
+                  view={view}
+                  filter={filter}
+                  onFilterChange={(value) => {
+                    setFilter(value);
+                    setValidationPage(1);
+                  }}
+                  page={validationPage}
+                  onPageChange={setValidationPage}
+                  onFixMapping={() => setState((prev) => goToStep(prev, 2, DEMO_FIELDS))}
+                  onReupload={handleReupload}
+                />
+              )}
+
+              {state.step === 4 && plan && (
+                <ConfirmStep
+                  plan={plan}
+                  policy={policy}
+                  onPolicyChange={(next) => {
+                    // Penolakan lama tidak relevan setelah policy berubah.
+                    setPolicy(next);
+                    setRejection(null);
+                  }}
+                  onSubmit={handleSubmit}
+                  rejection={rejection}
+                  summaryRef={summaryRef}
+                  result={result}
+                  onRestart={handleRestart}
+                />
+              )}
             </div>
-          )}
-        </CardFooter>
-      </Card>
+
+            {state.source && state.parsed && !state.parsed.error && (
+              <p data-testid="iw-status" className="text-xs text-muted-foreground">
+                Source: {state.source.kind === 'file' ? state.source.file.name : 'pasted text'} · Rows:{' '}
+                {state.parsed.rowCount} · Delimiter: {delimiter === '\t' ? 'tab' : delimiter}
+              </p>
+            )}
+          </CardContent>
+
+          <CardFooter className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <Button
+              type="button"
+              variant="outline"
+              data-testid="iw-back"
+              disabled={state.step === 1 || completed}
+              onClick={() => setState((prev) => goToStep(prev, prev.step - 1, DEMO_FIELDS))}
+            >
+              Back
+            </Button>
+            {nextAvailable && (
+              <div className="flex flex-col items-stretch gap-2 sm:items-end">
+                {nextReason && (
+                  <p
+                    ref={gateReasonRef}
+                    id="iw-gate-reason"
+                    tabIndex={-1}
+                    data-testid="iw-gate-reason"
+                    className="text-xs text-muted-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                  >
+                    {nextReason}
+                  </p>
+                )}
+                <Button
+                  type="button"
+                  data-testid="iw-next"
+                  aria-disabled={nextBlocked}
+                  aria-describedby={nextReason ? 'iw-gate-reason' : undefined}
+                  className={nextBlocked ? 'opacity-50' : undefined}
+                  onClick={handleNext}
+                >
+                  {NEXT_LABELS[stepIndex]}
+                </Button>
+              </div>
+            )}
+          </CardFooter>
+        </Card>
+      </section>
 
       <DemoPanel onLoad={handleDemo} lastResultSummary={lastSummary} />
     </div>

@@ -21,7 +21,7 @@ beforeAll(() => {
 describe('ImportWizardPage', () => {
   it('memulai di langkah 1 dengan judul dan live region', () => {
     render(<ImportWizardPage />);
-    expect(screen.getByRole('heading', { level: 2, name: 'Upload CSV file' })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 3, name: 'Upload CSV file' })).toBeTruthy();
     expect(screen.getByTestId('iw-live').textContent).toBe('Step 1 of 4: Upload CSV file');
     expect(screen.getByTestId('iw-next').getAttribute('aria-disabled')).toBe('true');
   });
@@ -46,9 +46,9 @@ describe('ImportWizardPage', () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 2, name: 'Map columns' })).toBeTruthy()
+      expect(screen.getByRole('heading', { level: 3, name: 'Map columns' })).toBeTruthy()
     );
-    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 2, name: 'Map columns' }));
+    expect(document.activeElement).toBe(screen.getByRole('heading', { level: 3, name: 'Map columns' }));
     expect(screen.getByTestId('iw-live').textContent).toBe('Step 2 of 4: Map columns');
     expect(screen.getByTestId('iw-mapping-row-Nama Lengkap')).toBeTruthy();
     expect(screen.queryByTestId('iw-missing')).toBeNull();
@@ -71,7 +71,7 @@ describe('ImportWizardPage', () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByRole('heading', { level: 2, name: 'Upload CSV file' })).toBeTruthy()
+      expect(screen.getByRole('heading', { level: 3, name: 'Upload CSV file' })).toBeTruthy()
     );
     expect((screen.getByTestId('iw-paste') as HTMLTextAreaElement).value).toBe(CSV_VALID);
   });

@@ -1,7 +1,6 @@
 'use client';
 
 import type * as React from 'react';
-import { AlertCircle, CheckCircle2, MinusCircle } from 'lucide-react';
 import {
   Alert,
   AlertDescription,
@@ -9,7 +8,6 @@ import {
   Label,
   RadioGroup,
   RadioGroupItem,
-  StatCard,
 } from '@ds/ui';
 import { plural } from '../_lib/plural';
 import type { ImportResult } from '../_lib/types';
@@ -56,6 +54,27 @@ export function ConfirmStep({
   }
 
   const buckets = summaryBuckets(plan, policy);
+  // Warna status hanya saat angkanya bermakna (> 0); selain itu netral.
+  const stats = [
+    {
+      label: 'Valid',
+      value: buckets.valid,
+      description: plan.canSubmit ? 'Will be included' : 'Cannot be imported yet',
+      tone: buckets.valid > 0 ? 'border-success' : 'border-border',
+    },
+    {
+      label: 'Skipped',
+      value: buckets.skipped,
+      description: 'Errors; left out of the import',
+      tone: 'border-border',
+    },
+    {
+      label: 'Failed',
+      value: buckets.failed,
+      description: 'Errors; blocking the import',
+      tone: buckets.failed > 0 ? 'border-destructive' : 'border-border',
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -65,26 +84,15 @@ export function ConfirmStep({
         data-testid="iw-summary"
         className="space-y-4 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
-        <div className="grid gap-3 sm:grid-cols-3">
-          <StatCard
-            title="Valid"
-            value={buckets.valid}
-            icon={CheckCircle2}
-            description={plan.canSubmit ? 'Will be included' : 'Cannot be imported yet'}
-          />
-          <StatCard
-            title="Skipped"
-            value={buckets.skipped}
-            icon={MinusCircle}
-            description="Errors; left out of the import"
-          />
-          <StatCard
-            title="Failed"
-            value={buckets.failed}
-            icon={AlertCircle}
-            description="Errors; blocking the import"
-          />
-        </div>
+        <dl className="grid gap-4 sm:grid-cols-3">
+          {stats.map((stat) => (
+            <div key={stat.label} className={`rounded-lg border border-l-4 p-4 ${stat.tone}`}>
+              <dt className="text-sm font-medium text-foreground">{stat.label}</dt>
+              <dd className="mt-1 text-2xl font-bold text-foreground font-display">{stat.value}</dd>
+              <dd className="mt-1 text-xs text-muted-foreground">{stat.description}</dd>
+            </div>
+          ))}
+        </dl>
 
         {rejection && (
           <Alert id="iw-gate-reject" variant="destructive" role="alert" data-testid="iw-reject">

@@ -167,6 +167,17 @@ describe('CodeBlock Component', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Salin kode' }));
     expect(await screen.findByText('Gagal disalin')).toBeDefined();
   });
+
+  it('uses custom copy labels and keeps defaults for the ones not provided', async () => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText: vi.fn().mockResolvedValue(undefined) },
+    });
+    render(<CodeBlock code="x" copyLabels={{ copyAriaLabel: 'Copy code', copied: 'Copied' }} />);
+    expect(screen.getByText('Salin')).toBeDefined();
+    fireEvent.click(screen.getByRole('button', { name: 'Copy code' }));
+    expect(await screen.findByRole('button', { name: 'Copied' })).toBeDefined();
+  });
 });
 
 describe('FileInput Component', () => {
