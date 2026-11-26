@@ -43,13 +43,6 @@
           "-c",
           "~/.local/bin/graphify-mcp \"$(git rev-parse --path-format=absolute --git-common-dir)/../graphify-out/graph.json\""
         ]
-      },
-      "gh_grep": {
-        "type": "remote",
-        "url": "https://mcp.grep.app",
-        "timeout": {
-          "startup": 60000
-        }
       }
     }
   }
