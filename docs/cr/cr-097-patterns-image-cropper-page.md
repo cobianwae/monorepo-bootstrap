@@ -1,6 +1,6 @@
 # CR-097 — Patterns: halaman Image Cropper
 
-**Status:** approved (ditetapkan user 2026-11-26)
+**Status:** done (ditetapkan user 2026-11-27)
 **Sumber:** audit visual Patterns 2026-11-26 (screenshot 37 route) + `notes-pilot.md` + umpan balik user atas pilot CR-094
 **Ref:** `docs/design/visual-language.md`, CR-094 (payung komposisi), CR-095 (payung visual), CR-093 (copy English), CR-096 (pola CR halaman pertama), `apps/showcase/src/app/(docs)/patterns/image-cropper/page.tsx`, `packages/ui/src/components/form/image-cropper.tsx`
 
@@ -204,7 +204,7 @@ Temuan di luar scope (input CR komponen):
 - [x] Kontras light dan dark lolos WCAG AA pada pasangan yang disentuh.
 - [x] Perilaku Radix/a11y tidak rusak: label grup kontrol, `role="status"` hasil, live region komponen tetap ada.
 - [x] API `cva` dan export `@ds/ui` tetap konsisten (tidak ada perubahan).
-- [x] State loading, empty, dan error relevan tersedia (empty, error format, error ukuran dengan Try again bawaan komponen).
+- [x] State loading, empty, dan error relevan tersedia (empty, error format, error ukuran; dropzone tampil lagi setelah error).
 - [x] Mobile: grup kontrol menumpuk tanpa terpotong; tanpa scroll horizontal.
 - [x] `pnpm typecheck`, `pnpm lint`, `pnpm test` pass; smoke build dari salinan sementara.
 
