@@ -159,6 +159,7 @@ Spec singkat + 1 story untuk komponen tanpa pattern baru; menggantikan PRD penuh
 | CR-095 | Patterns: keluarga visual lintas art direction, tipografi/surface/density/state dan detail craft; payung visual untuk CR per halaman | approved | `docs/cr/cr-095-patterns-visual-family.md` |
 | CR-096 | Patterns: halaman Rich Text Editor — demo-first, kontrol simulasi lewat SegmentedControl, section di bawah demo berbentuk spesimen/edge case/shortcut/kontrak prop | done | `docs/cr/cr-096-patterns-rich-text-editor-page.md` |
 | CR-097 | Patterns: halaman Image Cropper — satu demo + simulator State; section di bawah demo berbentuk spesimen bingkai/edge case/shortcut/kontrak prop | done | `docs/cr/cr-097-patterns-image-cropper-page.md` |
+| CR-098 | Patterns: halaman Settings — satu bingkai dengan sidebar kedua (Account/Workspace), dirty-state di baris + save bar, pencarian, drill-in mobile, perbaikan a11y (diimplementasikan 2026-11-27, menunggu review user) | approved | `docs/cr/cr-098-patterns-settings-page.md` |
 
 ## Catatan
 
