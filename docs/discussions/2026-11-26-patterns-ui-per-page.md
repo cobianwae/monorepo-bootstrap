@@ -79,7 +79,7 @@ Urutan di bawah adalah usulan; user yang menentukan. Nomor CR diambil saat CR di
 |---|---|---|---|
 | `rich-text-editor` | **CR-096 `done`** | instruksi sebelum demo; tiga kartu setara; 10 tombol kontrol bercampur | `notes-pilot.md`, CR-096 |
 | `image-cropper` | **CR-097 `done`** | demo tunggal + simulator State; 5 judul kartu ganda dihapus; tabel audit token keluar; preload + copy Indonesia → CR komponen | `notes-pilot.md`, CR-097 |
-| `settings` | **CR-098 menunggu review** | tiga heading untuk satu kelompok isi; dua kartu sama berat; state inti (dirty, invalid, danger) tak punya titik masuk; footer tombol menempel tepi kartu (verifikasi kode) | `notes-pilot.md` |
+| `settings` | **CR-098 `done`** | tiga heading untuk satu kelompok isi; dua kartu sama berat; state inti (dirty, invalid, danger) tak punya titik masuk; footer tombol menempel tepi kartu (verifikasi kode) | `notes-pilot.md` |
 | `dashboard` | edit disetujui user, **belum di-commit** | aksi aplikasi sudah dipindah dari PageHeader ke toolbar. Sisa minor: toolbar mengambang kanan, label kartu terpotong, ruang kosong kartu feed | `notes-pilot.md` |
 
 ### Gelombang 2 — sudah punya file temuan, verdict `buruk`

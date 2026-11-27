@@ -1,6 +1,6 @@
 # CR-098 — Patterns: halaman Settings
 
-**Status:** approved (ditetapkan user 2026-11-27)
+**Status:** done (ditetapkan user 2026-11-27)
 **Sumber:** audit visual Patterns 2026-11-26 (screenshot 37 route) + `notes-pilot.md` + verifikasi kode 2026-11-27 + arah dari user 2026-11-27
 **Ref:** `docs/design/visual-language.md`, CR-094 (payung komposisi), CR-095 (payung visual), CR-093 (copy English), `docs/discussions/2026-11-26-patterns-ui-per-page.md`, `apps/showcase/src/app/(docs)/patterns/settings/page.tsx` (S-005.23)
 
